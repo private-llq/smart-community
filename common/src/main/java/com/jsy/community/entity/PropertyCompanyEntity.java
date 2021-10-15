@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 /**
  * @program: com.jsy.community
  * @description: 物业公司
@@ -17,8 +19,32 @@ public class PropertyCompanyEntity extends BaseEntity {
     @ApiModelProperty(value = "公司名称")
     private String name;
     
+    @ApiModelProperty(value = "联系人")
+    private String contacts;
+    
+    @ApiModelProperty(value = "联系人电话")
+    private String contactsMobile;
+    
+    @ApiModelProperty(value = "地区")
+    private String region;
+    
+    @ApiModelProperty(value = "详细地址")
+    private String address;
+    
+    @ApiModelProperty(value = "开始时间")
+    private LocalDate beginTime;
+    
+    @ApiModelProperty(value = "到期时间")
+    private LocalDate overTime;
+    
+    @ApiModelProperty(value = "经度")
+    private String longitude;
+    
+    @ApiModelProperty(value = "纬度")
+    private String latitude;
+    
     @ApiModelProperty(value = "公司简介")
-    private String describe;
+    private String profile;
     
     @ApiModelProperty(value = "公司图片 以逗号分割")
     private String picture;

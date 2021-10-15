@@ -429,7 +429,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	 * @Date: 2021/10/13
 	 **/
 	@Override
-	@Transactional(rollbackFor = Exception.class)
 	public void addOperator(SysUserEntity sysUserEntity){
 		//生成盐值并对密码加密
 		String salt = RandomStringUtils.randomAlphanumeric(20);
@@ -464,7 +463,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	 * @Date: 2021/10/13
 	 **/
 	@Override
-	@Transactional(rollbackFor = Exception.class)
 	public void updateOperator(SysUserEntity sysUserEntity){
 		//查询uid
 		UserEntity user = sysUserMapper.queryUidById(sysUserEntity.getId());

@@ -26,6 +26,7 @@ public class SysMenuEntity extends BaseEntity {
 	private Long pid;//父级id
 	@JsonIgnore
 	private Long belongTo;//顶级菜单id
+	private Integer type;//类型 1.目录 2.菜单 3.按钮
 	private List<SysMenuEntity> childrenList;//子菜单
 	
 	private Long createBy;//创建人
