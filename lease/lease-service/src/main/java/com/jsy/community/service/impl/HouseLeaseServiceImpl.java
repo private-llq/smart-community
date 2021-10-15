@@ -7,6 +7,7 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.PropertyEnum;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
@@ -326,6 +327,10 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
                     vo.setHouseFloor("高层");
                 }
             }
+        }
+        // 1.12设置装修文本
+        if (vo.getDecorationTypeId() != null) {
+            vo.setDecorationType(PropertyEnum.DecorationEnum.DECORATION_MAP.get(vo.getDecorationTypeId()));
         }
         // 为冗余熟悉添加值
         if (vo.getCommonFacilitiesCode() != null) {
