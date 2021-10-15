@@ -623,6 +623,26 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             vo.setHouseCommunityName(communityNameAndHouseAddr.get("communityName"));
             vo.setHouseAddress(communityNameAndHouseAddr.get("houseAddress"));
         }
+        // 1.1公共设施标签解析
+        List<Long> commonFacilities = MyMathUtils.analysisTypeCode(vo.getCommonFacilitiesId());
+        vo.setCommonFacilitiesIds(commonFacilities);
+
+        // 1.2房屋设施标签解析
+        List<Long> roomFacilities = MyMathUtils.analysisTypeCode(vo.getRoomFacilitiesId());
+        vo.setRoomFacilitiesIds(roomFacilities);
+
+        // 1.3查出房屋标签
+        List<Long> advantageId = MyMathUtils.analysisTypeCode(vo.getHouseAdvantageId());
+        vo.setHouseAdvantageIds(advantageId);
+
+        // 1.4查出家具标签
+        List<Long> furnitureId = MyMathUtils.analysisTypeCode(vo.getHouseFurnitureId());
+        vo.setHouseFurnitureIds(furnitureId);
+
+        // 1.5出租要求
+        List<Long> requireId = MyMathUtils.analysisTypeCode(vo.getLeaseRequireId());
+        vo.setLeaseRequireIds(requireId);
+
         //查出房屋朝向
         vo.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(vo.getHouseDirectionId()));
         //房屋类型 code转换为文本 如 4室2厅1卫

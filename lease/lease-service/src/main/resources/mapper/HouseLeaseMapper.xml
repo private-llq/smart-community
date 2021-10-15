@@ -474,6 +474,7 @@
         l.house_city_id,
         r.`name` as houseCityName,
         l.house_community_id,
+        l.house_price,
         l.house_address,
         l.house_square_meter,
         l.house_type_code,
@@ -486,9 +487,17 @@
         l.house_leasetype_id,
         d.house_const_name AS houseLeaseType,
         l.house_title,
+        l.common_facilities_id,
+        l.house_advantage_id,
+        l.house_furniture_id,
+        l.lease_require_id,
+        l.room_facilities_id,
+        l.house_leasemode_id,
+        l.house_reserve_time,
         l.house_introduce,
         l.appellation,
         l.bedroom_type,
+        l.decoration_type_id,
         l.house_contact
         FROM
         t_house_lease AS l
