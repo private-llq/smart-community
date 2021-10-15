@@ -26,6 +26,7 @@ import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.lease.HouseImageVo;
 import com.jsy.community.vo.lease.HouseLeaseSimpleVO;
 import com.jsy.community.vo.lease.HouseLeaseVO;
+import jodd.util.StringUtil;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -312,7 +313,20 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             vo.setOperation(assetLeaseRecordEntity.getOperation());
             vo.setContractId(assetLeaseRecordEntity.getIdStr());
         }
-
+        // 1.11修改楼层显示文本
+        if (StringUtil.isNotBlank(vo.getHouseFloor())) {
+            String[] floorArray = vo.getHouseFloor().split("层");
+            if (floorArray[0] != null) {
+                Integer floor = Integer.valueOf(floorArray[0]);
+                if (floor <= 3) {
+                    vo.setHouseFloor("低层");
+                } else if (floor >= 4 && floor <= 7) {
+                    vo.setHouseFloor("中层");
+                } else {
+                    vo.setHouseFloor("高层");
+                }
+            }
+        }
         // 为冗余熟悉添加值
         if (vo.getCommonFacilitiesCode() != null) {
             redundancy.putAll(vo.getCommonFacilitiesCode());

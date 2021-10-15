@@ -2,6 +2,7 @@ package com.jsy.community.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -1294,9 +1295,20 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             leaseRecordEntity.setBlockStatus(2);
             leaseRecordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode());
             addLeaseOperationRecord(leaseRecordEntity);
-
-
-
+            // 修改房源出租状态
+            if (leaseRecordEntity.getAssetType().equals(BusinessEnum.HouseTypeEnum.HOUSE.getCode())) {
+                // 房屋
+                UpdateWrapper<HouseLeaseEntity> updateWrapper = new UpdateWrapper<>();
+                updateWrapper.eq("id", leaseRecordEntity.getAssetId());
+                updateWrapper.set("lease_status", 1);
+                houseLeaseMapper.update(new HouseLeaseEntity(), updateWrapper);
+            } else if (leaseRecordEntity.getAssetType().equals(BusinessEnum.HouseTypeEnum.SHOP.getCode())) {
+                // 商铺
+                UpdateWrapper<ShopLeaseEntity> updateWrapper = new UpdateWrapper<>();
+                updateWrapper.eq("id", leaseRecordEntity.getAssetId());
+                updateWrapper.set("lease_status", 1);
+                shopLeaseMapper.update(new ShopLeaseEntity(), updateWrapper);
+            }
 
             CommunityEntity communityEntity = communityService.getCommunityNameById(leaseRecordEntity.getCommunityId());
             //租客
@@ -1325,7 +1337,6 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 //                    "恭喜你，和房东"+userEntity.getRealName()+"签约完成："+communityEntity.getName()+"小区"+leaseRecordEntity.getAddress()+"房屋的房屋合同签署。",
 //                    map,
 //                    BusinessEnum.PushInfromEnum.CONTRACTSIGNING.getName());
-
             return assetLeaseRecordMapper.updateById(leaseRecordEntity);
         } else {
             return 0;
