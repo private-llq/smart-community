@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.LeaseOperationRecordMapper">
+    <select id="queryLeaseReleasePage" resultType="com.jsy.community.vo.lease.LeaseReleasePageVO">
+        SELECT * FROM (
+			SELECT
+				id,
+				t_title,
+				t_type,
+				t_community_id,
+				t_name,
+				t_mobile,
+				t_create_time,
+				t_lease_status
+			FROM (
+				SELECT
+					id,
+					title AS t_title,
+					'商铺' AS t_type,
+					community_id AS t_community_id,
+					nickname AS t_name,
+					mobile AS t_mobile,
+					create_time AS t_create_time,
+					lease_status AS t_lease_status
+				FROM t_shop_lease ) AS s UNION ALL (
+				SELECT
+					id,
+					house_title AS t_title,
+					'住宅' AS t_type,
+					house_community_id AS t_community_id,
+					appellation AS t_name,
+					house_contact AS t_mobile,
+					create_time AS t_create_time,
+					lease_status AS t_lease_status
+				FROM t_house_lease )
+			) AS r
+		WHERE 1=1
+        <if test="qo.communityId!=null">
+            AND t_community_id = #{qo.communityId}
+        </if>
+		<if test="qo.type!=null and qo.type!=''">
+			AND t_type = = #{qo.type}
+		</if>
+        <if test="qo.leaseStatus!=null">
+            AND t_lease_status = #{qo.leaseTypeId}
+        </if>
+        <if test="qo.info!=null and qo.info!=''">
+            AND ( t_name LIKE concat("%",#{qo.info},"%") OR t_mobile LIKE concat("%",#{qo.info},"%") )
+        </if>
+		ORDER BY t_create_time DESC
+    </select>
+</mapper>

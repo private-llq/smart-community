@@ -10,6 +10,7 @@ import com.jsy.community.api.IUserAccountService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.PaymentEnum;
+import com.jsy.community.entity.UserAccountRecordEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -19,6 +20,7 @@ import com.jsy.community.qo.UserTicketQO;
 import com.jsy.community.qo.proprietor.UserAccountTradeQO;
 import com.jsy.community.qo.proprietor.UserWithdrawalQ0;
 import com.jsy.community.qo.proprietor.ZhiFuBaoAccountBindingQO;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -99,7 +101,7 @@ public class UserAccountController {
      **/
     @ApiOperation("【用户账户】流水查询")
     @PostMapping("record")
-    public CommonResult queryAccountRecord(@RequestBody BaseQO<UserAccountRecordQO> baseQO) {
+    public CommonResult<PageInfo<UserAccountRecordEntity>> queryAccountRecord(@RequestBody BaseQO<UserAccountRecordQO> baseQO) {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new UserAccountRecordQO());
         }
@@ -128,12 +130,12 @@ public class UserAccountController {
         return CommonResult.ok(userAccountService.zhiFuBaoWithdrawal(userWithdrawalQ0, uid));
     }
 
-    @ApiOperation(value = "获取用户支付宝提现时最近一次输入的提现用户", notes = "需要登录")
-    @GetMapping("/zhifubao/account/cache")
-    public CommonResult<UserWithdrawalQ0> selectRedisZhiFuBaoWithdrawalInfo() {
-        String uid = UserUtils.getUserId();
-        return CommonResult.ok(userAccountService.selectRedisZhiFuBaoWithdrawalInfo(uid));
-    }
+//    @ApiOperation(value = "获取用户支付宝提现时最近一次输入的提现用户", notes = "需要登录")
+//    @GetMapping("/zhifubao/account/cache")
+//    public CommonResult<UserWithdrawalQ0> selectRedisZhiFuBaoWithdrawalInfo() {
+//        String uid = UserUtils.getUserId();
+//        return CommonResult.ok(userAccountService.selectRedisZhiFuBaoWithdrawalInfo(uid));
+//    }
 
     @ApiOperation(value = "查询已绑定支付宝账户", notes = "需要登录")
     @GetMapping("/zhifubao/account/query")
