@@ -1,20 +1,12 @@
-package com.jsy.community.api;
+package com.jsy.community.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.proprietor.LeaseOperationRecordEntity;
+
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.lease.LeaseReleasePageQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.lease.LeaseReleasePageVO;
 
-/**
- * @Author: Pipi
- * @Description: 租赁操作记录表服务
- * @Date: 2021/8/31 14:53
- * @Version: 1.0
- **/
-public interface LeaseOperationRecordService extends IService<LeaseOperationRecordEntity> {
-
+public interface LeaseReleaseService {
     /**
      * 商铺和房屋租赁信息发布列表
      *

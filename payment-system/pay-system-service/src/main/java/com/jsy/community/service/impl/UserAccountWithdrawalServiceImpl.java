@@ -355,14 +355,11 @@ public class UserAccountWithdrawalServiceImpl implements UserAccountWithdrawalSe
         certAlipayRequest.setAppId(AESOperator.decrypt(companyConfig.getAppId()));  //APPID 即创建应用后生成,详情见创建应用并获取 APPID
         certAlipayRequest.setPrivateKey(AESOperator.decrypt(companyConfig.getPrivateKey()));  //开发者应用私钥，由开发者自己生成
         //设置应用公钥证书路径
-        String decrypt = AESOperator.decrypt(companyConfig.getCertPath());
-        certAlipayRequest.setCertContent(AlipayUtils.getPrivateKey(decrypt));
+        certAlipayRequest.setCertContent(AlipayUtils.getPrivateKey(AESOperator.decrypt(companyConfig.getCertPath())));
         //设置支付宝公钥证书路径
-        String decrypt1 = AESOperator.decrypt(companyConfig.getAlipayPublicCertPath());
-        certAlipayRequest.setAlipayPublicCertContent(AlipayUtils.getPrivateKey(decrypt1));
+        certAlipayRequest.setAlipayPublicCertContent(AlipayUtils.getPrivateKey(AESOperator.decrypt(companyConfig.getAlipayPublicCertPath())));
         //设置支付宝根证书路径
-        String decrypt2 = AESOperator.decrypt(companyConfig.getRootCertPath());
-        certAlipayRequest.setRootCertContent(AlipayUtils.getPrivateKey(decrypt2));
+        certAlipayRequest.setRootCertContent(AlipayUtils.getPrivateKey(AESOperator.decrypt(companyConfig.getRootCertPath())));
         return certAlipayRequest;
     }
 
