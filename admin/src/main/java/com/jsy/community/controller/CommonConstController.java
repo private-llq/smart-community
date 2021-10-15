@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.entity.CommonConst;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.service.ICommonConstService;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/const")
+@ApiJSYController
 public class CommonConstController {
 	
 	@Autowired

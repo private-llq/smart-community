@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.qo.sys.SmsQO;
 import com.jsy.community.utils.MyHttpUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -10,7 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpGet;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -29,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @ConditionalOnProperty( value = "jsy.enable-dev-sms", havingValue = "true")
 @RequestMapping("/sms")
+@ApiJSYController
 public class SmsController {
 
     private static final String HOST = "http://smsbanling.market.alicloudapi.com";

@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.exception.JSYException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -31,6 +32,7 @@ import java.util.zip.ZipOutputStream;
  */
 @Controller
 @Slf4j
+@ApiJSYController
 public class DownloadLogController {
 
     //日志的绝对路径 本地

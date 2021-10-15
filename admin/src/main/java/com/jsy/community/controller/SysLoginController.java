@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.sys.SysMenuEntity;
@@ -41,6 +42,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @RestController
+@ApiJSYController
 public class SysLoginController {
 	@Resource
 	private ISysUserService sysUserService;

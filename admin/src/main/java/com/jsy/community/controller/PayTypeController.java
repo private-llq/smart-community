@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.entity.PayTypeEntity;
 import com.jsy.community.service.IPayTypeService;
 import com.jsy.community.vo.CommonResult;
@@ -25,6 +26,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/payType")
+@ApiJSYController
 public class PayTypeController {
 	
 	@Autowired
