@@ -315,4 +315,13 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @return:
 	 */
 	List<HouseEntity> queryUserHouseListAll(String userId);
+
+	/**
+	 * @Description: 用户绑定微信
+	 * @author: Hu
+	 * @since: 2021/10/15 10:05
+	 * @Param:
+	 * @return:
+	 */
+    String bindingWechat(String userId, String openid);
 }
