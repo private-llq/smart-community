@@ -190,6 +190,9 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
             proprietorMapper.insert(entity);
 
             UserHouseEntity userHouseEntity = new UserHouseEntity();
+            if (userEntity!=null){
+                userHouseEntity.setUid(userEntity.getUid());
+            }
             userHouseEntity.setCommunityId(houseMemberEntity.getCommunityId());
             userHouseEntity.setHouseId(houseMemberEntity.getHouseId());
             userHouseEntity.setCheckStatus(1);

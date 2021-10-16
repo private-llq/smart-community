@@ -60,4 +60,10 @@
 			#{id}
 		</foreach>
 	</update>
+    <update id="updateMobile">
+        update t_user_house set uid=#{uid} where house_id in
+		<foreach collection="ids" separator="," item="id" close=")" open="(">
+			#{id}
+		</foreach>
+    </update>
 </mapper>

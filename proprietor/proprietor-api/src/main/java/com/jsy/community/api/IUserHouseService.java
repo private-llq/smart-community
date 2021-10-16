@@ -208,4 +208,13 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @return:
 	 */
 	void updateMobileUser(String uid);
+
+	/**
+	 * @Description: 修改房屋认证表数据
+	 * @author: Hu
+	 * @since: 2021/10/16 17:28
+	 * @Param:
+	 * @return:
+	 */
+	void updateMobile(Set<Long> ids, String uuid);
 }
