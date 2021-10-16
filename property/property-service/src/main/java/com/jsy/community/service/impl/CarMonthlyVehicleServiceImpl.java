@@ -319,7 +319,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         Long communityId = vehicle.getCommunityId();
         CarEntity carEntity = new CarEntity();
         carEntity.setDeleted(1);
-        carMapper.update(carEntity,new QueryWrapper<CarEntity>().eq("car_plate",carNumber).eq("community_id",communityId));
+        carMapper.update(carEntity,new UpdateWrapper<CarEntity>().eq("car_plate",carNumber).eq("community_id",communityId).set("deleted",1));
 
 
         int delete = carMonthlyVehicleMapper.delete(new QueryWrapper<CarMonthlyVehicle>().eq("uid", uid));
