@@ -28,9 +28,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author chq459799974
@@ -234,6 +232,8 @@ public class SysConfigServiceImpl implements ISysConfigService {
 				returnList.add(sysMenuEntity);
 			}
 		}
+		// returnList排序
+		returnList.sort(Comparator.comparing(SysMenuEntity::getSort));
 		menuEntityList.removeAll(returnList);
 		setChildrenMenu(returnList,menuEntityList);
 		return returnList;
