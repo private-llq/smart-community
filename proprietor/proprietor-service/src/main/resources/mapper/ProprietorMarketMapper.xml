@@ -108,13 +108,13 @@
     </select>
 
     <!-- 查询单条详细信息    -->
-    <select id="selectMarketOne" resultMap="ProprietorMarketEntityMap">
+    <select id="selectMarketOne" resultType="com.jsy.community.entity.proprietor.ProprietorMarketEntity">
         select tm.id, tm.community_id , tm.uid, tm.goods_name as goodsName, tm.price, tm.goods_explain as goodsExplain,
                tm.negotiable,  tm.state, tm.category_id as categoryId,tm.label_id as labelId,
                tm.click as click, tm.phone as phone,tm.images as images,tm.shield as shield,
                tm.deleted as deleted, tm.create_time as createTime,tm.update_time as updateTime,
                tpml.label as labelName,tpmc.category  as categoryName,
-               tu.nickname as nickName,tu.avatar_url as avatarUrl,tu.is_real_auth as isRealAuth
+               tu.nickname as nickName,tu.avatar_url as avatarUrl,tu.is_real_auth as isRealAuth,tu.real_name as realName
         from t_proprietor_market tm
                  left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
                  left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
