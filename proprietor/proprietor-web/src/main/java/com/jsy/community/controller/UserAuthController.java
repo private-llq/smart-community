@@ -189,7 +189,9 @@ public class UserAuthController {
 		}
 		String accessToken = object.getString("access_token");
 		String openid = object.getString("openid");
-		return CommonResult.ok(userService.bindingWechat(UserUtils.getUserId(),openid),"操作成功");
+		JSONObject jsonObject = WeCharUtil.getUserInfo(accessToken, openid);
+		userService.bindingWechat(UserUtils.getUserId(),openid);
+		return CommonResult.ok(jsonObject.getString("nickname"),"绑定成功");
 	}
 	
 	@ApiOperation(value = "设置支付密码", notes = "需要登录")

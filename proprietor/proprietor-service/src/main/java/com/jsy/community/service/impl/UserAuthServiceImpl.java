@@ -20,18 +20,17 @@ import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.RegexUtils;
-import com.jsy.community.utils.imutils.open.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.transaction.annotation.Transactional;
-//import org.springframework.integration.redis.util.RedisLockRegistry;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Objects;
+
+//import org.springframework.integration.redis.util.RedisLockRegistry;
 
 @DubboService(version = Const.version, group = Const.group)
 @Slf4j
@@ -59,6 +58,30 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
     @Override
     public List<UserAuthEntity> getList(boolean a) {
         return list();
+    }
+
+    /**
+     * @Description: 查询当前用户是否绑定微信
+     * @author: Hu
+     * @since: 2021/10/16 10:27
+     * @Param:
+     * @return:
+     */
+    @Override
+    public UserAuthEntity selectByIsWeChat(String userId) {
+        return userAuthMapper.selectOne(new QueryWrapper<UserAuthEntity>().eq("uid",userId));
+    }
+
+    /**
+     * @Description: 设置微信openid
+     * @author: Hu
+     * @since: 2021/10/16 10:29
+     * @Param:
+     * @return:
+     */
+    @Override
+    public void updateByWechat(UserAuthEntity userAuthEntity) {
+        userAuthMapper.updateById(userAuthEntity);
     }
 
     /**

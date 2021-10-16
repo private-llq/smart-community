@@ -294,7 +294,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 		String url="http://192.168.12.113:8080/#/";
 
-		HouseMemberEntity memberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("house_id", membersQO.getHouseId()).eq("mobile", membersQO.getMobile()));
+		HouseMemberEntity memberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("house_id", membersQO.getHouseId()).eq("mobile", membersQO.getMobile()).eq("relation",membersQO.getRelation()));
 		if (memberEntity!=null){
 			throw new ProprietorException("当前成员以添加，请勿重复添加！");
 		}
@@ -334,7 +334,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 					userIMEntity.getImId(),
 					"房屋管理",
 					title,
-					url+"?"+houseInfoEntity.getId(),
+					url+"?id="+houseInfoEntity.getId()+"&mobile="+membersQO.getMobile(),
 					desc,
 					map,
 					BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
