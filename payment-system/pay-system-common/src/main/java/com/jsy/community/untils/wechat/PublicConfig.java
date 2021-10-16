@@ -3,6 +3,7 @@ package com.jsy.community.untils.wechat;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import net.sf.json.JSONObject;
 import okhttp3.HttpUrl;
 import org.apache.commons.io.IOUtils;
@@ -102,6 +103,9 @@ public class PublicConfig {
 //            case "/v3/pay/transactions/h5"://返回h5支付的链接
 //                return JSONObject.fromObject(body).getString("h5_url");
 //        }
+
+
+        System.out.println("body"+body);
         return JSONObject.fromObject(body).getString("prepay_id");
     }
 
@@ -142,6 +146,30 @@ public class PublicConfig {
         return jsonObject;
     }
 
+    public static JSONObject WxTuneUp1(String prepayId, String appId, String privateKeyFilePath) throws Exception {
+        String time = System.currentTimeMillis() / 1000 + "";
+        String nonceStr = UUID.randomUUID().toString().replace("-", "");
+        String packageStr = "prepay_id=" + prepayId;
+        ArrayList<String> list = new ArrayList<>();
+        list.add(appId);
+        list.add(time);
+        list.add(nonceStr);
+        list.add(packageStr);
+        //加载签名
+        String packageSign = sign(buildSignMessage(list).getBytes(), privateKeyFilePath);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("appid", appId);
+        jsonObject.put("partnerid", WechatConfig.MCH_ID);
+        jsonObject.put("prepayid", prepayId);
+        jsonObject.put("package", "Sign=WXPay");
+        //jsonObject.put("packages", packageStr);
+        jsonObject.put("noncestr", nonceStr);
+        jsonObject.put("timestamp", time);
+//        jsonObject.put("sign_type","HMAC-SHA256");
+        jsonObject.put("sign", packageSign);
+        return jsonObject;
+    }
 
     /**
      * 处理微信异步回调
@@ -567,5 +595,12 @@ public class PublicConfig {
         return builder.toString();
     }
 
+    public static String getOpenId(String appid,String secret,String code){
+        String  param="appid="+appid+"&secret="+secret+"&code="+code+"&grant_type=authorization_code";
+        String body = HttpRequest.sendGet(WechatConfig.OPENID_URL,param);
+        HashMap hashMap = JSON.parseObject(body, HashMap.class);
+        String openid = (String) hashMap.get("openid");
+        return openid;
+    }
 
 }

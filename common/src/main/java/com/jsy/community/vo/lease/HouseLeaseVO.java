@@ -62,6 +62,18 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty(value = "房屋租售家具标签ID")
     private Long houseFurnitureId;
 
+    @ApiModelProperty(value = "房屋租售优势标签ID")
+    private List<Long> houseAdvantageIds;
+
+    @ApiModelProperty(value = "房屋租售优势标签ID")
+    private String houseAdvantageIdStr;
+
+    @ApiModelProperty(value = "房屋租售家具标签ID")
+    private List<Long> houseFurnitureIds;
+
+    @ApiModelProperty(value = "房屋租售家具标签ID")
+    private String houseFurnitureIdStr;
+
     @ApiModelProperty(value = "房屋租售优势标签")
     private Map<String, Long> houseAdvantageCode;
 
@@ -175,11 +187,26 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty( value = "出租要求位运算后的id")
     private Long leaseRequireId;
 
+    @ApiModelProperty( value = "出租要求位运算后的id")
+    private List<Long> leaseRequireIds;
+
+    @ApiModelProperty( value = "出租要求位运算后的id")
+    private String leaseRequireIdStr;
+
+    @ApiModelProperty( value = "房屋要求")
+    private Map<String, Long> leaseRequireMap;
+
     @ApiModelProperty( value = "公共设施Code")
     private Map<String, Long> commonFacilitiesCode;
 
     @ApiModelProperty( value = "公共设施位运算后的id")
     private Long commonFacilitiesId;
+
+    @ApiModelProperty( value = "公共设施位运算后的id")
+    private List<Long> commonFacilitiesIds;
+
+    @ApiModelProperty( value = "公共设施位运算后的id")
+    private String commonFacilitiesIdStr;
 
     @ApiModelProperty( value = "房间设施Code")
     private Map<String, Long> roomFacilitiesCode;
@@ -187,13 +214,19 @@ public class HouseLeaseVO implements Serializable {
     @ApiModelProperty( value = "房间设施位运算后的id")
     private Long roomFacilitiesId;
 
+    @ApiModelProperty( value = "房间设施位运算后的id")
+    private List<Long> roomFacilitiesIds;
+
+    @ApiModelProperty( value = "房间设施位运算后的id")
+    private String roomFacilitiesIdStr;
+
     @ApiModelProperty( value = "装修情况codeId：1.简单装修 2.精装修 4.豪华装修")
     private Long decorationTypeId;
 
     @ApiModelProperty( value = "装修情况文本：1.简单装修 2.精装修 4.豪华装修")
     private String decorationType;
 
-    @ApiModelProperty( value = "室友期望Code：1.一个人住,2.不养宠物,4.作息正常")
+    @ApiModelProperty( value = "室友期望Code：1.一个人4住,2.不养宠物,4.作息正常")
     private List<Long> roommateExpectCode;
 
     @ApiModelProperty( value = "室友期望Code运算后的Id")
@@ -214,5 +247,4 @@ public class HouseLeaseVO implements Serializable {
     // 签约ID
     @TableField(exist = false)
     private String communityAddress;
-    
 }

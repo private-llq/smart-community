@@ -273,6 +273,12 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             vo.setRoomFacilitiesCode(houseConstService.getConstByTypeCodeForList(roomFacilities, 23L));
         }
 
+        // 1.3 出租要求
+        List<Long> requireIds = MyMathUtils.analysisTypeCode(vo.getLeaseRequireId());
+        if (!CollectionUtils.isEmpty(requireIds)) {
+            vo.setLeaseRequireMap(houseConstService.getConstByTypeCodeForList(requireIds, 21L));
+        }
+
         //1.4查出 房屋标签 ...
         List<Long> advantageId = MyMathUtils.analysisTypeCode(vo.getHouseAdvantageId());
         if (!CollectionUtils.isEmpty(advantageId)) {
@@ -623,12 +629,48 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             vo.setHouseCommunityName(communityNameAndHouseAddr.get("communityName"));
             vo.setHouseAddress(communityNameAndHouseAddr.get("houseAddress"));
         }
+        // 1.1公共设施标签解析
+        List<Long> commonFacilities = MyMathUtils.analysisTypeCode(vo.getCommonFacilitiesId());
+        vo.setCommonFacilitiesIds(commonFacilities);
+        vo.setCommonFacilitiesIdStr(listToString(commonFacilities));
+
+        // 1.2房屋设施标签解析
+        List<Long> roomFacilities = MyMathUtils.analysisTypeCode(vo.getRoomFacilitiesId());
+        vo.setRoomFacilitiesIds(roomFacilities);
+        vo.setRoomFacilitiesIdStr(listToString(roomFacilities));
+
+        // 1.3查出房屋标签
+        List<Long> advantageId = MyMathUtils.analysisTypeCode(vo.getHouseAdvantageId());
+        vo.setHouseAdvantageIds(advantageId);
+        vo.setHouseAdvantageIdStr(listToString(advantageId));
+
+        // 1.4查出家具标签
+        List<Long> furnitureId = MyMathUtils.analysisTypeCode(vo.getHouseFurnitureId());
+        vo.setHouseFurnitureIds(furnitureId);
+        vo.setHouseFurnitureIdStr(listToString(furnitureId));
+
+        // 1.5出租要求
+        List<Long> requireId = MyMathUtils.analysisTypeCode(vo.getLeaseRequireId());
+        vo.setLeaseRequireIds(requireId);
+        vo.setLeaseRequireIdStr(listToString(requireId));
+
         //查出房屋朝向
         vo.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(vo.getHouseDirectionId()));
         //房屋类型 code转换为文本 如 4室2厅1卫
         vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
         vo.setHouseImage(houseLeaseMapper.queryHouseAllImgById(vo.getHouseImageId()));
         return vo;
+    }
+
+    private String listToString(List<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return null;
+        }
+        StringBuffer result = new StringBuffer("");
+        for (Long id : ids) {
+            result.append(String.valueOf(id));
+        }
+        return String.valueOf(result);
     }
 
     /**

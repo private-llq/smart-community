@@ -20,6 +20,8 @@ public class WechatConfig {
     public static final String WXPAY_PAY = "https://api.mch.weixin.qq.com/v3/pay/transactions/out-trade-no/";
     //退款地址
     public static final String WXPAY_REFUND = "https://api.mch.weixin.qq.com/v3/refund/domestic/refunds";
+    //获取openid地址
+    public static final String OPENID_URL="https://api.weixin.qq.com/sns/oauth2/access_token";
     //服务号的应用号
     public static String APPID;
     //私钥所在路径
