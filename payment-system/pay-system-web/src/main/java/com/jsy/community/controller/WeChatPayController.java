@@ -11,6 +11,7 @@ import com.jsy.community.entity.CompanyPayConfigEntity;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
+import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.payment.WeChatPayQO;
 import com.jsy.community.qo.payment.WithdrawalQO;
@@ -82,6 +83,9 @@ public class WeChatPayController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
+
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IUserAccountService userAccountService;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -283,6 +287,8 @@ public class WeChatPayController {
             } else
             //房屋租赁业务逻辑
             if (split[0].equals("9")){
+                AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordService.queryRecordByConId(split[1]);
+                userAccountService.rentalIncome(split[1],new BigDecimal(map.get("amount")),leaseRecordEntity.getHomeOwnerUid());
                 // 修改签章合同支付状态
                 Map<String, Object> houseMap = housingRentalOrderService.completeLeasingOrder(map.get("out_trade_no"), split[1]);
                 // 修改租房签约支付状态

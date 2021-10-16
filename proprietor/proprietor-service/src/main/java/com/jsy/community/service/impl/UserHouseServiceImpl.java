@@ -263,6 +263,9 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			HouseEntity houseEntity = houseMapper.selectById(entity.getHouseId());
 			//移除人
 			UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("type",8);
 			//推送消息
 			PushInfoUtil.PushPublicTextMsg(
 					userIMEntity.getImId(),
@@ -271,7 +274,8 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 					null,
 					"尊敬的用户您好，\n" +
 							"用户"+userEntity.getRealName()+"已房东的身份移除你在"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(entity.getRelation())+"身份，如已知晓，请忽略。",
-					null,BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
+					map,
+					BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
 
 		}
 		houseMemberMapper.deleteBatchIds(list);
@@ -288,7 +292,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	@Transactional
 	public String membersSave(MembersQO membersQO, String userId) {
 
-		String url="http://192.168.12.113:8080/";
+		String url="http://192.168.12.113:8080/#/";
 
 		HouseMemberEntity memberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("house_id", membersQO.getHouseId()).eq("mobile", membersQO.getMobile()));
 		if (memberEntity!=null){
@@ -323,6 +327,8 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			houseInfoEntity.setYhUid(userEntity.getUid());
 			houseInfoService.saveOne(houseInfoEntity);
 
+			Map<String, Object> map = new HashMap<>();
+			map.put("type",9);
 			//推送消息
 			PushInfoUtil.PushPublicMsg(
 					userIMEntity.getImId(),
@@ -330,10 +336,10 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 					title,
 					url+"?"+houseInfoEntity.getId(),
 					desc,
-					null,
+					map,
 					BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
 			redisTemplate.opsForValue().set(MEMBERKEY+membersQO.getMobile(), JSON.toJSONString(membersQO),1, TimeUnit.HOURS);
-			return url;
+			return url+"?id="+houseInfoEntity.getId()+"&mobile="+membersQO.getMobile();
 
 			//添加成员表数据
 //			HouseMemberEntity entity = new HouseMemberEntity();
@@ -360,7 +366,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			membersQO.setUid(userId);
 
 			redisTemplate.opsForValue().set(MEMBERKEY+membersQO.getMobile(), JSON.toJSONString(membersQO),1, TimeUnit.HOURS);
-			return url+"?id="+houseInfoEntity.getId();
+			return url+"?id="+houseInfoEntity.getId()+"&mobile="+membersQO.getMobile();
 		}
 
 		/*

@@ -146,7 +146,7 @@ public class UserHouseController {
     @PutMapping("members/save")
     public CommonResult membersUpdate(@RequestBody MembersQO membersQO){
         ValidatorUtils.validateEntity(membersQO,MembersQO.MembersVerify.class);
-        return CommonResult.ok(userHouseService.membersSave(membersQO, UserUtils.getUserId()));
+        return CommonResult.ok(userHouseService.membersSave(membersQO, UserUtils.getUserId()),"操作成功");
     }
     /**
      * @Description: 业主家属删除接口
