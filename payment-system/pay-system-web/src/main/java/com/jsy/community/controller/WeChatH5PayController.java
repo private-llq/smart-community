@@ -80,7 +80,7 @@ public class WeChatH5PayController {
 //    @Login
     @PostMapping("/wxH5Pay")
     public CommonResult<Map<String, Object>> wxH5Pay(@RequestBody AliOrderContentQO qo) throws Exception {
-//        System.out.println(qo);
+        System.out.println(qo);
 
 
             //返回前端参数
