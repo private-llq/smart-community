@@ -173,6 +173,7 @@ public class UserAuthController {
 	@PostMapping("/password")
 	@Login
 	public CommonResult<Boolean> addPassword(@RequestBody AddPasswordQO qo) {
+
 		ValidatorUtils.validateEntity(qo,AddPasswordQO.passwordVGroup.class);
 		String uid = UserUtils.getUserId();
 		boolean b = userAuthService.addPassword(uid, qo);
@@ -188,7 +189,7 @@ public class UserAuthController {
 		}
 		String accessToken = object.getString("access_token");
 		String openid = object.getString("openid");
-		return CommonResult.ok(userService.bindingWechat(UserUtils.getUserId(),openid));
+		return CommonResult.ok(userService.bindingWechat(UserUtils.getUserId(),openid),"操作成功");
 	}
 	
 	@ApiOperation(value = "设置支付密码", notes = "需要登录")

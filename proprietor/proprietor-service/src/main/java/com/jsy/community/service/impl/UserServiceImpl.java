@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -314,9 +315,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         String str = redisTemplate.opsForValue().get("pushInFormMember:" + qo.getAccount());
         if (str!=null){
 
-            MembersQO membersQO = JSON.parseObject(str, MembersQO.class);
+            MembersQO membersQO = JSONUtil.toBean(JSONUtil.parseObj(str), MembersQO.class);
 
             List<HouseInfoEntity> houseInfoEntities = houseInfoService.selectList(membersQO.getMobile());
+            Map<String, Object> map = new HashMap<>();
+            map.put("type",9);
             if (houseInfoEntities.size()!=0){
                 for (HouseInfoEntity houseInfoEntity : houseInfoEntities) {
                     //推送消息
@@ -324,9 +327,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                             imId,
                             "房屋管理",
                             houseInfoEntity.getTitle(),
-                            "http://192.168.12.113:8080/"+"?id="+houseInfoEntity.getId(),
+                            "http://192.168.12.113:8080/#/"+"?id="+houseInfoEntity.getId()+"mobile="+qo.getAccount(),
                             houseInfoEntity.getContent(),
-                            null,
+                            map,
                             BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
                 }
             }
@@ -999,8 +1002,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public String bindingWechat(String userId, String openid) {
         UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
         if (userEntity != null) {
-            UserThirdPlatformEntity thirdPlatformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("third_platform_id", openid).eq("third_platform_type", 2).eq("uid",userId));
-            if (userEntity != null) {
+            UserThirdPlatformEntity thirdPlatformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("third_platform_id", openid).eq("third_platform_type", 2));
+            if (thirdPlatformEntity != null) {
                 throw new ProprietorException("当前用户已绑定微信！");
             }
             UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
