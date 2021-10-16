@@ -14,13 +14,17 @@ import com.jsy.community.util.CarOperation;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.sun.el.stream.Stream;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(tags = "收费设置")
 @RestController
@@ -93,6 +97,7 @@ public class CarChargeController {
     @CarOperation(operation = "新增了【临时停车收费设置模板】")
     public CommonResult temporaryParkingSet(@RequestBody CarChargeEntity carChargeEntity){
         Integer integer = carChargeService.temporaryParkingSet(carChargeEntity, UserUtils.getAdminCommunityId());
+
         return CommonResult.ok();
     }
 

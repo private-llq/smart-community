@@ -314,6 +314,12 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
                 .set("end_time",null)
                 .set("remark",null)
         );
+        // 同时删除 车辆表 满足AAP端业务
+        String carNumber = vehicle.getCarNumber();
+        Long communityId = vehicle.getCommunityId();
+        carMapper.delete(new QueryWrapper<CarEntity>().eq("car_plate",carNumber).eq("community_id",communityId));
+
+
         int delete = carMonthlyVehicleMapper.delete(new QueryWrapper<CarMonthlyVehicle>().eq("uid", uid));
         return delete;
     }
