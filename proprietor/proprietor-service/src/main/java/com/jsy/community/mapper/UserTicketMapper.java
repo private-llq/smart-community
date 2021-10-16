@@ -83,8 +83,8 @@ public interface UserTicketMapper extends BaseMapper<UserTicketEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/1/29
 	**/
-	@Update("update t_user_ticket set deleted = 1 " +
+	@Update("update t_user_ticket set deleted = #{id} " +
 		"where UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(expire_time) >= 30*24*60*60 and deleted = 0")
-	void deleteExpiredTicket();
+	void deleteExpiredTicket(@Param("id")Long id);
 	
 }

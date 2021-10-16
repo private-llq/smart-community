@@ -8,7 +8,6 @@ import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.CommunityEntity;
-import com.jsy.community.entity.FinanceTicketTemplateFieldEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserIMEntity;
 import com.jsy.community.entity.property.*;
@@ -22,7 +21,7 @@ import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
-import com.jsy.community.vo.property.TemplateAndFinanceOrderVO;
+import com.jsy.community.vo.property.FinanceOrderAndCarOrHouseInfoVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -692,7 +691,13 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             Map<Object, Object> map = new HashMap<>();
             map.put("type", 3);
             map.put("dataId", tripartiteOrder);
-            PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(), 1, total.toString(), null, "物业缴费", map, BusinessEnum.PushInfromEnum.PAYHELPER.getName());
+            PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+                    1,
+                    total.toString(),
+                    null,
+                    "物业缴费",
+                    map,
+                    BusinessEnum.PushInfromEnum.PROPERTYPAYMENT.getName());
         }
     }
 
@@ -2236,21 +2241,43 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     }
 
     /**
-     * 根据账单ID和模板ID返回相应的数据
+     * 根据账单ID查询账单信息和房屋/车辆信息
      *
-     * @param id  账单ID
-     * @param tid 模板ID
-     * @return TemplateAndFinanceOrderVO
+     * @param id 账单ID
+     * @return FinanceOrderAndCarOrHouseInfoVO
      */
     @Override
-    public TemplateAndFinanceOrderVO queryTemplateAndFinanceOrder(Long id, String tid) {
+    public FinanceOrderAndCarOrHouseInfoVO queryTemplateAndFinanceOrder(Long id) {
         //查询数据
+        FinanceOrderAndCarOrHouseInfoVO templateAndFinanceOrderVO = new FinanceOrderAndCarOrHouseInfoVO();
         PropertyFinanceOrderEntity propertyFinanceOrder = propertyFinanceOrderMapper.selectById(id);
-        //查询模板
-        Map<Integer, List<FinanceTicketTemplateFieldEntity>> template = ticketTemplateFieldService.getTicketTemplateFieldList(tid);
-        TemplateAndFinanceOrderVO templateAndFinanceOrderVO = new TemplateAndFinanceOrderVO();
-        templateAndFinanceOrderVO.setTemplate(template);
+        if (propertyFinanceOrder == null) {
+            return templateAndFinanceOrderVO;
+        }
         templateAndFinanceOrderVO.setFinanceOrder(propertyFinanceOrder);
+        //查询车位信息或者房屋信息
+        Long targetId = propertyFinanceOrder.getTargetId();
+        Integer associatedType = propertyFinanceOrder.getAssociatedType();
+        if (associatedType == null || targetId == null) {
+            return templateAndFinanceOrderVO;
+        }
+        if (associatedType.equals(1)) {
+            //查询房屋信息
+            HouseEntity houseEntity = houseMapper.selectById(targetId);
+            templateAndFinanceOrderVO.setHouseInfo(houseEntity);
+        } else {
+            //查询车位信息
+            CarPositionEntity carPositionEntity = carPositionMapper.selectById(targetId);
+            templateAndFinanceOrderVO.setCarInfo(carPositionEntity);
+        }
+        //查询收费项目
+        if (propertyFinanceOrder.getFeeRuleId() != null) {
+            PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectById(propertyFinanceOrder.getFeeRuleId());
+            if (propertyFeeRuleEntity != null) {
+                templateAndFinanceOrderVO.setFeeName(propertyFeeRuleEntity.getName());
+                templateAndFinanceOrderVO.setMonetaryUnit(propertyFeeRuleEntity.getMonetaryUnit());
+            }
+        }
         return templateAndFinanceOrderVO;
     }
 }

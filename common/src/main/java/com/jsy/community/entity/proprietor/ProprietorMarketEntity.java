@@ -76,6 +76,19 @@ public class ProprietorMarketEntity extends BaseEntity {
     @TableField(exist = false)
     private String realName;
 
+    @ApiModelProperty("昵称")
+    @TableField(exist = false)
+    private String nickName;
+
+    @ApiModelProperty("头像地址")
+    @TableField(exist = false)
+    private String avatarUrl;
+
+    @ApiModelProperty("是否实名")
+    @TableField(exist = false)
+    private Integer isRealAuth;
+
+
     @TableField(exist = false)
     @ApiModelProperty(value = "社区名")
     private  String communityName;

@@ -1,10 +1,13 @@
 package com.jsy.community.entity.sys;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
+import com.jsy.community.entity.admin.AdminMenuEntity;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 /**
  * @author chq459799974
@@ -21,5 +24,10 @@ public class SysRoleEntity extends BaseEntity {
 	
 	private Long createBy;//创建人
 	private Long updateBy;//修改人
-
+	
+	@TableField(exist = false)
+	private List<Long> menuIds;//菜单ID列表
+	
+	@TableField(exist = false)
+	private List<SysMenuEntity> menuList;//菜单ID列表
 }

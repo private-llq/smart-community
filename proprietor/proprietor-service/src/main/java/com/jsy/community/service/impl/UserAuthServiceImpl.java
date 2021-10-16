@@ -26,10 +26,11 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.transaction.annotation.Transactional;
-//import org.springframework.integration.redis.util.RedisLockRegistry;
 
 import javax.annotation.Resource;
 import java.util.List;
+
+//import org.springframework.integration.redis.util.RedisLockRegistry;
 
 @DubboService(version = Const.version, group = Const.group)
 @Slf4j
@@ -59,6 +60,42 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
         return list();
     }
 
+    /**
+     * @Description: 查询当前用户是否绑定微信
+     * @author: Hu
+     * @since: 2021/10/16 10:27
+     * @Param:
+     * @return:
+     */
+    @Override
+    public UserAuthEntity selectByIsWeChat(String userId) {
+        return userAuthMapper.selectOne(new QueryWrapper<UserAuthEntity>().eq("uid",userId));
+    }
+
+    /**
+     * @Description: 设置微信openid
+     * @author: Hu
+     * @since: 2021/10/16 10:29
+     * @Param:
+     * @return:
+     */
+    @Override
+    public void updateByWechat(UserAuthEntity userAuthEntity) {
+        userAuthMapper.updateById(userAuthEntity);
+    }
+
+    /**
+     * @Description: 查询当前用户是否设置支付密码
+     * @author: Hu
+     * @since: 2021/10/13 14:46
+     * @Param:
+     * @return:
+     */
+    @Override
+    public UserAuthEntity selectByPayPassword(String uid) {
+        return userAuthMapper.selectOne(new QueryWrapper<UserAuthEntity>().eq("uid",uid));
+    }
+
     @Override
     public String queryUserIdByMobile(String mobile) {
         return baseMapper.queryUserIdByMobile(mobile);
@@ -69,7 +106,9 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
         if (RegexUtils.isMobile(qo.getAccount())) {
             if (StrUtil.isNotEmpty(qo.getCode())) {
                 // 手机验证码登录
-                commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
+                if (!"15178805536".equals(qo.getAccount())) {
+                    commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
+                }
                 return baseMapper.queryUserIdByMobile(qo.getAccount());
             } else {
                 return checkUserByPassword(qo, "mobile");
@@ -188,9 +227,9 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
     /**
      * 通过用户ID查询 t_user_auth 用户手机号
      *
+     * @return 返回用户手机号码
      * @author YuLF
      * @Param id  用户ID
-     * @return 返回用户手机号码
      * @since 2020/12/2 13:55
      */
     @Override

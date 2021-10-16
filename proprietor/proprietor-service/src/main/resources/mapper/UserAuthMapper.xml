@@ -3,14 +3,14 @@
 
 <mapper namespace="com.jsy.community.mapper.UserAuthMapper">
 	<select id="queryUserByField" resultType="com.jsy.community.entity.UserAuthEntity">
-		select * from t_user_auth ua where ${field} = #{account}
+		select * from t_user_auth ua where ${field} = #{account} and deleted=0
 	</select>
 	
 	<select id="queryUserIdByMobile" resultType="java.lang.String">
-		select uid from t_user_auth ua where ua.mobile = #{mobile}
+		select uid from t_user_auth ua where ua.mobile = #{mobile} and deleted=0
 	</select>
 	
 	<select id="checkUserExists" resultType="java.lang.Long">
-		select id from t_user_auth ua where ${field} = #{account}
+		select id from t_user_auth ua where ${field} = #{account} and deleted=0
 	</select>
 </mapper>

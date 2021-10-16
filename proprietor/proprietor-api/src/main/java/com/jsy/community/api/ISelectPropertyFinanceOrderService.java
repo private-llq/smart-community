@@ -28,5 +28,5 @@ public interface ISelectPropertyFinanceOrderService {
      * @Param:
      * @return:
      */
-    List<PropertyFinanceOrderEntity> findOne(String orderId);
+    List<PropertyFinanceOrderEntity> findOne(String orderId,Integer orderStatus);
 }

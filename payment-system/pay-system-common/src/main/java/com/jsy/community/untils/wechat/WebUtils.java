@@ -31,7 +31,7 @@ public class WebUtils {
 				}
 				jsonStr = resBodyBuf.toString();
 	        System.out.println(jsonStr);
-	        map = XMLUtils.parseXmlToList(jsonStr);
+	        map = XmlUtil.xmlParse(jsonStr);
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jsy.community.mapper.CarPositionMapper">
 
-<insert id="seavefile" parameterType="CarPositionEntity">
+<insert id="seavefile" parameterType="List">
 
     insert into t_car_position(
                                community_id,
@@ -54,7 +54,7 @@
     </sql>
 
     <!-- 使用sql片段 -->
-    <select id="selectCarPosition" parameterType="CarPositionEntity" resultType="com.jsy.community.entity.property.CarPositionEntity">
+    <select id="selectCarPosition" parameterType="com.jsy.community.entity.property.CarPositionEntity" resultType="com.jsy.community.entity.property.CarPositionEntity">
         SELECT * FROM t_car_position as car
         <where>
             <include refid="carPosition_select"></include>

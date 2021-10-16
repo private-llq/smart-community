@@ -18,9 +18,15 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessagePostProcessor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -52,6 +58,9 @@ public class PropertyVoteServiceImpl extends ServiceImpl<PropertyVoteMapper,Vote
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
 
 
@@ -125,6 +134,30 @@ public class PropertyVoteServiceImpl extends ServiceImpl<PropertyVoteMapper,Vote
         if (list.size()!=0){
             propertyVoteOptionMapper.saveAll(list);
         }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("type",2);
+        map.put("dataId",voteEntity.getId());
+
+        //投票进行中
+        map.put("status",2);
+        rabbitTemplate.convertAndSend("exchange_activity_delay", "queue.activity.delay", map, new MessagePostProcessor() {
+            @Override
+            public Message postProcessMessage(Message message) throws AmqpException {
+                message.getMessageProperties().setHeader("x-delay", LocalDateTime.now().until(voteEntity.getBeginTime(), ChronoUnit.MILLIS));
+                return message;
+            }
+        });
+
+        //投票已结束
+        map.put("status",3);
+        rabbitTemplate.convertAndSend("exchange_activity_delay", "queue.activity.delay", map, new MessagePostProcessor() {
+            @Override
+            public Message postProcessMessage(Message message) throws AmqpException {
+                message.getMessageProperties().setHeader("x-delay", LocalDateTime.now().until(voteEntity.getOverTime(), ChronoUnit.MILLIS));
+                return message;
+            }
+        });
     }
 
     /**

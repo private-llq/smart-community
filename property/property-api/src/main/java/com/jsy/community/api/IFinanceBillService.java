@@ -43,4 +43,22 @@ public interface IFinanceBillService {
     void updateTemporary();
 
 
+    /**
+     * @Description: 推送按年缴费信息
+     * @author: Hu
+     * @since: 2021/9/29 17:42
+     * @Param:
+     * @return:
+     */
+    void pushAnnual();
+
+    /**
+     * @Description: 推送按月缴费信息
+     * @author: Hu
+     * @since: 2021/9/29 17:43
+     * @Param:
+     * @return:
+     */
+    void pushMonth();
+
 }

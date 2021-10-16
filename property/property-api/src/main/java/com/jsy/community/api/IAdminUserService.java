@@ -1,7 +1,6 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.admin.AdminUserAuthEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.qo.BaseQO;
@@ -247,6 +246,15 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Date: 2021/3/18
 	**/
 	void updateOperator(AdminUserEntity adminUserEntity);
+	
+	/**
+	 * @Description: 删除操作员
+	 * @author: DKS
+	 * @since: 2021/10/13 15:38
+	 * @Author: DKS
+	 * @Date: 2021/10/13
+	 */
+	void deleteOperator(Long id);
 	
 //	/**
 //	* @Description: 重置密码

@@ -1,13 +1,12 @@
 package com.jsy.community.service.impl;
 import com.alibaba.fastjson.JSON;
-import com.google.common.collect.Sets;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.IAdminUserService;
-import com.jsy.community.api.IUserService;
+import com.jsy.community.api.PropertyUserService;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.Const;
@@ -18,7 +17,6 @@ import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.*;
-import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -59,7 +57,7 @@ public class VisitorServiceImpl implements IVisitorService {
 	private RabbitTemplate rabbitTemplate;
 
 	@Autowired
-	private IUserService userService;
+	private PropertyUserService userService;
 
 	@Autowired
 	private IAdminUserService adminUserService;
@@ -272,6 +270,7 @@ public class VisitorServiceImpl implements IVisitorService {
 		if(!StringUtils.isEmpty(query.getMachineName())){
 			queryWrapper.like("machine_name",query.getMachineName());
 		}
+		queryWrapper.orderByDesc("snap_time");
 		Page<VisitorStrangerEntity> pageData = visitorStrangerMapper.selectPage(page,queryWrapper);
 		PageInfo<VisitorStrangerEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageData,pageInfo);

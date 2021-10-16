@@ -28,6 +28,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class VisitorController {
 	@PostMapping("")
 	public CommonResult<VisitorEntryVO> save(@RequestBody VisitorEntity visitorEntity) {
 		ValidatorUtils.validateEntity(visitorEntity);
-		if(LocalDateTime.now().isAfter(visitorEntity.getStartTime())){
+		if(LocalDate.now().isAfter(visitorEntity.getStartTime().toLocalDate())){
 			throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "预计来访时间不得早于当前时间");
 		}
 		if(!StringUtils.isEmpty(visitorEntity.getCarPlate())){

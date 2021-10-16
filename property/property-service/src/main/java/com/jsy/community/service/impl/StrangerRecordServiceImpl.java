@@ -77,6 +77,7 @@ public class StrangerRecordServiceImpl extends ServiceImpl<StrangerRecordMapper,
         if (StringUtils.isNotBlank(baseQO.getQuery().getFacesluiceName())) {
             queryWrapper.like("facesluice_name", baseQO.getQuery().getFacesluiceName());
         }
+        queryWrapper.orderByDesc("create_time");
         page = strangerRecordMapper.selectPage(page, queryWrapper);
         PageInfo<StrangerRecordEntiy> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(page, pageInfo);

@@ -35,7 +35,7 @@
 
     <!-- 通过 楼栋id或单元id 和 楼层文本查询属于该楼层的房屋 -->
     <select id="getHouseByFloor" resultType="java.util.HashMap">
-        select  id,`number` as door,'door' as door <include refid="tableNameAndCondition"/> pid = #{id} and floor = #{floor} and type = 4
+        select  id,`door` as door,'door' as door <include refid="tableNameAndCondition"/> pid = #{id} and floor = #{floor} and type = 4
     </select>
 
 </mapper>

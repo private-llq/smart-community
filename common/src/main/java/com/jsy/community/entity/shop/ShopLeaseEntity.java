@@ -104,12 +104,20 @@ public class ShopLeaseEntity extends BaseEntity {
     
     @ApiModelProperty(value = "手机")
     private String mobile;
+
+    /**
+     * 租赁状态;0:未出租;1已出租;单间和合租,可以多次出租,整租不能
+     */
+    private Integer leaseStatus;
     
 
     // 业主查询商铺列表时的展示
     @TableField(exist = false)
     private String shopShowImg;
-    
+
+    // 社区名称
+    @TableField(exist = false)
+    private String communityName;
     
     
     

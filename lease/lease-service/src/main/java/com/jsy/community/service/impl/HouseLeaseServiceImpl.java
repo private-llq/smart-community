@@ -7,6 +7,7 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.PropertyEnum;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
@@ -26,9 +27,11 @@ import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.lease.HouseImageVo;
 import com.jsy.community.vo.lease.HouseLeaseSimpleVO;
 import com.jsy.community.vo.lease.HouseLeaseVO;
+import jodd.util.StringUtil;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -55,10 +58,13 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
     private ILeaseUserService leaseUserService;
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
-    private IUserService userService;
+    private PropertyUserService userService;
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private AssetLeaseRecordMapper assetLeaseRecordMapper;
@@ -88,6 +94,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         CommunityEntity community = communityService.getCommunityNameById(qo.getHouseCommunityId());
         qo.setHouseLon(community.getLon().doubleValue());
         qo.setHouseLat(community.getLat().doubleValue());
+        qo.setHouseCityId(community.getHouseId());
         //1.保存房源数据
         qo.setId(SnowFlake.nextId());
         //保存房屋优势标签至中间表 随时入住、电梯楼、家电齐全等等
@@ -117,6 +124,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         CommunityEntity community = communityService.getCommunityNameById(qo.getHouseCommunityId());
         qo.setHouseLon(community.getLon().doubleValue());
         qo.setHouseLat(community.getLat().doubleValue());
+        qo.setHouseCityId(community.getHouseId());
         //单间新增房源 相对于 整租 只是多一个 公共设施 、 房间设施  相当于把整租的家具(houseFurnitureCode) 分成了两部分
         qo.setId(SnowFlake.nextId());
         //保存房屋优势标签至中间表 随时入住、电梯楼、家电齐全等等
@@ -152,6 +160,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         CommunityEntity community = communityService.getCommunityNameById(qo.getHouseCommunityId());
         qo.setHouseLon(community.getLon().doubleValue());
         qo.setHouseLat(community.getLat().doubleValue());
+        qo.setHouseCityId(community.getHouseId());
         qo.setCommonFacilitiesId(null);
         qo.setRoommateExpectId(null);
         //单间新增房源 相对于 整租 只是多一个 公共设施 、 房间设施  相当于把整租的家具(houseFurnitureCode) 分成了两部分
@@ -214,6 +223,20 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         if (CollectionUtils.isEmpty(vos)) {
             return vos;
         }
+        // 查询社区名称
+        List<Long> communityIdSet = vos.stream().map(HouseLeaseVO::getHouseCommunityId).collect(Collectors.toList());
+        List<CommunityEntity> communityEntityList = communityService.queryCommunityBatch(communityIdSet);
+        for (HouseLeaseVO vo : vos) {
+            for (CommunityEntity communityEntity : communityEntityList) {
+                if (communityEntity.getId() == vo.getHouseCommunityId()) {
+                    String area = (String) redisTemplate.opsForValue().get("RegionSingle:" + vo.getHouseAreaId());
+                    if (area == null) {
+                        area = "";
+                    }
+                    vo.setCommunityAddress(area + communityEntity.getName());
+                }
+            }
+        }
         //根据数据字段id 查询 一对多的 房屋标签name和id 如 邻地铁、可短租、临街商铺等多标签、之类
         getHouseFieldTag(vos);
         return vos;
@@ -231,6 +254,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         //1.查出单条数据
         HouseLeaseVO vo = houseLeaseMapper.queryHouseLeaseOne(houseId);
 
+
         if (vo == null) {
             return null;
         }
@@ -247,6 +271,12 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         List<Long> roomFacilities = MyMathUtils.analysisTypeCode(vo.getRoomFacilitiesId());
         if (!CollectionUtils.isEmpty(roomFacilities)) {
             vo.setRoomFacilitiesCode(houseConstService.getConstByTypeCodeForList(roomFacilities, 23L));
+        }
+
+        // 1.3 出租要求
+        List<Long> requireIds = MyMathUtils.analysisTypeCode(vo.getLeaseRequireId());
+        if (!CollectionUtils.isEmpty(requireIds)) {
+            vo.setLeaseRequireMap(houseConstService.getConstByTypeCodeForList(requireIds, 21L));
         }
 
         //1.4查出 房屋标签 ...
@@ -290,7 +320,24 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             vo.setOperation(assetLeaseRecordEntity.getOperation());
             vo.setContractId(assetLeaseRecordEntity.getIdStr());
         }
-
+        // 1.11修改楼层显示文本
+        if (StringUtil.isNotBlank(vo.getHouseFloor())) {
+            String[] floorArray = vo.getHouseFloor().split("层");
+            if (floorArray[0] != null) {
+                Integer floor = Integer.valueOf(floorArray[0]);
+                if (floor <= 3) {
+                    vo.setHouseFloor("低层");
+                } else if (floor >= 4 && floor <= 7) {
+                    vo.setHouseFloor("中层");
+                } else {
+                    vo.setHouseFloor("高层");
+                }
+            }
+        }
+        // 1.12设置装修文本
+        if (vo.getDecorationTypeId() != null) {
+            vo.setDecorationType(PropertyEnum.DecorationEnum.DECORATION_MAP.get(vo.getDecorationTypeId()));
+        }
         // 为冗余熟悉添加值
         if (vo.getCommonFacilitiesCode() != null) {
             redundancy.putAll(vo.getCommonFacilitiesCode());
@@ -305,6 +352,11 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             redundancy.putAll(houseFurniture);
         }
         vo.setRedundancy(redundancy);
+        String area = (String) redisTemplate.opsForValue().get("RegionSingle:" + vo.getHouseAreaId());
+        if (area == null) {
+            area = "";
+        }
+        vo.setCommunityAddress(area + vo.getHouseCommunityName());
 
         UserEntity one = userService.selectOne(vo.getUid());
         // 详情页展示的业主名称是用户在发布的时候填写的昵称
@@ -553,6 +605,18 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         return houseLeaseMapper.allCommunity(cityId, userId);
     }
 
+    /**
+     * @param userId :
+     * @author: Pipi
+     * @description: 按用户id获取所有小区名称
+     * @return: java.util.List<com.jsy.community.entity.CommunityEntity>
+     * @date: 2021/10/13 11:36
+     **/
+    @Override
+    public List<CommunityEntity> allCommunity(String userId) {
+        return houseLeaseMapper.allUserCommunity(userId);
+    }
+
     @Override
     public HouseLeaseVO editDetails(Long houseId, String uid) {
         HouseLeaseVO vo = houseLeaseMapper.editDetails(houseId, uid);
@@ -565,12 +629,48 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
             vo.setHouseCommunityName(communityNameAndHouseAddr.get("communityName"));
             vo.setHouseAddress(communityNameAndHouseAddr.get("houseAddress"));
         }
+        // 1.1公共设施标签解析
+        List<Long> commonFacilities = MyMathUtils.analysisTypeCode(vo.getCommonFacilitiesId());
+        vo.setCommonFacilitiesIds(commonFacilities);
+        vo.setCommonFacilitiesIdStr(listToString(commonFacilities));
+
+        // 1.2房屋设施标签解析
+        List<Long> roomFacilities = MyMathUtils.analysisTypeCode(vo.getRoomFacilitiesId());
+        vo.setRoomFacilitiesIds(roomFacilities);
+        vo.setRoomFacilitiesIdStr(listToString(roomFacilities));
+
+        // 1.3查出房屋标签
+        List<Long> advantageId = MyMathUtils.analysisTypeCode(vo.getHouseAdvantageId());
+        vo.setHouseAdvantageIds(advantageId);
+        vo.setHouseAdvantageIdStr(listToString(advantageId));
+
+        // 1.4查出家具标签
+        List<Long> furnitureId = MyMathUtils.analysisTypeCode(vo.getHouseFurnitureId());
+        vo.setHouseFurnitureIds(furnitureId);
+        vo.setHouseFurnitureIdStr(listToString(furnitureId));
+
+        // 1.5出租要求
+        List<Long> requireId = MyMathUtils.analysisTypeCode(vo.getLeaseRequireId());
+        vo.setLeaseRequireIds(requireId);
+        vo.setLeaseRequireIdStr(listToString(requireId));
+
         //查出房屋朝向
         vo.setHouseDirection(BusinessEnum.HouseDirectionEnum.getDirectionName(vo.getHouseDirectionId()));
         //房屋类型 code转换为文本 如 4室2厅1卫
         vo.setHouseType(HouseHelper.parseHouseType(vo.getHouseTypeCode()));
         vo.setHouseImage(houseLeaseMapper.queryHouseAllImgById(vo.getHouseImageId()));
         return vo;
+    }
+
+    private String listToString(List<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return null;
+        }
+        StringBuffer result = new StringBuffer("");
+        for (Long id : ids) {
+            result.append(String.valueOf(id)+",");
+        }
+        return String.valueOf(result);
     }
 
     /**

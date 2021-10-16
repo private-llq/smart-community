@@ -2,8 +2,11 @@ package com.jsy.community.service;
 
 import com.jsy.community.entity.sys.SysMenuEntity;
 import com.jsy.community.entity.sys.SysRoleEntity;
+import com.jsy.community.entity.sys.SysUserRoleEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.sys.SysMenuQO;
 import com.jsy.community.qo.sys.SysRoleQO;
+import com.jsy.community.utils.PageInfo;
 
 import java.util.List;
 
@@ -51,6 +54,15 @@ public interface ISysConfigService {
 	 **/
 	List<SysMenuEntity> listOfMenu();
 	
+	/**
+	 * @Description: 查询用户菜单权限(新接口)
+	 * @Param: [uid]
+	 * @Return: java.util.List<com.jsy.community.entity.sys.SysMenuEntity>
+	 * @Author: DKS
+	 * @Date: 2021/10/13
+	 **/
+	List<SysMenuEntity> queryMenuByUid(Long roleId);
+	
 	//==================================================== Role角色 ===============================================================
 	/**
 	* @Description: 添加角色
@@ -87,6 +99,24 @@ public interface ISysConfigService {
 	 * @Date: 2020/12/14
 	**/
 	List<SysRoleEntity> listOfRole();
+	
+	/**
+	 * @Description: 角色列表 分页查询
+	 * @Param: []
+	 * @Return: java.util.List<com.jsy.community.entity.sys.SysRoleEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/14
+	 **/
+	PageInfo<SysRoleEntity> queryPage(BaseQO<SysRoleEntity> baseQO);
+	
+	/**
+	 * @author: DKS
+	 * @description: 根据用户uid查询用户的角色id
+	 * @param uid: 用户uid
+	 * @return: java.lang.Long
+	 * @date: 2021/10/12 17:05
+	 **/
+	SysUserRoleEntity queryRoleIdByUid(String uid);
 	
 	//==================================================== 角色-菜单 ===============================================================
 	

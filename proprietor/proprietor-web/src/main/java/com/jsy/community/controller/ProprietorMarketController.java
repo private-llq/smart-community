@@ -76,7 +76,7 @@ public class ProprietorMarketController {
     * @Date: 2021/8/21-15:44
     **/
    @PostMapping("/updateMarket")
-    @ApiOperation("社区集市发布商品")
+    @ApiOperation("社区集市修改商品")
     @Login
     public CommonResult updateMarket(@RequestBody ProprietorMarketQO marketQO){
         String userId = UserUtils.getUserId();
@@ -139,7 +139,7 @@ public class ProprietorMarketController {
     @ApiOperation("查询用户已发布或已下架的商品")
     @Login
     public CommonResult SelectOneMarket(@RequestParam("id") Long id){
-      ProprietorMarketVO marketVO =  marketService.findOne(id);
+        ProprietorMarketEntity marketVO =  marketService.findOne(id);
         return CommonResult.ok(marketVO,"查询成功");
     }
 
@@ -225,8 +225,6 @@ public class ProprietorMarketController {
                 filePath.append(",");
             }
         }
-
-
         String[] split = filePath.toString().split(",");
         return CommonResult.ok(split,"上传成功");
     }
@@ -240,5 +238,4 @@ public class ProprietorMarketController {
 
         return CommonResult.ok("删除成功");
     }
-
 }

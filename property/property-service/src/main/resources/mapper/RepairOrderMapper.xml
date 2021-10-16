@@ -6,7 +6,7 @@
         select * from t_repair_order
         <where>
             <if test="qo.query.searchText!=null and qo.query.searchText!=''">
-                name like concat ("%",#{qo.query.searchText},"%") or phone like concat("%",#{qo.query.searchText},"%") or number like concat("%",#{qo.query.searchText},"%")
+                (name like concat ("%",#{qo.query.searchText},"%") or phone like concat("%",#{qo.query.searchText},"%") or number like concat("%",#{qo.query.searchText},"%"))
             </if>
             <if test="qo.query.problem!=null and qo.query.problem!=''">
                 and problem like concat ("%",#{qo.query.problem},"%")

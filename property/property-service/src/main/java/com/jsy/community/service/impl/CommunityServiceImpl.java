@@ -46,7 +46,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	private CommunityMapper communityMapper;
 	
 	@Autowired
-	private UserHouseMapper userHouseMapper;
+	private PropertyUserHouseMapper propertyUserHouseMapper;
 	
 	@Autowired
 	private HouseMemberMapper houseMemberMapper;
@@ -186,7 +186,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		//2. 获取社区总人数
 		// 认证的业主总数【根据房屋认证表获取】
 //		Integer userHouseCount = userHouseMapper.selectCount(new QueryWrapper<UserHouseEntity>().eq("check_status",1));
-		Integer userHouseCount = userHouseMapper.selectCount(new QueryWrapper<>());
+		Integer userHouseCount = propertyUserHouseMapper.selectCount(new QueryWrapper<>());
 		
 		// 房间成员人数【不包含业主本人】
 		Integer houseMemberCount = houseMemberMapper.selectCount(null);

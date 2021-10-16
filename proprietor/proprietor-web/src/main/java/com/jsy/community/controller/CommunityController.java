@@ -10,7 +10,6 @@ import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.ControlVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -69,10 +68,6 @@ public class CommunityController {
 	@PostMapping("locate")
 	@Login(allowAnonymous = true)
 	public CommonResult<CommunityEntity> locate(@RequestBody Map<String,Double> location){
-		ControlVO controlVO = UserUtils.getPermissions(UserUtils.getUserId(), redisTemplate);
-		if (!controlVO.getAccessLevel().equals(1)){
-			return CommonResult.ok(iCommunityService.getCommunity(controlVO));
-		}
 		return CommonResult.ok(iCommunityService.locateCommunity(UserUtils.getUserId(),location));
 	}
 

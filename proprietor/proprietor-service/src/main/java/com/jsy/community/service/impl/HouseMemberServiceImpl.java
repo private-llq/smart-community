@@ -1,4 +1,6 @@
 package com.jsy.community.service.impl;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,11 +10,14 @@ import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseMemberEntity;
+import com.jsy.community.entity.UserEntity;
 import com.jsy.community.mapper.HouseMemberMapper;
+import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseMemberQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -41,6 +46,9 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	
 	@Autowired
 	private HouseMemberMapper houseMemberMapper;
+
+	@Autowired
+	private UserMapper userMapper;
 	
 //	@Autowired
 //	private UserMapper userMapper;
@@ -243,5 +251,40 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 		queryWrapper.eq("community_id", communityId);
 		queryWrapper.in("uid", uidSet);
 		return houseMemberMapper.selectList(queryWrapper);
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 新增房屋成员
+	 * @param uid: 新增成员uid
+	 * @param homeOwnerUid: 业主uid
+	 * @param communityId: 社区ID
+	 * @param houseId: 房屋ID
+	 * @param validTime: 租户有效时间,此处传合同截止时间即可
+	 * @return: java.lang.Integer
+	 * @date: 2021/10/15 17:45
+	 **/
+	@Override
+	public Integer addMember(String uid, String homeOwnerUid, Long communityId, Long houseId, LocalDateTime validTime) {
+		UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", uid));
+		HouseMemberEntity houseMemberEntity = new HouseMemberEntity();
+		houseMemberEntity.setId(SnowFlake.nextId());
+		houseMemberEntity.setStatus(1);
+		houseMemberEntity.setUid(uid);
+		houseMemberEntity.setHouseholderId(homeOwnerUid);
+		houseMemberEntity.setCommunityId(communityId);
+		houseMemberEntity.setHouseId(houseId);
+		houseMemberEntity.setName(userEntity.getRealName());
+		houseMemberEntity.setSex(userEntity.getSex());
+		houseMemberEntity.setMobile(userEntity.getMobile());
+		houseMemberEntity.setRelation(7);
+		houseMemberEntity.setEnterTime(LocalDate.now());
+		houseMemberEntity.setIdentificationType(1);
+		houseMemberEntity.setIdCard(userEntity.getIdCard());
+		houseMemberEntity.setRemark("");
+		houseMemberEntity.setValidTime(validTime);
+		houseMemberEntity.setDeleted(0);
+		houseMemberEntity.setCreateTime(LocalDateTime.now());
+		return houseMemberMapper.insert(houseMemberEntity);
 	}
 }

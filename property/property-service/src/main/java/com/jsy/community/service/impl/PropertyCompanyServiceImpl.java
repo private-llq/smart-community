@@ -32,7 +32,7 @@ public class PropertyCompanyServiceImpl extends ServiceImpl<PropertyCompanyMappe
     public PropertyCompanyEntity findOne(Long id) {
         return propertyCompanyMapper.selectOne(new QueryWrapper<PropertyCompanyEntity>().select("id,\n" +
                 "\t`name`,\n" +
-                "\t`describe`,\n" +
+                "\t`profile`,\n" +
                 "\tpicture,\n" +
                 "\tdeleted,\n" +
                 "\tcreate_time,\n" +

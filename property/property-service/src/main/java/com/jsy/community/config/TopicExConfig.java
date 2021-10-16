@@ -25,7 +25,7 @@ public class TopicExConfig {
 	//监听topic名称
 	public final static String QUEUE_FROM_COMMUNITY = "queue.2cloud"; //云端监听小区队列，根据参数communityId判断是哪个小区(摄像头相关)
 	// TODO 本地测试为了不被线上环境消费加了'.19'
-	public final static String QUEUE_VISITOR_HIS_FROM_COMMUNITY = "queue.visitor.his.2cloud.19"; //云端监听小区队列，根据参数communityId判断是哪个小区(访客记录相关)
+	public final static String QUEUE_VISITOR_HIS_FROM_COMMUNITY = "queue.visitor.his.2cloud.20"; //云端监听小区队列，根据参数communityId判断是哪个小区(访客记录相关)
 	
 	//小区相关-声明交换机
 	@Bean

@@ -28,6 +28,6 @@ public interface IUserAccountRecordService {
 	 * @Author: chq459799974
 	 * @Date: 2021/2/7
 	**/
-	PageInfo queryAccountRecord(BaseQO<UserAccountRecordQO> baseQO);
+	PageInfo<UserAccountRecordEntity> queryAccountRecord(BaseQO<UserAccountRecordQO> baseQO);
 	
 }

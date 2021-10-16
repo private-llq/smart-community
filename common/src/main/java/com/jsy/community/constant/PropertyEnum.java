@@ -132,10 +132,10 @@ public interface PropertyEnum {
 	 * @Date: 2021/3/12
 	 **/
 	enum DecorationEnum{
-		T1("样板间",1),
-		T2("毛坯",2),
-		T3("简装",3),
-		T4("精装",4);
+		T1("豪华装修",1),
+		T2("精装修",2),
+		T3("简单装修",4),
+		T4("毛坯",8);
 		private String name;
 		private Integer code;
 		DecorationEnum(String name, Integer code) {

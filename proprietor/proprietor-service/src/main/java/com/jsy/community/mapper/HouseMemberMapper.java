@@ -8,10 +8,7 @@ import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -73,4 +70,22 @@ public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
      * @return:
      */
 	List<MembersVO> selectRelation(@Param("communityId") Long communityId, @Param("houseId") Long houseId, @Param("relation") int relation);
+
+	/**
+	 * @Description: 修改成员表uid
+	 * @author: Hu
+	 * @since: 2021/10/12 15:00
+	 * @Param:
+	 * @return:
+	 */
+    void updateByUid(@Param("uid") String uid, @Param("mobile") String mobile);
+
+	/**
+	 * @Description: 根据id修改成员表id
+	 * @author: Hu
+	 * @since: 2021/10/12 15:00
+	 * @Param:
+	 * @return:
+	 */
+	void updateByMobile(@Param("ids") Set<Long> ids,@Param("uid") String uid);
 }

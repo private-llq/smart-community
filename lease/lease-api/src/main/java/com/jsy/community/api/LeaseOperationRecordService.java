@@ -2,6 +2,10 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.proprietor.LeaseOperationRecordEntity;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.lease.LeaseReleasePageQO;
+import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.lease.LeaseReleasePageVO;
 
 /**
  * @Author: Pipi
@@ -11,4 +15,11 @@ import com.jsy.community.entity.proprietor.LeaseOperationRecordEntity;
  **/
 public interface LeaseOperationRecordService extends IService<LeaseOperationRecordEntity> {
 
+    /**
+     * 商铺和房屋租赁信息发布列表
+     *
+     * @param baseQO 分页条件和查询条件
+     * @return
+     */
+    PageInfo<LeaseReleasePageVO> queryLeaseReleasePage(BaseQO<LeaseReleasePageQO> baseQO);
 }

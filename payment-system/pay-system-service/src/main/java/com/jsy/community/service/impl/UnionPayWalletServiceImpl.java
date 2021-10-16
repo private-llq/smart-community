@@ -46,8 +46,8 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
     @Autowired
     private RedisTemplate redisTemplate;
 
-    @Autowired
-    private UnionPayUtils unionPayUtils;
+//    @Autowired
+//    private UnionPayUtils UnionPayUtils;
 
     @Autowired
     private UnionPayWalletBankMapper unionPayWalletBankMapper;
@@ -187,7 +187,8 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
         }
         if (bindBankCardQO.getOprtType() == 3) {
             // 解绑,则软删数据
-            unionPayWalletBankMapper.updateDeleted(bindBankCardQO.getWalletId(), bindBankCardQO.getBankAcctNo());
+            Long id = SnowFlake.nextId();
+            unionPayWalletBankMapper.updateDeleted(id, bindBankCardQO.getWalletId(), bindBankCardQO.getBankAcctNo());
         }
         if (bindBankCardQO.getOprtType() == 4) {
             // 设置默认
@@ -288,8 +289,8 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
         }
         BeanUtils.copyProperties(baseAcctInfo, acctInfoVO);
         //获取钱包关联信息(只允许查询C端)
-        String relationMsgBody = unionPayUtils.buildMsgBody(walletIdQO);
-        OpenApiResponseVO relationResponse = unionPayUtils.queryApi(relationMsgBody, UnionPayConfig.QUERY_ACCT_RELATED_INFO);
+        String relationMsgBody = UnionPayUtils.buildMsgBody(walletIdQO);
+        OpenApiResponseVO relationResponse = UnionPayUtils.queryApi(relationMsgBody, UnionPayConfig.QUERY_ACCT_RELATED_INFO);
         if (relationResponse.getResponse() == null || !SUCCESS_STATUS_CODE.equals(relationResponse.getCode())) {
             return acctInfoVO;
         }

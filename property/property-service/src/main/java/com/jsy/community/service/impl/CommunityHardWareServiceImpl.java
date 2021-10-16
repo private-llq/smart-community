@@ -51,7 +51,7 @@ public class CommunityHardWareServiceImpl extends ServiceImpl<CommunityHardWareM
     private IVisitorService visitorService;
 
     @Autowired
-    private IUserService userService;
+    private PropertyUserService userService;
 
     @Autowired
     private UserFaceSyncRecordService userFaceSyncRecordService;

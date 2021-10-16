@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.exception.JSYError;
@@ -27,6 +28,7 @@ import java.util.List;
 @Api(tags = "系统消息控制器")
 @RestController
 @RequestMapping("sys/inform")
+@ApiJSYController
 public class SysInformController {
 
 

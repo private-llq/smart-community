@@ -34,5 +34,14 @@
 			and thm.relation=#{relation}
 		</if>
     </select>
+	<update id="updateByUid">
+		update t_house_member set uid=#{uid} where mobile=#{mobile}
+	</update>
+	<update id="updateByMobile">
+        update t_house_member set uid=#{uid} where id in
+        <foreach collection="ids" open="(" close=")" item="id" separator=",">
+			#{id}
+		</foreach>
+    </update>
 
 </mapper>

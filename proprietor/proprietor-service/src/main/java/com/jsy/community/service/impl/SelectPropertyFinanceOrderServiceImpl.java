@@ -6,6 +6,7 @@ import com.jsy.community.api.ISelectPropertyFinanceOrderService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.mapper.AppCarOrderMapper;
 import com.jsy.community.mapper.HouseMapper;
@@ -45,28 +46,53 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
 
 
     @Override
-    public List<PropertyFinanceOrderEntity> findOne(String orderId) {
-        LinkedList<Map<String,Object>> objects = new LinkedList<>();
-        Map houseMap = new HashMap();
-        Map<String,List<PropertyFinanceOrderEntity>> map = new HashMap();
-        Set<Long> houseIds = new HashSet();
-        List<PropertyFinanceOrderEntity> list = propertyFinanceOrderService.findOrder(orderId);
-        for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : list) {
-            if (propertyFinanceOrderEntity.getAssociatedType()==1){
-                houseIds.add(propertyFinanceOrderEntity.getTargetId());
+    public List<PropertyFinanceOrderEntity> findOne(String orderId,Integer orderStatus) {
+        List<PropertyFinanceOrderEntity> list = null;
+        if (orderStatus==0){
+            list= new LinkedList<>();
+            PropertyFinanceOrderEntity propertyFinanceOrderEntity = propertyFinanceOrderService.findOne(Long.parseLong(orderId));
+            if(propertyFinanceOrderEntity.getAssociatedType()==2){
+                CarPositionEntity entity = carPositionService.selectOne(propertyFinanceOrderEntity.getTargetId());
+                HouseEntity houseEntity = houseMapper.selectById(entity.getHouseId());
+                propertyFinanceOrderEntity.setAddress(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
+                propertyFinanceOrderEntity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(propertyFinanceOrderEntity.getType()));
+            } else {
+                HouseEntity houseEntity = houseMapper.selectById(propertyFinanceOrderEntity.getTargetId());
+                propertyFinanceOrderEntity.setAddress(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
+                propertyFinanceOrderEntity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(propertyFinanceOrderEntity.getType()));
             }
+            if (propertyFinanceOrderEntity.getPenalSum()!=null||!propertyFinanceOrderEntity.getPenalSum().equals(0.00)){
+
+                propertyFinanceOrderEntity.setTotalMoney(propertyFinanceOrderEntity.getPropertyFee().add(propertyFinanceOrderEntity.getPenalSum()));
+            }else {
+                propertyFinanceOrderEntity.setTotalMoney(propertyFinanceOrderEntity.getPropertyFee());
+            }
+            list.add(propertyFinanceOrderEntity);
+            return list;
+        } else {
+            LinkedList<Map<String,Object>> objects = new LinkedList<>();
+            Map houseMap = new HashMap();
+            Map<String,List<PropertyFinanceOrderEntity>> map = new HashMap();
+            Set<Long> houseIds = new HashSet();
+            list = propertyFinanceOrderService.findOrder(orderId);
+            for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : list) {
+                if (propertyFinanceOrderEntity.getAssociatedType()==1){
+                    houseIds.add(propertyFinanceOrderEntity.getTargetId());
+                }
+            }
+            if (houseIds.size()!=0){
+                List<HouseEntity> houseEntities = houseMapper.selectBatchIds(houseIds);
+                for (HouseEntity entity : houseEntities) {
+                    houseMap.put(entity.getId(),entity.getBuilding()+entity.getUnit()+entity.getDoor());
+                }
+                for (PropertyFinanceOrderEntity entity : list) {
+                    entity.setTotalMoney(entity.getPropertyFee().add(entity.getPenalSum()));
+                    entity.setAddress((String) houseMap.get(entity.getTargetId()));
+                    entity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(entity.getType()));
+                }
+            }
+            return list;
         }
-        if (houseIds.size()!=0){
-            List<HouseEntity> houseEntities = houseMapper.selectBatchIds(houseIds);
-            for (HouseEntity entity : houseEntities) {
-                houseMap.put(entity.getId(),entity.getBuilding()+entity.getUnit()+entity.getDoor());
-            }
-            for (PropertyFinanceOrderEntity entity : list) {
-                entity.setAddress((String) houseMap.get(entity.getTargetId()));
-                entity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(entity.getType()));
-            }
-        }
-        return list;
     }
 
     /**
@@ -100,11 +126,10 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
                 //取相应房间map
                 Map<String, Object> roomMap = roomMaps.get(BigInteger.valueOf(entity.getTargetId()));
                 //在相应房间节点下添加物业费数据
-                List dataList = (List) roomMap.get("list");
-                if(dataList == null){
-                    roomMap.put("list",new ArrayList<>());
-                    dataList = (List) roomMap.get("list");
+                if (roomMap.get("list") == null) {
+                    roomMap.put("list", new ArrayList<>());
                 }
+                List dataList = (List) roomMap.get("list");
                 dataList.add(entity);
                 //在相应房间节点下累加总金额
                 BigDecimal totalAmount = entity.getPropertyFee().add(entity.getPenalSum());

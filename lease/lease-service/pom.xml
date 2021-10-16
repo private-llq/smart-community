@@ -104,10 +104,8 @@
             <groupId>com.jsy</groupId>
             <artifactId>pay-system-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
 		<!-- 支付模块 -->
-
 
 
 

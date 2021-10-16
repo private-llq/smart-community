@@ -29,7 +29,8 @@ public class RabbitMqConfig {
     public static final String EXCHANGE_TOPICS_WECHAT = "exchange_topics_wechat";
     public static final String EXCHANGE_DELAY_WECHAT = "exchange_delay_wechat";
 
-
+    public static final String QUEUE_ACTIVITY_DELAY = "queue_activity_delay";
+    public static final String EXCHANGE_ACTIVITY_DELAY = "exchange_activity_delay";
 
     public static final String EXCHANGE_CAR_TOPICS = "exchange_car_topics";
     public static final String QUEUE_CAR_INSERT = "queue_car_insert";
@@ -40,6 +41,41 @@ public class RabbitMqConfig {
     public static final String QUEUE_CAMERA_FACE = "queue_camera_face";
     public static final String EXCHANGE_CAMERA_FACE = "exchange_camera_face";
 
+    //-------------------------------------------------------------------------------------
+    /**
+     * @Description: 活动报名业主投票延时队列
+     * @author: Hu
+     * @since: 2021/1/23 16:46
+     * @Param:
+     * @return:
+     */
+    @Bean(EXCHANGE_ACTIVITY_DELAY)
+    public CustomExchange exchangeActivityDelay() {
+        Map<String, Object> args = new HashMap<>(1);
+        args.put("x-delayed-type", "direct");
+        return new CustomExchange(EXCHANGE_ACTIVITY_DELAY, "x-delayed-message", true, false, args);
+    }
+
+    /**
+     * 声明延时队列
+     */
+    @Bean(QUEUE_ACTIVITY_DELAY)
+    public Queue queueActivityDelay() {
+        return new Queue(QUEUE_ACTIVITY_DELAY);
+    }
+
+    /**
+     * @Description: 绑定延时队列
+     * @author: Hu
+     * @since: 2020/12/29 14:30
+     * @Param:
+     * @return:
+     */
+    @Bean
+    public Binding bindingQueueInformActivityDelay(@Qualifier(QUEUE_ACTIVITY_DELAY) Queue queue,
+                                                 @Qualifier(EXCHANGE_ACTIVITY_DELAY) Exchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with("queue.activity.delay").noargs();
+    }
 
     //-------------------------------------------------------------------------------------
     /**

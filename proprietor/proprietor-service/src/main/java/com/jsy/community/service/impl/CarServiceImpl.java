@@ -427,7 +427,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                     null,
                     "月租缴费",
                     map,
-                    BusinessEnum.PushInfromEnum.PAYHELPER.getName());
+                    BusinessEnum.PushInfromEnum.MONTHLYRENTPAYMENT.getName());
         } else {
             throw new ProprietorException("当前月租车辆不存在！");
         }
@@ -524,6 +524,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carOrderEntity.setBeginTime(carEntity.getBeginTime());
                 carOrderEntity.setOverTime(carEntity.getOverTime());
                 carOrderEntity.setMoney(carEntity.getMoney());
+                carOrderEntity.setMonth(entity.getMonth());
                 carOrderEntity.setOrderNum(carEntity.getOrderNum());
                 carOrderEntity.setOrderStatus(0);
                 carOrderEntity.setCarPlate(carEntity.getCarPlate());
@@ -538,6 +539,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 vehicle.setCarNumber(entity.getCarPlate());
                 vehicle.setOwnerName(carEntity.getOwner());
                 vehicle.setPhone(carEntity.getContact());
+                vehicle.setDistributionStatus(1);
                 vehicle.setStartTime(carEntity.getBeginTime());
                 vehicle.setEndTime(carEntity.getOverTime());
                 vehicle.setMonthlyFee(entity.getMoney());
@@ -560,7 +562,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                         null,
                         "月租缴费",
                         map,
-                        BusinessEnum.PushInfromEnum.PAYHELPER.getName());
+                        BusinessEnum.PushInfromEnum.MONTHLYRENTPAYMENT.getName());
             }
     }
 

@@ -297,4 +297,31 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @return:
 	 */
 	UserEntity getUser(String tenantUid);
+
+	/**
+	 * @Description: 查询当前用户所有是业主身份的小区
+	 * @author: Hu
+	 * @since: 2021/9/29 15:36
+	 * @Param:
+	 * @return:
+	 */
+	Collection<Map<String, Object>> queryCommunityUserList(String uid);
+
+	/**
+	 * @Description: 查询当前用户所有身份的房屋信息
+	 * @author: Hu
+	 * @since: 2021/9/29 16:08
+	 * @Param:
+	 * @return:
+	 */
+	List<HouseEntity> queryUserHouseListAll(String userId);
+
+	/**
+	 * @Description: 用户绑定微信
+	 * @author: Hu
+	 * @since: 2021/10/15 10:05
+	 * @Param:
+	 * @return:
+	 */
+    String bindingWechat(String userId, String openid);
 }

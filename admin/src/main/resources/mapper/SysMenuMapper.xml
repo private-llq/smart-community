@@ -27,4 +27,14 @@
 		where ur.user_id = #{uid}
 	</select>
 
+	<!-- idList入参批量查询菜单实体 -->
+	<select id="queryMenuBatch" resultType="com.jsy.community.entity.sys.SysMenuEntity">
+		select * from t_sys_menu
+		where deleted = 0
+		and id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+
 </mapper>

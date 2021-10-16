@@ -3,14 +3,12 @@ package com.jsy.community.controller;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.nacos.common.utils.UuidUtils;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.ICarPositionService;
 import com.jsy.community.api.ICarPositionTypeService;
-import com.jsy.community.api.IUserService;
 import com.jsy.community.api.*;
 import com.jsy.community.config.ExcelListener;
 import com.jsy.community.config.ExcelUtils;
@@ -25,36 +23,24 @@ import com.jsy.community.qo.property.*;
 import com.jsy.community.util.*;
 import com.jsy.community.utils.MD5Util;
 import com.jsy.community.utils.MinioUtils;
-import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.car.CarVO;
 import com.jsy.community.vo.car.GpioData;
 import com.jsy.community.vo.car.Rs485Data;
-import com.jsy.community.vo.car.WhitelistData;
 import com.jsy.community.vo.property.PageVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import net.bytebuddy.asm.Advice;
-import net.bytebuddy.implementation.bind.annotation.This;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.entity.ContentType;
-import org.elasticsearch.search.sort.MinAndMax;
 import org.springframework.beans.BeanUtils;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -80,7 +66,7 @@ public class CarPositionController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarPositionService iCarPositionService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
-    private IUserService iUserService;
+    private PropertyUserService iUserService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarPositionTypeService iCarPositionTypeService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -272,85 +258,6 @@ public class CarPositionController {
         }
         return CommonResult.ok(b, "更新失败");
     }
-
-    @ApiOperation("获取二维码")
-    @Login
-    @RequestMapping(value = "/obtainTwoCode", method = RequestMethod.POST)
-    public CommonResult<String> obtainTwoCode() {
-        Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
-
-
-        return null;
-    }
-
-
-
-//    @ApiOperation("过车记录1")
-//    @RequestMapping(value = "/test1", method = RequestMethod.POST)
-//    public void carBeforeRecord1(@RequestParam("type") String type,//type 固定 online 或 offline online 表示正常在线传输结果，offline 表示断网续传结果
-//                                 @RequestParam("mode") Integer mode,//mode 协议模式，数字表示 模式 5 以上才有此字段
-//                                 @RequestParam("park_id") String parkId,//车场 ID，最大支持 60 个字符
-//                                 @RequestParam("plate_num") String plateNum,//plate_num 车牌号码，UTF8 编码
-//                                 @RequestParam("plate_color") String plateColor,//plate_color 车牌底色，UTF8 编码
-//                                 @RequestParam("plate_val") boolean plateVal,// plate_val 虚假车牌信息，true 表示真牌，false 表示虚假车牌
-//                                 @RequestParam("car_sublogo") String carSubLogo,//车辆子品牌，UTF8 编码
-//                                 @RequestParam("vehicle_type") String vehicleType,//vehicle_type 车辆类型，UTF8 编码
-//                                 @RequestParam("start_time") Long startTime,//start_time 车牌识别时间,1970/01/01 到现在的秒数目
-//                                 @RequestParam("cam_id") String camId,//相机 ID 号根据配置决定是使用MAC 还是 UID
-//                                 @RequestParam("vdc_type") String vdcType,//出入口类型，in 表示入口，out 表示出口
-//                                 @RequestParam("is_whitelist") Boolean isWhitelist,//是否是白名单车辆，true 表示白名单，false 表示非白名
-//                                 @RequestParam("triger_type") String trigerType,//video 表示视频触发，hwtriger 表示地感触发，swtriger 表示软触发
-//                                 @RequestParam("picture") String picture,//全景图，BASE64 编码 为避免Http传输时URL编码意外
-//                                 @RequestParam("closeup_pic") String closeupPic//车牌特写图，BASE64 编码 为避免Http传输时URL编码意外改变图片的 BASE64 编码，作了特殊的替换：'+'替换为'-'，'/'替换为'_'，'='替换为'.
-//            , HttpServletResponse response, HttpServletRequest request) throws IOException {
-//        CarVO carVO = new CarVO();//返回對象
-//        carVO.setError_num(0);
-//        carVO.setError_str("响应");
-//        carVO.setPasswd("123456");
-//        carVO.setGpio_data(new ArrayList<>());
-//        carVO.setRs485_data(new ArrayList<>());
-//        carVO.setWhitelist_data(new ArrayList<>());
-//
-//
-//        //是否开闸
-//        GpioData gpioData = new GpioData();
-//        gpioData.setIonum("io1");
-//        gpioData.setAction("on");
-//        carVO.getGpio_data().add(gpioData);
-//
-//
-//        String ultimatelyValue= Crc16Util.getUltimatelyValue("测试成功");
-//
-//        //led显示内容1
-//        Rs485Data e2 = new Rs485Data();
-//        e2.setEncodetype("hex2string");
-//        e2.setData(ultimatelyValue);
-//        carVO.getRs485_data().add(e2);
-//
-////        //led显示内容2
-////        Rs485Data e3 = new Rs485Data();
-////        e3.setEncodetype("hex2string");
-////        e3.setData(value1);
-////        carVO.getRs485_data().add(e3);
-////
-////        //语音播报内容
-////        Rs485Data e4 = new Rs485Data();
-////        e4.setEncodetype("hex2string");
-////        e4.setData("0064FFFF300901BBB6D3ADB9E2C1D93258");//欢迎回家
-////        carVO.getRs485_data().add(e4);
-//
-//
-//        response.setStatus(200);
-//        response.setCharacterEncoding("utf-8");
-//        response.setContentType("application/json; charset=utf-8");
-//        response.setContentLength(carVO.toString().length());
-//        PrintWriter writer = response.getWriter();
-//        System.out.println(JSONArray.toJSON(carVO).toString());
-//        writer.write(JSONArray.toJSON(carVO).toString());
-//        writer.flush();
-//        writer.close();
-//
-//    }
 
 
 
@@ -906,14 +813,16 @@ public class CarPositionController {
             //时间戳转年月日       //进闸时间
             LocalDateTime localDateTime = new Date(startTime * 1000l).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime();
             CarEquipmentManageEntity carEquipmentManageEntity = equipmentManageService.equipmentOne(camId);
+            CarLaneEntity carLaneOne = iCarLaneService.getCarLaneOne(carEquipmentManageEntity.getId(), carEquipmentManageEntity.getCommunityId());
             for (CarCutOffEntity i : carCutOffEntityList) {
                 i.setStopTime(localDateTime);
                 i.setState(1);
                 //出闸照片
                 i.setOutPic(closeupPic);
                 i.setOutImage(picture);
-                CarLaneEntity carLaneOne = iCarLaneService.getCarLaneOne(carEquipmentManageEntity.getId(), carEquipmentManageEntity.getCommunityId());
-                carCutOffEntity.setOutLane(carLaneOne.getLaneName());
+
+                i.setOutLane(carLaneOne.getLaneName());
+                System.out.println("*********"+carLaneOne.getLaneName());
                 carCutOffService.updateCutOff(i);
             }
 

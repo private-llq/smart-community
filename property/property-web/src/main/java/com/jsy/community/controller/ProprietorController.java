@@ -8,7 +8,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IProprietorService;
-import com.jsy.community.api.IUserService;
+import com.jsy.community.api.PropertyUserService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.ProprietorEntity;
 import com.jsy.community.entity.UserEntity;
@@ -68,7 +68,7 @@ public class ProprietorController {
     private IHouseService iHouseService;
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
-    private IUserService iUserService;
+    private PropertyUserService iUserService;
 
     /**
      * [2021.3.16] 根据物业端需求改造完成

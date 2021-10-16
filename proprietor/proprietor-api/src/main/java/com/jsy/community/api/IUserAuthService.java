@@ -83,4 +83,31 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
      * @Date: 2021/1/12
     **/
 	String queryUserIdByMobile(String mobile);
+
+	/**
+	 * @Description: 查询当前用户是否设置支付密码
+	 * @author: Hu
+	 * @since: 2021/10/13 14:46
+	 * @Param:
+	 * @return:
+	 */
+    UserAuthEntity selectByPayPassword(String uid);
+
+    /**
+     * @Description: 查询当前登录用户是否绑定微信
+     * @author: Hu
+     * @since: 2021/10/16 10:26
+     * @Param:
+     * @return:
+     */
+	UserAuthEntity selectByIsWeChat(String userId);
+
+	/**
+	 * @Description: 设置微信openid
+	 * @author: Hu
+	 * @since: 2021/10/16 10:29
+	 * @Param:
+	 * @return:
+	 */
+	void updateByWechat(UserAuthEntity userAuthEntity);
 }

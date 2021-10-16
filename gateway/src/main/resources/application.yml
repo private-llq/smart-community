@@ -1,5 +1,6 @@
 server:
   port: 9527
+
 spring:
   application:
     name: server-gateway
@@ -29,22 +30,22 @@ spring:
       routes:
         # 跳转URL
         - id: property
-          uri: lb://property-web
+          uri: lb:http://property-web
           predicates:
             - Path=/*/*/property/**
 
         - id: proprietor
-          uri: lb://proprietor-web
+          uri: lb:http://proprietor-web
           predicates:
             - Path=/*/*/proprietor/**
 
         - id: payment
-          uri: lb://payment-web
+          uri: lb:http://payment-web
           predicates:
             - Path=/*/*/payment/**
 
         - id: lease
-          uri: lb://lease-web
+          uri: lb:http://lease-web
           predicates:
             - Path=/*/*/lease/**
 dubbo:

@@ -69,7 +69,7 @@ public interface IProprietorMarketService extends IService<ProprietorMarketEntit
      * @Author: Tian
      * @Date: 2021/8/23-14:06
      **/
-    ProprietorMarketVO findOne(Long id);
+    ProprietorMarketEntity findOne(Long id);
     /**
      * @Description: 热门商品
      * @Param: [baseQO]

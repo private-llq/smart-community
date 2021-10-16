@@ -15,6 +15,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,7 +139,9 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
         for (CarPositionEntity positionEntity : selectList) {
             list.add(positionEntity.getCarPosition());
         }
-        bindingPositionMapper.delete(new QueryWrapper<BindingPositionEntity>().in("position_id",list));
+        if (!CollectionUtils.isEmpty(list)) {
+            bindingPositionMapper.delete(new QueryWrapper<BindingPositionEntity>().in("position_id",list));
+        }
     }
 
 }

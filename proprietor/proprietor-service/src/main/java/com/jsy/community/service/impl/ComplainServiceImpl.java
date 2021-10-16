@@ -3,18 +3,15 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IComplainService;
-import com.jsy.community.api.PropertyException;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.ComplainEntity;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.mapper.ComplainMapper;
 import com.jsy.community.qo.proprietor.ComplainQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.proprietor.ComplainVO;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,17 +132,17 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
     @Override
     public List<ComplainVO> selectComplain(String userId) {
         List<ComplainVO> list = new ArrayList<>();
+        ComplainVO complainVO = null;
         List<ComplainEntity> selectList = complainMapper.selectList(new QueryWrapper<ComplainEntity>().eq("uid", userId).orderByDesc("create_time"));
         for(ComplainEntity entity :selectList){
-            ComplainVO complainVO = new ComplainVO();
+            complainVO = new ComplainVO();
             BeanUtils.copyProperties(entity,complainVO);
             CommunityEntity communityEntity = communityMapper.selectById(entity.getCommunityId());
-            System.out.println(communityEntity);
             if (communityEntity==null){
                 throw new ProprietorException("你还没有反馈信息");
             }
             complainVO.setCommunityName(communityEntity.getName());
-            list.add(complainVO);
+            list.add(complainVO); 
         }
         return list;
     }
@@ -188,6 +185,6 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
      */
     @Override
     public List<ComplainEntity> selectUserIdComplain(String userId) {
-        return complainMapper.selectList(new QueryWrapper<ComplainEntity>().eq("uid",userId));
+        return complainMapper.selectList(new QueryWrapper<ComplainEntity>().eq("uid",userId).orderByDesc("create_time"));
     }
 }

@@ -2,6 +2,7 @@ package com.jsy.community.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -90,6 +91,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IHouseService houseService;
+
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IHouseMemberService houseMemberService;
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserImService userImService;
@@ -198,7 +202,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         UserIMEntity userIMEntity = userImService.selectUid(assetLeaseRecordEntity.getHomeOwnerUid());
         UserEntity userEntity = userService.getUser(assetLeaseRecordEntity.getTenantUid());
         HashMap<Object, Object> map = new HashMap<>();
-        map.put("type",1);
+        map.put("type",6);
         map.put("dataId",null);
         PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
                 "合同签约",
@@ -1095,18 +1099,17 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 }
             }
         }
-        if (assetLeaseRecordEntity.getIdentityType() == 1) {
-            // 房东,查看租客信息
-            UserInfoVo userInfoVo = userService.proprietorDetails(leaseRecordEntity.getTenantUid());
-            leaseRecordEntity.setRealName(userInfoVo.getRealName());
-            leaseRecordEntity.setTenantPhone(userInfoVo.getMobile());
-            leaseRecordEntity.setTenantIdCard(userInfoVo.getIdCard());
-        } else {
+        if (assetLeaseRecordEntity.getIdentityType() == 2) {
             // 租客,查看房东信息
             UserInfoVo userInfoVo = userService.proprietorDetails(leaseRecordEntity.getHomeOwnerUid());
             leaseRecordEntity.setLandlordName(userInfoVo.getRealName());
             leaseRecordEntity.setLandlordPhone(userInfoVo.getMobile());
         }
+        // 租客信息
+        UserInfoVo userInfoVo = userService.proprietorDetails(leaseRecordEntity.getTenantUid());
+        leaseRecordEntity.setRealName(userInfoVo.getRealName());
+        leaseRecordEntity.setTenantPhone(userInfoVo.getMobile());
+        leaseRecordEntity.setTenantIdCard(userInfoVo.getIdCard());
         setCountdown(leaseRecordEntity);
         return leaseRecordEntity;
     }
@@ -1295,9 +1298,28 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             leaseRecordEntity.setBlockStatus(2);
             leaseRecordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.COMPLETE_CONTRACT.getCode());
             addLeaseOperationRecord(leaseRecordEntity);
+            // 修改房源出租状态
+            if (leaseRecordEntity.getAssetType().equals(BusinessEnum.HouseTypeEnum.HOUSE.getCode())) {
+                // 房屋
+                UpdateWrapper<HouseLeaseEntity> updateWrapper = new UpdateWrapper<>();
+                updateWrapper.eq("id", leaseRecordEntity.getAssetId());
+                updateWrapper.set("lease_status", 1);
+                houseLeaseMapper.update(new HouseLeaseEntity(), updateWrapper);
+            } else if (leaseRecordEntity.getAssetType().equals(BusinessEnum.HouseTypeEnum.SHOP.getCode())) {
+                // 商铺
+                UpdateWrapper<ShopLeaseEntity> updateWrapper = new UpdateWrapper<>();
+                updateWrapper.eq("id", leaseRecordEntity.getAssetId());
+                updateWrapper.set("lease_status", 1);
+                shopLeaseMapper.update(new ShopLeaseEntity(), updateWrapper);
+            }
 
-
-
+            // 绑定租客为房屋租客身份,向house_member表增加数据
+            houseMemberService.addMember(leaseRecordEntity.getTenantUid(),
+                    leaseRecordEntity.getHomeOwnerUid(),
+                    leaseRecordEntity.getCommunityId(),
+                    leaseRecordEntity.getAssetId(),
+                    leaseRecordEntity.getEndDate().atStartOfDay()
+            );
 
             CommunityEntity communityEntity = communityService.getCommunityNameById(leaseRecordEntity.getCommunityId());
             //租客
@@ -1326,7 +1348,6 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 //                    "恭喜你，和房东"+userEntity.getRealName()+"签约完成："+communityEntity.getName()+"小区"+leaseRecordEntity.getAddress()+"房屋的房屋合同签署。",
 //                    map,
 //                    BusinessEnum.PushInfromEnum.CONTRACTSIGNING.getName());
-
             return assetLeaseRecordMapper.updateById(leaseRecordEntity);
         } else {
             return 0;

@@ -1,17 +1,16 @@
 package com.jsy.community.vo.proprietor;
 
-import com.jsy.community.qo.BaseQO;
+import com.jsy.community.vo.BaseVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @ApiModel("投诉建议返回参数")
-public class ComplainVO extends BaseQO implements Serializable {
+public class ComplainVO extends BaseVO {
     @ApiModelProperty(value = "社区id")
     private String communityName;
 

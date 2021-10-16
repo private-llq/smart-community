@@ -272,6 +272,20 @@ public class AdminUserController {
 	}
 	
 	/**
+	 * @Description: 删除操作员
+	 * @Param: [sysUserEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: DKS
+	 * @Date: 2021/10/13
+	 **/
+	@Login
+	@DeleteMapping("delete")
+	public CommonResult deleteOperator(Long id){
+		adminUserService.deleteOperator(id);
+		return CommonResult.ok("操作成功");
+	}
+	
+	/**
 	* @Description: 查询管理员有权限的社区列表
 	 * @Param: []
 	 * @Return: com.jsy.community.vo.CommonResult

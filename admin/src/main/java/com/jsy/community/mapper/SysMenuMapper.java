@@ -24,8 +24,8 @@ public interface SysMenuMapper extends BaseMapper<SysMenuEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
-	@Insert("insert into t_sys_menu(icon,name,url,pid,sort)" +
-		"select #{entity.icon},#{entity.name},#{entity.url},#{entity.pid},max(sort)+1 from t_sys_menu where pid = #{entity.pid}")
+	@Insert("insert into t_sys_menu(icon,name,url,pid,sort,belong_to)" +
+		"select #{entity.icon},#{entity.name},#{entity.url},#{entity.pid},max(sort)+1,#{entity.belongTo} from t_sys_menu where id = #{entity.pid}")
 	int addMenu(@Param("entity") SysMenuEntity sysMenuEntity);
 	
 	/**
@@ -74,5 +74,14 @@ public interface SysMenuMapper extends BaseMapper<SysMenuEntity> {
 	 * @Date: 2020/12/15
 	**/
 	List<SysMenuEntity> queryUserMenu(Long uid);
+	
+	/**
+	 * @Description: 根据idList批量查询菜单实体
+	 * @Param: [list]
+	 * @Return: java.util.List<com.jsy.community.entity.sys.SysMenuEntity>
+	 * @Author: DKS
+	 * @Date: 2021/10/13
+	 **/
+	List<SysMenuEntity> queryMenuBatch(@Param("list")List<Long> list);
 
 }

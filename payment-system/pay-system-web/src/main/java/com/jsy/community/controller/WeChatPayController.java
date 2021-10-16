@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import cn.hutool.json.JSONUtil;
-import com.alibaba.nacos.common.utils.IpUtils;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
@@ -12,6 +11,7 @@ import com.jsy.community.entity.CompanyPayConfigEntity;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
+import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.payment.WeChatPayQO;
 import com.jsy.community.qo.payment.WithdrawalQO;
@@ -84,6 +84,9 @@ public class WeChatPayController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
 
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private IUserAccountService userAccountService;
+
     @Autowired
     private RedisTemplate redisTemplate;
     //物业费redis缓存分组key
@@ -129,7 +132,7 @@ public class WeChatPayController {
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description", weChatPayQO.getDescriptionStr());
         map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://tb2korpp.dongtaiyuming.net/api/v1/payment/callback/"+serviceConfig.getCompanyId());
+        map.put("notify_url","http://222.178.212.28:9527/api/v1/payment/callback/"+serviceConfig.getCompanyId());
         map.put("amount",hashMap);
         //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("total",1);
@@ -284,6 +287,8 @@ public class WeChatPayController {
             } else
             //房屋租赁业务逻辑
             if (split[0].equals("9")){
+                AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordService.queryRecordByConId(split[1]);
+                userAccountService.rentalIncome(split[1],new BigDecimal(map.get("amount")),leaseRecordEntity.getHomeOwnerUid());
                 // 修改签章合同支付状态
                 Map<String, Object> houseMap = housingRentalOrderService.completeLeasingOrder(map.get("out_trade_no"), split[1]);
                 // 修改租房签约支付状态
@@ -458,87 +463,6 @@ public class WeChatPayController {
 //        }
 //        return clientIp;
 //    }
-
-//    /**
-//     * @Description: H5下单并返回支付连接
-//     * @author: Hu
-//     * @since: 2021/2/25 14:28
-//     * @Param:
-//     * @return:
-//     */
-//    @PostMapping("/wxPayH5")
-//    public CommonResult wxPayH5(HttpServletRequest request,@RequestBody WeChatPayQO weChatPayQO) throws Exception {
-//        //支付的请求参数信息(此参数与微信支付文档一致，文档地址：https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_1.shtml)
-//        Map<String, Object> map = new LinkedHashMap<>();
-//        weChatPayQO.setDescriptionStr("H5支付");
-//
-//
-////        System.out.println(getClientIpAddress(request));
-//        map.put("appid", WechatConfig.APPID);
-//        map.put("mchid",WechatConfig.MCH_ID);
-//
-//        BigDecimal bigDecimal = new BigDecimal(0.01);
-//        map.put("body","购买商品支付" + String.valueOf(1/ 100) + "元");
-//        map.put("nonce_str",UUID.randomUUID());
-//
-//
-//       // map.put("description",weChatPayQO.getDescriptionStr());
-//        map.put("out_trade_no", OrderNoUtil.getOrder());
-//        map.put("total_fee", bigDecimal.multiply(new BigDecimal(100)));
-//        map.put("notify_url","http://tb2korpp.dongtaiyuming.net/api/v1/payment/callback/1");
-//        map.put("trade_type","MWEB");
-//        map.put("spbill_create_ip","192.168.1.1");
-//        map.put("scene_info", "'h5_info':{'type':'Wap','wap_url':'www.baidu.com','wap_name': '停车场扫码'}");
-//
-//
-////        Map hashMap = new LinkedHashMap();
-//        String sign = PublicConfig.getSignToken(map,WechatConfig.PRIVATE_KEY);
-////        hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
-////        hashMap.put("total",1);
-////        hashMap.put("currency","CNY");
-//
-//
-//        //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
-//
-////        Map hashMap1 = new LinkedHashMap();
-////        hashMap1.put("payer_client_ip",weChatPayQO.getPayerClientIp());
-////        LinkedHashMap hashMap2 = new LinkedHashMap();
-////        hashMap2.put("type",weChatPayQO.getType());
-////        hashMap1.put("h5_info",hashMap2);
-////        map.put("amount",hashMap);
-////        map.put("scene_info",hashMap1);
-//
-//
-//        String wxPayRequestJsonStr = JSONUtil.toJsonStr(map);
-//        System.out.println(wxPayRequestJsonStr);
-//
-//        WeChatOrderEntity msg = new WeChatOrderEntity();
-//        msg.setId((String) map.get("out_trade_no"));
-//        msg.setUid(UserUtils.getUserId());
-////        msg.setOpenId(weChatPayQO.getOpenId());
-////        msg.setDescription(weChatPayQO.getDescription());
-//        msg.setAmount(weChatPayQO.getAmount());
-//        msg.setOrderStatus(1);
-//        msg.setArriveStatus(1);
-//        msg.setCreateTime(LocalDateTime.now());
-//        System.out.println("H5保存数据库中");
-//
-//
-//        //mq异步保存账单到数据库
-//        rabbitTemplate.convertAndSend("exchange_topics_wechat","queue.wechat",msg);
-//        //半个小时如果还没支付就自动删除数据库账单
-//        rabbitTemplate.convertAndSend("exchange_delay_wechat", "queue.wechat.delay", map.get("out_trade_no"), new MessagePostProcessor() {
-//            @Override
-//            public Message postProcessMessage(Message message) throws AmqpException {
-//                    message.getMessageProperties().setHeader("x-delay",60000*30);
-//                return message;
-//            }
-//        });
-//        //第一步获取prepay_id
-//        String h5_url = PublicConfig.V3PayGet("/v3/pay/transactions/h5", wxPayRequestJsonStr, WechatConfig.MCH_ID, WechatConfig.MCH_SERIAL_NO, WechatConfig.APICLIENT_KEY);
-//        return CommonResult.ok(h5_url);
-//    }
-
 
 
 }

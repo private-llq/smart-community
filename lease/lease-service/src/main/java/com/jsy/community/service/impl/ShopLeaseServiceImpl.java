@@ -42,6 +42,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -108,7 +109,7 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
     private IHouseLeaseService iHouseLeaseService;
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
-    private IUserService userService;
+    private PropertyUserService userService;
 
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private IHouseConstService houseConstService;
@@ -199,7 +200,13 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
         ShopLeaseVO shopLeaseVo = new ShopLeaseVO();
         // 封装基本信息
         BeanUtils.copyProperties(shop, shopLeaseVo);
-
+        CommunityEntity communityNameById = communityService.getCommunityNameById(shop.getCommunityId());
+        if (communityNameById != null) {
+            String area = (String) redisTemplate.opsForValue().get("RegionSingle:" + shop.getAreaId());
+            area = area == null ? "" : area;
+            String communityName = communityNameById.getName() == null ? "" : communityNameById.getName();
+            shopLeaseVo.setCommunityAddress(area + communityName);
+        }
         // 查询该商铺是否申请租赁签约
         QueryWrapper<AssetLeaseRecordEntity> assetLeaseRecordEntityQueryWrapper = new QueryWrapper<>();
         assetLeaseRecordEntityQueryWrapper.eq("tenant_uid", uid);
@@ -797,10 +804,19 @@ public class ShopLeaseServiceImpl extends ServiceImpl<ShopLeaseMapper, ShopLease
 
         Page<ShopLeaseEntity> info = new Page<>(page, size);
         List<ShopLeaseEntity> shopList = shopLeaseMapper.getShopByCondition(baseQO, info);
+        List<Long> communityIdList = shopList.stream().map(ShopLeaseEntity::getCommunityId).collect(Collectors.toList());
+        List<CommunityEntity> communityEntityList = communityService.queryCommunityBatch(communityIdList);
         ArrayList<IndexShopVO> shopVOS = new ArrayList<>();
         for (ShopLeaseEntity shopLeaseEntity : shopList) {
             IndexShopVO indexShopVO = new IndexShopVO();
             BeanUtils.copyProperties(shopLeaseEntity, indexShopVO);
+            for (CommunityEntity communityEntity : communityEntityList) {
+                if (communityEntity.getId() == shopLeaseEntity.getCommunityId()) {
+                    String area = redisTemplate.opsForValue().get("RegionSingle:" + shopLeaseEntity.getAreaId());
+                    area = area == null ? "" : area;
+                    indexShopVO.setCommunityAddress(area + communityEntity.getName());
+                }
+            }
             // 封装图片
             QueryWrapper<ShopImgEntity> imgWrapper = new QueryWrapper<>();
             imgWrapper.eq("shop_id", shopLeaseEntity.getId());

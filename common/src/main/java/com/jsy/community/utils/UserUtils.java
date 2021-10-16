@@ -6,6 +6,7 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.vo.ControlVO;
 import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.jsy.community.vo.sys.SysInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -17,7 +18,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -29,6 +29,7 @@ public class UserUtils {
 	
 	public static final String USER_TOKEN = "token";
 	public static final String USER_KEY = "userId";
+	public static final String USER_ID = "id";
 	public static final String USER_INFO = "userInfo";
 	public static final String USER_COMMUNITY = "communityId";
 	public static final String USER_COMMUNITY_ID_LIST = "communityIds";
@@ -84,6 +85,27 @@ public class UserUtils {
 	}
 	
 	/**
+	 * @Description: 通过token获取用户信息(物业端)
+	 * @Param: [loginToken]
+	 * @Return: com.jsy.community.vo.sys.SysInfoVo
+	 * @Author: DKS
+	 * @Date: 2021/10/14
+	 **/
+	public SysInfoVo getSysInfo(String loginToken) {
+		if(StringUtils.isEmpty(loginToken)){
+			return null;
+		}
+		String str;
+		try {
+			str = stringRedisTemplate.opsForValue().get("Sys:Login:" + loginToken);
+		} catch (Exception e) {
+			throw new JSYException(JSYError.INTERNAL.getCode(),"redis超时");
+		}
+		SysInfoVo sysUser = JSONObject.parseObject(str, SysInfoVo.class);
+		return sysUser;
+	}
+	
+	/**
 	* @Description: 获取request域中用户信息(登录用户自己的信息)
 	 * @Param: []
 	 * @Return: com.jsy.community.vo.UserInfoVo
@@ -122,6 +144,19 @@ public class UserUtils {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
 		return (String) request.getAttribute(USER_KEY);
+	}
+	
+	/**
+	 * @Description: 获取request域中用户id(登录用户自己的uid)
+	 * @Param: []
+	 * @Return: java.lang.String
+	 * @Author: chq459799974
+	 * @Date: 2020/12/3
+	 **/
+	public static String getId() {
+		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+			.getRequest();
+		return (String) request.getAttribute(USER_ID);
 	}
 	
 	/**

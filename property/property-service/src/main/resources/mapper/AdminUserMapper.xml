@@ -73,7 +73,6 @@
                 (u.real_name like concat ("%",#{condition},"%") or u.number like concat ("%",#{condition},"%") or o.name like concat("%",#{condition},"%"))
 			</if>
             and u.org_id = o.id
-            and u.community_id = #{communityId}
             and o.is_repair = 1
 		</where>
 	</select>
@@ -95,7 +94,8 @@
 		left join t_admin_user_role aur on aur.uid = au.uid
 		left join t_admin_role ar on ar.id = aur.role_id
 		<where>
-			ar.company_id = #{qo.companyId}
+			au.deleted = 0
+			and ar.company_id = #{qo.companyId}
 			<if test="qo.name != null and qo.name !=''">
 				and (au.real_name like concat("%", #{qo.name}, "%")
 				or au.mobile like concat("%", #{qo.name}, "%"))
@@ -121,7 +121,8 @@
 		left join t_admin_user_role aur on aur.uid = au.uid
 		left join t_admin_role ar on ar.id = aur.role_id
 		<where>
-			ar.company_id = #{qo.companyId}
+			au.deleted = 0
+			and ar.company_id = #{qo.companyId}
 			<if test="qo.name != null and qo.name !=''">
 				and (au.real_name like concat("%", #{qo.name}, "%")
 				or au.mobile like concat("%", #{qo.name}, "%"))

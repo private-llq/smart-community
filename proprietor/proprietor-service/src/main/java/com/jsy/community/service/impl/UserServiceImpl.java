@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -17,6 +18,7 @@ import com.jsy.community.dto.signature.SignatureUserDTO;
 import com.jsy.community.entity.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
+import com.jsy.community.qo.MembersQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.UserThirdPlatformQO;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
@@ -87,6 +89,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IRelationService relationService;
 
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private PropertyUserService propertyUserService;
+
     @Autowired
     private IUserAccountService userAccountService;
 
@@ -122,6 +127,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Autowired
     private RestHighLevelClient restHighLevelClient;
+
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private IHouseInfoService houseInfoService;
 
     @Autowired
     private ISignatureService signatureService;
@@ -199,6 +207,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (userIMEntity != null) {
             userInfoVo.setImId(userIMEntity.getImId());
             userInfoVo.setImPassword(userIMEntity.getImPassword());
+        }
+        //查询用户是否绑定微信
+        UserThirdPlatformEntity platformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("uid", uid).eq("third_platform_type", 2));
+        if (platformEntity != null) {
+            userInfoVo.setIsBindWechat(1);
+        } else {
+            userInfoVo.setIsBindWechat(0);
+        }
+        //查询用户是否设置支付密码
+        UserAuthEntity userAuthEntity = userAuthService.selectByPayPassword(uid);
+        if (userAuthEntity != null) {
+            if (userAuthEntity.getPayPassword()!=null){
+                userInfoVo.setIsBindPayPassword(1);
+            } else {
+                userInfoVo.setIsBindPayPassword(0);
+            }
+
+            if (userAuthEntity.getOpenId()!=null){
+                userInfoVo.setIsBindWechat(1);
+            } else {
+                userInfoVo.setIsBindWechat(0);
+            }
         }
         return userInfoVo;
     }
@@ -290,6 +320,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             log.error("；聊天用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
+        String str = redisTemplate.opsForValue().get("pushInFormMember:" + qo.getAccount());
+        if (str!=null){
+
+            MembersQO membersQO = JSONUtil.toBean(JSONUtil.parseObj(str), MembersQO.class);
+
+            List<HouseInfoEntity> houseInfoEntities = houseInfoService.selectList(membersQO.getMobile());
+            Map<String, Object> map = new HashMap<>();
+            map.put("type",9);
+            if (houseInfoEntities.size()!=0){
+                for (HouseInfoEntity houseInfoEntity : houseInfoEntities) {
+                    //推送消息
+                    PushInfoUtil.PushPublicMsg(
+                            imId,
+                            "房屋管理",
+                            houseInfoEntity.getTitle(),
+                            "http://192.168.12.113:8080/#/"+"?id="+houseInfoEntity.getId()+"mobile="+qo.getAccount(),
+                            houseInfoEntity.getContent(),
+                            map,
+                            BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
+                }
+            }
+
+        }
         //创建签章用户(远程调用)
         SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
         signatureUserDTO.setUuid(uuid);
@@ -307,6 +360,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (!signUserResult) {
             log.error("签章用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
+        }
+
+        //如果当前注册用户有房屋，则更新房屋信息
+        List<HouseMemberEntity> mobile = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("mobile", qo.getAccount()));
+        Set<Long> ids=null;
+        if (mobile.size()!=0){
+            ids=new HashSet<>();
+            for (HouseMemberEntity houseMemberEntity : mobile) {
+                ids.add(houseMemberEntity.getId());
+            }
+            houseMemberMapper.updateByMobile(ids,uuid);
         }
 
         return uuid;
@@ -465,6 +529,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             if (!StringUtils.isEmpty(entity.getUid())) {
                 //登录成功
                 UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
+                UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", entity.getUid()));
+                if (userEntity!=null){
+                    userInfoVo.setMobile(userEntity.getMobile());
+                }
                 userInfoVo.setIdCard(null);
                 UserAuthVo userAuthVo = createAuthVoWithToken(userInfoVo);
 //                returnMap.put("exists",true);
@@ -526,6 +594,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 //        userInfoVo.setUid(uid);
         //登录成功
         UserInfoVo userInfoVo = queryUserInfo(uid);
+        userInfoVo.setMobile(userThirdPlatformQO.getMobile());
         userInfoVo.setIdCard(null);
         return createAuthVoWithToken(userInfoVo);
     }
@@ -880,6 +949,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return communityIdAndName.values();
     }
 
+    @Override
+    public Collection<Map<String, Object>> queryCommunityUserList(String uid) {
+        //查所有房屋已认证的小区
+        Set<Long> communityIds = userHouseService.queryUserHousesOfCommunityIds(uid);
+        if (CollectionUtils.isEmpty(communityIds)) {
+            return null;
+        }
+        //查小区名称
+        Map<String, Map<String, Object>> communityIdAndName = communityService.queryCommunityNameByIdBatch(communityIds);
+        return communityIdAndName.values();
+    }
+
     /**
      * @Description: 查询业主所有小区的房屋
      * @Param: [uid]
@@ -919,6 +1000,78 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         /* t_community *//* t_user */
         Map<String, Map<String, Object>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
         UserInfoVo userInfoVo = userMapper.selectUserInfoById(uid);
+        for (HouseEntity userHouseEntity : houses) {
+            Map<String, Object> map = communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId()));
+            userHouseEntity.setCommunityName(map == null ? null : String.valueOf(map.get("name")));
+            userHouseEntity.setOwner(userInfoVo.getRealName());
+        }
+        return houses;
+    }
+
+
+    /**
+     * @Description: 用户绑定微信
+     * @author: Hu
+     * @since: 2021/10/15 10:05
+     * @Param:
+     * @return:
+     */
+    @Override
+    @Transactional
+    public String bindingWechat(String userId, String openid) {
+        UserAuthEntity userAuthEntity = userAuthService.selectByIsWeChat(userId);
+        if (userAuthEntity != null) {
+            if (userAuthEntity.getOpenId()!=null){
+                throw new ProprietorException("当前用户已绑定微信！");
+            }
+            //设置用户openid
+            userAuthEntity.setOpenId(openid);
+            userAuthService.updateByWechat(userAuthEntity);
+            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
+
+            return userEntity.getRealName();
+        }
+        return null;
+    }
+
+    /**
+     * @Description: 查询当前用户所有身份的房屋信息
+     * @author: Hu
+     * @since: 2021/9/29 16:08
+     * @Param: [userId, permissions]
+     * @return: java.util.List<com.jsy.community.entity.HouseEntity>
+     */
+    @Override
+    public List<HouseEntity> queryUserHouseListAll(String userId) {
+        //步骤一
+        /* t_user_house */
+        List<HouseMemberEntity> entityList = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("uid", userId));
+        if (entityList.size()==0){
+            return null;
+        }
+        HashSet<Long> communityIdSet = new HashSet<>();
+        LinkedList<Long> houseIdList = new LinkedList<>();
+        for (HouseMemberEntity permission : entityList) {
+            communityIdSet.add(permission.getCommunityId());
+            houseIdList.add(permission.getHouseId());
+        }
+
+        //步骤二
+        //查社区id,房间id,楼栋id,地址拼接
+        //补buildingId如果pid!=0
+        /* t_house */
+        List<HouseEntity> houses = houseService.queryHouses(houseIdList);
+        //组装buildingId
+        for (HouseEntity tempEntity : houses) {
+            //递归查父节点，组装楼栋级节点id进buildingId
+            setBuildingId(tempEntity);
+        }
+
+        //步骤三
+        //查小区名、业主姓名
+        /* t_community *//* t_user */
+        Map<String, Map<String, Object>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
+        UserInfoVo userInfoVo = userMapper.selectUserInfoById(userId);
         for (HouseEntity userHouseEntity : houses) {
             Map<String, Object> map = communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId()));
             userHouseEntity.setCommunityName(map == null ? null : String.valueOf(map.get("name")));
@@ -1113,6 +1266,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         signatureUserDTO.setIdCardNumber(userEntity.getIdCard());
         signatureUserDTO.setIdCardAddress(userEntity.getDetailAddress());
         boolean b = signatureService.realNameUpdateUser(signatureUserDTO);
+        //根据手机更新成员表uid
+        userHouseService.updateMobileUser(userEntity.getUid());
+
         if (!b) {
             log.error("签章用户实名同步失败，用户：" + userEntity.getUid());
             throw new ProprietorException(JSYError.INTERNAL);
@@ -1166,6 +1322,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
 
+    //保存人脸
     @Override
     @Transactional
     public void saveFace(String userId, String faceUrl) {
@@ -1173,6 +1330,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (userEntity != null) {
             userEntity.setFaceUrl(faceUrl);
             userMapper.updateById(userEntity);
+            if (userEntity.getFaceEnableStatus() == 1) {
+                // 修改人脸之后,查询相关社区及相关社区设备列表
+                QueryWrapper<HouseMemberEntity> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("uid", userId);
+                List<HouseMemberEntity> houseMemberEntities = houseMemberMapper.selectList(queryWrapper);
+                if (!CollectionUtils.isEmpty(houseMemberEntities)) {
+                    List<Long> communityIds = houseMemberEntities.stream().map(HouseMemberEntity::getCommunityId).collect(Collectors.toList());
+                    // 然后同步人脸
+                    propertyUserService.saveFace(userEntity, communityIds);
+                }
+            }
         }
     }
 

@@ -5,4 +5,12 @@
     <select id="selectAllByCommunityId" resultType="com.jsy.community.entity.CommunityHardWareEntity">
         select * from t_community_hardware where community_id = #{communityId} and deleted = 0
     </select>
+    <!-- 查询多个社区的设备列表 -->
+    <select id="selectAllByCommunityIds" resultType="com.jsy.community.entity.CommunityHardWareEntity">
+        select * from t_community_hardware where
+        deleted = 0
+        <foreach collection="list" separator="," open="and community_id in (" item="communityId" close=")">
+            #{communityId}
+        </foreach>
+    </select>
 </mapper>
