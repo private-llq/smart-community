@@ -60,7 +60,7 @@ public class CarQRController {
 //    }
     @ApiOperation("下载社区停车二维码")
     @Login
-    @RequestMapping(value = "/uploadQRCode", method = RequestMethod.GET)
+    @RequestMapping(value = "/uploadQRCode", method = RequestMethod.POST)
     public void uploadQRCode(HttpServletResponse response) throws Exception {
         Long communityId = UserUtils.getAdminCommunityId();
         CarQREntity carQREntity =  iCaQRService.findOne(communityId);
