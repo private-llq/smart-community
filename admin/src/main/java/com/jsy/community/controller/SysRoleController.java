@@ -123,6 +123,6 @@ public class SysRoleController {
 	@Login
 	@GetMapping("/roleDetail")
 	public CommonResult roleDetail(@RequestParam("roleId") Long roleId) {
-		return CommonResult.ok(sysConfigService.queryRoleDetail(roleId), "查询成功!");
+		return CommonResult.ok(sysConfigService.queryRoleDetail(roleId));
 	}
 }
