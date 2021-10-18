@@ -324,4 +324,13 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @return:
 	 */
     String bindingWechat(String userId, String openid);
+
+    /**
+     * @Description: 解除微信绑定
+     * @author: Hu
+     * @since: 2021/10/18 10:56
+     * @Param:
+     * @return:
+     */
+	void relieveBindingWechat(RegisterQO registerQO, String userId);
 }

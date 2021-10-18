@@ -72,6 +72,19 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
         return userAuthMapper.selectOne(new QueryWrapper<UserAuthEntity>().eq("uid",userId));
     }
 
+
+    /**
+     * @Description: 清除微信三方绑定
+     * @author: Hu
+     * @since: 2021/10/18 11:03
+     * @Param: [id]
+     * @return: void
+     */
+    @Override
+    public void updateByOpenId(Long id) {
+        userAuthMapper.updateByOpenId(id);
+    }
+
     /**
      * @Description: 设置微信openid
      * @author: Hu
