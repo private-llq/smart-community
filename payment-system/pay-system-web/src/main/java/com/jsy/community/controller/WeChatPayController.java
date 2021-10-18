@@ -132,7 +132,7 @@ public class WeChatPayController {
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description", weChatPayQO.getDescriptionStr());
         map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://jsy.free.svipss.top/api/v1/payment/callback/"+serviceConfig.getCompanyId());
+        map.put("notify_url","http://222.178.212.28/api/v1/payment/callback/"+serviceConfig.getCompanyId());
         map.put("amount",hashMap);
         //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("total",1);
