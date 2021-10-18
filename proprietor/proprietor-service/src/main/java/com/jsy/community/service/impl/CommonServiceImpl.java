@@ -14,7 +14,6 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.CommonMapper;
 import com.jsy.community.mapper.RegionMapper;
 import com.jsy.community.mapper.WeatherIconMapper;
-import com.jsy.community.task.RegionTask;
 import com.jsy.community.utils.LunarCalendarFestivalUtils;
 import com.jsy.community.utils.WeatherUtils;
 import com.jsy.community.vo.WeatherForecastVO;
@@ -31,9 +30,6 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
