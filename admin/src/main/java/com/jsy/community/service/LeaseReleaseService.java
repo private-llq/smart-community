@@ -2,9 +2,10 @@ package com.jsy.community.service;
 
 
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.lease.LeaseReleasePageQO;
+import com.jsy.community.qo.admin.LeaseReleasePageQO;
 import com.jsy.community.utils.PageInfo;
-import com.jsy.community.vo.lease.LeaseReleasePageVO;
+import com.jsy.community.vo.admin.LeaseReleaseInfoVO;
+import com.jsy.community.vo.admin.LeaseReleasePageVO;
 
 public interface LeaseReleaseService {
     /**
@@ -14,4 +15,6 @@ public interface LeaseReleaseService {
      * @return
      */
     PageInfo<LeaseReleasePageVO> queryLeaseReleasePage(BaseQO<LeaseReleasePageQO> baseQO);
+
+    LeaseReleaseInfoVO queryLeaseHouseInfo(Long id, String type);
 }

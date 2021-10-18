@@ -82,6 +82,14 @@ public class SysUserEntity extends BaseEntity {
 	@TableField(exist = false)
 	private Long roleId;
 	
+	// 角色IdStr
+	@TableField(exist = false)
+	private String roleIdStr;
+	
+	// 角色名称
+	@TableField(exist = false)
+	private String roleName;
+	
 	/**
 	 * 注册邀请传参验证
 	 */

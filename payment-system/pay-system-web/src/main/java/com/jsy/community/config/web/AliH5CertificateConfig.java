@@ -16,18 +16,18 @@ public class AliH5CertificateConfig {
         //设置应用Id
         certAlipayRequest.setAppId("2016110100783947");
         //设置应用私钥
-        certAlipayRequest.setPrivateKey("MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCcNJVHqlT4Aie1zP5K2cx1BbotSph7A6/NIiaEBhy0FUAEZNKdMGbRjqr7kW9Nm65Ejn/KzKg1/x18p6lKCuGR4nN4awLzV+bC3s/ZlCflfW02pjlLvghbJ6T4CVT569ID9SYQB0iG4vp2YqLBbYTqYDU1JpVbKXy6KcFwCvpe9nQDunxM5MNkUW0xkt4Un2POhve6Fdrr/4FO5rwebvj9Q+2TyOHW3mmcEdFHt534zbICtxJUkHP6ctVZx+u7iqpUvxBfMEGSzGg0gzo76GFwTOHLq3rcpf1DWwEuryYgx1qVo6GWXnIsgtT2aNSVkceyUNmsgk/qlAccN35AsUBFAgMBAAECggEBAISdI8tW8ZIoijwPUCiN5cXH2frPpMpzI9J81sQpSD8e912Dl0c6K2BnxgOTwjHaJMYxUI8E1x4Ye5kz4kZpHH41CaFHAJdFnjT84usum/x6Urkdv/Ds4b052BV4HrubGI6hlvHurQVPOCI/tTuQVlKA4UtBeXWOsESAZKhRuaPaLR7ViqH0s8akXKrhv677UYEm2jmIqeOAzlZ1aO6KQcjP/NB9xU0yHSis+5Qty4MQb/m3lUgM/lVSx28XdNRMCbX3HIfEcmTdDWbmhNpA6dx0Lo5596/vIlBubAA80hlz1KGTGbSAnQhs0vY9j+Z+mXuucrYnJIO7HwtvgHfeBqECgYEA/XHV+NpJZ4RoQApcelGk4oURLg5Y9br6mRtWq/wfHk8V3q25sECsAPu+ngjrza9sdvUl0Gcr89wQN4tuEQuVv+61M9fag2U9h8uVFGLrPf4T5hiQyi+wXwUiuJuytuo8Th2bD+LM9cYrQocs8Lj+WVIYaE8KSeWt6m5fttI7HGkCgYEAncfDhFQseU+S9IRqMNVa82kDQqVAN7YUWCwcMlRdxo876e5qtdcvdTAul73VyR07iwA1N6QWNg7f2saTXkQMR6h17fZ15i7ZVbXUITvYI/zHk1SA4ll0gX4qwRnsS/68o4xipLSs+sXqo7KPLHr4f7A/XsmqBBBzBE32fxBZOX0CgYAr5oQBzw3X+H92WFUcevfspNANAj82kWTHEI06zTk2rsxC/iSj+w/QO8sQ5MqznidTk7MxHi3m17+XX3d5TGBsFpUcnc8j4219EC6KkXfeDRy1RpwN6aTLUMBq6c1TEc/QWCB75/VIvULRC0kliWXFYwsHRmmp0zcE3ImHyXKjwQKBgFReUWodKHrl1gryE2Zxb+TgrmGgw6oGrvJHA/zVqB9Y0AzS9DSwECx1yzRQylR0UTaOseZC062sXn851+t8L6TRq93HAFxJiOWQCRKMUZNMw9tAQHrIosfrkykWl4g7ettpYgX4ptahpkpKXMzIJMECmaAx7bumoBoZJknjkBJxAoGAYS6K+qjr9VEfFhNnu0GcFyXBXkUdfEi2iczQi40p1ZtoP6RLi9y49cEOQgbF8s6qtn1EW00Ce10kK+SLYBpTzooHe2+FCFlfgxVcnuzoqFUVIQTlmbhmwNC878toEQyRVjRBrOtcV381ee13Thg4FYuIcIdyh2m1PdEZt2f4MNQ=");
+        certAlipayRequest.setPrivateKey("MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCo/urQd+BXzpOKhindIRQkSiTiKn7bLpwTkCE8sLVEJJvNQcyZN7f20AYXn8PjSuWq1FRwoY5OYFBKruvItyuGnZYAq1VjS6OVCvURDv2IGb5Aq6f3/qFrhItNvW/iYf35wueRl0Jt8t12eqFHNMEN/XjGYWRHclUmVI6pAiRYV4UobsV8u54ivSfNq1Bh2n3OSVUjljw3vgvE2iPrYgwJDhTqMiBJRfMoXyDGf0emGsxobkzfDlM9ONS/TkOVVO10HW/OxMwzqd62rBxKvOEmhvRP6YndkOUX9NBYNfRyWMKkr4DFMRGcc7EnBrjLu38Nmr58Sy0n0rMqJZfB3M6TAgMBAAECggEAVOlo0IA7D8Ny7JpGtJ3nQeijKaRSgwyjTU0Q9i6PlYKTagmSpLWTUIbrWLlksnKyfSgcmU8DcqwAC9ZiEELAsu3BLeroh3C866lKw1x11QmiR1o4lmmxb5V0bQYvDl9QPktJESUgMqBh2CL7oAyIp9/g7ESJH0D6Ob0oxRCXdG8L3z9jxhyFq8WXpMIvB6VV6jlbVt/veG9DmMWIclb1y75Zr9CC51SdkSwc/KpXm3ThPWAaI/CllA1jzvjsOCtrH39qehh80JlZ4H75pr1cjfrn5kg6SUbpf8uj1mZXQir6P2/j9h9AOz5l26wHctmdiTMbEqBHXwbUTJfIAw3hcQKBgQDbXDuH8MJcI/dhUiRtluO8mVjgPdLLmSTfGCSqiN766nLB8r4CuaQuZLhtgXCs6kDxkXjpRrn5A70oT7DDl526/QdKzN8ImOLDGau76QTlKaXG0DFrlQprEnbKTT3KkUE3QAdJEy/bDLWEJnOjdox/XJ7KNLv4Uy1AWavvOJzXywKBgQDFOR24kjrL/pt04XcDLpC+ZVsDvaFeyEtCnQrreUOioiuMsoJwHB4GrSudxIuW+vl7qikNlG+s0jGn0LPraGu01UaYHhZgoxZTBZ0W+KAlYiDnlUi9PZPZpcwcjpJGt80CUD+ceTg2rJybBgxsd9NMQwr03VwVI+VdxBsOUY47WQKBgC5AIiUldDVtN+mDIj8hA19ujbiqEFnxLj8Dnid+uFT7Pbr67WkxrxZBEkm0cwdiVNMaMv4sdWW1jhqDwudafl1AoFr7G0N6yMUOEpGKLggLYfKrTuA6CnpM6FL7Oj4Npkx56Y9UxlBPO65jVRpwEmuAIdLMj51qHC5nOcM0ko1FAoGAQ82uFR1Yz3cZ9OXqp5JjusFXuAKCrvZHQYCCF5BaG1iLhlR8mZRhEkSIwTWoE+D20ngeoweMGSsuXRZYNK9yj/neyj9VzCVlcGd2qUYSsKd6zoM5Pa4k3Wets4ekbGGWPpxeMipOlCVltbovnT7YytgltSdBGBd+LG1WK+cH8gkCgYA9nTPbTALOKv2pEuAWBafqAg34Yr2xaoiEys22awEwoJACoAjCcsBOLp0+IR8677TKmtYhhcYWydH4U6YSFffYsJ1jw6cDNNYQ/tA4EPaj6yfO/c2s8OhmdQ4v28f19awtRRDwB5BWb7Ry7se8+equegqB77Is8jgfO4TdPpO9+g==");
         certAlipayRequest.setFormat("json");
         //设置字符集
         certAlipayRequest.setCharset("utf-8");
         //设置签名类型
         certAlipayRequest.setSignType("RSA2");
         //设置应用公钥证书路径
-        certAlipayRequest.setCertContent("C:\\Users\\Administrator\\Desktop\\pay\\appCertPublicKey_2016110100783947.crt");
+        certAlipayRequest.setCertContent("C:\\alipay\\appCertPublicKey_2016110100783947.crt");
         //设置支付宝公钥证书路径
-        certAlipayRequest.setAlipayPublicCertContent("C:\\Users\\Administrator\\Desktop\\pay\\alipayCertPublicKey_RSA2.crt");
+        certAlipayRequest.setAlipayPublicCertContent("C:\\alipay\\alipayCertPublicKey_RSA2.crt");
         //设置支付宝根证书路径
-        certAlipayRequest.setRootCertContent("C:\\Users\\Administrator\\Desktop\\pay\\alipayRootCert.crt");
+        certAlipayRequest.setRootCertContent("C:\\alipay\\alipayRootCert.crt");
         return certAlipayRequest;
     }
 

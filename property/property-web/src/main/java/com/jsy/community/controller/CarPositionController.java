@@ -34,6 +34,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.annotation.OrderUtils;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -743,10 +744,10 @@ public class CarPositionController {
         CarOrderEntity entity = new CarOrderEntity();//新增一个车辆订单对象
         entity.setType(1);//临时车
         entity.setPlateColor(plateColor);
-        entity.setOrderNum(UuidUtils.generateUuid().replace("-", "")+System.currentTimeMillis());//订单编号
+        entity.setOrderNum(OrderNoUtil.getOrder());//订单编号
         entity.setBeginTime(beginTime);//进入的时间
         entity.setOrderStatus(0);//未支付
-        entity.setRise("临时-" + plateNum);//账单标题
+        entity.setRise("无");
         entity.setCarPlate(plateNum);//车牌号
         entity.setCommunityId(communityId);//社区id
         Calendar calendar = Calendar.getInstance();

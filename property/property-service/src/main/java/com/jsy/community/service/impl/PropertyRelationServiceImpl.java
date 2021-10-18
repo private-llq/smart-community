@@ -174,9 +174,11 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
     @Override
     @Transactional
     public void save(HouseMemberEntity houseMemberEntity,String uid) {
-//        houseMemberEntity.setStatus(1);
+        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("mobile", houseMemberEntity.getMobile()));
+        if (userEntity!=null){
+            houseMemberEntity.setUid(userEntity.getUid());
+        }
         houseMemberEntity.setId(SnowFlake.nextId());
-        houseMemberEntity.setHouseholderId(uid);
         propertyRelationMapper.insert(houseMemberEntity);
 
         if (houseMemberEntity.getRelation()==1){
@@ -188,6 +190,9 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
             proprietorMapper.insert(entity);
 
             UserHouseEntity userHouseEntity = new UserHouseEntity();
+            if (userEntity!=null){
+                userHouseEntity.setUid(userEntity.getUid());
+            }
             userHouseEntity.setCommunityId(houseMemberEntity.getCommunityId());
             userHouseEntity.setHouseId(houseMemberEntity.getHouseId());
             userHouseEntity.setCheckStatus(1);

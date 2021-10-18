@@ -217,10 +217,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         //查询用户是否设置支付密码
         UserAuthEntity userAuthEntity = userAuthService.selectByPayPassword(uid);
-        if (userAuthEntity != null&&userAuthEntity.getPayPassword()!=null) {
-            userInfoVo.setIsBindPayPassword(1);
-        } else {
-            userInfoVo.setIsBindPayPassword(0);
+        if (userAuthEntity != null) {
+            if (userAuthEntity.getPayPassword()!=null){
+                userInfoVo.setIsBindPayPassword(1);
+            } else {
+                userInfoVo.setIsBindPayPassword(0);
+            }
+
+            if (userAuthEntity.getOpenId()!=null){
+                userInfoVo.setIsBindWechat(1);
+            } else {
+                userInfoVo.setIsBindWechat(0);
+            }
         }
         return userInfoVo;
     }
@@ -352,6 +360,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (!signUserResult) {
             log.error("签章用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
+        }
+
+        //如果当前注册用户有房屋，则更新房屋信息
+        List<HouseMemberEntity> mobile = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("mobile", qo.getAccount()));
+        Set<Long> ids=null;
+        if (mobile.size()!=0){
+            ids=new HashSet<>();
+            for (HouseMemberEntity houseMemberEntity : mobile) {
+                ids.add(houseMemberEntity.getId());
+            }
+            houseMemberMapper.updateByMobile(ids,uuid);
+            userHouseService.updateMobile(ids,uuid);
         }
 
         return uuid;
@@ -1000,18 +1020,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     @Transactional
     public String bindingWechat(String userId, String openid) {
-        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
-        if (userEntity != null) {
-            UserThirdPlatformEntity thirdPlatformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("third_platform_id", openid).eq("third_platform_type", 2));
-            if (thirdPlatformEntity != null) {
+        UserAuthEntity userAuthEntity = userAuthService.selectByIsWeChat(userId);
+        if (userAuthEntity != null) {
+            if (userAuthEntity.getOpenId()!=null){
                 throw new ProprietorException("当前用户已绑定微信！");
             }
-            UserThirdPlatformEntity userThirdPlatformEntity = new UserThirdPlatformEntity();
-            userThirdPlatformEntity.setUid(userId);
-            userThirdPlatformEntity.setThirdPlatformId(openid);
-            userThirdPlatformEntity.setThirdPlatformType(2);
-            userThirdPlatformEntity.setId(SnowFlake.nextId());
-            userThirdPlatformMapper.insert(userThirdPlatformEntity);
+            //设置用户openid
+            userAuthEntity.setOpenId(openid);
+            userAuthService.updateByWechat(userAuthEntity);
+            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
 
             return userEntity.getRealName();
         }

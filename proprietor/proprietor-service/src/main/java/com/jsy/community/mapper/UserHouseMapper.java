@@ -102,4 +102,13 @@ public interface UserHouseMapper extends BaseMapper<UserHouseEntity> {
 	 * @return:
 	 */
     void updateByUid(@Param("ids") Set<Long> ids, @Param("uid") String uid);
+
+    /**
+     * @Description: 修改房屋认证表数据uid
+     * @author: Hu
+     * @since: 2021/10/16 17:29
+     * @Param:
+     * @return:
+     */
+    void updateMobile(@Param("ids") Set<Long> ids, @Param("uid") String uuid);
 }

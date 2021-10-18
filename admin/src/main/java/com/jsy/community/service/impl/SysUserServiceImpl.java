@@ -7,10 +7,12 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.sys.SysRoleEntity;
 import com.jsy.community.entity.sys.SysUserAuthEntity;
 import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.entity.sys.SysUserRoleEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.mapper.SysRoleMapper;
 import com.jsy.community.mapper.SysUserAuthMapper;
 import com.jsy.community.mapper.SysUserMapper;
 import com.jsy.community.mapper.SysUserRoleMapper;
@@ -62,6 +64,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	
 	@Resource
 	private SysUserRoleMapper sysUserRoleMapper;
+	
+	@Resource
+	private SysRoleMapper sysRoleMapper;
 	
 	@Autowired
 	private UserUtils userUtils;
@@ -410,6 +415,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		Integer integer = sysUserMapper.countPageUserEntity(query);
 		if (integer == null) {
 			integer = 0;
+		}
+		// 补充角色名称和角色idStr
+		for (SysUserEntity sysUserEntity : sysUserEntities) {
+			SysRoleEntity sysRoleEntity = sysRoleMapper.selectById(sysUserEntity.getRoleId());
+			sysUserEntity.setRoleIdStr(String.valueOf(sysUserEntity.getRoleId()));
+			sysUserEntity.setRoleName(sysRoleEntity.getName());
 		}
 		PageInfo<SysUserEntity> pageInfo = new PageInfo<>();
 		pageInfo.setRecords(sysUserEntities);

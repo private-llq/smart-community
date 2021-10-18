@@ -21,22 +21,17 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.imutils.open.StringUtils;
 import com.jsy.community.vo.UserAccountVO;
-import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.WithdrawalResulrVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -448,7 +443,7 @@ public class UserAccountServiceImpl implements IUserAccountService {
         recordEntityQueryWrapper.eq("goods_id", conId);
         recordEntityQueryWrapper.last(" limit 1");
         UserAccountRecordEntity userAccountRecordEntity = userAccountRecordMapper.selectOne(recordEntityQueryWrapper);
-        if (userAccountRecordEntity == null) {
+        if (userAccountRecordEntity != null) {
             // 已经有入账数据,说明入过账,跳过
             return 0;
         }

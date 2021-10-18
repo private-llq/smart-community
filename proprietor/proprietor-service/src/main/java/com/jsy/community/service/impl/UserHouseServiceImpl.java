@@ -104,6 +104,18 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	}
 
 	/**
+	 * @Description: 修改房屋认证表数据
+	 * @author: Hu
+	 * @since: 2021/10/16 17:28
+	 * @Param:
+	 * @return:
+	 */
+	@Override
+	public void updateMobile(Set<Long> ids, String uuid) {
+		userHouseMapper.updateMobile(ids,uuid);
+	}
+
+	/**
 	 * @Description: 根据用户手机更新成员表uid
 	 * @author: Hu
 	 * @since: 2021/10/12 14:52
@@ -294,9 +306,13 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 		String url="http://192.168.12.113:8080/#/";
 
-		HouseMemberEntity memberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("house_id", membersQO.getHouseId()).eq("mobile", membersQO.getMobile()));
+		HouseMemberEntity memberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("house_id", membersQO.getHouseId()).eq("mobile", membersQO.getMobile()).eq("relation",membersQO.getRelation()));
 		if (memberEntity!=null){
 			throw new ProprietorException("当前成员以添加，请勿重复添加！");
+		}
+		Object obj = redisTemplate.opsForValue().get(MEMBERKEY + membersQO.getMobile());
+		if (obj!=null){
+			throw new ProprietorException("请勿重复提交，请一个小时后在重新添加！");
 		}
 		//社区
 		CommunityEntity communityEntity = communityMapper.selectById(membersQO.getCommunityId());
@@ -334,7 +350,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 					userIMEntity.getImId(),
 					"房屋管理",
 					title,
-					url+"?"+houseInfoEntity.getId(),
+					url+"?id="+houseInfoEntity.getId()+"&mobile="+membersQO.getMobile(),
 					desc,
 					map,
 					BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());

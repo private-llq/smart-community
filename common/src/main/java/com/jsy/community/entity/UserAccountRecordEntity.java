@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * @author chq459799974
@@ -38,12 +37,14 @@ public class UserAccountRecordEntity extends BaseEntity {
     private BigDecimal tradeAmount;
 
     @ApiModelProperty(value = "交易金额字符串")
+    @TableField(exist = false)
     private String tradeAmountStr;
 
     @ApiModelProperty(value = "交易后余额")
     private BigDecimal balance;
 
     @ApiModelProperty(value = "交易后余额字符串")
+    @TableField(exist = false)
     private String balanceStr;
 
     @ApiModelProperty(value = "商品id")
@@ -53,6 +54,7 @@ public class UserAccountRecordEntity extends BaseEntity {
     private String comment;
 
     @ApiModelProperty(value = "流水号")
+    @TableField(exist = false)
     private String serialNumber;
 
 

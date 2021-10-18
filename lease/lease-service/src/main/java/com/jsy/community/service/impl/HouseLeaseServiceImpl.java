@@ -668,7 +668,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         }
         StringBuffer result = new StringBuffer("");
         for (Long id : ids) {
-            result.append(String.valueOf(id));
+            result.append(String.valueOf(id)+",");
         }
         return String.valueOf(result);
     }

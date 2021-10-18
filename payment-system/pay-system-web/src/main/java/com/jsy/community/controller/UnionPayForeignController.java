@@ -186,7 +186,7 @@ public class UnionPayForeignController {
     /**
      *@Author: Pipi
      *@Description: 银联消费类下单
-     *@Param: unionPayOrderRecordEntity:
+     *@Param: unionPayOrderRecordEntity
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/26 16:33
      **/

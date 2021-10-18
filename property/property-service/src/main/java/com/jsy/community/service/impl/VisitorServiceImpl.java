@@ -380,7 +380,7 @@ public class VisitorServiceImpl implements IVisitorService {
 		QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<VisitorEntity>()
 				.eq("community_id", communityId)//社区id
 				.eq("status",status)//状态 1.待入园 2.已入园 3.已出园 4.已失效
-				.eq("check_status",1)//通过审核
+				//.eq("check_status",1)//通过审核
 				.eq("car_plate",carNumber);
 		List<VisitorEntity> visitorEntities = visitorMapper.selectList(queryWrapper);
 		if (visitorEntities.size()>0) {
