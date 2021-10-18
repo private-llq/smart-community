@@ -2,7 +2,6 @@ package com.jsy.community.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -1431,7 +1430,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             // 但是支付宝订单不行,所以这里做的处理是在租客支付回调时查看签约状态,如果是已经取消则退款
             if (weChatOrderEntity != null && weChatOrderEntity.getCompanyId() != null) {
                 // 作废微信支付订单
-                CompanyPayConfigEntity companyConfig = companyPayConfigService.getCompanyConfig(weChatOrderEntity.getCompanyId());
+                CompanyPayConfigEntity companyConfig = companyPayConfigService.getCompanyConfig(weChatOrderEntity.getCompanyId(),1);
                 WechatConfig.setConfig(companyConfig);
                 try {
                     PublicConfig.closeOrder(weChatOrderEntity.getId());

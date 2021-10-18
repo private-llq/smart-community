@@ -90,8 +90,8 @@ public class CompanyPayConfigServiceImpl extends ServiceImpl<CompanyPayConfigMap
      * @return: com.jsy.community.entity.CompanyPayConfigEntity
      */
     @Override
-    public CompanyPayConfigEntity getCompanyConfig(Long propertyId) {
-        return companyPayConfigMapper.selectOne(new QueryWrapper<CompanyPayConfigEntity>().eq("company_id",propertyId));
+    public CompanyPayConfigEntity getCompanyConfig(Long propertyId,Integer type) {
+        return companyPayConfigMapper.selectOne(new QueryWrapper<CompanyPayConfigEntity>().eq("company_id",propertyId).eq("type",type));
     }
 
     /**

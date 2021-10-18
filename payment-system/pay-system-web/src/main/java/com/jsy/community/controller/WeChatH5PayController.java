@@ -2,57 +2,31 @@ package com.jsy.community.controller;
 
 import cn.hutool.json.JSONUtil;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.*;
+import com.jsy.community.api.ICarOrderService;
+import com.jsy.community.api.ICompanyPayConfigService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderEntity;
-import com.jsy.community.entity.CarOrderRecordEntity;
-import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.CompanyPayConfigEntity;
-import com.jsy.community.entity.payment.WeChatOrderEntity;
-import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
-import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.payment.AliOrderContentQO;
-import com.jsy.community.qo.payment.WeChatH5PayQO;
-import com.jsy.community.qo.payment.WeChatPayQO;
-import com.jsy.community.qo.payment.WithdrawalQO;
-import com.jsy.community.untils.wechat.*;
-import com.jsy.community.utils.UserUtils;
+import com.jsy.community.untils.wechat.PublicConfig;
+import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.vo.CommonResult;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
-import org.springframework.amqp.AmqpException;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessagePostProcessor;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
-import org.xmlpull.v1.XmlPullParserException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @program: pay
@@ -87,7 +61,7 @@ public class WeChatH5PayController {
             Map<String, Object> result = new HashMap<String, Object>();
 
             //获取微信需要的相关参数
-            CompanyPayConfigEntity serviceConfig = companyPayConfigService.getCompanyConfig(1l);
+            CompanyPayConfigEntity serviceConfig = companyPayConfigService.getCompanyConfig(1l,2);
             WechatConfig.setConfig(serviceConfig);
 
         System.out.println("code\n\n"+qo.getCode());

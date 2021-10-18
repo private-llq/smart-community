@@ -72,4 +72,9 @@ public class CompanyPayConfigEntity extends BaseEntity {
      */
     private Integer refundStatus;
 
+    /**
+     * 1APP 2公众号 3小程序
+     */
+    private Integer type;
+
 }

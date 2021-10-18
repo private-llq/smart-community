@@ -122,7 +122,7 @@ public class WeChatPayController {
         CommunityEntity entity = communityService.getCommunityNameById(weChatPayQO.getCommunityId());
         CompanyPayConfigEntity serviceConfig = null;
         if (Objects.nonNull(entity)){
-            serviceConfig = companyPayConfigService.getCompanyConfig(entity.getPropertyId());
+            serviceConfig = companyPayConfigService.getCompanyConfig(entity.getPropertyId(),1);
             WechatConfig.setConfig(serviceConfig);
         } else {
             throw new PaymentException("当前小区不支持微信支付！");
@@ -232,7 +232,7 @@ public class WeChatPayController {
     public void callback(HttpServletRequest request, HttpServletResponse response,@PathVariable("companyId") Long companyId) throws Exception {
         log.info("回调成功");
         log.info(String.valueOf(companyId));
-        CompanyPayConfigEntity configEntity = companyPayConfigService.getCompanyConfig(companyId);
+        CompanyPayConfigEntity configEntity = companyPayConfigService.getCompanyConfig(companyId,1);
         if (Objects.nonNull(configEntity)){
             WechatConfig.setConfig(configEntity);
         }
