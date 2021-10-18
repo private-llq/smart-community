@@ -339,7 +339,7 @@ public class UserAccountWithdrawalServiceImpl implements UserAccountWithdrawalSe
     private static final String ALIPAY_CHARSET = "UTF-8";
     private static final String ALIPAY_SIGN_TYPE = "RSA2";
 
-    @DubboReference(version = Const.version, group = Const.group_property)
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPayConfigureService iPayConfigureService;
 
     private CertAlipayRequest initRequest() throws Exception {

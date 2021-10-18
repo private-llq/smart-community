@@ -36,7 +36,7 @@ public class LeaseOperationRecordServiceImpl extends ServiceImpl<LeaseOperationR
     @Autowired
     private LeaseOperationRecordMapper leaseOperationRecordMapper;
 
-    @DubboReference(version = Const.version, group = Const.group)
+    @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService iCommunityService;
 
     /**
