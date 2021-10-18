@@ -325,7 +325,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         int delete = carMonthlyVehicleMapper.delete(new QueryWrapper<CarMonthlyVehicle>().eq("uid", uid));
         return delete;
     }
-
     /**
      * 多条件查询+分页
      * @param carMonthlyVehicleQO
