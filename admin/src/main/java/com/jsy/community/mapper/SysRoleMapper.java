@@ -44,4 +44,13 @@ public interface SysRoleMapper extends BaseMapper<SysRoleEntity> {
 	 * @Date: 2020/12/15
 	**/
 	int addRoleMenuBatch(@Param("list") List<Long> list, @Param("roleId") Long roleId);
+	
+	/**
+	 * @author: DKS
+	 * @description: 查询角色的菜单ID列表
+	 * @param roleId: 角色ID
+	 * @return: java.util.List<java.lang.Long>
+	 * @date: 2021/10/18 16:10
+	 **/
+	List<Long> queryRoleMuneIdsByRoleId(Long roleId);
 }
