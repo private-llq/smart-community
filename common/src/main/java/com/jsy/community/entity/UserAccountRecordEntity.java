@@ -28,9 +28,9 @@ public class UserAccountRecordEntity extends BaseEntity {
     @TableField(exist = false)
     private String tradeFromStr;
 
-    @ApiModelProperty(value = "交易类型1.收入2.支出")
+    @ApiModelProperty(value = "交易类型 1.支出2.收入")
     private Integer tradeType;
-    @ApiModelProperty(value = "交易类型展示用字符串1.收入2.支出", hidden = true)
+    @ApiModelProperty(value = "交易类型展示用字符串 1.支出2.收入", hidden = true)
     @TableField(exist = false)
     private String tradeTypeStr;
 
