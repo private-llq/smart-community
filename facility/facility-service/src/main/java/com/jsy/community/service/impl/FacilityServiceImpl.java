@@ -46,7 +46,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 	private FacilityTypeMapper facilityTypeMapper;
 	
 	@Autowired
-	private PropertyUserHouseMapper houseMapper;
+	private UserHouseMapper houseMapper;
 	
 	@Autowired
 	private UserMapper userMapper;

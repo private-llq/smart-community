@@ -392,6 +392,16 @@ public class UserAccountServiceImpl implements IUserAccountService {
     }
 
     /**
+     * 解绑支付宝提现账户
+     *
+     * @param uid
+     */
+    @Override
+    public void unbundlingZhiFuBaoAccount(String uid) {
+        userThirdPlatformMapper.deleteZhiFuBaoBinDing(uid);
+    }
+
+    /**
      * 绑定支付宝账户
      *
      * @param uid              用户ID
