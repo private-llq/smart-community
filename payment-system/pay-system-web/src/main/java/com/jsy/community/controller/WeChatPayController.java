@@ -132,7 +132,7 @@ public class WeChatPayController {
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description", weChatPayQO.getDescriptionStr());
         map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://222.178.212.28:9527/api/v1/payment/callback/"+serviceConfig.getCompanyId());
+        map.put("notify_url","http://222.178.212.28/api/v1/payment/callback/"+serviceConfig.getCompanyId());
         map.put("amount",hashMap);
         //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("total",1);
@@ -288,7 +288,7 @@ public class WeChatPayController {
             //房屋租赁业务逻辑
             if (split[0].equals("9")){
                 AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordService.queryRecordByConId(split[1]);
-                userAccountService.rentalIncome(split[1],new BigDecimal(map.get("amount")),leaseRecordEntity.getHomeOwnerUid());
+                userAccountService.rentalIncome(split[1],new BigDecimal(map.get("amount")).divide(new BigDecimal(100)),leaseRecordEntity.getHomeOwnerUid());
                 // 修改签章合同支付状态
                 Map<String, Object> houseMap = housingRentalOrderService.completeLeasingOrder(map.get("out_trade_no"), split[1]);
                 // 修改租房签约支付状态

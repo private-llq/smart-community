@@ -371,6 +371,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 ids.add(houseMemberEntity.getId());
             }
             houseMemberMapper.updateByMobile(ids,uuid);
+            userHouseService.updateMobile(ids,uuid);
         }
 
         return uuid;

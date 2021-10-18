@@ -3,8 +3,8 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.entity.proprietor.LeaseOperationRecordEntity;
-import com.jsy.community.qo.lease.LeaseReleasePageQO;
-import com.jsy.community.vo.lease.LeaseReleasePageVO;
+import com.jsy.community.qo.admin.LeaseReleasePageQO;
+import com.jsy.community.vo.admin.LeaseReleasePageVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
