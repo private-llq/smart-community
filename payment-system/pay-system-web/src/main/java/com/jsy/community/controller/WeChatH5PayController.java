@@ -163,15 +163,14 @@ public class WeChatH5PayController {
         CarOrderEntity entity;
         //订单号
         entity = carOrderService.selectId(Long.parseLong(split[1]));
+        System.out.println("\n\n"+entity);
         //付款金额 单位是分 需要除 100在存入数据库
-        String amount = params.get("amount");
-        String total = JSONObject.fromObject(amount).getString("payer_total");
-        BigDecimal decimal = BigDecimal.valueOf(Long.parseLong(total));
-        BigDecimal divide = decimal.divide(new BigDecimal(100));
+        String total = params.get("amount");
+        BigDecimal divide = new BigDecimal(total).divide(new BigDecimal(100));
         entity.setOrderNum(params.get("out_trade_no"));
         entity.setMoney(divide);//支付金额
         //支付状态
-        entity.setOrderStatus(1);//0未支付，1已支付
+        entity.setOrderStatus(0);//0未支付，1已支付
         //支付类型
         entity.setPayType(4);//1app支付 2物业后台 3支付宝手机H5 4微信公众号
 
@@ -192,9 +191,9 @@ public class WeChatH5PayController {
         }
         entity.setOrderNum(params.get("out_trade_no"));//商户订单编号
         entity.setBillNum(params.get("transaction_id"));//微信账单编号
-        System.out.println(entity);
-        boolean b = carOrderService.updateOrderId(entity,Long.parseLong(split[0]));//根据订单号修改订单信息
-        System.out.println("修改成功");
+        System.out.println("\n\n\n"+entity);
+        boolean b = carOrderService.updateOrderId(entity,Long.parseLong(split[1]));//根据订单号修改订单信息
+        System.out.println(b);
 
     }
 
