@@ -126,7 +126,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Autowired
     private RestHighLevelClient restHighLevelClient;
 
-    @DubboReference(version = Const.version, group = Const.group, check = false)
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IHouseInfoService houseInfoService;
 
     @Autowired
@@ -1014,7 +1014,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     @Transactional
     public void relieveBindingWechat(RegisterQO registerQO, String userId) {
-        commonService.checkVerifyCode(registerQO.getAccount(), registerQO.getCode());
         UserAuthEntity authEntity = userAuthService.selectByIsWeChat(userId);
         if (authEntity != null) {
             if (authEntity.getOpenId()==null){
