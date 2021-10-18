@@ -228,7 +228,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 userInfoVo.setIsBindWechat(0);
             }
         }
-        UserThirdPlatformEntity userThirdPlatformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("uid", uid).eq("type", 5));
+        UserThirdPlatformEntity userThirdPlatformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("uid", uid).eq("third_platform_type", 5));
         if (userThirdPlatformEntity != null) {
             userInfoVo.setIsBindAlipay(1);
         } else {
@@ -1022,7 +1022,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public void relieveBindingWechat(RegisterQO registerQO, String userId) {
         UserAuthEntity authEntity = userAuthService.selectByIsWeChat(userId);
         if (authEntity != null) {
-            if (authEntity.getOpenId()==null){
+            if (StringUtils.isEmpty(authEntity.getOpenId())){
                 throw new ProprietorException("当前用户并未绑定微信！");
             }
 

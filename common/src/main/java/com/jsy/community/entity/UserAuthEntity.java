@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -77,6 +78,7 @@ public class UserAuthEntity extends BaseEntity {
 	@ApiModelProperty("支付密码验证(盐值)")
 	private String paySalt;
 
-	@ApiModelProperty("支付密码验证(盐值)")
+	@ApiModelProperty("openid")
+	@TableField("open_id")
 	private String openId;
 }
