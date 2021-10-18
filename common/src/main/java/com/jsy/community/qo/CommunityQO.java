@@ -48,6 +48,9 @@ public class CommunityQO extends BaseQO {
     @ApiModelProperty(value = "纬度")
     private BigDecimal lat;
     
+    @ApiModelProperty(value = "物业公司ID")
+    private Long propertyId;
+    
     /**
      * 通过名称查询社区 验证参数接口
      * @author YuLF

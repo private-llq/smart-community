@@ -76,7 +76,8 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	**/
 	public List<SysMenuEntity> queryMenu(){
 		List<SysMenuEntity> menuList = sysMenuMapper.selectList(new QueryWrapper<SysMenuEntity>().select("*").eq("pid", 0));
-		setChildren(menuList,new LinkedList<SysMenuEntity>());
+		setChildren(menuList,new LinkedList<>());
+		menuList.sort(Comparator.comparing(SysMenuEntity::getSort));
 		return menuList;
 	}
 	
@@ -202,6 +203,11 @@ public class SysConfigServiceImpl implements ISysConfigService {
 		List<SysMenuEntity> list = null;
 		try{
 			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Sys:Menu"),List.class);
+			// list排序
+			if (CollectionUtils.isEmpty(list)) {
+				return new ArrayList<>();
+			}
+			list.sort(Comparator.comparing(SysMenuEntity::getSort));
 		}catch (Exception e){
 			log.error("redis获取菜单失败");
 			return queryMenu();//从mysql获取
