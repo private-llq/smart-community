@@ -139,7 +139,7 @@ public class UserAccountController {
 
     @ApiOperation(value = "查询已绑定支付宝账户", notes = "需要登录")
     @GetMapping("/zhifubao/account/query")
-    public CommonResult<ZhiFuBaoAccountBindingQO> bindingZhiFuBaoAccount() {
+    public CommonResult<ZhiFuBaoAccountBindingQO> queryZhiFuBaoAccount() {
         return CommonResult.ok(userAccountService.queryZhiFuBaoAccount(UserUtils.getUserId()));
     }
 
@@ -148,6 +148,14 @@ public class UserAccountController {
     public CommonResult<Boolean> bindingZhiFuBaoAccount(@RequestBody ZhiFuBaoAccountBindingQO accountBindingQO) {
         String uid = UserUtils.getUserId();
         userAccountService.bindingZhiFuBaoAccount(uid, accountBindingQO);
+        return CommonResult.ok();
+    }
+
+    @ApiOperation(value = "解绑支付宝账户", notes = "需要登录")
+    @GetMapping("/zhifubao/account/unbundling")
+    public CommonResult<Boolean> unbundlingZhiFuBaoAccount() {
+        String uid = UserUtils.getUserId();
+        userAccountService.unbundlingZhiFuBaoAccount(uid);
         return CommonResult.ok();
     }
 

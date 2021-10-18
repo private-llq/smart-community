@@ -133,6 +133,13 @@ public interface IUserAccountService {
     ZhiFuBaoAccountBindingQO queryZhiFuBaoAccount(String uid);
 
     /**
+     * 解绑支付宝提现账户
+     *
+     * @param uid
+     */
+    void unbundlingZhiFuBaoAccount(String uid);
+
+    /**
      * @param uid              用户ID
      * @param accountBindingQO 绑定的支付宝账户信息
      */
