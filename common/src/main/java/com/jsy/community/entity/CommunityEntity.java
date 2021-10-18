@@ -94,6 +94,10 @@ public class CommunityEntity extends BaseEntity {
     @TableField(exist=false)
     private String companyName;
     
+    // 地区地址拼接
+    @TableField(exist = false)
+    private String address;
+    
     /**
      * 大后台新增社区验证组
      */

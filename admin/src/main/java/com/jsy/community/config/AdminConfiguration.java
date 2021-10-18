@@ -27,8 +27,8 @@ public class AdminConfiguration {
     @Value("${spring.redis.password}")
     private String redisPassword;
 
-    @Value("${spring.redis.sms-databases}")
-    private Integer smsDatabases;
+//    @Value("${spring.redis.sms-databases}")
+//    private Integer smsDatabases;
 
 
     @Bean("adminRedisTemplate")
@@ -51,7 +51,7 @@ public class AdminConfiguration {
         JedisClientConfiguration.JedisPoolingClientConfigurationBuilder poolingClientConfigurationBuilder =
                 (JedisClientConfiguration.JedisPoolingClientConfigurationBuilder)JedisClientConfiguration.builder();
         JedisClientConfiguration jedisClientConfiguration = poolingClientConfigurationBuilder.build();
-        redisStandaloneConfiguration.setDatabase(smsDatabases);
+//        redisStandaloneConfiguration.setDatabase(smsDatabases);
         redisStandaloneConfiguration.setHostName(redisHost);
         redisStandaloneConfiguration.setPort(redisPort);
         redisStandaloneConfiguration.setPassword(redisPassword);

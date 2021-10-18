@@ -3,6 +3,7 @@ package com.jsy.community.qo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -22,4 +23,12 @@ public class PropertyCompanyQO implements Serializable {
 	@ApiModelProperty(value = "地区")
 	private String region;
 	
+	@ApiModelProperty(value = "省份ID")
+	private Integer provinceId;
+	
+	@ApiModelProperty(value = "城市ID")
+	private Integer cityId;
+	
+	@ApiModelProperty(value = "区ID")
+	private Integer areaId;
 }

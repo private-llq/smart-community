@@ -1,9 +1,11 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -25,8 +27,18 @@ public class PropertyCompanyEntity extends BaseEntity {
     @ApiModelProperty(value = "联系人电话")
     private String contactsMobile;
     
-    @ApiModelProperty(value = "地区")
+    @ApiModelProperty(value = "物业地区")
+    @TableField(exist = false)
     private String region;
+    
+    @ApiModelProperty(value = "省份ID")
+    private Integer provinceId;
+    
+    @ApiModelProperty(value = "城市ID")
+    private Integer cityId;
+    
+    @ApiModelProperty(value = "区ID")
+    private Integer areaId;
     
     @ApiModelProperty(value = "详细地址")
     private String address;
@@ -38,10 +50,10 @@ public class PropertyCompanyEntity extends BaseEntity {
     private LocalDate overTime;
     
     @ApiModelProperty(value = "经度")
-    private String longitude;
+    private BigDecimal longitude;
     
     @ApiModelProperty(value = "纬度")
-    private String latitude;
+    private BigDecimal latitude;
     
     @ApiModelProperty(value = "公司简介")
     private String profile;

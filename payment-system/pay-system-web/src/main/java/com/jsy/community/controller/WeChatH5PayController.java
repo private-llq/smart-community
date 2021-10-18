@@ -66,29 +66,28 @@ import java.util.concurrent.TimeUnit;
 public class WeChatH5PayController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICompanyPayConfigService companyPayConfigService;
-    private static String unifiedorder_url = "/v3/pay/transactions/jsapi";
-//    private static String code="021uWhml26CwT74Kkeml25h4Ia1uWhmG";
+    //    private static String unifiedorder_url = "/v3/pay/transactions/jsapi";
     private static String APPID="wxc7e3b98bb50243a6";
-    //获取openid的地址
-    private static String getopenid_url = "https://api.weixin.qq.com/sns/oauth2/access_token";
-    //公众号的参数
+    //    //获取openid的地址
+//    private static String getopenid_url = "https://api.weixin.qq.com/sns/oauth2/access_token";
+//    //公众号的参数
     private static String secret="ffef760d5868be78a88506122ee6bcfa";
+
+    @Value("${notifyUrl}")
+    private String notifyUrl;
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarOrderService carOrderService;
 
-//    @Login
+    //    @Login
     @PostMapping("/wxH5Pay")
     public CommonResult<Map<String, Object>> wxH5Pay(@RequestBody AliOrderContentQO qo) throws Exception {
         System.out.println(qo);
-
-
-            //返回前端参数
-            Map<String, Object> result = new HashMap<String, Object>();
-
-            //获取微信需要的相关参数
-            CompanyPayConfigEntity serviceConfig = companyPayConfigService.getCompanyConfig(1l);
-            WechatConfig.setConfig(serviceConfig);
+        //返回前端参数
+        Map<String, Object> result = new HashMap<String, Object>();
+        //获取微信需要的相关参数
+        CompanyPayConfigEntity serviceConfig = companyPayConfigService.getCompanyConfig(qo.getCommunityId(), 2);
+        WechatConfig.setConfig(serviceConfig);
 
         System.out.println("code\n\n"+qo.getCode());
 
@@ -101,16 +100,16 @@ public class WeChatH5PayController {
         //参数中：openid
         Map<String, Object> payer = new HashMap<String, Object>();
         //获取openid
-        String openid = PublicConfig.getOpenId(APPID, secret, qo.getCode());
+        String openid = PublicConfig.getOpenId(WechatConfig.APPID, WechatConfig.APPID_SECRET, qo.getCode());
 
         System.out.println(qo+"\n\n");
         payer.put("openid",openid);
-        paraMap.put("appid", APPID);//微信分配的公众账号ID
+        paraMap.put("appid", WechatConfig.APPID);//微信分配的公众账号ID
         paraMap.put("mchid", WechatConfig.MCH_ID);//微信支付分配的商户号
         paraMap.put("out_trade_no",qo.getOrderNum());//商品的订单号每次要唯一
         paraMap.put("description",qo.getCommunityName()+"-临时停车" + qo.getTime());
         //接收微信支付异步通知回调地址，通知url必须为直接可访问的url  不能携带参数。
-        paraMap.put("notify_url", "http://wodemao.nat300.top/api/v1/payment/callback"); // 此路径是微信服务器调用支付结果通知路径
+        paraMap.put("notify_url", notifyUrl+"/api/v1/payment/callback/H5/"+qo.getCommunityId()); // 此路径是微信服务器调用支付结果通知路径
         paraMap.put("payer",payer);
         paraMap.put("amount",amount);
         paraMap.put("attach",qo.getCommunityName()+"-临时停车" + qo.getTime());
@@ -121,9 +120,8 @@ public class WeChatH5PayController {
         String prepayId = PublicConfig.V3PayGet("/v3/pay/transactions/jsapi",JSONUtil.toJsonStr(paraMap),WechatConfig.MCH_ID,WechatConfig.MCH_SERIAL_NO,WechatConfig.APICLIENT_KEY);
         //第二步获取调起支付的参数
         System.out.println(prepayId);
-        JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp1(prepayId,APPID, WechatConfig.APICLIENT_KEY));
-
-        result.put("appId",APPID);
+        JSONObject object = JSONObject.fromObject(PublicConfig.WxTuneUp1(prepayId,WechatConfig.APPID, WechatConfig.APICLIENT_KEY));
+        result.put("appId",WechatConfig.APPID);
         result.put("timeStamp",object.get("timestamp"));
         result.put("nonceStr",object.get("noncestr"));
         result.put("package",object.get("prepayid"));
@@ -135,21 +133,25 @@ public class WeChatH5PayController {
         return CommonResult.ok(result);
     }
 
-/**
- * @Description: JAapi支付成功回调地址
- * @Param: [request, response]
- * @Return: void
- * @Author: Tian
- * @Date: 2021/10/7-10:02
- **/
-    @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
-    public void callback(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    /**
+     * @Description: JAapi支付成功回调地址
+     * @Param: [request, response]
+     * @Return: void
+     * @Author: Tian
+     * @Date: 2021/10/7-10:02
+     **/
+    @RequestMapping(value = "/callback/H5/{companyId}", method = {RequestMethod.POST,RequestMethod.GET})
+    public void callback(HttpServletRequest request, HttpServletResponse response,@PathVariable("companyId") Long companyId) throws Exception {
         log.info("\n\n\n\n回调成功\n\n\n\n");
         //回调验证
+        CompanyPayConfigEntity configEntity = companyPayConfigService.getCompanyConfig(companyId,2);
+        if (Objects.nonNull(configEntity)){
+            WechatConfig.setConfig(configEntity);
+        }
         Map<String, String> params = PublicConfig.notify(request ,response, WechatConfig.API_V3_KEY);
         log.info(String.valueOf(params));
         System.out.println(params);
-//        return CommonResult.ok("okok");
+
 
 
         //处理业务逻辑
@@ -166,7 +168,6 @@ public class WeChatH5PayController {
         entity.setOrderStatus(1);//0未支付，1已支付
         //支付类型
         entity.setPayType(4);//1app支付 2物业后台 3支付宝手机H5 4微信公众号
-
 
         entity.setRise(params.get("attach"));//商品订单抬头
 
@@ -185,7 +186,10 @@ public class WeChatH5PayController {
         }
         entity.setOrderNum(params.get("out_trade_no"));//商户订单编号
         entity.setBillNum(params.get("transaction_id"));//微信账单编号
+        System.out.println(entity);
         boolean b = carOrderService.updateOrder(entity,params.get("out_trade_no"));//根据订单号修改订单信息
+//
+//                return CommonResult.ok("okok");
     }
 
     @GetMapping("ip")
