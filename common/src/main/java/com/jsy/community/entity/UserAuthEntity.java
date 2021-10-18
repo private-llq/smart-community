@@ -47,6 +47,11 @@ public class UserAuthEntity extends BaseEntity {
 	 * 修改支付密码
 	 */
 	public static final int CODE_TYPE_CHANGE_PAY_PWD = 7;
+
+	/**
+	 * 解除微信绑定
+	 */
+	public static final int CODE_TYPE_CHANGE_WECHAT_RELIEVE = 8;
 	
 	@ApiModelProperty("业主ID")
 	private String uid;

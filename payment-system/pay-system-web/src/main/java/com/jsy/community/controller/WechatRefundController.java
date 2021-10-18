@@ -66,7 +66,7 @@ public class WechatRefundController {
         if (wechatRefundQO.getOrderNum()!=null){
             entity = weChatService.getOrderOne(wechatRefundQO.getOrderNum());
             if (entity!=null){
-                CompanyPayConfigEntity serviceConfig = companyPayConfigService.getCompanyConfig(entity.getCompanyId());
+                CompanyPayConfigEntity serviceConfig = companyPayConfigService.getCompanyConfig(entity.getCompanyId(),1);
                 WechatConfig.setConfig(serviceConfig);
             } else {
                 return CommonResult.error("当前订单不存在，请检查订单是否正确！");
@@ -74,7 +74,7 @@ public class WechatRefundController {
         } else {
             entity = weChatService.getOrderByQuery(wechatRefundQO);
             if (entity!=null){
-                CompanyPayConfigEntity serviceConfig = companyPayConfigService.getCompanyConfig(entity.getCompanyId());
+                CompanyPayConfigEntity serviceConfig = companyPayConfigService.getCompanyConfig(entity.getCompanyId(),1);
                 WechatConfig.setConfig(serviceConfig);
             } else {
                 return CommonResult.error("当前订单不存在，请检查订单是否正确！");
@@ -134,7 +134,7 @@ public class WechatRefundController {
     public void callback(HttpServletRequest request, HttpServletResponse response, @PathVariable("companyId") Long companyId) throws Exception {
         log.info("退款回调成功");
         log.info(String.valueOf(companyId));
-        CompanyPayConfigEntity configEntity = companyPayConfigService.getCompanyConfig(companyId);
+        CompanyPayConfigEntity configEntity = companyPayConfigService.getCompanyConfig(companyId,1);
         if (Objects.nonNull(configEntity)){
             WechatConfig.setConfig(configEntity);
         }

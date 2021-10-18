@@ -110,4 +110,13 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
 	 * @return:
 	 */
 	void updateByWechat(UserAuthEntity userAuthEntity);
+
+	/**
+	 * @Description: 清除微信三方绑定
+	 * @author: Hu
+	 * @since: 2021/10/18 11:02
+	 * @Param:
+	 * @return:
+	 */
+    void updateByOpenId(Long id);
 }

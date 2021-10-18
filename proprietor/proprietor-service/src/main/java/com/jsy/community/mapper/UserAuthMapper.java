@@ -36,4 +36,14 @@ public interface UserAuthMapper extends BaseMapper<UserAuthEntity> {
 	**/
 	@Select("select count(pay_password) as hasPayPassword,count(password) as hasPassword,mobile from t_user_auth where uid = #{uid}")
 	Map<String,String> querySafeStatus(String uid);
+
+	/**
+	 * @Description: 清除微信三方绑定
+	 * @author: Hu
+	 * @since: 2021/10/18 11:03
+	 * @Param:
+	 * @return:
+	 */
+	@Update("update t_user_auth set open_id = null where id = #{id}")
+    void updateByOpenId(@Param("id") Long id);
 }

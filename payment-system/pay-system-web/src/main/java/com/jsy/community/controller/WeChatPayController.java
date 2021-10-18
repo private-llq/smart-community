@@ -72,6 +72,9 @@ public class WeChatPayController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICarService carService;
 
+    @Value("${wechatNotifyUrl}")
+    private String wechatNotifyUrl;
+
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICompanyPayConfigService companyPayConfigService;
 
@@ -119,7 +122,7 @@ public class WeChatPayController {
         CommunityEntity entity = communityService.getCommunityNameById(weChatPayQO.getCommunityId());
         CompanyPayConfigEntity serviceConfig = null;
         if (Objects.nonNull(entity)){
-            serviceConfig = companyPayConfigService.getCompanyConfig(entity.getPropertyId());
+            serviceConfig = companyPayConfigService.getCompanyConfig(entity.getPropertyId(),1);
             WechatConfig.setConfig(serviceConfig);
         } else {
             throw new PaymentException("当前小区不支持微信支付！");
@@ -132,7 +135,7 @@ public class WeChatPayController {
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description", weChatPayQO.getDescriptionStr());
         map.put("out_trade_no", OrderNoUtil.getOrder());
-        map.put("notify_url","http://222.178.212.28/api/v1/payment/callback/"+serviceConfig.getCompanyId());
+        map.put("notify_url",wechatNotifyUrl+serviceConfig.getCompanyId());
         map.put("amount",hashMap);
         //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
         hashMap.put("total",1);
@@ -229,7 +232,7 @@ public class WeChatPayController {
     public void callback(HttpServletRequest request, HttpServletResponse response,@PathVariable("companyId") Long companyId) throws Exception {
         log.info("回调成功");
         log.info(String.valueOf(companyId));
-        CompanyPayConfigEntity configEntity = companyPayConfigService.getCompanyConfig(companyId);
+        CompanyPayConfigEntity configEntity = companyPayConfigService.getCompanyConfig(companyId,1);
         if (Objects.nonNull(configEntity)){
             WechatConfig.setConfig(configEntity);
         }
