@@ -182,6 +182,7 @@ public class UserAuthController {
 
 	@ApiOperation("绑定微信")
 	@PostMapping("/bindingWechat")
+	@Login
 	public CommonResult bindingWechat(@RequestParam("code")String code) {
 		JSONObject object = WeCharUtil.getAccessToken(code);
 		if ("".equals(object)||object==null){
@@ -196,7 +197,9 @@ public class UserAuthController {
 
 	@ApiOperation("解绑微信绑定")
 	@PostMapping("/relieveBindingWechat")
+	@Login
 	public CommonResult relieveBindingWechat(@RequestBody RegisterQO registerQO) {
+		commonService.checkVerifyCode(registerQO.getAccount(), registerQO.getCode());
 		userService.relieveBindingWechat(registerQO,UserUtils.getUserId());
 		return CommonResult.ok();
 	}
