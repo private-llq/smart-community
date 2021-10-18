@@ -18,6 +18,7 @@ import org.apache.dubbo.common.utils.UrlUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.http.entity.ContentType;
 import org.bouncycastle.util.encoders.UTF8;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,7 +41,8 @@ public class CarQRController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICaQRService iCaQRService;
 
-   private static final String URL = "http://192.168.12.111:8080/#/?CommunityID=";
+    @Value("${qr}")
+    private String URL;
     private static final String BUCKET_NAME = "qrcode";
     private static final Integer WIDTH = 400;
     private static final Integer HEIGHT = 400;
@@ -57,11 +59,10 @@ public class CarQRController {
 //        System.out.println("ok");
 //    }
     @ApiOperation("下载社区停车二维码")
-//    @Login
-    @RequestMapping(value = "/uploadQRCode", method = RequestMethod.GET)
+    @Login
+    @RequestMapping(value = "/uploadQRCode", method = RequestMethod.POST)
     public void uploadQRCode(HttpServletResponse response) throws Exception {
-//        Long communityId = UserUtils.getAdminCommunityId();
-                Long communityId = 1L;
+        Long communityId = UserUtils.getAdminCommunityId();
         CarQREntity carQREntity =  iCaQRService.findOne(communityId);
         if (carQREntity!=null){
             ServletOutputStream out = response.getOutputStream();
@@ -72,7 +73,6 @@ public class CarQRController {
             out.write(date);
             out.flush();
             out.close();
-           // return CommonResult.ok("下载成功");
         }else {
             String text = URL+communityId;
             System.out.println("新增二维码");

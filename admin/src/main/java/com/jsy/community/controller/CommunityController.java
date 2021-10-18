@@ -1,25 +1,20 @@
 package com.jsy.community.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.service.ICommunityService;
-import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Map;
 
 /**
  * @author chq459799974
@@ -35,72 +30,69 @@ import java.util.Map;
 public class CommunityController {
 	
 	@Autowired
-	private ICommunityService iCommunityService;
-	
-	@Autowired
-	private StringRedisTemplate redisTemplate;
-	
-	private static final String BUCKETNAME = "community-img"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
+	private ICommunityService communityService;
 	
 	/**
-	* @Description: 新增社区
-	 * @Param: [communityEntity]
-	 * @Return: com.jsy.community.vo.CommonResult
-	 * @Author: chq459799974
-	 * @Date: 2020/12/14
-	**/
-	@PostMapping("")
-	public CommonResult addCommunity(@RequestBody CommunityEntity communityEntity){
-		ValidatorUtils.validateEntity(communityEntity,CommunityEntity.sysAddValidatedGroup.class);
-		boolean result = iCommunityService.addCommunity(communityEntity);
-		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
+	 * @param communityEntity:
+	 * @author: DKS
+	 * @description: 物业端添加社区
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/10/18 11:43
+	 **/
+	@Login
+	@PostMapping("/add")
+	public CommonResult addCommunity(@RequestBody CommunityEntity communityEntity) {
+		ValidatorUtils.validateEntity(communityEntity, CommunityEntity.ProperyuAddValidatedGroup.class);
+		// 新增数据
+		return CommonResult.ok(communityService.addCommunity(communityEntity) ? "添加成功!":"添加失败");
 	}
 	
 	/**
-	* @Description: 删除社区
+	 * @param baseQO:
+	 * @author: DKS
+	 * @description: 分页查询小区列表
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/10/18 11:43
+	 **/
+	@Login
+	@PostMapping("/query")
+	public CommonResult communityList(@RequestBody BaseQO<CommunityQO> baseQO) {
+		PageInfo<CommunityEntity> communityEntityPage = communityService.queryCommunity(baseQO);
+		return CommonResult.ok(communityEntityPage);
+	}
+	
+	/**
+	 * @param communityEntity:
+	 * @author: DKS
+	 * @description: 更新社区信息
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/10/18 11:39
+	 **/
+	@Login
+	@PutMapping("/update")
+	public CommonResult updateCommunity(@RequestBody CommunityEntity communityEntity) {
+		if (communityEntity.getId() == null) {
+			throw new JSYException(400, "社区ID不能为空!");
+		}
+		// 需要判定用户有权限的社区是否包含该社区
+//		AdminInfoVo adminUserInfo = UserUtils.getAdminUserInfo();
+//		if (!adminUserInfo.getCommunityIdList().contains(communityEntity.getId())) {
+//			throw new JSYException(400, "你没有该社区的操作权限!");
+//		}
+		ValidatorUtils.validateEntity(communityEntity, CommunityEntity.ProperyuAddValidatedGroup.class);
+		return communityService.updateCommunity(communityEntity) > 0 ? CommonResult.ok("更新成功") : CommonResult.error("更新失败");
+	}
+	
+	/**
+	 * @Description: 删除社区信息
 	 * @Param: [id]
 	 * @Return: com.jsy.community.vo.CommonResult
-	 * @Author: chq459799974
-	 * @Date: 2020/12/14
-	**/
-//	@DeleteMapping("{id}")
-//	public CommonResult deleteCommunity(@PathVariable Long id){
-//		boolean result = iCommunityService.deleteCommunity(id);
-//		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
-//	}
-	
-	/**
-	* @Description: 修改社区
-	 * @Param: [communityQO]
-	 * @Return: com.jsy.community.vo.CommonResult
-	 * @Author: chq459799974
-	 * @Date: 2020/12/14
-	**/
-	@PutMapping("")
-	public CommonResult updateCommunity(@RequestBody CommunityQO communityQO){
-		Map<String, Object> resultMap = iCommunityService.updateCommunity(communityQO);
-		return (boolean)resultMap.get("result") ? CommonResult.ok() : CommonResult.error(JSYError.REQUEST_PARAM.getCode(),String.valueOf(resultMap.get("msg")));
+	 * @Author: DKS
+	 * @Date: 2021/10/18
+	 **/
+	@Login
+	@DeleteMapping("delete")
+	public CommonResult delCommunity(@RequestParam("id") Long id){
+		return communityService.delCommunity(id) ? CommonResult.ok("删除成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"删除失败");
 	}
-	
-	/**
-	* @Description: 查询社区
-	 * @Param: [baseQO]
-	 * @Return: com.jsy.community.vo.CommonResult<com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.jsy.community.entity.CommunityEntity>>
-	 * @Author: chq459799974
-	 * @Date: 2021/1/4
-	**/
-	@PostMapping("page")
-	public CommonResult<Page<CommunityEntity>> queryCommunity(@RequestBody BaseQO<CommunityQO> baseQO){
-		return CommonResult.ok(iCommunityService.queryCommunity(baseQO));
-	}
-	
-	
-	@PostMapping("/uploadIconImg")
-	@ApiOperation("社区头图上传")
-	public CommonResult uploadIconImg(@RequestParam("file") MultipartFile file){
-		String filePath = MinioUtils.upload(file, BUCKETNAME);
-		redisTemplate.opsForSet().add("community_img_part",filePath);
-		return CommonResult.ok(filePath);
-	}
-	
 }
