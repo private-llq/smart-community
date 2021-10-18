@@ -1,4 +1,4 @@
-package com.jsy.community.qo.lease;
+package com.jsy.community.qo.admin;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
