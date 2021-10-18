@@ -8,6 +8,7 @@ import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayFundTransUniTransferRequest;
 import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import com.jsy.community.api.IPayConfigureService;
+import com.jsy.community.api.PaymentException;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.api.UserAccountWithdrawalService;
 import com.jsy.community.constant.Const;
@@ -35,6 +36,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import javax.net.ssl.SSLContext;
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.MessageDigest;
@@ -377,6 +379,16 @@ public class UserAccountWithdrawalServiceImpl implements UserAccountWithdrawalSe
      */
     @Override
     public WithdrawalResulrVO zhiFuBaoWithdrawal(String serialNumber, String amount, String realName, String identity, String identityType) {
+        //支付宝转账取值范围[0.1,100000000]
+        BigDecimal amountObj = new BigDecimal(amount);
+        if (amountObj.compareTo(new BigDecimal("0.1")) < 0) {
+            log.error("提现金额不能少于0.1元");
+            return new WithdrawalResulrVO("-1", "提现金额不能少于0.1元", false);
+        }
+        if (amountObj.compareTo(new BigDecimal("100000000")) > 0) {
+            log.error("提现金额不能大于100,000,000元");
+            return new WithdrawalResulrVO("-1", "提现金额不能大于100,000,000元", false);
+        }
         AlipayClient alipayClient;
         try {
             alipayClient = new DefaultAlipayClient(initRequest());
@@ -407,18 +419,18 @@ public class UserAccountWithdrawalServiceImpl implements UserAccountWithdrawalSe
                 log.info("支付宝转账API调用成功。");
                 if ("10000".equals(response.getCode())) {
                     log.info("转账成功,支付宝返回参数:{}", JSONObject.toJSONString(response));
-                    return new WithdrawalResulrVO("0", "转账成功", true);
+                    return new WithdrawalResulrVO("0", "提现成功", true);
                 } else {
                     log.error("转账失败,支付宝返回参数:{}", JSONObject.toJSONString(response));
                     return new WithdrawalResulrVO(response.getCode(), response.getSubMsg(), false, response.getSubCode());
                 }
             } else {
                 log.error("支付宝转账API调用失败：{}", JSONObject.toJSONString(response));
-                return new WithdrawalResulrVO(response.getCode(), "转账失败,调用支付宝转账API失败", false, response.getSubCode());
+                return new WithdrawalResulrVO(response.getCode(), response.getSubMsg(), false, response.getSubCode());
             }
         } catch (AlipayApiException e) {
             log.error("调用支付宝转账API异常：{}", e);
-            return new WithdrawalResulrVO("-1", "转账失败,调用支付宝转账API异常", false);
+            return new WithdrawalResulrVO("-1", "提现失败,调用支付宝转账功能异常", false);
         }
     }
 

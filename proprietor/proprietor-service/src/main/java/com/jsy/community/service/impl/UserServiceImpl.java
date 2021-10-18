@@ -228,6 +228,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 userInfoVo.setIsBindWechat(0);
             }
         }
+        UserThirdPlatformEntity userThirdPlatformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("uid", uid).eq("type", 5));
+        if (userThirdPlatformEntity != null) {
+            userInfoVo.setIsBindAlipay(1);
+        } else {
+            userInfoVo.setIsBindAlipay(0);
+        }
         return userInfoVo;
     }
 
