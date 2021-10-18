@@ -310,7 +310,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		if (memberEntity!=null){
 			throw new ProprietorException("当前成员以添加，请勿重复添加！");
 		}
-		Object obj = redisTemplate.opsForValue().get(MEMBERKEY + membersQO.getMobile());
+		Object obj = redisTemplate.opsForValue().get(MEMBERKEY + membersQO.getMobile()+membersQO.getHouseId());
 		if (obj!=null){
 			throw new ProprietorException("请勿重复提交，请一个小时后在重新添加！");
 		}
@@ -341,6 +341,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			houseInfoEntity.setOverdueTime(LocalDateTime.now().plusHours(1));
 			houseInfoEntity.setYzUid(userId);
 			houseInfoEntity.setYhUid(userEntity.getUid());
+			houseInfoEntity.setHouseId(String.valueOf(membersQO.getHouseId()));
 			houseInfoService.saveOne(houseInfoEntity);
 
 			Map<String, Object> map = new HashMap<>();
@@ -354,7 +355,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 					desc,
 					map,
 					BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
-			redisTemplate.opsForValue().set(MEMBERKEY+membersQO.getMobile(), JSON.toJSONString(membersQO),1, TimeUnit.HOURS);
+			redisTemplate.opsForValue().set(MEMBERKEY+membersQO.getMobile()+membersQO.getHouseId(), JSON.toJSONString(membersQO),1, TimeUnit.HOURS);
 			return url+"?id="+houseInfoEntity.getId()+"&mobile="+membersQO.getMobile();
 
 			//添加成员表数据
@@ -378,10 +379,11 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			houseInfoEntity.setCreateTime(LocalDateTime.now());
 			houseInfoEntity.setOverdueTime(LocalDateTime.now().plusHours(1));
 			houseInfoEntity.setYzUid(userId);
+			houseInfoEntity.setHouseId(String.valueOf(membersQO.getHouseId()));
 			houseInfoService.saveOne(houseInfoEntity);
 			membersQO.setUid(userId);
 
-			redisTemplate.opsForValue().set(MEMBERKEY+membersQO.getMobile(), JSON.toJSONString(membersQO),1, TimeUnit.HOURS);
+			redisTemplate.opsForValue().set(MEMBERKEY+membersQO.getMobile()+membersQO.getHouseId(), JSON.toJSONString(membersQO),1, TimeUnit.HOURS);
 			return url+"?id="+houseInfoEntity.getId()+"&mobile="+membersQO.getMobile();
 		}
 

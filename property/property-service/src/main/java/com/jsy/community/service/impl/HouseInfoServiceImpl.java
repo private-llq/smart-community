@@ -91,7 +91,7 @@ public class HouseInfoServiceImpl extends ServiceImpl<HouseInfoMapper, HouseInfo
     public void relationSave(HouseInfoEntity houseInfoEntity) {
         HouseInfoEntity infoEntity = houseInfoMapper.selectById(houseInfoEntity.getId());
         if (infoEntity != null) {
-            Object object = redisTemplate.opsForValue().get("pushInFormMember:" + infoEntity.getMobile());
+            Object object = redisTemplate.opsForValue().get("pushInFormMember:" + infoEntity.getMobile()+infoEntity.getHouseId());
             if (object!=null){
                 MembersQO membersQO = JSONUtil.toBean(JSONUtil.parseObj(object), MembersQO.class);
 

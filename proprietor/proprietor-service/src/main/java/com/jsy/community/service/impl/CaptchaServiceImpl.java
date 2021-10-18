@@ -9,13 +9,11 @@ import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.utils.SmsUtil;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.annotation.Resource;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -52,7 +50,9 @@ public class CaptchaServiceImpl implements ICaptchaService {
 			}
 		} else if(type == UserAuthEntity.CODE_TYPE_BIND_MOBILE){
 			//三方登录绑定手机 暂不做处理
-		} else{
+		} else if (type==UserAuthEntity.CODE_TYPE_CHANGE_WECHAT_RELIEVE) {
+			//三方解除微信绑定  暂时不做验证
+		} else {
 			throw new ProprietorException("不支持的验证码类型");
 		}
 		

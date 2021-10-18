@@ -51,4 +51,9 @@ public class HouseInfoEntity implements Serializable {
      */
     private Integer status;
 
+    /**
+     * 房间id
+     */
+    private String houseId;
+
 }

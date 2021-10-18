@@ -3,7 +3,6 @@ package com.jsy.community.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -18,7 +17,6 @@ import com.jsy.community.dto.signature.SignatureUserDTO;
 import com.jsy.community.entity.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
-import com.jsy.community.qo.MembersQO;
 import com.jsy.community.qo.ProprietorQO;
 import com.jsy.community.qo.UserThirdPlatformQO;
 import com.jsy.community.qo.property.ElasticsearchCarQO;
@@ -320,29 +318,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             log.error("；聊天用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
-        String str = redisTemplate.opsForValue().get("pushInFormMember:" + qo.getAccount());
-        if (str!=null){
-
-            MembersQO membersQO = JSONUtil.toBean(JSONUtil.parseObj(str), MembersQO.class);
-
-            List<HouseInfoEntity> houseInfoEntities = houseInfoService.selectList(membersQO.getMobile());
-            Map<String, Object> map = new HashMap<>();
-            map.put("type",9);
-            if (houseInfoEntities.size()!=0){
-                for (HouseInfoEntity houseInfoEntity : houseInfoEntities) {
-                    //推送消息
-                    PushInfoUtil.PushPublicMsg(
-                            imId,
-                            "房屋管理",
-                            houseInfoEntity.getTitle(),
-                            "http://192.168.12.113:8080/#/"+"?id="+houseInfoEntity.getId()+"mobile="+qo.getAccount(),
-                            houseInfoEntity.getContent(),
-                            map,
-                            BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
-                }
+        //推送房屋消息
+        List<HouseInfoEntity> houseInfoEntities = houseInfoService.selectList(qo.getAccount());
+        Map<String, Object> map = new HashMap<>();
+        map.put("type",9);
+        if (houseInfoEntities.size()!=0){
+            for (HouseInfoEntity houseInfoEntity : houseInfoEntities) {
+                //推送消息
+                PushInfoUtil.PushPublicMsg(
+                        imId,
+                        "房屋管理",
+                        houseInfoEntity.getTitle(),
+                        "http://192.168.12.113:8080/#/"+"?id="+houseInfoEntity.getId()+"mobile="+qo.getAccount(),
+                        houseInfoEntity.getContent(),
+                        map,
+                        BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
             }
-
         }
+
         //创建签章用户(远程调用)
         SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
         signatureUserDTO.setUuid(uuid);
@@ -1009,6 +1002,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return houses;
     }
 
+
+
+    /**
+     * @Description: 解除微信绑定
+     * @author: Hu
+     * @since: 2021/10/18 10:57
+     * @Param: [registerQO, userId]
+     * @return: void
+     */
+    @Override
+    @Transactional
+    public void relieveBindingWechat(RegisterQO registerQO, String userId) {
+        commonService.checkVerifyCode(registerQO.getAccount(), registerQO.getCode());
+        UserAuthEntity authEntity = userAuthService.selectByIsWeChat(userId);
+        if (authEntity != null) {
+            if (authEntity.getOpenId()==null){
+                throw new ProprietorException("当前用户并未绑定微信！");
+            }
+
+            //删除微信三方登录绑定
+            userThirdPlatformMapper.delete(new QueryWrapper<UserThirdPlatformEntity>().eq("third_platform_id",authEntity.getOpenId()));
+
+            //设置userAuth表的openId为null
+            userAuthService.updateByOpenId(authEntity.getId());
+        }
+    }
 
     /**
      * @Description: 用户绑定微信
