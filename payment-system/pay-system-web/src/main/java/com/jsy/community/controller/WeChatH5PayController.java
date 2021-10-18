@@ -17,6 +17,7 @@ import com.jsy.community.qo.payment.AliOrderContentQO;
 import com.jsy.community.qo.payment.WeChatH5PayQO;
 import com.jsy.community.qo.payment.WeChatPayQO;
 import com.jsy.community.qo.payment.WithdrawalQO;
+import com.jsy.community.qo.property.orderChargeDto;
 import com.jsy.community.untils.wechat.*;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
@@ -66,6 +67,10 @@ import java.util.concurrent.TimeUnit;
 public class WeChatH5PayController {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICompanyPayConfigService companyPayConfigService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICarChargeService carChargeService;
+
     //    private static String unifiedorder_url = "/v3/pay/transactions/jsapi";
     private static String APPID="wxc7e3b98bb50243a6";
     //    //获取openid的地址
@@ -90,7 +95,7 @@ public class WeChatH5PayController {
         WechatConfig.setConfig(serviceConfig);
 
         System.out.println("code\n\n"+qo.getCode());
-
+        orderChargeDto orderCharge =carChargeService.orderCharge(qo.getCommunityId(), qo.getCarNumber());
         //拼接下单所需要的参数
         Map<String, Object> paraMap = new HashMap<String, Object>();
         //参数中：下单金额
@@ -106,10 +111,10 @@ public class WeChatH5PayController {
         payer.put("openid",openid);
         paraMap.put("appid", WechatConfig.APPID);//微信分配的公众账号ID
         paraMap.put("mchid", WechatConfig.MCH_ID);//微信支付分配的商户号
-        paraMap.put("out_trade_no",qo.getOrderNum());//商品的订单号每次要唯一
+        paraMap.put("out_trade_no",OrderNoUtil.getOrder());//商品的订单号每次要唯一
         paraMap.put("description",qo.getCommunityName()+"-临时停车" + qo.getTime());
         //接收微信支付异步通知回调地址，通知url必须为直接可访问的url  不能携带参数。
-        paraMap.put("notify_url", notifyUrl+"/api/v1/payment/callback/H5/"+qo.getCommunityId()); // 此路径是微信服务器调用支付结果通知路径
+        paraMap.put("notify_url", notifyUrl+"/api/v1/payment/callback/H5/"+qo.getCommunityId()+","+orderCharge.getId()); // 此路径是微信服务器调用支付结果通知路径
         paraMap.put("payer",payer);
         paraMap.put("amount",amount);
         paraMap.put("attach",qo.getCommunityName()+"-临时停车" + qo.getTime());
@@ -141,28 +146,29 @@ public class WeChatH5PayController {
      * @Date: 2021/10/7-10:02
      **/
     @RequestMapping(value = "/callback/H5/{companyId}", method = {RequestMethod.POST,RequestMethod.GET})
-    public void callback(HttpServletRequest request, HttpServletResponse response,@PathVariable("companyId") Long companyId) throws Exception {
+    public void callback(HttpServletRequest request, HttpServletResponse response,@PathVariable("companyId") String companyId) throws Exception {
         log.info("\n\n\n\n回调成功\n\n\n\n");
+        System.out.println(companyId);
+        String[] split = companyId.split(",");
         //回调验证
-        CompanyPayConfigEntity configEntity = companyPayConfigService.getCompanyConfig(companyId,2);
+        CompanyPayConfigEntity configEntity = companyPayConfigService.getCompanyConfig(Long.parseLong(split[0]),2);
         if (Objects.nonNull(configEntity)){
             WechatConfig.setConfig(configEntity);
         }
         Map<String, String> params = PublicConfig.notify(request ,response, WechatConfig.API_V3_KEY);
         log.info(String.valueOf(params));
-        System.out.println(params);
-
-
+//        System.out.println(params);
 
         //处理业务逻辑
         CarOrderEntity entity;
         //订单号
-        entity = carOrderService.selectOneOrder(params.get("out_trade_no"));
+        entity = carOrderService.selectId(Long.parseLong(split[1]));
         //付款金额 单位是分 需要除 100在存入数据库
         String amount = params.get("amount");
         String total = JSONObject.fromObject(amount).getString("payer_total");
         BigDecimal decimal = BigDecimal.valueOf(Long.parseLong(total));
         BigDecimal divide = decimal.divide(new BigDecimal(100));
+        entity.setOrderNum(params.get("out_trade_no"));
         entity.setMoney(divide);//支付金额
         //支付状态
         entity.setOrderStatus(1);//0未支付，1已支付
@@ -187,9 +193,9 @@ public class WeChatH5PayController {
         entity.setOrderNum(params.get("out_trade_no"));//商户订单编号
         entity.setBillNum(params.get("transaction_id"));//微信账单编号
         System.out.println(entity);
-        boolean b = carOrderService.updateOrder(entity,params.get("out_trade_no"));//根据订单号修改订单信息
-//
-//                return CommonResult.ok("okok");
+        boolean b = carOrderService.updateOrderId(entity,Long.parseLong(split[0]));//根据订单号修改订单信息
+        System.out.println("修改成功");
+
     }
 
     @GetMapping("ip")

@@ -72,6 +72,9 @@ public class LeaseReleaseInfoVO implements Serializable {
     @ApiModelProperty(value = "房间设施ID")
     private Long roomFacilitiesId;
 
+    @ApiModelProperty(value = "房间设施")
+    private List<String> roomFacilities = new ArrayList<>();
+
     @ApiModelProperty(value = "房屋优势ID")
     private Long houseAdvantageId;
 

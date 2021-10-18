@@ -117,6 +117,9 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
         return result;
     }
 
+    /**
+     * 商铺信息转返回的实体
+     */
     private LeaseReleaseInfoVO shopToLeaseInfo(ShopLeaseEntity shop) {
         LeaseReleaseInfoVO info = new LeaseReleaseInfoVO();
         info.setId(shop.getId());
@@ -144,7 +147,7 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
         // 租售方式
         releaseInfo.setLeaseType(leaseType(releaseInfo.getHouseLeasemodeId()));
         //押付方式
-        releaseInfo.setHouseLeaseMode(houseLeaseMode(releaseInfo.getHouseLeasedepositId()));
+        releaseInfo.setHouseLeaseMode(houseLeaseMode(releaseInfo.getHouseLeasedepositId(), 1));
         //月租价格
         if (releaseInfo.getHousePrice() != null) {
             String price = releaseInfo.getHousePrice().setScale(2, RoundingMode.HALF_UP).toString();
@@ -169,27 +172,25 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
         releaseInfo.setDirection(direction(releaseInfo.getHouseDirectionId()));
         //装修情况
         releaseInfo.setDecorationType(decorationType(releaseInfo.getDecorationTypeId()));
-        //todo
-        //房屋设施 分别查询商铺和住宅
-
-        if ("住宅".equals(type)) {
-            //房屋亮点
-            releaseInfo.setHouseAdvantage(advantage(releaseInfo.getHouseAdvantageId()));
-            //出租要求
-            releaseInfo.setLeaseRequire(leaseRequire(releaseInfo.getLeaseRequireId()));
-        }
-        //图片
         if ("商铺".equals(type)) {
+            //商铺设施 好像没有
+//            releaseInfo.setRoomFacilities(houseConst(releaseInfo.getRoomFacilitiesId(), 16));
             // 查商铺图片
             List<String> imgUrls = shopLeaseMapper.queryAllShopImg(releaseInfo.getId());
             releaseInfo.setImgUrl(imgUrls);
         } else {
+            //房间设施
+            releaseInfo.setRoomFacilities(houseConst(releaseInfo.getRoomFacilitiesId(), 24));
+            //房屋亮点
+            releaseInfo.setHouseAdvantage(houseConst(releaseInfo.getHouseAdvantageId(), 4));
+            //出租要求
+            releaseInfo.setLeaseRequire(houseConst(releaseInfo.getLeaseRequireId(), 21));
+            //住宅图片
             if (releaseInfo.getHouseImageId() != null) {
                 List<String> imgUrls = houseLeaseMapper.queryHouseAllImgById(releaseInfo.getHouseImageId());
                 releaseInfo.setImgUrl(imgUrls);
             }
         }
-
     }
 
     /**
@@ -214,33 +215,22 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
     /**
      * 房屋亮点
      */
-    private List<String> advantage(Long houseAdvantageId) {
+    private List<String> houseConst(Long houseAdvantageId, Integer type) {
         if (houseAdvantageId == null) {
             return new ArrayList<>();
         }
-        List<HouseLeaseConstEntity> houseLeaseConstEntities = queryHouseConst(4, Long.parseLong(houseAdvantageId.toString()));
-        return houseLeaseConstEntities.stream().map(HouseLeaseConstEntity::getHouseConstName).collect(Collectors.toList());
-    }
-
-    /**
-     * 出租要求
-     */
-    private List<String> leaseRequire(Long leaseRequireId) {
-        if (leaseRequireId == null) {
-            return new ArrayList<>();
-        }
-        List<HouseLeaseConstEntity> houseLeaseConstEntities = queryHouseConst(21, Long.parseLong(leaseRequireId.toString()));
+        List<HouseLeaseConstEntity> houseLeaseConstEntities = queryHouseConst(type, Long.parseLong(houseAdvantageId.toString()));
         return houseLeaseConstEntities.stream().map(HouseLeaseConstEntity::getHouseConstName).collect(Collectors.toList());
     }
 
     /**
      * 押付方式
      */
-    private String houseLeaseMode(Integer leasedeposit) {
+    private String houseLeaseMode(Integer leasedeposit, Integer type) {
         if (leasedeposit == null) {
             return "";
         }
-        List<HouseLeaseConstEntity> houseLeaseConstEntities = queryHouseConst(1, Long.parseLong(leasedeposit.toString()));
+        List<HouseLeaseConstEntity> houseLeaseConstEntities = queryHouseConst(type, Long.parseLong(leasedeposit.toString()));
         if (houseLeaseConstEntities.size() > 0) {
             return houseLeaseConstEntities.get(0).getHouseConstName();
         }
@@ -251,7 +241,7 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
      * 户型
      */
     private static String houseType(String code) {
-        if (StringUtils.isEmpty(code)) {
+        if (StringUtils.isEmpty(code) || code.length() < 1) {
             return "";
         }
         if ("000000".equals(code)) {
@@ -298,7 +288,7 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
      * 查询房屋的某些常量
      *
      * @param type 常量种类 1.房屋出租方式 2.房屋类型 3.房屋装修风格 4.房屋优势标签 5.租金 6.面积
-     *             7.商铺类型 8.商铺行业 9.房屋来源 10.租房类型 11.租房方式 12.出租房类型
+     *             7.商铺类型 8.商铺行业 9.房屋来源 10.租房类型 11.租房方式 12.出租房类型 。。。
      * @param code 标识这个类型的常量标签 的唯一code，按2的倍数存储
      */
     public List<HouseLeaseConstEntity> queryHouseConst(Integer type, Long code) {
@@ -336,6 +326,41 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
             set.add(Long.parseLong(sb.toString(), 2));
         }
         return new ArrayList<>(set);
+    }
+
+    /**
+     * 查询租赁存证详情
+     *
+     * @param id
+     * @param type
+     */
+    public void queryContractInfo(Long id, String type) {
+        Integer code = BusinessEnum.HouseTypeEnum.getCode(type);
+        if (code == null) {
+            throw new AdminException("type类型不符合");
+        }
+        //查询是否已成交
+        if ("住宅".equals(type)) {
+            HouseLeaseEntity house = houseLeaseMapper.selectById(id);
+            if (house.getLeaseStatus() == 0) {
+                throw new AdminException("该住宅尚未出租，暂无租赁存证。");
+            }
+        } else {
+            ShopLeaseEntity shop = shopLeaseMapper.selectById(id);
+            if (shop.getLeaseStatus() == 0) {
+                throw new AdminException("该商铺尚未出租，暂无租赁存证。");
+            }
+        }
+        //调取签章
+
+    }
+
+    /**
+     * http调用签章
+     */
+    private void queryContract(Long id) {
+
+
     }
 
 }
