@@ -170,7 +170,7 @@ public class WeChatH5PayController {
         entity.setOrderNum(params.get("out_trade_no"));
         entity.setMoney(divide);//支付金额
         //支付状态
-        entity.setOrderStatus(0);//0未支付，1已支付
+        entity.setOrderStatus(1);//0未支付，1已支付
         //支付类型
         entity.setPayType(4);//1app支付 2物业后台 3支付宝手机H5 4微信公众号
 
