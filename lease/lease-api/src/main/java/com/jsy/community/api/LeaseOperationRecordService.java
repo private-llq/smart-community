@@ -3,9 +3,9 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.proprietor.LeaseOperationRecordEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.lease.LeaseReleasePageQO;
+import com.jsy.community.qo.admin.LeaseReleasePageQO;
 import com.jsy.community.utils.PageInfo;
-import com.jsy.community.vo.lease.LeaseReleasePageVO;
+import com.jsy.community.vo.admin.LeaseReleasePageVO;
 
 /**
  * @Author: Pipi
