@@ -496,14 +496,16 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
             CommunityEntity communityNameById = communityService.getCommunityNameById(adminCommunityId);
             String name = communityNameById.getName();
 
-
+            orderChargeDto.setId(carOrderEntity.getId());
             orderChargeDto.setOrderNum(orderNum);//订单编号
+            orderChargeDto.setCommunityId(adminCommunityId);//社区id
             orderChargeDto.setCommunityName(name);//社区名称
             orderChargeDto.setCarNumber(carNumber);//车牌号
             orderChargeDto.setChargePrice(carChargeEntity.getChargePrice());//收费标准
             orderChargeDto.setInTime(openTime);//进闸时间
             orderChargeDto.setTime(time);//停车时长
             orderChargeDto.setMoney(money);//金额
+            System.out.println(orderChargeDto);
             return orderChargeDto;
         }
         return null;

@@ -16,4 +16,9 @@ public interface ICarOrderService extends IService<CarOrderEntity> {
     public CarOrderEntity selectOneOrder(String orderNumber);
     //修改订单
     public  boolean updateOrder(CarOrderEntity carOrderEntity,String orderNumber);
+
+    //根据id查询订单号
+    CarOrderEntity selectId(Long s);
+    //根据id修改订单
+    boolean updateOrderId(CarOrderEntity entity, long parseLong);
 }
