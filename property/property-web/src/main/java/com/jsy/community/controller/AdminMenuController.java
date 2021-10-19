@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.constant.Const;
@@ -23,6 +24,7 @@ import java.util.Map;
  **/
 @RestController
 @RequestMapping("menu")
+@ApiJSYController
 public class AdminMenuController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)

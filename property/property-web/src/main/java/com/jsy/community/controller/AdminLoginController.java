@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
@@ -44,6 +45,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @RestController
+@ApiJSYController
 public class AdminLoginController {
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminUserService adminUserService;
