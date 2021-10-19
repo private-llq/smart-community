@@ -347,7 +347,7 @@ public class UserAccountWithdrawalServiceImpl implements UserAccountWithdrawalSe
     private CertAlipayRequest initRequest() throws Exception {
         PayConfigureEntity companyConfig = iPayConfigureService.getCompanyConfig(1L);
         if (companyConfig == null) {
-            throw new ProprietorException("没有支付宝配置");
+            throw new PaymentException("没有支付宝配置");
         }
         CertAlipayRequest certAlipayRequest = new CertAlipayRequest();
         certAlipayRequest.setServerUrl(ALIPAY_SERVER_URL);  //gateway:支付宝网关（固定）https://openapi.alipay.com/gateway.do
