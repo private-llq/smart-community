@@ -75,6 +75,7 @@ public class CarOrderServiceImpl extends ServiceImpl<CarOrderMapper, CarOrderEnt
 
 
     public boolean updateOrderId(CarOrderEntity entity, long parseLong) {
+        System.out.println(entity);
         UpdateWrapper<CarOrderEntity> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id",parseLong);
         int update = carOrderMapper.update(entity, updateWrapper);

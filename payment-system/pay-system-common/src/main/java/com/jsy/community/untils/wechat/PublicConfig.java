@@ -203,8 +203,6 @@ public class PublicConfig {
         String string = JSONObject.fromObject(plainText).getString("amount");
         JSONObject jsonObject = JSONObject.fromObject(string);
         returnMap.put("amount",jsonObject.getString("total"));
-
-
         return returnMap;
     }
 

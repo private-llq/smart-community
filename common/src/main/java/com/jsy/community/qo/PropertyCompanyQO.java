@@ -3,7 +3,6 @@ package com.jsy.community.qo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -19,9 +18,6 @@ public class PropertyCompanyQO implements Serializable {
 	
 	@ApiModelProperty(value = "查询条件 name")
 	private String name;
-	
-	@ApiModelProperty(value = "地区")
-	private String region;
 	
 	@ApiModelProperty(value = "省份ID")
 	private Integer provinceId;
