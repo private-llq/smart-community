@@ -96,6 +96,7 @@ public class WeChatH5PayController {
 
         System.out.println("code\n\n"+qo.getCode());
         orderChargeDto orderCharge =carChargeService.orderCharge(qo.getCommunityId(), qo.getCarNumber());
+        System.out.println(orderCharge);
         if (orderCharge.getId()==null){
             System.out.println("id悟空");
         }
