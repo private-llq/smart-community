@@ -306,7 +306,7 @@
                 and house_type_code like "03%"
             </if>
             <if test="query.houseTypeCode != null and query.houseTypeCode &gt; 0 and query.houseTypeCode == 3">
-                and house_type_code &gt;= "04"
+                and house_type_code &gt;= "040000"
             </if>
             <!-- 如果查询筛选增加了房屋类型条件 住宅、别墅、公寓之类 1是不限的意思 -->
             <if test="query.houseLeasetypeId != null and query.houseLeasetypeId != &quot;&quot; and query.houseLeasetypeId &gt; 0 and query.houseLeasetypeId != 1">
