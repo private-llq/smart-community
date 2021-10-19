@@ -348,11 +348,9 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         );
         return chargeEntityList;
     }
-
     /**
      * 查询所有临时停车收费标准
      */
-
     @Override
     public List<CarChargeEntity> ListCharge2(Long adminCommunityId) {
         List<CarChargeEntity> chargeEntityList = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
