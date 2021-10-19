@@ -74,6 +74,7 @@
     <update id="relieve" parameterType="Long"  >
     UPDATE t_car_position as par
     set par.uid=null,
+    par.house_id=null,
     par.car_pos_status=0,
     par.belong_house=null,
     par.owner_phone=null,

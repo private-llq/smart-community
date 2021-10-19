@@ -137,9 +137,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         if (Objects.isNull(carMonthlyVehicle.getOwnerName())){
             throw new PropertyException("车主姓名不能为空！");
         }
-        if (Objects.isNull(carMonthlyVehicle.getCarPosition())){
+        /*if (Objects.isNull(carMonthlyVehicle.getCarPosition())){
             throw new PropertyException("车位号不能为空！");
-        }
+        }*/
         if (Objects.isNull(carMonthlyVehicle.getMonthlyMethodId())){
             throw new PropertyException("包月方式不能为空！");
         }
@@ -157,7 +157,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         }
 
         //查询数据库是否正在包月中
-        CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carMonthlyVehicle.getCarNumber()).ge("end_time",carMonthlyVehicle.getEndTime()));
+        CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carMonthlyVehicle.getCarNumber()).ge("end_time",LocalDateTime.now()));
         if (Objects.nonNull(vehicle)){
             throw new PropertyException("已进行包月，如果需要延期，请查询记录执行时间延期操作！");
         }
@@ -785,9 +785,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         if (Objects.isNull(carMonthlyVehicle.getOwnerName())){
             throw new PropertyException("车主姓名不能为空！");
         }
-        if (Objects.isNull(carMonthlyVehicle.getCarPosition())){
+        /*if (Objects.isNull(carMonthlyVehicle.getCarPosition())){
             throw new PropertyException("车位号不能为空！");
-        }
+        }*/
         /*if (Objects.isNull(carMonthlyVehicle.getMonthlyMethodId())){
             throw new PropertyException("包月方式不能为空！");
         }*/

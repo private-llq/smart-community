@@ -39,27 +39,25 @@ public class CarProprietorEntity implements Serializable{
     @ApiModelProperty("手机号")
     private Long phone;
 
-//
-//    @ApiModelProperty(value = "创建时间")
-//    //@TableField(exist = false)
-//    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-//    @JsonFormat(
-//            pattern = "yyyy-MM-dd HH:mm:ss",
-//            timezone = "GMT+8")
-//    private LocalDateTime createTime;
-//
-//    @ApiModelProperty(value = "更新时间")
-//    @TableField(exist = false)
-//    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-//    @JsonFormat(
-//            pattern = "yyyy-MM-dd HH:mm:ss",
-//            timezone = "GMT+8")
-//    private LocalDateTime updateTime;
 
-//    @ApiModelProperty(value = "逻辑删除")
-//    @TableLogic(value = "0",delval = "1")
-//    private  Integer deleted;
-//
+    @ApiModelProperty(value = "创建时间")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(
+            pattern = "yyyy-MM-dd HH:mm:ss",
+            timezone = "GMT+8")
+    private LocalDateTime createTime;
+
+    @ApiModelProperty(value = "更新时间")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(
+            pattern = "yyyy-MM-dd HH:mm:ss",
+            timezone = "GMT+8")
+    private LocalDateTime updateTime;
+
+    @ApiModelProperty(value = "逻辑删除")
+    @TableLogic(value = "0",delval = "1")
+    private  Integer deleted;
+
 //    @ApiModelProperty("分页查询当前页")
 //	@TableField(exist = false)
 //    private Long page;
