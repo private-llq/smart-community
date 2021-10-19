@@ -1,4 +1,4 @@
-package com.jsy.community.utils.imutils;
+package com.jsy.community.utils;
 
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
@@ -6,11 +6,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.UpdateBasic;
-import com.jsy.community.utils.AESUtil;
-import com.jsy.community.utils.MD5Util;
-import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.imutils.open.EncryptHelper;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
@@ -20,10 +17,11 @@ import java.util.Map;
  * @Date: 2021/10/19 10:29
  * @Version: 1.0
  **/
+@Component
 public class CallUtil {
 
-    @Value("${imUrl}")
-    public static String imUrl;
+//    @Value("${imUrl}")
+    public static String imUrl = "https://im.zhsj.co:8090";
 
     public static void sign(Map<String, Object> json) {
         json.put(EncryptHelper.SECURITY_SECRET, EncryptHelper.SECRET_KEY);

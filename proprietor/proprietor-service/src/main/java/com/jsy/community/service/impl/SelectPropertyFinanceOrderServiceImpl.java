@@ -15,6 +15,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -126,7 +127,7 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
                 //取相应房间map
                 Map<String, Object> roomMap = roomMaps.get(BigInteger.valueOf(entity.getTargetId()));
                 //在相应房间节点下添加物业费数据
-                if (roomMap.get("list") == null) {
+                if (StringUtils.isEmpty(roomMap.get("list"))) {
                     roomMap.put("list", new ArrayList<>());
                 }
                 List dataList = (List) roomMap.get("list");
