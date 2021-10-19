@@ -476,7 +476,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
              * //查询收费金额
              */
             //todo
-            carOrderEntity.get
+            carChargeQO.setState(carOrderEntity.getIsRetention());
             BigDecimal money = this.charge(carChargeQO);
 
             /**
