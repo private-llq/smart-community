@@ -177,7 +177,7 @@ public class AdminLoginController {
 		if (adminUserRoleEntity != null) {
 			adminInfoVo.setRoleId(adminUserRoleEntity.getRoleId());
 			userData.setRoleId(adminUserRoleEntity.getRoleId());
-			//判断登录类型 (根据拥有权限的小区数量等于1是小区管理员账号 否则是物业公司账号)
+			/*//判断登录类型 (根据拥有权限的小区数量等于1是小区管理员账号 否则是物业公司账号)
 			if(adminCommunityList.size() == 1){
 				//小区管理员账号 直接登入小区菜单
 				userData.setCommunityId(adminCommunityList.get(0).getCommunityId());
@@ -189,7 +189,11 @@ public class AdminLoginController {
 				userMenu = adminConfigService.queryMenuByUid(adminUserRoleEntity.getRoleId(),PropertyConsts.LOGIN_TYPE_PROPERTY);
 				//设置登录类型
 				adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_PROPERTY);
-			}
+			}*/
+			//物业公司账号 进入物业公司管理菜单
+			userMenu = adminConfigService.queryMenuByUid(adminUserRoleEntity.getRoleId(),PropertyConsts.LOGIN_TYPE_PROPERTY);
+			//设置登录类型
+			adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_PROPERTY);
 		}
 		//设置菜单
 		userData.setMenuList(userMenu);

@@ -2,6 +2,7 @@ package com.jsy.community.config;
 
 import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,6 +16,9 @@ import java.util.Map;
  **/
 @Configuration
 public class TopicExConfig {
+
+//	@Value("${topic-environment}")
+//	public final static String ENVIRONMENT = "20";
 	
 	//小区相关-topic交换机名称
 	public final static String EX_TOPIC_TO_COMMUNITY = "cloud2CommunityTopicExchange";

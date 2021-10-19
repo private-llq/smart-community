@@ -296,8 +296,17 @@
                 and house_square_meter &lt;= #{query.houseSquareMeterMax}
             </if>
             <!-- 如果查询筛选增加了户型条件 几室几厅之类 -->
-            <if test="query.houseTypeCode != null and query.houseTypeCode != &quot;&quot; and query.houseTypeCode &gt; 0">
-                and house_type_code = #{query.houseTypeCode}
+            <if test="query.houseTypeCode != null and query.houseTypeCode &gt; 0 and query.houseTypeCode == 1">
+                and house_type_code like "01%"
+            </if>
+            <if test="query.houseTypeCode != null and query.houseTypeCode &gt; 0 and query.houseTypeCode == 2">
+                and house_type_code like "02%"
+            </if>
+            <if test="query.houseTypeCode != null and query.houseTypeCode &gt; 0 and query.houseTypeCode == 3">
+                and house_type_code like "03%"
+            </if>
+            <if test="query.houseTypeCode != null and query.houseTypeCode &gt; 0 and query.houseTypeCode == 3">
+                and house_type_code &gt;= "04"
             </if>
             <!-- 如果查询筛选增加了房屋类型条件 住宅、别墅、公寓之类 1是不限的意思 -->
             <if test="query.houseLeasetypeId != null and query.houseLeasetypeId != &quot;&quot; and query.houseLeasetypeId &gt; 0 and query.houseLeasetypeId != 1">
