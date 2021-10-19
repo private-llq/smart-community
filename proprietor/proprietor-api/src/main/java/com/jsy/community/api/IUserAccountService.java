@@ -118,13 +118,6 @@ public interface IUserAccountService {
     WithdrawalResulrVO zhiFuBaoWithdrawal(UserWithdrawalQ0 userWithdrawalQ0, String uid);
 
     /**
-     * 获取用户支付宝提现时最近一次输入的提现用户
-     *
-     * @param uid 用户id
-     */
-    UserWithdrawalQ0 selectRedisZhiFuBaoWithdrawalInfo(String uid);
-
-    /**
      * 查询绑定的支付宝账户
      *
      * @param uid 用户id

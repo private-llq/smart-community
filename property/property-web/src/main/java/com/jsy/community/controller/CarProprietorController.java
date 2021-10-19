@@ -42,9 +42,12 @@ public class CarProprietorController {
      **/
     @Login
     @PostMapping("/listPage")
-    public CommonResult listPage(@RequestBody CarProprietorEntity baseQO){
-
-        Page<CarProprietorEntity> listPage = carProprietorService.listPage(baseQO,UserUtils.getAdminCommunityId());
+    public CommonResult listPage(@RequestBody BaseQO<CarProprietorEntity> baseQO){
+        if (baseQO.getQuery()==null){
+            baseQO.setQuery(new CarProprietorEntity());
+        }
+        Long communityId = UserUtils.getAdminCommunityId();
+        Page<CarProprietorEntity> listPage = carProprietorService.listPage(baseQO,communityId);
         return CommonResult.ok(listPage,"查询成功");
     }
 

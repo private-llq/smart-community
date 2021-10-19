@@ -278,11 +278,6 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
         } else {
             return "简单装修";
         }
-//        List<HouseLeaseConstEntity> houseLeaseConstEntities = queryHouseConst(3, decorationTypeId);
-//        if (houseLeaseConstEntities.size() > 0) {
-//            return houseLeaseConstEntities.get(0).getHouseConstName();
-//        }
-//        return "";
     }
 
     /**
@@ -334,7 +329,7 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
      *
      * @param id   租赁数据id
      * @param type
-     */
+
     public LeaseContractInfoVO queryContractInfo(Long id, String type) {
         Integer code = BusinessEnum.HouseTypeEnum.getCode(type);
         if (code == null) {
@@ -354,19 +349,16 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
         }
         //调取签章
 
+
+        //
+
         //查询甲乙双方签名，联系方式，签约日期等
+
 
         //todo 身份证（营业执照信息暂时无法获取，流程中没有存储，待后期版本优化再添加）
 
         return null;
     }
-
-    /**
-     * http调用签章
      */
-    private void queryContract(Long id) {
-
-
-    }
 
 }
