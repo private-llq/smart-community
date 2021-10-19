@@ -6,6 +6,8 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.PropertyCompanyQO;
 import com.jsy.community.utils.PageInfo;
 
+import java.util.List;
+
 
 /**
  * 物业公司
@@ -45,4 +47,13 @@ public interface IPropertyCompanyService extends IService<PropertyCompanyEntity>
 	 * @Date: 2021/10/15
 	 */
 	void deleteCompany(Long id);
+	
+	/**
+	 * @Description: 物业公司列表查询
+	 * @Param: []
+	 * @Return: java.util.List<com.jsy.community.entity.sys.PropertyCompanyEntity>
+	 * @Author: DKS
+	 * @Date: 2021/10/19
+	 **/
+	List<PropertyCompanyEntity> queryCompanyList();
 }

@@ -21,6 +21,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 
 /**
@@ -131,5 +132,17 @@ public class PropertyCompanyServiceImpl extends ServiceImpl<PropertyCompanyMappe
 		if (i != 1) {
 			throw new AdminException(JSYError.INTERNAL.getCode(),"删除失败");
 		}
+	}
+	
+	/**
+	 * @Description: 物业公司列表查询
+	 * @Param: []
+	 * @Return: java.util.List<com.jsy.community.entity.sys.PropertyCompanyEntity>
+	 * @Author: DKS
+	 * @Date: 2021/10/19
+	 **/
+	@Override
+	public List<PropertyCompanyEntity> queryCompanyList() {
+		return propertyCompanyMapper.selectList(new QueryWrapper<PropertyCompanyEntity>().select("*"));
 	}
 }

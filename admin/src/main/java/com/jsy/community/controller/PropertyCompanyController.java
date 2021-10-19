@@ -85,4 +85,17 @@ public class PropertyCompanyController {
 		propertyCompanyService.deleteCompany(id);
 		return CommonResult.ok("删除成功");
 	}
+	
+	/**
+	 * @Description: 物业公司列表查询
+	 * @Param: [baseQO]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: DKS
+	 * @Date: 2021/10/19
+	 **/
+	@Login
+	@GetMapping("list")
+	public CommonResult queryCompanyList(){
+		return CommonResult.ok(propertyCompanyService.queryCompanyList());
+	}
 }

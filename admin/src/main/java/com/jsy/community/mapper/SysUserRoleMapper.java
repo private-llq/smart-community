@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.sys.SysUserRoleEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @Author: DKS
@@ -12,5 +13,12 @@ import org.apache.ibatis.annotations.Mapper;
  **/
 @Mapper
 public interface SysUserRoleMapper extends BaseMapper<SysUserRoleEntity> {
-
+	/**
+	 * @Description: 编辑操作员角色
+	 * @Param: [entity]
+	 * @Return: int
+	 * @Author: DKS
+	 * @Date: 2021/10/19
+	 **/
+	int updateOperatorRole(@Param("userId") Long userId, @Param("roleId") Long roleId);
 }
