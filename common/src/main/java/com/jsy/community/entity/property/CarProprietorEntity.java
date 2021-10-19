@@ -39,8 +39,6 @@ public class CarProprietorEntity  implements Serializable {
     @ApiModelProperty("手机号码")
     private Long phone;
 
-    @ApiModelProperty("手机号码")
-    private String carPosition;
 
     @ApiModelProperty(value = "创建时间")
     //@TableField(exist = false)
