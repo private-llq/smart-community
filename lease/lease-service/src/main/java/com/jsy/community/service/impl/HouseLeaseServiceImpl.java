@@ -323,6 +323,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         // 1.11修改楼层显示文本
         if (StringUtil.isNotBlank(vo.getHouseFloor())) {
             String[] floorArray = vo.getHouseFloor().split("层");
+            floorArray = floorArray[0].split("/");
             if (floorArray[0] != null) {
                 Integer floor = Integer.valueOf(floorArray[0]);
                 if (floor <= 3) {
