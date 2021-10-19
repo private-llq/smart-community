@@ -476,7 +476,7 @@ public class UserAccountServiceImpl implements IUserAccountService {
             ucoinRecordEntity.setId(SnowFlake.nextId());
             ucoinRecordEntity.setUid(uid);
             ucoinRecordEntity.setTradeFrom(5);
-            ucoinRecordEntity.setTradeType(1);
+            ucoinRecordEntity.setTradeType(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex());
             ucoinRecordEntity.setTradeAmount(amount);
             ucoinRecordEntity.setBalance(userAccountEntity.getBalance().add(amount));//交易后余额
             ucoinRecordEntity.setComment("租金入账");
@@ -518,7 +518,7 @@ public class UserAccountServiceImpl implements IUserAccountService {
         ucoinRecordEntity.setId(SnowFlake.nextId());
         ucoinRecordEntity.setUid(uid);
         ucoinRecordEntity.setTradeFrom(1);
-        ucoinRecordEntity.setTradeType(2);
+        ucoinRecordEntity.setTradeType(PaymentEnum.TradeTypeEnum.TRADE_TYPE_EXPEND.getIndex());
         ucoinRecordEntity.setTradeAmount(amount);
         ucoinRecordEntity.setBalance(subtract);//交易后余额
         ucoinRecordEntity.setComment(typeStr + "提现");

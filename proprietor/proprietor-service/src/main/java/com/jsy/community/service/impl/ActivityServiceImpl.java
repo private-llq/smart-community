@@ -113,7 +113,7 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
         }
         if (entity!=null){
             Integer count = activityUserMapper.selectCount(new QueryWrapper<ActivityUserEntity>().eq("activity_id", activityUserEntity.getActivityId()));
-            if (entity.getCount()<count){
+            if (entity.getCount()<=count){
                 throw new ProprietorException("当前活动报名人数已满!");
             }
             activityUserMapper.insert(activityUserEntity);

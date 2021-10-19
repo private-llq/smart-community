@@ -21,6 +21,6 @@ public interface PropertyActivityUserMapper extends BaseMapper<ActivityUserEntit
      * @Param:
      * @return:
      */
-    @Select("SELECT uid FROM t_activity_user WHERE deleted=0 AND (activity_id = #{dataId})")
+    @Select("SELECT uid FROM t_activity_user WHERE activity_id = #{dataId}")
     Set<String> selectUid(@Param("dataId") String dataId);
 }
