@@ -65,20 +65,22 @@ public class ActivityListener {
             }
         } else if (map.get("type").equals(3)){
             ActivityEntity activityEntity = propertyActivityMapper.selectById(String.valueOf(map.get("dataId")));
-            Set<String> set = propertyActivityUserMapper.selectUid(String.valueOf(map.get("dataId")));
-            Map<Object, Object> map1 = new HashMap<>();
-            map1.put("type",4);
-            map1.put("dataId",activityEntity.getId());
-            if (set.size()!=0){
-                List<UserIMEntity> list = userImService.selectUidAll(set);
-                for (UserIMEntity entity : list) {
-                    PushInfoUtil.PushPublicTextMsg(entity.getImId(),
-                            "活动投票",
-                            "您报名的活动即将开始",
-                            null,
-                            "您报名的"+activityEntity.getTheme()+"还有两个小时就开始了，请即时参加哦，\n"+activityEntity.getBeginActivityTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))+"——"+activityEntity.getOverActivityTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-                            map1,
-                            BusinessEnum.PushInfromEnum.ACTIVITYVOTING.getName());
+            if (activityEntity!=null){
+                Set<String> set = propertyActivityUserMapper.selectUid(String.valueOf(map.get("dataId")));
+                Map<Object, Object> map1 = new HashMap<>();
+                map1.put("type",4);
+                map1.put("dataId",activityEntity.getId());
+                if (set.size()!=0){
+                    List<UserIMEntity> list = userImService.selectUidAll(set);
+                    for (UserIMEntity entity : list) {
+                        PushInfoUtil.PushPublicTextMsg(entity.getImId(),
+                                "活动投票",
+                                "您报名的活动即将开始",
+                                null,
+                                "您报名的"+activityEntity.getTheme()+"还有两个小时就开始了，请即时参加哦，\n"+activityEntity.getBeginActivityTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))+"——"+activityEntity.getOverActivityTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                                map1,
+                                BusinessEnum.PushInfromEnum.ACTIVITYVOTING.getName());
+                    }
                 }
             }
         }
