@@ -122,25 +122,27 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
         }
         //房间数据集合
         Map<String,Map<String,Object>> roomMaps = houseMapper.getRoomMap(ids);
-        for (PropertyFinanceOrderEntity entity : list) {
-            if (entity.getTargetId() != null) {
-                //取相应房间map
-                Map<String, Object> roomMap = roomMaps.get(BigInteger.valueOf(entity.getTargetId()));
-                //在相应房间节点下添加物业费数据
-                if (StringUtils.isEmpty(roomMap.get("list"))) {
-                    roomMap.put("list", new ArrayList<>());
-                }
-                List dataList = (List) roomMap.get("list");
-                dataList.add(entity);
-                //在相应房间节点下累加总金额
+        if (!CollectionUtils.isEmpty(roomMaps)){
+            for (PropertyFinanceOrderEntity entity : list) {
+                if (entity.getTargetId() != null) {
+                    //取相应房间map
+                    Map<String, Object> roomMap = roomMaps.get(BigInteger.valueOf(entity.getTargetId()));
+                    //在相应房间节点下添加物业费数据
+                    if (StringUtils.isEmpty(roomMap.get("list"))) {
+                        roomMap.put("list", new ArrayList<>());
+                    }
+                    List dataList = (List) roomMap.get("list");
+                    dataList.add(entity);
+                    //在相应房间节点下累加总金额
 
-                BigDecimal totalAmount = entity.getPropertyFee().add(entity.getPenalSum());
-                if(totalAmount == null){
-                    roomMap.put("totalAmount",new BigDecimal("0.00"));
-                    totalAmount = (BigDecimal) roomMap.get("totalAmount");
+                    BigDecimal totalAmount = entity.getPropertyFee().add(entity.getPenalSum());
+                    if(totalAmount == null){
+                        roomMap.put("totalAmount",new BigDecimal("0.00"));
+                        totalAmount = (BigDecimal) roomMap.get("totalAmount");
+                    }
+                    entity.setTotalMoney(entity.getPropertyFee().add(entity.getPenalSum()));
+                    roomMap.put("totalAmount",totalAmount);
                 }
-                entity.setTotalMoney(entity.getPropertyFee().add(entity.getPenalSum()));
-                roomMap.put("totalAmount",totalAmount);
             }
         }
         returnList.addAll(roomMaps.values());
