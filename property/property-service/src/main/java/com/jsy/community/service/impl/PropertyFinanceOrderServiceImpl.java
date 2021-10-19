@@ -692,7 +692,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             map.put("type", 3);
             map.put("dataId", tripartiteOrder);
             PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
-                    1,
+                    payType,
                     total.toString(),
                     null,
                     "物业缴费",
