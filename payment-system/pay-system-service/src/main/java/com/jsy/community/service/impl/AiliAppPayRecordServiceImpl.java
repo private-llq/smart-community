@@ -11,6 +11,7 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.AiliAppPayRecordDao;
+import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 
@@ -33,6 +34,7 @@ public class AiliAppPayRecordServiceImpl implements AiliAppPayRecordService {
 	//创建支付宝订单记录
 	@Override
 	public boolean createAliAppPayRecord(AiliAppPayRecordEntity ailiAppPayRecordEntity){
+		ailiAppPayRecordEntity.setId(SnowFlake.nextId());
 		return ailiAppPayRecordDao.insert(ailiAppPayRecordEntity) == 1;
 	}
 	
