@@ -60,8 +60,8 @@ public class CarProprietorServiceImpl extends ServiceImpl<CarProprietorMapper,Ca
 
     @Override
     public boolean addProprietor(CarProprietorEntity carProprietorEntity, Long adminCommunityId) {
-        carProprietorEntity.setId(SnowFlake.nextId());
-        carProprietorEntity.setCommunityId(adminCommunityId);
+//        carProprietorEntity.setId(SnowFlake.nextId());
+//        carProprietorEntity.setCommunityId(adminCommunityId);
         return carProprietorMapper.insert(carProprietorEntity) == 1;
     }
 
