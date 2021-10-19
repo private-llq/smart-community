@@ -193,7 +193,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 					}
 					// 增加房东余额
 					log.info("开始修改房东余额");
-					userAccountService.rentalIncome(serviceOrderNo, tradeAmount, order.getUserid());
+					userAccountService.rentalIncome(leaseRecordEntity.getConId(), tradeAmount, leaseRecordEntity.getHomeOwnerUid());
 					log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + orderNo);
 				}
 			} else if (PaymentEnum.TradeFromEnum.TRADE_FROM_MANAGEMENT.getIndex().equals(order.getTradeName())) {

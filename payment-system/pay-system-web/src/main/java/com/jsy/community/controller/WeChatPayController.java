@@ -291,7 +291,7 @@ public class WeChatPayController {
             //房屋租赁业务逻辑
             if (split[0].equals("9")){
                 AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordService.queryRecordByConId(split[1]);
-                userAccountService.rentalIncome(split[1],new BigDecimal(map.get("amount")).divide(new BigDecimal(100)),leaseRecordEntity.getHomeOwnerUid());
+                userAccountService.rentalIncome(leaseRecordEntity.getConId(), new BigDecimal(map.get("amount")).divide(new BigDecimal(100)),leaseRecordEntity.getHomeOwnerUid());
                 // 修改签章合同支付状态
                 Map<String, Object> houseMap = housingRentalOrderService.completeLeasingOrder(map.get("out_trade_no"), split[1]);
                 // 修改租房签约支付状态
