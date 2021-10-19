@@ -259,7 +259,7 @@ public class WeChatPayController {
                 String amount = map.get("amount");
 
                 log.info("账单ids：" + String.valueOf(ids).split(","));
-                propertyFinanceOrderService.updateOrderStatusBatch(1,map.get("out_trade_no"),String.valueOf(ids).split(","),new BigDecimal(amount));
+                propertyFinanceOrderService.updateOrderStatusBatch(1,map.get("out_trade_no"),String.valueOf(ids).split(","),new BigDecimal(amount).divide(new BigDecimal(100)));
                 //获取一条账单，得到社区id
                 PropertyFinanceOrderEntity financeOrderEntity = propertyFinanceOrderService.findOne(Long.valueOf(String.valueOf(ids).split(",")[0]));
                 PropertyFinanceReceiptEntity receiptEntity = new PropertyFinanceReceiptEntity();
