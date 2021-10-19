@@ -16,13 +16,14 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_property)
 public class CarProprietorServiceImpl extends ServiceImpl<CarProprietorMapper,CarProprietorEntity> implements ICarProprietorService {
-    @Autowired
+    @Resource
     private CarProprietorMapper carProprietorMapper;
 
     /**
@@ -46,15 +47,14 @@ public class CarProprietorServiceImpl extends ServiceImpl<CarProprietorMapper,Ca
      * @Date: 2021/8/11-10:36
      **/
     @Override
-    public Page<CarProprietorEntity> listPage(CarProprietorEntity baseQO, Long adminCommunityId) {
-
-        Page<CarProprietorEntity> page = new Page<CarProprietorEntity>(baseQO.getPage(), baseQO.getSize());
+    public Page<CarProprietorEntity> listPage(BaseQO<CarProprietorEntity>  baseQO, Long adminCommunityId) {
+        Page<CarProprietorEntity> page = new Page<>(baseQO.getPage(), baseQO.getSize());
         QueryWrapper<CarProprietorEntity> queryWrapper = new QueryWrapper<CarProprietorEntity>().eq("community_id", adminCommunityId);
         if (baseQO.getQuery().getPhone()!=null){
             queryWrapper.like("phone",baseQO.getQuery().getPhone());
         }
-        Page<CarProprietorEntity> selectPage = carProprietorMapper.selectPage(page, queryWrapper);
-        return selectPage;
+        Page<CarProprietorEntity> entityPage = carProprietorMapper.selectPage(page,queryWrapper);
+        return entityPage;
 
     }
 

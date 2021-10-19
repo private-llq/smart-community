@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @ApiModel("业主车辆")
 @TableName("t_car_proprietor")
-public class CarProprietorEntity  implements Serializable {
+public class CarProprietorEntity implements Serializable{
     @ApiModelProperty(value = "id")
     private Long id;
 
@@ -36,39 +36,39 @@ public class CarProprietorEntity  implements Serializable {
     @ApiModelProperty("业主姓名")
     private String proprietorName;
 
-    @ApiModelProperty("车位号")
+    @ApiModelProperty("手机号")
     private Long phone;
 
+//
+//    @ApiModelProperty(value = "创建时间")
+//    //@TableField(exist = false)
+//    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//    @JsonFormat(
+//            pattern = "yyyy-MM-dd HH:mm:ss",
+//            timezone = "GMT+8")
+//    private LocalDateTime createTime;
+//
+//    @ApiModelProperty(value = "更新时间")
+//    @TableField(exist = false)
+//    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//    @JsonFormat(
+//            pattern = "yyyy-MM-dd HH:mm:ss",
+//            timezone = "GMT+8")
+//    private LocalDateTime updateTime;
 
-    @ApiModelProperty(value = "创建时间")
-    //@TableField(exist = false)
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(
-            pattern = "yyyy-MM-dd HH:mm:ss",
-            timezone = "GMT+8")
-    private LocalDateTime createTime;
-
-    @ApiModelProperty(value = "更新时间")
-    @TableField(exist = false)
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(
-            pattern = "yyyy-MM-dd HH:mm:ss",
-            timezone = "GMT+8")
-    private LocalDateTime updateTime;
-
-    @ApiModelProperty(value = "逻辑删除")
-    @TableLogic(value = "0",delval = "1")
-    private  Integer deleted;
-
-    @ApiModelProperty("分页查询当前页")
-	@TableField(exist = false)
-    private Long page;
-
-    @ApiModelProperty("分页查询每页数据条数")
-	@TableField(exist = false)
-    private Long size;
-
-    @TableField(exist = false)
-    private CarProprietorEntity query;
+//    @ApiModelProperty(value = "逻辑删除")
+//    @TableLogic(value = "0",delval = "1")
+//    private  Integer deleted;
+//
+//    @ApiModelProperty("分页查询当前页")
+//	@TableField(exist = false)
+//    private Long page;
+//
+//    @ApiModelProperty("分页查询每页数据条数")
+//	@TableField(exist = false)
+//    private Long size;
+//
+//    @TableField(exist = false)
+//    private CarProprietorEntity query;
 
 }
