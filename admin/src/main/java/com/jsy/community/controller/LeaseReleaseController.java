@@ -36,10 +36,18 @@ public class LeaseReleaseController {
     }
 
     @ApiOperation("商铺和房屋租赁信息发布详情")
-    @PostMapping("/release/info")
+    @GetMapping("/release/info")
     @Login(allowAnonymous = true)
     public CommonResult<LeaseReleaseInfoVO> queryLeaseHouseInfo(@RequestParam("id") Long id,
                                                                 @RequestParam("type") String type) {
         return CommonResult.ok(leaseReleaseService.queryLeaseHouseInfo(id, type));
     }
+
+//    @ApiOperation("商铺或房屋租赁合同")
+//    @GetMapping("/release/contract")
+//    @Login(allowAnonymous = true)
+//    public CommonResult<LeaseReleaseInfoVO> queryContractInfo(@RequestParam("id") Long id,
+//                                                              @RequestParam("type") String type) {
+//        return CommonResult.ok(leaseReleaseService.queryLeaseHouseInfo(id, type));
+//    }
 }

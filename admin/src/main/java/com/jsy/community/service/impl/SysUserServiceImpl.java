@@ -509,6 +509,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		}
 		//更新菜单权限
 //		adminConfigService.setUserMenus(sysUserEntity.getMenuIdList(), uid);
+		// 更新操作员角色
+		if (sysUserEntity.getRoleId() != null) {
+			sysUserRoleMapper.updateOperatorRole(sysUserEntity.getId(), sysUserEntity.getRoleId());
+		}
 		//更新资料
 		sysUserMapper.updateOperator(sysUserEntity);
 	}

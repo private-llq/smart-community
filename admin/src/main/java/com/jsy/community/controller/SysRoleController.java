@@ -112,4 +112,17 @@ public class SysRoleController {
 		boolean b = sysConfigService.setRoleMenus(sysRoleMenuEntity.getMenuIds(), sysRoleMenuEntity.getRoleId());
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"设置角色菜单失败");
 	}
+	
+	/**
+	 * @author: DKS
+	 * @description: 查询角色详情
+	 * @param roleId: 角色ID
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/10/18 16:10
+	 **/
+	@Login
+	@GetMapping("/roleDetail")
+	public CommonResult roleDetail(@RequestParam("roleId") Long roleId) {
+		return CommonResult.ok(sysConfigService.queryRoleDetail(roleId));
+	}
 }

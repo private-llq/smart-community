@@ -89,7 +89,7 @@ public class CommunityInformController {
     public CommonResult<?> listCommunityInform(@RequestBody BaseQO<OldPushInformQO> qo) {
         ValidatorUtils.validatePageParam(qo);
         if (qo.getQuery() == null) {
-            return CommonResult.error(JSYError.BAD_REQUEST);
+            qo.setQuery(new OldPushInformQO());
         }
         ValidatorUtils.validateEntity(qo.getQuery(), OldPushInformQO.CommunityPushInformValidate.class);
         qo.getQuery().setUid(UserUtils.getUserId());

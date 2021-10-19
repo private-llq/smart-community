@@ -159,7 +159,7 @@ public class UserAuthController {
 	public CommonResult<UserAuthVo> register(@RequestBody RegisterQO qo) {
 		ValidatorUtils.validateEntity(qo);
 		//验证码验证
-		commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
+//		commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
 		String uid = userService.register(qo);
 		UserInfoVo userInfoVo = new UserInfoVo();
 		userInfoVo.setUid(uid);
@@ -182,6 +182,7 @@ public class UserAuthController {
 
 	@ApiOperation("绑定微信")
 	@PostMapping("/bindingWechat")
+	@Login
 	public CommonResult bindingWechat(@RequestParam("code")String code) {
 		JSONObject object = WeCharUtil.getAccessToken(code);
 		if ("".equals(object)||object==null){
@@ -192,6 +193,15 @@ public class UserAuthController {
 		JSONObject jsonObject = WeCharUtil.getUserInfo(accessToken, openid);
 		userService.bindingWechat(UserUtils.getUserId(),openid);
 		return CommonResult.ok(jsonObject.getString("nickname"),"绑定成功");
+	}
+
+	@ApiOperation("解绑微信绑定")
+	@PostMapping("/relieveBindingWechat")
+	@Login
+	public CommonResult relieveBindingWechat(@RequestBody RegisterQO registerQO) {
+		commonService.checkVerifyCode(registerQO.getAccount(), registerQO.getCode());
+		userService.relieveBindingWechat(registerQO,UserUtils.getUserId());
+		return CommonResult.ok();
 	}
 	
 	@ApiOperation(value = "设置支付密码", notes = "需要登录")

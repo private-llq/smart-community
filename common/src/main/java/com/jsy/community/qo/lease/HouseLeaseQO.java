@@ -133,10 +133,11 @@ public class HouseLeaseQO implements Serializable {
 
     /**
      * 值是变动  需要存id至数据库 对应 名称 有后台人员管理
+     * 1:一室;2:两室;3:三室;4:四室及以上
      */
     @ApiModelProperty(value = "房屋户型id：1.四室一厅、2.二室一厅...")
-    @Pattern(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class,  UpdateWholeLeaseHouse.class}, regexp = "^[0-9]{6}$", message = "房屋类型Code必须为6位数字!")
-    @NotNull(groups = {AddWholeLeaseHouse.class,  AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "未选择房屋户型!")
+    // @Pattern(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class,  UpdateWholeLeaseHouse.class}, regexp = "^[0-9]{6}$", message = "房屋类型Code必须为6位数字!")
+    @NotBlank(groups = {AddWholeLeaseHouse.class,  AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "未选择房屋户型!")
     private String houseTypeCode;
 
 

@@ -24,6 +24,8 @@ public class WechatConfig {
     public static final String OPENID_URL="https://api.weixin.qq.com/sns/oauth2/access_token";
     //服务号的应用号
     public static String APPID;
+    //服务号的SECRET
+    public static String APPID_SECRET;
     //私钥所在路径
     public static String APICLIENT_KEY;
     //apiclient_cert.p12所在路劲
@@ -39,6 +41,7 @@ public class WechatConfig {
 
     public static void setConfig(CompanyPayConfigEntity serviceConfig) {
         APPID= AESOperator.decrypt(serviceConfig.getAppId());
+        APPID_SECRET=AESOperator.decrypt(serviceConfig.getAppSecret());
         MCH_ID=AESOperator.decrypt(serviceConfig.getMchId());
         PRIVATE_KEY=AESOperator.decrypt(serviceConfig.getPrivateKey());
         API_V3_KEY=AESOperator.decrypt(serviceConfig.getApiV3());

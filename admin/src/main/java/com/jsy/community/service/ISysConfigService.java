@@ -138,4 +138,13 @@ public interface ISysConfigService {
 	 * @Date: 2020/12/15
 	**/
 	List<SysMenuEntity> queryUserMenu(Long uid);
+	
+	/**
+	 * @author: DKS
+	 * @description: 查询角色详情
+	 * @param roleId: 角色ID
+	 * @return: com.jsy.community.entity.admin.AdminRoleEntity
+	 * @date: 2021/10/18 16:10
+	 **/
+	SysRoleEntity queryRoleDetail(Long roleId);
 }

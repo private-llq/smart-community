@@ -198,11 +198,11 @@ public class PublicConfig {
         response.flushBuffer();
         returnMap.put("out_trade_no",JSONObject.fromObject(plainText).getString("out_trade_no"));
         returnMap.put("attach",JSONObject.fromObject(plainText).getString("attach"));
+        returnMap.put("success_time",JSONObject.fromObject(plainText).getString("success_time"));
         returnMap.put("transaction_id",JSONObject.fromObject(plainText).getString("transaction_id"));
         String string = JSONObject.fromObject(plainText).getString("amount");
         JSONObject jsonObject = JSONObject.fromObject(string);
         returnMap.put("amount",jsonObject.getString("total"));
-
         return returnMap;
     }
 

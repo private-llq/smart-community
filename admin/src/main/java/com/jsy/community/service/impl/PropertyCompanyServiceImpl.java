@@ -16,9 +16,12 @@ import com.jsy.community.utils.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 
 /**
@@ -30,6 +33,9 @@ public class PropertyCompanyServiceImpl extends ServiceImpl<PropertyCompanyMappe
 	
 	@Resource
 	private PropertyCompanyMapper propertyCompanyMapper;
+	
+	@Autowired
+	private RedisTemplate redisTemplate;
 	
 	/**
 	 * @Description: 物业公司条件查询
@@ -53,11 +59,27 @@ public class PropertyCompanyServiceImpl extends ServiceImpl<PropertyCompanyMappe
 			queryWrapper.like("name",query.getName());
 		}
 		//是否查地区
-		if (StringUtils.isNotBlank(query.getRegion())) {
-			queryWrapper.like("region",query.getRegion());
+		if (query.getProvinceId() != null) {
+			queryWrapper.eq("province_id", query.getProvinceId());
+		}
+		if (query.getCityId() != null) {
+			queryWrapper.eq("city_id", query.getCityId());
+		}
+		if (query.getAreaId() != null) {
+			queryWrapper.eq("area_id", query.getAreaId());
 		}
 		queryWrapper.orderByDesc("create_time");
 		Page<PropertyCompanyEntity> pageData = propertyCompanyMapper.selectPage(page, queryWrapper);
+		// 补充物业地址
+		for (PropertyCompanyEntity record : pageData.getRecords()) {
+			String province = (String) redisTemplate.opsForValue().get("RegionSingle:" + String.valueOf(record.getProvinceId()));
+			String city = (String) redisTemplate.opsForValue().get("RegionSingle:" + String.valueOf(record.getCityId()));
+			String area = (String) redisTemplate.opsForValue().get("RegionSingle:" + String.valueOf(record.getAreaId()));
+			province = StringUtils.isNotBlank(province) ? province : "";
+			city = StringUtils.isNotBlank(city) ? city : "";
+			area = StringUtils.isNotBlank(area) ? area : "";
+			record.setRegion(province + city + area);
+		}
 		PageInfo<PropertyCompanyEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageData, pageInfo);
 		return pageInfo;
@@ -110,5 +132,17 @@ public class PropertyCompanyServiceImpl extends ServiceImpl<PropertyCompanyMappe
 		if (i != 1) {
 			throw new AdminException(JSYError.INTERNAL.getCode(),"删除失败");
 		}
+	}
+	
+	/**
+	 * @Description: 物业公司列表查询
+	 * @Param: []
+	 * @Return: java.util.List<com.jsy.community.entity.sys.PropertyCompanyEntity>
+	 * @Author: DKS
+	 * @Date: 2021/10/19
+	 **/
+	@Override
+	public List<PropertyCompanyEntity> queryCompanyList() {
+		return propertyCompanyMapper.selectList(new QueryWrapper<PropertyCompanyEntity>().select("*"));
 	}
 }

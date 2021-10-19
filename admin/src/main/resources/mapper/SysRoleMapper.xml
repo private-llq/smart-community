@@ -12,4 +12,8 @@
 		</foreach>
 	</insert>
 
+	<!-- 查询角色的菜单ID列表 -->
+	<select id="queryRoleMuneIdsByRoleId" resultType="java.lang.Long">
+        select menu_id from t_sys_role_menu where role_id = #{roleId}
+    </select>
 </mapper>

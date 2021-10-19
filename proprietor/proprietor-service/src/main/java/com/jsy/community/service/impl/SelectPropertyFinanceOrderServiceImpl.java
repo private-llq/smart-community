@@ -132,6 +132,7 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
                 List dataList = (List) roomMap.get("list");
                 dataList.add(entity);
                 //在相应房间节点下累加总金额
+
                 BigDecimal totalAmount = entity.getPropertyFee().add(entity.getPenalSum());
                 if(totalAmount == null){
                     roomMap.put("totalAmount",new BigDecimal("0.00"));

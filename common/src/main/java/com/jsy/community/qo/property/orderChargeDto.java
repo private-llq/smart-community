@@ -9,11 +9,22 @@ import java.time.LocalDateTime;
 
 @Data
 public class orderChargeDto implements Serializable {
+    
     /**
      * 社区名
      */
     private String communityName;
 
+    private Long id;
+
+    /**
+     * @Description: 
+     * @Param: 社区id
+     * @Return: 
+     * @Author: Tian
+     * @Date: 2021/10/18-15:51
+     **/
+    private Long communityId;
 
     /**
      * 车辆信息（车牌号）

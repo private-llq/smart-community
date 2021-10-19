@@ -28,7 +28,11 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author chq459799974
@@ -76,7 +80,8 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	**/
 	public List<SysMenuEntity> queryMenu(){
 		List<SysMenuEntity> menuList = sysMenuMapper.selectList(new QueryWrapper<SysMenuEntity>().select("*").eq("pid", 0));
-		setChildren(menuList,new LinkedList<SysMenuEntity>());
+		setChildren(menuList,new LinkedList<>());
+		menuList.sort(Comparator.comparing(SysMenuEntity::getSort));
 		return menuList;
 	}
 	
@@ -202,6 +207,11 @@ public class SysConfigServiceImpl implements ISysConfigService {
 		List<SysMenuEntity> list = null;
 		try{
 			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Sys:Menu"),List.class);
+			// list排序
+			if (CollectionUtils.isEmpty(list)) {
+				return new ArrayList<>();
+			}
+			list.sort(Comparator.comparing(SysMenuEntity::getSort));
 		}catch (Exception e){
 			log.error("redis获取菜单失败");
 			return queryMenu();//从mysql获取
@@ -419,4 +429,27 @@ public class SysConfigServiceImpl implements ISysConfigService {
 		return sysMenuMapper.queryUserMenu(uid);
 	}
 	
+	/**
+	 * @param roleId : 角色ID
+	 * @author: DKS
+	 * @description: 查询角色详情
+	 * @return: com.jsy.community.entity.admin.AdminRoleEntity
+	 * @date: 2021/10/18 16:10
+	 **/
+	@Override
+	public SysRoleEntity queryRoleDetail(Long roleId) {
+		// 查询角色信息
+		QueryWrapper<SysRoleEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("id", roleId);
+		SysRoleEntity sysRoleEntity = sysRoleMapper.selectOne(queryWrapper);
+		if (sysRoleEntity == null) {
+			return new SysRoleEntity();
+		}
+		// 查询分配的菜单列表
+		List<Long> roleMenuIds = sysRoleMapper.queryRoleMuneIdsByRoleId(roleId);
+		// 去重
+		List<Long> collect = roleMenuIds.stream().distinct().collect(Collectors.toList());
+		sysRoleEntity.setMenuIds(collect);
+		return sysRoleEntity;
+	}
 }

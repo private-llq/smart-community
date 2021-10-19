@@ -37,7 +37,7 @@ public interface ICompanyPayConfigService {
      * @Param:
      * @return:
      */
-    CompanyPayConfigEntity getCompanyConfig(Long propertyId);
+    CompanyPayConfigEntity getCompanyConfig(Long propertyId,Integer type);
 
     /**
      * @Description: 查询退款配置

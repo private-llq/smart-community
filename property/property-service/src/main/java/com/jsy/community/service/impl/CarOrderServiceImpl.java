@@ -68,5 +68,22 @@ public class CarOrderServiceImpl extends ServiceImpl<CarOrderMapper, CarOrderEnt
     }
 
 
+    public CarOrderEntity selectId(Long id) {
+        CarOrderEntity entity = carOrderMapper.selectOne(new QueryWrapper<CarOrderEntity>().eq("id", id));
+        return entity;
+    }
+
+
+    public boolean updateOrderId(CarOrderEntity entity, long parseLong) {
+        System.out.println(entity);
+        UpdateWrapper<CarOrderEntity> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id",parseLong);
+        int update = carOrderMapper.update(entity, updateWrapper);
+        if(update>0){
+            return true;
+        }
+        return false;
+    }
+
 
 }
