@@ -137,9 +137,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         if (Objects.isNull(carMonthlyVehicle.getOwnerName())){
             throw new PropertyException("车主姓名不能为空！");
         }
-        if (Objects.isNull(carMonthlyVehicle.getCarPosition())){
+        /*if (Objects.isNull(carMonthlyVehicle.getCarPosition())){
             throw new PropertyException("车位号不能为空！");
-        }
+        }*/
         if (Objects.isNull(carMonthlyVehicle.getMonthlyMethodId())){
             throw new PropertyException("包月方式不能为空！");
         }
@@ -785,9 +785,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         if (Objects.isNull(carMonthlyVehicle.getOwnerName())){
             throw new PropertyException("车主姓名不能为空！");
         }
-        if (Objects.isNull(carMonthlyVehicle.getCarPosition())){
+        /*if (Objects.isNull(carMonthlyVehicle.getCarPosition())){
             throw new PropertyException("车位号不能为空！");
-        }
+        }*/
         /*if (Objects.isNull(carMonthlyVehicle.getMonthlyMethodId())){
             throw new PropertyException("包月方式不能为空！");
         }*/
