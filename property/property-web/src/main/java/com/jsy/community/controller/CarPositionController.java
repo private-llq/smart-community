@@ -219,10 +219,11 @@ public class CarPositionController {
         if (qo.getCarPosStatus()==1) {//绑定为业主的时候
             long carProprietorId = SnowFlake.nextId();//外键业主车辆表
             carPositionEntity.setCarProprietorId(carProprietorId);//外键
-            carPositionEntity.setCarPosition(qo.getCarNumber());//车牌号
+            carPositionEntity.setCarNumber(qo.getCarNumber());//车牌号
             CarProprietorEntity entity = new CarProprietorEntity();
             entity.setCommunityId(adminCommunityId);//社区id
             entity.setCarNumber(qo.getCarNumber());//车牌号
+            entity.setProprietorName(qo.getUserName());//用户名
             entity.setId(carProprietorId);//主键id
             entity.setPhone(Long.parseLong(qo.getOwnerPhone()));//电话
             iCarProprietorService.addProprietor(entity,adminCommunityId);
@@ -245,8 +246,15 @@ public class CarPositionController {
     @CarOperation(operation = "解除绑定")
     @RequestMapping(value = "/relieve", method = RequestMethod.POST)
     public CommonResult<Boolean> relieve(Long id) {
+
+            //查询业主车辆
+            CarPositionEntity byId = iCarPositionService.getById(id);
+            if (byId.getCarPosStatus()==1) {
+                System.out.println(byId.getCarProprietorId());
+                boolean b1 = iCarProprietorService.deleteProprietor(byId.getCarProprietorId());//删除业主车辆
+            }
         Boolean b = iCarPositionService.relieve(id);
-        if (b) {
+        if(b){
             return CommonResult.ok(b, "解绑成功");
         }
         return CommonResult.ok(b, "解绑失败");

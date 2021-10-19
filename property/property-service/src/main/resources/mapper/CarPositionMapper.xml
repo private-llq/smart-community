@@ -80,8 +80,9 @@
     par.binding_status=0,
     par.begin_time=null,
     par.end_time=null,
-    par.user_name=null
-
+    par.user_name=null,
+    par.car_number=null,
+    par.car_proprietor_id=null
     WHERE id=#{id}
     </update>
 
