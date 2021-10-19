@@ -10,13 +10,17 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
+import com.jsy.community.entity.property.CarProprietorEntity;
 import com.jsy.community.mapper.CarPositionMapper;
+import com.jsy.community.mapper.CarProprietorMapper;
 import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.qo.property.InsterCarPositionQO;
 import com.jsy.community.qo.property.MoreInsterCarPositionQO;
 import com.jsy.community.qo.property.SelectCarPositionPagingQO;
 import com.jsy.community.qo.property.UpdateCarPositionQO;
+import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.lucene.search.spans.SpanNotQuery;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +42,7 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
     private CarPositionMapper carPositionMapper;
     @Resource
     private HouseMapper houseMapper;
+
 
     @Override
     public List<CarPositionEntity> selectCarPostionBystatustatus() {
@@ -156,12 +161,10 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
 
     @Override
     public Boolean insterCarPosition(InsterCarPositionQO qo, Long adminCommunityId) {
-
         List<CarPositionEntity> list = carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>().eq("car_position", qo.getCarPosition()));
         if (list.size() > 0) {
             throw new PropertyException(500, "车位号已经存在");
         }
-
         CarPositionEntity carPositionEntity = new CarPositionEntity();
         BeanUtils.copyProperties(qo, carPositionEntity);
         carPositionEntity.setCommunityId(adminCommunityId);

@@ -64,4 +64,6 @@ public class CustomerBindingQO implements Serializable {
     @ApiModelProperty("几个月")
     private Integer number;
 
+    @ApiModelProperty("车牌号")
+    private String    carNumber;
 }

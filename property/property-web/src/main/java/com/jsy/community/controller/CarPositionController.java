@@ -23,6 +23,7 @@ import com.jsy.community.qo.property.*;
 import com.jsy.community.util.*;
 import com.jsy.community.utils.MD5Util;
 import com.jsy.community.utils.MinioUtils;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.car.CarVO;
@@ -39,6 +40,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -90,7 +92,8 @@ public class CarPositionController {
     private IVisitorService visitorService;
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarChargeService carChargeService;
-
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICarProprietorService iCarProprietorService;
     @ApiOperation("分页查询车位信息")
     @Login
     @RequestMapping(value = "/selectCarPositionPaging", method = RequestMethod.POST)
@@ -193,6 +196,7 @@ public class CarPositionController {
     @CarOperation(operation = "绑定用户")
     @RequestMapping(value = "/customerBinding", method = RequestMethod.POST)
     public CommonResult<Boolean> customerBinding(@RequestBody CustomerBindingQO qo) {
+        Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
         CarPositionEntity carPositionEntity = new CarPositionEntity();
         BeanUtils.copyProperties(qo, carPositionEntity);
         carPositionEntity.setBindingStatus(1);
@@ -211,8 +215,26 @@ public class CarPositionController {
         //查询用户的id
         String uid = iUserService.selectUserUID(qo.getOwnerPhone(), qo.getUserName());
         carPositionEntity.setUid(uid);
+
+        if (qo.getCarPosStatus()==1) {//绑定为业主的时候
+            long carProprietorId = SnowFlake.nextId();//外键业主车辆表
+            carPositionEntity.setCarProprietorId(carProprietorId);//外键
+            carPositionEntity.setCarPosition(qo.getCarNumber());//车牌号
+            CarProprietorEntity entity = new CarProprietorEntity();
+            entity.setCommunityId(adminCommunityId);//社区id
+            entity.setCarNumber(qo.getCarNumber());//车牌号
+            entity.setId(carProprietorId);//主键id
+            entity.setPhone(Long.parseLong(qo.getOwnerPhone()));//电话
+            iCarProprietorService.addProprietor(entity,adminCommunityId);
+        }
+
+
+
         boolean b = iCarPositionService.updateById(carPositionEntity);
         if (b) {
+
+
+
             return CommonResult.ok(b, "绑定成功");
         }
         return CommonResult.ok(b, "绑定失败");
@@ -657,10 +679,10 @@ public class CarPositionController {
                     String standard = Crc16Util.getStandard(aLong.intValue());
                     String ultimatelyValue = Crc16Util.getUltimatelyValue("余位" + standard);
                     //led
-                    Rs485Data e1 = new Rs485Data();
-                    e1.setEncodetype("hex2string");
-                    e1.setData(ultimatelyValue);//余位
-                    carVO.getRs485_data().add(e1);
+//                    Rs485Data e1 = new Rs485Data();
+//                    e1.setEncodetype("hex2string");
+//                    e1.setData(ultimatelyValue);//余位
+//                    carVO.getRs485_data().add(e1);
 
                     //语音播报内容
                     Rs485Data e2 = new Rs485Data();
