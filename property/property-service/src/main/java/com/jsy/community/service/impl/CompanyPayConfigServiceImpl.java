@@ -42,7 +42,7 @@ public class CompanyPayConfigServiceImpl extends ServiceImpl<CompanyPayConfigMap
     @Override
     public Map getRefundConfig(Long companyId) {
         Map<String, Integer> map = new HashMap<>();
-        CompanyPayConfigEntity entity = companyPayConfigMapper.selectOne(new QueryWrapper<CompanyPayConfigEntity>().eq("company_id", companyId));
+        CompanyPayConfigEntity entity = companyPayConfigMapper.selectOne(new QueryWrapper<CompanyPayConfigEntity>().eq("company_id", companyId).eq("type",1));
         if (entity!=null){
             map.put("wechat",entity.getRefundStatus());
         }else {
@@ -67,7 +67,7 @@ public class CompanyPayConfigServiceImpl extends ServiceImpl<CompanyPayConfigMap
     @Override
     public Map getBasicConfig(Long companyId) {
         Map<String, Integer> map = new HashMap<>();
-        CompanyPayConfigEntity entity = companyPayConfigMapper.selectOne(new QueryWrapper<CompanyPayConfigEntity>().eq("company_id", companyId));
+        CompanyPayConfigEntity entity = companyPayConfigMapper.selectOne(new QueryWrapper<CompanyPayConfigEntity>().eq("company_id", companyId).eq("type",1));
         if (entity != null){
             map.put("wechat",1);
         }else {
