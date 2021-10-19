@@ -257,12 +257,9 @@ public class WeChatPayController {
                     return;
                 }
                 String amount = map.get("amount");
-                String total = JSONObject.fromObject(amount).getString("payer_total");
-                BigDecimal decimal = BigDecimal.valueOf(Long.parseLong(total));
-                BigDecimal divide = decimal.divide(new BigDecimal(100));
 
                 log.info("账单ids：" + String.valueOf(ids).split(","));
-                propertyFinanceOrderService.updateOrderStatusBatch(1,map.get("out_trade_no"),String.valueOf(ids).split(","),divide);
+                propertyFinanceOrderService.updateOrderStatusBatch(1,map.get("out_trade_no"),String.valueOf(ids).split(","),new BigDecimal(amount));
                 //获取一条账单，得到社区id
                 PropertyFinanceOrderEntity financeOrderEntity = propertyFinanceOrderService.findOne(Long.valueOf(String.valueOf(ids).split(",")[0]));
                 PropertyFinanceReceiptEntity receiptEntity = new PropertyFinanceReceiptEntity();
