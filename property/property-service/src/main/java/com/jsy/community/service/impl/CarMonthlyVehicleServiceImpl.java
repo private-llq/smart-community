@@ -293,8 +293,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         carPositionEntity.setEndTime(carMonthlyVehicle.getEndTime());//结束时间
         carPositionEntity.setUserName(carMonthlyVehicle.getOwnerName());//租户姓名
         carPositionMapper.update(carPositionEntity,new UpdateWrapper<CarPositionEntity>().eq("car_position",carMonthlyVehicle.getCarPosition()).eq("community_id",carMonthlyVehicle.getCommunityId()));
-
-
         return update;
     }
 
