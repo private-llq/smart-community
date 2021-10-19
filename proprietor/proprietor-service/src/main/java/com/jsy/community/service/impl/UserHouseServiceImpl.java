@@ -18,6 +18,7 @@ import com.jsy.community.vo.UserHouseVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -49,6 +50,8 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 	@Autowired
 	private RedisTemplate redisTemplate;
+	@Value("${H5Url}")
+	private String H5Url;
 
 	@Autowired
 	private CommunityMapper communityMapper;
@@ -304,8 +307,6 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	@Transactional
 	public String membersSave(MembersQO membersQO, String userId) {
 
-		String url="http://192.168.12.113:8080/#/";
-
 		HouseMemberEntity memberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("house_id", membersQO.getHouseId()).eq("mobile", membersQO.getMobile()).eq("relation",membersQO.getRelation()));
 		if (memberEntity!=null){
 			throw new ProprietorException("当前成员以添加，请勿重复添加！");
@@ -351,12 +352,12 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 					userIMEntity.getImId(),
 					"房屋管理",
 					title,
-					url+"?id="+houseInfoEntity.getId()+"&mobile="+membersQO.getMobile(),
+					H5Url+"?id="+houseInfoEntity.getId()+"&mobile="+membersQO.getMobile(),
 					desc,
 					map,
 					BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
 			redisTemplate.opsForValue().set(MEMBERKEY+membersQO.getMobile()+membersQO.getHouseId(), JSON.toJSONString(membersQO),1, TimeUnit.HOURS);
-			return url+"?id="+houseInfoEntity.getId()+"&mobile="+membersQO.getMobile();
+			return H5Url+"?id="+houseInfoEntity.getId()+"&mobile="+membersQO.getMobile();
 
 			//添加成员表数据
 //			HouseMemberEntity entity = new HouseMemberEntity();
@@ -384,7 +385,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			membersQO.setUid(userId);
 
 			redisTemplate.opsForValue().set(MEMBERKEY+membersQO.getMobile()+membersQO.getHouseId(), JSON.toJSONString(membersQO),1, TimeUnit.HOURS);
-			return url+"?id="+houseInfoEntity.getId()+"&mobile="+membersQO.getMobile();
+			return H5Url+"?id="+houseInfoEntity.getId()+"&mobile="+membersQO.getMobile();
 		}
 
 		/*

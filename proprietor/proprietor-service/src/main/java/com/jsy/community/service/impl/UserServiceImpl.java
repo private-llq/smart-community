@@ -36,6 +36,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -129,6 +130,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IHouseInfoService houseInfoService;
+
+    @Value("${H5Url}")
+    private String H5Url;
 
     @Autowired
     private ISignatureService signatureService;
@@ -336,7 +340,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                         imId,
                         "房屋管理",
                         houseInfoEntity.getTitle(),
-                        "http://192.168.12.113:8080/#/" + "?id=" + houseInfoEntity.getId() + "mobile=" + qo.getAccount(),
+                        H5Url + "?id=" + houseInfoEntity.getId() + "mobile=" + qo.getAccount(),
                         houseInfoEntity.getContent(),
                         map,
                         BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
