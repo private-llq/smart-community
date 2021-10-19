@@ -73,6 +73,7 @@ public class BindingPositionController {
     @DeleteMapping("deleteBinding")
     @CarOperation(operation = "删除了【车位管理车辆】")
     public CommonResult deleteBinding(@RequestParam("uid") String uid) {
+
         bindingPositionService.deleteBinding(uid);
         return CommonResult.ok();
     }

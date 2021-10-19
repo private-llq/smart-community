@@ -55,9 +55,9 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
 
 
         if (list.size()==0){
-            bindingPositionEntity.setBindingStatus(1);//默认第一个添加进来的为绑定状态
+            bindingPositionEntity.setBindingStatus(0);//默认第一个添加进来的为绑定状态
         }else {
-            bindingPositionEntity.setBindingStatus(0);//未绑定状态
+            bindingPositionEntity.setBindingStatus(1);//未绑定状态
         }
 
         bindingPositionEntity.setUid(UserUtils.randomUUID());
@@ -123,6 +123,7 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
          if (entity.getBindingStatus()==1){
              throw new PropertyException("该车辆已绑定车位，如需删除请先解绑！");
          }*/
+
         bindingPositionMapper.delete(new QueryWrapper<BindingPositionEntity>().eq("uid",uid));
     }
 

@@ -157,9 +157,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         }
 
         //查询数据库是否正在包月中
-        CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carMonthlyVehicle.getCarNumber()).ge("end_time",LocalDateTime.now()));
+        CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carMonthlyVehicle.getCarNumber()).ge("end_time",carMonthlyVehicle.getEndTime()));
         if (Objects.nonNull(vehicle)){
-            throw new PropertyException("已进行包月，如果需要延期，请查询记录执行时间延期操作！");
+            throw new PropertyException("该车辆已进行包月，如果需要延期，请查询记录执行时间延期操作！");
         }
 
         //查询基础设置里面的最大续费月数
@@ -263,7 +263,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             orderEntity.setOrderNum(orderNum);//账单号
             orderEntity.setTargetId(car_position.getId());//车位id
         }
-
         return insert;
     }
 
@@ -914,13 +913,16 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
                 .eq("type", 12)
                 .eq("disposable", 2)
         );
-        orderEntity.setFeeRuleId(propertyFeeRuleEntity.getId());//缴费项目id
-        orderEntity.setType(propertyFeeRuleEntity.getType());//账单类型
-        orderEntity.setAssociatedType(2);//关联类型车位
-        orderEntity.setOrderTime(LocalDate.now());//账单月份
-        String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(communityId));
-        orderEntity.setOrderNum(orderNum);//账单号
-        orderEntity.setTargetId(car_position.getId());//车位id
+        if (Objects.nonNull(propertyFeeRuleEntity)){
+            orderEntity.setFeeRuleId(propertyFeeRuleEntity.getId());//缴费项目id
+            orderEntity.setType(propertyFeeRuleEntity.getType());//账单类型
+            orderEntity.setAssociatedType(2);//关联类型车位
+            orderEntity.setOrderTime(LocalDate.now());//账单月份
+            String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(communityId));
+            orderEntity.setOrderNum(orderNum);//账单号
+            orderEntity.setTargetId(car_position.getId());//车位id
+
+        }
 
 
         return insert;
