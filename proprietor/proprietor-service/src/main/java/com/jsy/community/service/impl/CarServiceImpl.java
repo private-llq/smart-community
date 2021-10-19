@@ -271,6 +271,11 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             if (basicsEntity.getMonthlyPayment()==0){
                 throw new ProprietorException("当前小区不允许车辆包月！");
             }
+            //查询数据库是否正在包月中
+            CarEntity plate = carMapper.selectOne(new QueryWrapper<CarEntity>().eq("car_plate", carEntity.getCarPlate()).eq("type",2));
+            if (Objects.nonNull(plate)){
+                throw new PropertyException("当前车辆已进行包月，如果需要延期，请查询记录执行时间延期操作！");
+            }
             if (basicsEntity.getWhetherAllowMonth()==0){
                 //查询车主在当前小区是否存在未交的物业费账单
                 List<PropertyFinanceOrderEntity> list = propertyFinanceOrderService.FeeOrderList(carEntity.getCommunityId(),carEntity.getUid());
@@ -359,7 +364,11 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
         CarEntity carEntity = carMapper.selectById(entity.getCarId());
         if (carEntity!=null){
-            carEntity.setOverTime(carEntity.getOverTime().plusMonths(entity.getMonth()));
+            if (carEntity.getOverTime().isBefore(LocalDateTime.now())){
+                carEntity.setOverTime(LocalDateTime.now().plusMonths(entity.getMonth()));
+            } else {
+                carEntity.setOverTime(carEntity.getOverTime().plusMonths(entity.getMonth()));
+            }
             carMapper.updateById(carEntity);
 
 
