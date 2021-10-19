@@ -504,6 +504,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
             CommunityEntity communityNameById = communityService.getCommunityNameById(adminCommunityId);
             String name = communityNameById.getName();
 
+            orderChargeDto.setCommunityId(adminCommunityId);//社区id
             orderChargeDto.setOrderNum(orderNum);//订单编号
             orderChargeDto.setCommunityName(name);//社区名称
             orderChargeDto.setCarNumber(carNumber);//车牌号
