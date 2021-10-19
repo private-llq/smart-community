@@ -6,6 +6,8 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.PageInfo;
 
+import java.util.List;
+
 /**
  * @author chq459799974
  * @description 社区接口
@@ -47,4 +49,13 @@ public interface ICommunityService extends IService<CommunityEntity> {
 	 * @Date: 2021/10/18
 	 **/
 	boolean delCommunity(Long id);
+	
+	/**
+	 * @Description: 社区列表查询
+	 * @Param: []
+	 * @Return: java.util.List<com.jsy.community.entity.sys.PropertyCompanyEntity>
+	 * @Author: DKS
+	 * @Date: 2021/10/19
+	 **/
+	List<CommunityEntity> queryCommunityList();
 }

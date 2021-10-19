@@ -21,7 +21,7 @@ public class UserAccountRecordQO implements Serializable {
 	@ApiModelProperty(value = "用户ID")
 	private String uid;
 	
-	@ApiModelProperty(value = "交易类型1.收入2.支出")
+	@ApiModelProperty(value = "交易类型 1.支出2.收入")
 	private Integer tradeType;
 
 }

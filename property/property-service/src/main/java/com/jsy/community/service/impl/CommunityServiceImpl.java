@@ -412,7 +412,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		ConsoleEntity consoleEntity = new ConsoleEntity();
 		// 查该物业剩余短信数量
 		PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectOne(new QueryWrapper<PropertyCompanyEntity>().select("message_quantity").eq("id", companyId));
-		consoleEntity.setMessageQuantity(companyEntity.getMessageQuantity());
+		consoleEntity.setMessageQuantity(companyEntity == null ? 0 : companyEntity.getMessageQuantity());
 		// 查该物业公司所属小区
 		List<CommunityEntity> communityEntities = communityMapper.queryCommunityByCompanyId(companyId);
 		// 设置物业所属小区数量

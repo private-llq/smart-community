@@ -83,7 +83,7 @@ public class SignatureServiceImpl implements ISignatureService {
 	 * http调用签章接口
 	 */
 	private boolean sendRedbagByHttp(int type, SignatureUserDTO signatureUserDTO){
-		HttpPost httpPost = null;
+		HttpPost httpPost;
 		HttpPut httpPut = null;
 		String url = "";
 		long id = SnowFlake.nextId();

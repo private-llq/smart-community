@@ -296,7 +296,10 @@ public class CarPositionController {
 
         //查询社区代写
         Long communityId = equipmentManageService.equipmentOne(camId).getCommunityId();
-
+        System.out.println("社区id"+communityId);
+        System.out.println("相机id"+camId);
+        System.out.println("进出"+vdcType);
+        System.out.println("车牌号"+plateNum);
         //在小区是否是黑名单车辆
         CarBlackListEntity carBlackListEntity = iCarBlackListService.carBlackListOne(plateNum, communityId);
         if (carBlackListEntity == null) {//不是黑名单
@@ -609,7 +612,7 @@ public class CarPositionController {
 
 
             //新增订单
-            insterCarOrder(plateNum, communityId, LocalDateTime.now(),plateColor);
+            insterCarOrder(plateNum, communityId, LocalDateTime.now(),plateColor,0);
             //如果是收到邀请的车辆状态改变为已经进园
             boolean statusInvite = visitorService.selectCarNumberIsNoInvite(plateNum, communityId, 1);
             if (statusInvite) {
@@ -619,7 +622,9 @@ public class CarPositionController {
         } else if (vdcType.equals("out")) {//出口
             Integer orderStatus = 0;
             //查询临时车最后订单
+            System.out.println(communityId+plateNum+"+++++");
             CarOrderEntity carOrderEntity = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
+            System.out.println(carOrderEntity);
             if (carOrderEntity != null) {
                 orderStatus = carOrderEntity.getOrderStatus();//获取订单的状态
             }
@@ -700,7 +705,7 @@ public class CarPositionController {
                     e2.setData("0064FFFF300901BDFBD6B9CDA8D0D0E950");//禁止通行
                     carVO.getRs485_data().add(e2);
                     //新增订单
-                    insterCarOrder(plateNum, communityId, orderTime,plateColor);
+                    insterCarOrder(plateNum, communityId, orderTime,plateColor,1);
                 }
                 if (l < dwellTime) {//没有超过滞留时间
                     //是否开闸
@@ -740,10 +745,11 @@ public class CarPositionController {
     }
 
     //新增一个车辆订单对象
-    private void insterCarOrder(String plateNum, Long communityId, LocalDateTime beginTime,String plateColor) {
+    private void insterCarOrder(String plateNum, Long communityId, LocalDateTime beginTime,String plateColor,Integer isRetention) {
         CarOrderEntity entity = new CarOrderEntity();//新增一个车辆订单对象
         entity.setType(1);//临时车
         entity.setPlateColor(plateColor);
+        entity.setIsRetention(isRetention);//是否为滞留订单0正常1,滞留订单
         entity.setOrderNum(OrderNoUtil.getOrder());//订单编号
         entity.setBeginTime(beginTime);//进入的时间
         entity.setOrderStatus(0);//未支付

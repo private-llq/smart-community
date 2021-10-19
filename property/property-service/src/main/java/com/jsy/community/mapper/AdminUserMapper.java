@@ -150,7 +150,7 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @return: java.lang.Long
 	 * @date: 2021/7/29 11:13
 	 **/
-	@Select("select company_id from t_admin_user_company where uid = #{uid} limit 1")
+	@Select("select ar.company_id from t_admin_user_role ur left join t_admin_role ar on ar.id = ur.role_id where ur.uid = #{uid} limit 1")
 	Long queryCompanyId(String uid);
 
 	//========资料或账户相关start ==========

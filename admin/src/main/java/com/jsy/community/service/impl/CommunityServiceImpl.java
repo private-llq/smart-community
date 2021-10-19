@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author chq459799974
@@ -128,5 +129,17 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	@Override
 	public boolean delCommunity(Long id){
 		return communityMapper.deleteById(id) == 1;
+	}
+	
+	/**
+	 * @Description: 社区列表查询
+	 * @Param: []
+	 * @Return: java.util.List<com.jsy.community.entity.sys.PropertyCompanyEntity>
+	 * @Author: DKS
+	 * @Date: 2021/10/19
+	 **/
+	@Override
+	public List<CommunityEntity> queryCommunityList() {
+		return communityMapper.selectList(new QueryWrapper<CommunityEntity>().select("*"));
 	}
 }

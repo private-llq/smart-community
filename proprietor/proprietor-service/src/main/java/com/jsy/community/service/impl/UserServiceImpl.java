@@ -26,6 +26,7 @@ import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
+import com.jsy.community.utils.imutils.CallUtil;
 import com.jsy.community.utils.imutils.entity.ImResponseEntity;
 import com.jsy.community.vo.*;
 import lombok.extern.slf4j.Slf4j;
@@ -216,13 +217,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //查询用户是否设置支付密码
         UserAuthEntity userAuthEntity = userAuthService.selectByPayPassword(uid);
         if (userAuthEntity != null) {
-            if (userAuthEntity.getPayPassword()!=null){
+            if (userAuthEntity.getPayPassword() != null) {
                 userInfoVo.setIsBindPayPassword(1);
             } else {
                 userInfoVo.setIsBindPayPassword(0);
             }
 
-            if (userAuthEntity.getOpenId()!=null){
+            if (userAuthEntity.getOpenId() != null) {
                 userInfoVo.setIsBindWechat(1);
             } else {
                 userInfoVo.setIsBindWechat(0);
@@ -327,15 +328,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //推送房屋消息
         List<HouseInfoEntity> houseInfoEntities = houseInfoService.selectList(qo.getAccount());
         Map<String, Object> map = new HashMap<>();
-        map.put("type",9);
-        if (houseInfoEntities.size()!=0){
+        map.put("type", 9);
+        if (houseInfoEntities.size() != 0) {
             for (HouseInfoEntity houseInfoEntity : houseInfoEntities) {
                 //推送消息
                 PushInfoUtil.PushPublicMsg(
                         imId,
                         "房屋管理",
                         houseInfoEntity.getTitle(),
-                        "http://192.168.12.113:8080/#/"+"?id="+houseInfoEntity.getId()+"mobile="+qo.getAccount(),
+                        "http://192.168.12.113:8080/#/" + "?id=" + houseInfoEntity.getId() + "mobile=" + qo.getAccount(),
                         houseInfoEntity.getContent(),
                         map,
                         BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
@@ -355,22 +356,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         String avatar = ResourceLoadUtil.loadJSONResource("/sys_default_content.json").getString("avatar");
         signatureUserDTO.setImage(avatar);
+        signatureUserDTO.setNickName(user.getNickname());
         boolean signUserResult = signatureService.insertUser(signatureUserDTO);
         if (!signUserResult) {
             log.error("签章用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
+        // 同步聊天头像昵称
+        CallUtil.updateUserInfo(imId, user.getNickname(), avatar);
+        log.info("同步聊天头像昵称成功：userid -> {},nickName -> {},image -> {}", imId, user.getNickname(), avatar);
 
         //如果当前注册用户有房屋，则更新房屋信息
         List<HouseMemberEntity> mobile = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("mobile", qo.getAccount()));
-        Set<Long> ids=null;
-        if (mobile.size()!=0){
-            ids=new HashSet<>();
+        Set<Long> ids = null;
+        if (mobile.size() != 0) {
+            ids = new HashSet<>();
             for (HouseMemberEntity houseMemberEntity : mobile) {
                 ids.add(houseMemberEntity.getId());
             }
-            houseMemberMapper.updateByMobile(ids,uuid);
-            userHouseService.updateMobile(ids,uuid);
+            houseMemberMapper.updateByMobile(ids, uuid);
+            userHouseService.updateMobile(ids, uuid);
         }
 
         return uuid;
@@ -458,14 +463,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         String avatar = ResourceLoadUtil.loadJSONResource("/sys_default_content.json").getString("avatar");
         signatureUserDTO.setImage(avatar);
+        signatureUserDTO.setNickName(user.getNickname());
         boolean signUserResult = signatureService.insertUser(signatureUserDTO);
         if (!signUserResult) {
             log.error("签章用户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
+        // 同步聊天头像昵称
+        CallUtil.updateUserInfo(imId, user.getNickname(), avatar);
+        log.info("同步聊天头像昵称成功：userid -> {},nickName -> {},image -> {}", imId, user.getNickname(), avatar);
         return uuid;
-
-
     }
 
     /**
@@ -530,7 +537,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 //登录成功
                 UserInfoVo userInfoVo = queryUserInfo(entity.getUid());
                 UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", entity.getUid()));
-                if (userEntity!=null){
+                if (userEntity != null) {
                     userInfoVo.setMobile(userEntity.getMobile());
                 }
                 userInfoVo.setIdCard(null);
@@ -1009,7 +1016,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
 
-
     /**
      * @Description: 解除微信绑定
      * @author: Hu
@@ -1022,12 +1028,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public void relieveBindingWechat(RegisterQO registerQO, String userId) {
         UserAuthEntity authEntity = userAuthService.selectByIsWeChat(userId);
         if (authEntity != null) {
-            if (StringUtils.isEmpty(authEntity.getOpenId())){
+            if (authEntity.getOpenId() == null) {
                 throw new ProprietorException("当前用户并未绑定微信！");
             }
 
             //删除微信三方登录绑定
-            userThirdPlatformMapper.delete(new QueryWrapper<UserThirdPlatformEntity>().eq("third_platform_id",authEntity.getOpenId()));
+            userThirdPlatformMapper.delete(new QueryWrapper<UserThirdPlatformEntity>().eq("third_platform_id", authEntity.getOpenId()));
 
             //设置userAuth表的openId为null
             userAuthService.updateByOpenId(authEntity.getId());
@@ -1046,7 +1052,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public String bindingWechat(String userId, String openid) {
         UserAuthEntity userAuthEntity = userAuthService.selectByIsWeChat(userId);
         if (userAuthEntity != null) {
-            if (userAuthEntity.getOpenId()!=null){
+            if (userAuthEntity.getOpenId() != null) {
                 throw new ProprietorException("当前用户已绑定微信！");
             }
             //设置用户openid
@@ -1071,7 +1077,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //步骤一
         /* t_user_house */
         List<HouseMemberEntity> entityList = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("uid", userId));
-        if (entityList.size()==0){
+        if (entityList.size() == 0) {
             return null;
         }
         HashSet<Long> communityIdSet = new HashSet<>();
@@ -1290,13 +1296,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         signatureUserDTO.setIdCardName(userEntity.getRealName());
         signatureUserDTO.setIdCardNumber(userEntity.getIdCard());
         signatureUserDTO.setIdCardAddress(userEntity.getDetailAddress());
+        if (!StringUtils.isEmpty(userEntity.getAvatarUrl())) {
+            signatureUserDTO.setImage(userEntity.getAvatarUrl());
+        }
+        if (!StringUtils.isEmpty(userEntity.getNickname())) {
+            signatureUserDTO.setNickName(userEntity.getNickname());
+        }
         boolean b = signatureService.realNameUpdateUser(signatureUserDTO);
         //根据手机更新成员表uid
         userHouseService.updateMobileUser(userEntity.getUid());
-
         if (!b) {
             log.error("签章用户实名同步失败，用户：" + userEntity.getUid());
             throw new ProprietorException(JSYError.INTERNAL);
+        }
+        // 同步聊天信息
+        List<String> strings = userIMMapper.selectByUid(Collections.singleton(userEntity.getUid()));
+        if (strings.size() > 0) {
+            if (!StringUtils.isEmpty(userEntity.getAvatarUrl()) || !StringUtils.isEmpty(userEntity.getNickname())) {
+                CallUtil.updateUserInfo(strings.get(0), userEntity.getNickname(), userEntity.getAvatarUrl());
+                log.info("同步聊天头像昵称成功：userid -> {},nickName -> {},image -> {}",
+                        strings.get(0), userEntity.getNickname(), userEntity.getAvatarUrl());
+            }
         }
     }
 
