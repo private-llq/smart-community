@@ -512,6 +512,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
             orderChargeDto.setInTime(openTime);//进闸时间
             orderChargeDto.setTime(time);//停车时长
             orderChargeDto.setMoney(money);//金额
+            orderChargeDto.setId(carOrderEntity.getId());//id
             return orderChargeDto;
         }
         return null;

@@ -96,6 +96,9 @@ public class WeChatH5PayController {
 
         System.out.println("code\n\n"+qo.getCode());
         orderChargeDto orderCharge =carChargeService.orderCharge(qo.getCommunityId(), qo.getCarNumber());
+        if (orderCharge.getId()==null){
+            System.out.println("id悟空");
+        }
         //拼接下单所需要的参数
         Map<String, Object> paraMap = new HashMap<String, Object>();
         //参数中：下单金额
