@@ -8,7 +8,9 @@ import com.jsy.community.dto.signature.SignatureUserDTO;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.UserAuthMapper;
 import com.jsy.community.mapper.UserDataMapper;
+import com.jsy.community.mapper.UserIMMapper;
 import com.jsy.community.qo.proprietor.UserDataQO;
+import com.jsy.community.utils.imutils.CallUtil;
 import com.jsy.community.utils.imutils.open.StringUtils;
 import com.jsy.community.vo.UserDataVO;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,8 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,6 +38,9 @@ public class UserDataServiceImpl implements IUserDataService {
     @Autowired
     private UserAuthMapper userAuthMapper;
 
+    @Autowired
+    private UserIMMapper userIMMapper;
+
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ISignatureService signatureService;
 
@@ -48,13 +55,13 @@ public class UserDataServiceImpl implements IUserDataService {
     @Override
     public void updateUserData(UserDataQO userDataQO, String userId) {
         userDataMapper.updateUserData(userDataQO, userId);
+        //在这里如果头像和昵称都没更新的话，是不需要更新签章信息的
         if (StringUtils.isEmpty(userDataQO.getAvatarUrl()) && StringUtils.isEmpty(userDataQO.getNickname())) {
             return;
         }
         //同步修改签章用户信息
         SignatureUserDTO signatureUserDTO = new SignatureUserDTO();
         signatureUserDTO.setUuid(userId);
-        //在这里如果头像和昵称都没更新的话，是不需要更新签章信息的
         if (!StringUtils.isEmpty(userDataQO.getAvatarUrl())) {
             signatureUserDTO.setImage(userDataQO.getAvatarUrl());
         }
@@ -65,6 +72,12 @@ public class UserDataServiceImpl implements IUserDataService {
         if (!b) {
             log.error("更新个人资料，签章用户同步失败，相关账户：" + userId + "，新个人资料：" + userDataQO.toString());
             throw new ProprietorException(JSYError.INTERNAL.getCode(), "签章板块个人资料同步失败，请联系管理员");
+        }
+        // 同步聊天头像昵称
+        List<String> strings = userIMMapper.selectByUid(Collections.singleton(userId));
+        if (strings.size() > 0) {
+            CallUtil.updateUserInfo(strings.get(0), userDataQO.getNickname(), userDataQO.getAvatarUrl());
+            log.info("同步聊天头像昵称成功：userid -> {},nickName -> {},image -> {}", strings.get(0), userDataQO.getNickname(), userDataQO.getAvatarUrl());
         }
     }
 

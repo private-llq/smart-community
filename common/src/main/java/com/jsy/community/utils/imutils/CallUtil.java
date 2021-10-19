@@ -66,6 +66,12 @@ public class CallUtil {
         return encrypt(jsonData, randomStr, device);
     }
 
+    /**
+     * 同步聊天信息
+     * @param imId
+     * @param nickName
+     * @param image
+     */
     public static void updateUserInfo(String imId, String nickName, String image){
         UpdateBasic updateBasic = new UpdateBasic(imId, nickName, image, image);
         String str = String.valueOf(SnowFlake.nextId());

@@ -36,4 +36,9 @@ public class CarChargeQO implements Serializable {
      * 车牌颜色
      */
     private String carColor;
+
+    /**
+     * 是否是滞留时间的订单 1:是 0：否
+     */
+    private Integer state;
 }

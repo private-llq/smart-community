@@ -266,6 +266,8 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         BigDecimal chargePrice = carChargeEntity.getChargePrice();
 
 
+
+
         /**
          * 出场时间-入场时间
          */
@@ -274,10 +276,14 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
 
 
         /**
-         * 未超过免费时间不收费
+         * 未超过免费时间不收费，但是滞留订单不享受免费时间
          */
         if (minutes<=freeTime){
-            return new BigDecimal(0);
+            //0:正常订单 1：滞留订单
+            if (carChargeQO.getState()==0){
+                return new BigDecimal(0);
+            }
+
         }
 
         /**
@@ -441,7 +447,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
 
         orderChargeDto orderChargeDto = new orderChargeDto();
         /**
-         * 查询该车辆进闸时生成的订单
+         * 查询该车辆出闸最新生成的订单
          */
         List<CarOrderEntity> list = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>()
                 .eq("car_plate",carNumber)
@@ -469,6 +475,8 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
             /**
              * //查询收费金额
              */
+            //todo
+            carChargeQO.setState(carOrderEntity.getIsRetention());
             BigDecimal money = this.charge(carChargeQO);
 
             /**
@@ -496,16 +504,13 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
             CommunityEntity communityNameById = communityService.getCommunityNameById(adminCommunityId);
             String name = communityNameById.getName();
 
-            orderChargeDto.setId(carOrderEntity.getId());
             orderChargeDto.setOrderNum(orderNum);//订单编号
-            orderChargeDto.setCommunityId(adminCommunityId);//社区id
             orderChargeDto.setCommunityName(name);//社区名称
             orderChargeDto.setCarNumber(carNumber);//车牌号
             orderChargeDto.setChargePrice(carChargeEntity.getChargePrice());//收费标准
             orderChargeDto.setInTime(openTime);//进闸时间
             orderChargeDto.setTime(time);//停车时长
             orderChargeDto.setMoney(money);//金额
-            System.out.println(orderChargeDto);
             return orderChargeDto;
         }
         return null;

@@ -155,6 +155,7 @@ public class WeChatH5PayController {
         if (Objects.nonNull(configEntity)){
             WechatConfig.setConfig(configEntity);
         }
+        //回调验证
         Map<String, String> params = PublicConfig.notify(request ,response, WechatConfig.API_V3_KEY);
         log.info(String.valueOf(params));
 //        System.out.println(params);

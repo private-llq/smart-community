@@ -17,6 +17,7 @@ import com.jsy.community.service.LeaseReleaseService;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.imutils.open.StringUtils;
+import com.jsy.community.vo.admin.LeaseContractInfoVO;
 import com.jsy.community.vo.admin.LeaseReleaseInfoVO;
 import com.jsy.community.vo.admin.LeaseReleasePageVO;
 import org.springframework.beans.BeanUtils;
@@ -331,10 +332,10 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
     /**
      * 查询租赁存证详情
      *
-     * @param id
+     * @param id   租赁数据id
      * @param type
      */
-    public void queryContractInfo(Long id, String type) {
+    public LeaseContractInfoVO queryContractInfo(Long id, String type) {
         Integer code = BusinessEnum.HouseTypeEnum.getCode(type);
         if (code == null) {
             throw new AdminException("type类型不符合");
@@ -353,6 +354,11 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
         }
         //调取签章
 
+        //查询甲乙双方签名，联系方式，签约日期等
+
+        //todo 身份证（营业执照信息暂时无法获取，流程中没有存储，待后期版本优化再添加）
+
+        return null;
     }
 
     /**

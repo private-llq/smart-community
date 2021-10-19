@@ -546,11 +546,11 @@ public class UserAccountServiceImpl implements IUserAccountService {
         //检查余额
         BigDecimal amount = userWithdrawalQ0.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP); //用户要提现金额，保留两位小数
         userWithdrawalQ0.setAmount(amount);
-        if (amount.compareTo(BigDecimal.ZERO) < 1) {
-            throw new ProprietorException("提现金额错误！请提现一个大于0.00元的金额。");
+        if (amount.compareTo(new BigDecimal("0.1")) < 0) {
+            throw new ProprietorException("提现金额错误！提现金额不能小于0.1元。");
         }
-        if (amount.compareTo(new BigDecimal(10000)) > 0) {
-            throw new ProprietorException("提现金额错误！请提现一个小于10000元的金额。");
+        if (amount.compareTo(new BigDecimal("100000000")) > 0) {
+            throw new ProprietorException("提现金额错误！提现金额不能大于100,000,000元。");
         }
         UserAccountVO userAccountVO = queryBalance(uid);
         if (userAccountVO == null) {
