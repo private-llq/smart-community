@@ -1,4 +1,5 @@
 package com.jsy.community.qo.property;
+import com.alibaba.excel.annotation.ExcelIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -60,5 +61,10 @@ public class InsterCarPositionQO implements Serializable {
      */
     @ApiModelProperty("月租")
     private  BigDecimal     monthlyPrice;
+
+
+
+
+
 
 }

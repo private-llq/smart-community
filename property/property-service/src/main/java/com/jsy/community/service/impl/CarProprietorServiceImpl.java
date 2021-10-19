@@ -49,11 +49,6 @@ public class CarProprietorServiceImpl extends ServiceImpl<CarProprietorMapper,Ca
     public Page<CarProprietorEntity> listPage(CarProprietorEntity baseQO, Long adminCommunityId) {
 
         Page<CarProprietorEntity> page = new Page<CarProprietorEntity>(baseQO.getPage(), baseQO.getSize());
-
-//        CarProprietorEntity query = baseQO.getQuery();
-//        query.setCommunityId(adminCommunityId);
-        System.out.println(baseQO.getPage());
-        System.out.println(baseQO.getSize());
         QueryWrapper<CarProprietorEntity> queryWrapper = new QueryWrapper<CarProprietorEntity>().eq("community_id", adminCommunityId);
         if (baseQO.getQuery().getPhone()!=null){
             queryWrapper.like("phone",baseQO.getQuery().getPhone());
@@ -65,8 +60,8 @@ public class CarProprietorServiceImpl extends ServiceImpl<CarProprietorMapper,Ca
 
     @Override
     public boolean addProprietor(CarProprietorEntity carProprietorEntity, Long adminCommunityId) {
-        carProprietorEntity.setId(SnowFlake.nextId());
-        carProprietorEntity.setCommunityId(adminCommunityId);
+//        carProprietorEntity.setId(SnowFlake.nextId());
+//        carProprietorEntity.setCommunityId(adminCommunityId);
         return carProprietorMapper.insert(carProprietorEntity) == 1;
     }
 
