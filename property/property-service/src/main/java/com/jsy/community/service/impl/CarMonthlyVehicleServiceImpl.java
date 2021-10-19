@@ -210,7 +210,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         carPositionEntity.setBeginTime(carMonthlyVehicle.getStartTime());//开始时间
         carPositionEntity.setEndTime(carMonthlyVehicle.getEndTime());//结束时间
         carPositionEntity.setUserName(carMonthlyVehicle.getOwnerName());//租户姓名
-        carPositionMapper.update(carPositionEntity,new QueryWrapper<CarPositionEntity>().eq("car_position",carMonthlyVehicle.getCarPosition()).eq("community_id",carMonthlyVehicle.getCommunityId()));
+        carPositionMapper.update(carPositionEntity,new UpdateWrapper<CarPositionEntity>().eq("car_position",carMonthlyVehicle.getCarPosition()).eq("community_id",carMonthlyVehicle.getCommunityId()));
 
 
         //保存车辆数据到基础车辆表t_car中
@@ -254,13 +254,15 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
                 .eq("disposable", 2)
         );
 
-        orderEntity.setFeeRuleId(propertyFeeRuleEntity.getId());//缴费项目id
-        orderEntity.setType(propertyFeeRuleEntity.getType());//账单类型
-        orderEntity.setAssociatedType(2);//关联类型车位
-        orderEntity.setOrderTime(LocalDate.now());//账单月份
-        String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(communityId));
-        orderEntity.setOrderNum(orderNum);//账单号
-        orderEntity.setTargetId(car_position.getId());//车位id
+        if (Objects.nonNull(propertyFeeRuleEntity)){
+            orderEntity.setFeeRuleId(propertyFeeRuleEntity.getId());//缴费项目id
+            orderEntity.setType(propertyFeeRuleEntity.getType());//账单类型
+            orderEntity.setAssociatedType(2);//关联类型车位
+            orderEntity.setOrderTime(LocalDate.now());//账单月份
+            String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(communityId));
+            orderEntity.setOrderNum(orderNum);//账单号
+            orderEntity.setTargetId(car_position.getId());//车位id
+        }
 
         return insert;
     }
@@ -278,7 +280,20 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
 
         carMonthlyVehicle.setMonthlyMethodName(carChargeEntity.getName());
-        int update = carMonthlyVehicleMapper.update(carMonthlyVehicle, new QueryWrapper<CarMonthlyVehicle>().eq("uid", carMonthlyVehicle.getUid()));
+        int update = carMonthlyVehicleMapper.update(carMonthlyVehicle, new UpdateWrapper<CarMonthlyVehicle>().eq("uid", carMonthlyVehicle.getUid()));
+
+
+        //修改车位的信息：为已绑定 开始结束时间变更
+        CarPositionEntity carPositionEntity = new CarPositionEntity();
+        carPositionEntity.setBindingStatus(1);//已绑定
+        carPositionEntity.setCarPosStatus(2);//租赁状态
+        carPositionEntity.setOwnerPhone(carMonthlyVehicle.getPhone());//联系电话
+        carPositionEntity.setRemark(carMonthlyVehicle.getRemarks());//备注
+        carPositionEntity.setBeginTime(carMonthlyVehicle.getStartTime());//开始时间
+        carPositionEntity.setEndTime(carMonthlyVehicle.getEndTime());//结束时间
+        carPositionEntity.setUserName(carMonthlyVehicle.getOwnerName());//租户姓名
+        carPositionMapper.update(carPositionEntity,new UpdateWrapper<CarPositionEntity>().eq("car_position",carMonthlyVehicle.getCarPosition()).eq("community_id",carMonthlyVehicle.getCommunityId()));
+
 
         return update;
     }
@@ -408,7 +423,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         carPositionEntity.setBeginTime(reCarMonthlyVehicle.getStartTime());//开始时间
         carPositionEntity.setEndTime(reCarMonthlyVehicle.getEndTime());//延期后的结束时间
         carPositionEntity.setUserName(reCarMonthlyVehicle.getOwnerName());//租户姓名
-        carPositionMapper.update(carPositionEntity,new QueryWrapper<CarPositionEntity>().eq("car_position",carMonthlyVehicle.getCarPosition()).eq("community_id",carMonthlyVehicle.getCommunityId()));
+        carPositionMapper.update(carPositionEntity,new UpdateWrapper<CarPositionEntity>().eq("car_position",carMonthlyVehicle.getCarPosition()).eq("community_id",carMonthlyVehicle.getCommunityId()));
 
 
 
@@ -591,7 +606,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             carPositionEntity.setBeginTime(startTime);//开始时间
             carPositionEntity.setEndTime(endTime);//延期后的结束时间
             carPositionEntity.setUserName(ownerName);//租户姓名
-            carPositionMapper.update(carPositionEntity,new QueryWrapper<CarPositionEntity>().eq("car_position",carPosition).eq("community_id",communityId));
+            carPositionMapper.update(carPositionEntity,new UpdateWrapper<>(carPositionEntity).eq("car_position",carPosition).eq("community_id",communityId));
 
 
             //保存车辆数据到基础车辆表t_car中
@@ -659,7 +674,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     public void issue(String uid, Long adminCommunityId) {
         CarMonthlyVehicle carMonthlyVehicle = new CarMonthlyVehicle();
         carMonthlyVehicle.setDistributionStatus(1);
-        carMonthlyVehicleMapper.update(carMonthlyVehicle,new QueryWrapper<CarMonthlyVehicle>().eq("uid",uid).eq("community_id",adminCommunityId));
+        carMonthlyVehicleMapper.update(carMonthlyVehicle,new UpdateWrapper<>(carMonthlyVehicle).eq("uid",uid).eq("community_id",adminCommunityId));
     }
 
 
@@ -858,7 +873,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         carPositionEntity.setBeginTime(carMonthlyVehicle.getStartTime());//开始时间
         carPositionEntity.setEndTime(carMonthlyVehicle.getEndTime());//结束时间
         carPositionEntity.setUserName(carMonthlyVehicle.getOwnerName());//租户姓名
-        carPositionMapper.update(carPositionEntity,new QueryWrapper<CarPositionEntity>().eq("car_position",carMonthlyVehicle.getCarPosition()).eq("community_id",carMonthlyVehicle.getCommunityId()));
+        carPositionMapper.update(carPositionEntity,new UpdateWrapper<CarPositionEntity>().eq("car_position",carMonthlyVehicle.getCarPosition()).eq("community_id",carMonthlyVehicle.getCommunityId()));
 
 
         //保存车辆数据到基础车辆表t_car中
