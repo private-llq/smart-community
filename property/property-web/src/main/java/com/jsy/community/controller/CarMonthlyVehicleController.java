@@ -65,7 +65,10 @@ public class CarMonthlyVehicleController {
      */
     @PutMapping("UpdateMonthlyVehicle")
     @CarOperation(operation = "更新了【月租停车】")
+    @Login
     public CommonResult UpdateMonthlyVehicle(@RequestBody CarMonthlyVehicle carMonthlyVehicle) {
+        Long adminCommunityId = UserUtils.getAdminCommunityId();
+        carMonthlyVehicle.setCommunityId(adminCommunityId);
         vehicleService.UpdateMonthlyVehicle(carMonthlyVehicle);
         return CommonResult.ok();
     }
