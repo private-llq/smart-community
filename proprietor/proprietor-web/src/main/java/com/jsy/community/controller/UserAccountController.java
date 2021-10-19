@@ -130,13 +130,6 @@ public class UserAccountController {
         return CommonResult.ok(userAccountService.zhiFuBaoWithdrawal(userWithdrawalQ0, uid));
     }
 
-//    @ApiOperation(value = "获取用户支付宝提现时最近一次输入的提现用户", notes = "需要登录")
-//    @GetMapping("/zhifubao/account/cache")
-//    public CommonResult<UserWithdrawalQ0> selectRedisZhiFuBaoWithdrawalInfo() {
-//        String uid = UserUtils.getUserId();
-//        return CommonResult.ok(userAccountService.selectRedisZhiFuBaoWithdrawalInfo(uid));
-//    }
-
     @ApiOperation(value = "查询已绑定支付宝账户", notes = "需要登录")
     @GetMapping("/zhifubao/account/query")
     public CommonResult<ZhiFuBaoAccountBindingQO> queryZhiFuBaoAccount() {

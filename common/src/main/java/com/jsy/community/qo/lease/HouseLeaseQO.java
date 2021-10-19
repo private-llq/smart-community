@@ -69,7 +69,7 @@ public class HouseLeaseQO implements Serializable {
     @NotBlank(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "未填写房屋租售详细地址")
     private String houseAddress;
 
-    @NotEmpty( groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class}, message = "房屋亮点标签至少一个!")
+    @NotEmpty( groups = {AddWholeLeaseHouse.class}, message = "房屋亮点标签至少一个!")
     @ApiModelProperty(value = "房屋租售亮点标签ID数组")
     private List<Long> houseAdvantageCode;
 

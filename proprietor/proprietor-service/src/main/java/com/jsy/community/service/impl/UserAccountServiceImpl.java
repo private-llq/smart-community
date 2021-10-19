@@ -336,16 +336,6 @@ public class UserAccountServiceImpl implements IUserAccountService {
         String platform;
         String realName;
         String identityType;
-//        if (!StringUtils.isEmpty(userWithdrawalQ0.getMobile()) && !StringUtils.isEmpty(userWithdrawalQ0.getName())) {
-//            platform = userWithdrawalQ0.getMobile();
-//            realName = userWithdrawalQ0.getName();
-//            identityType = "ALIPAY_LOGON_ID";
-//            //将用户输入过的账密保存到缓存
-//            UserWithdrawalQ0 redisInfo = new UserWithdrawalQ0();
-//            redisInfo.setMobile(userWithdrawalQ0.getMobile());
-//            redisInfo.setName(userWithdrawalQ0.getName());
-//            redisTemplate.opsForValue().set(ZHIFUBAO_WITHDRAWAL_INFO_KEY + uid, JSONObject.toJSONString(redisInfo));
-//        }
         //查询要转账去的个人支付宝账户
         UserThirdPlatformEntity entity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>()
                 .eq("uid", uid).eq("third_platform_type", 5));
@@ -356,21 +346,6 @@ public class UserAccountServiceImpl implements IUserAccountService {
         realName = entity.getRealname();
         identityType = "ALIPAY_LOGON_ID";
         return transactionWithdrawal(serialNumber, userWithdrawalQ0.getAmount(), platform, uid, balance, 2, realName, identityType);
-    }
-
-    /**
-     * 在缓存中查询支付宝账户信息等
-     *
-     * @param uid 用户id
-     * @return
-     */
-    @Override
-    public UserWithdrawalQ0 selectRedisZhiFuBaoWithdrawalInfo(String uid) {
-        String s = redisTemplate.opsForValue().get(ZHIFUBAO_WITHDRAWAL_INFO_KEY + uid);
-        if (StringUtils.isEmpty(s)) {
-            return null;
-        }
-        return JSONObject.parseObject(s, UserWithdrawalQ0.class);
     }
 
     /**
@@ -411,6 +386,8 @@ public class UserAccountServiceImpl implements IUserAccountService {
     public void bindingZhiFuBaoAccount(String uid, ZhiFuBaoAccountBindingQO accountBindingQO) {
         String account = accountBindingQO.getAccount();
         String realname = accountBindingQO.getRealname();
+        log.info("绑定支付宝账号：" + account);
+        log.info("绑定支付宝账号名称：" + realname);
         if (StringUtils.isEmpty(account) || StringUtils.isEmpty(realname)) {
             throw new ProprietorException("账户和真实姓名填写完整。");
         }

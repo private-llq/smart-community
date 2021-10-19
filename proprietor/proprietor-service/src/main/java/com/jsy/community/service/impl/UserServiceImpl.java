@@ -26,7 +26,7 @@ import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
-import com.jsy.community.utils.imutils.CallUtil;
+import com.jsy.community.utils.CallUtil;
 import com.jsy.community.utils.imutils.entity.ImResponseEntity;
 import com.jsy.community.vo.*;
 import lombok.extern.slf4j.Slf4j;
@@ -1028,7 +1028,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public void relieveBindingWechat(RegisterQO registerQO, String userId) {
         UserAuthEntity authEntity = userAuthService.selectByIsWeChat(userId);
         if (authEntity != null) {
-            if (authEntity.getOpenId() == null) {
+            if (StringUtils.isEmpty(authEntity.getOpenId())) {
                 throw new ProprietorException("当前用户并未绑定微信！");
             }
 

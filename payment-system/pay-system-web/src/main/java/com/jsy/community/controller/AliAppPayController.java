@@ -120,8 +120,8 @@ public class AliAppPayController {
 				return CommonResult.error("车位缴费临时订单记录id不能为空！");
 			}
 		}
-		//TODO 测试金额 0.01
-		aliAppPayQO.setTotalAmount(new BigDecimal("0.01"));
+		//TODO 测试金额 0.1
+		aliAppPayQO.setTotalAmount(new BigDecimal("0.1"));
 		
 		String orderStr = null;
 //		if(aliAppPayQO.getPayType() == 1){

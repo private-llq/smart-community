@@ -5,7 +5,6 @@ import com.jsy.community.intercepter.AuthorizationInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -44,13 +43,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addInterceptor(authorizationInterceptor).addPathPatterns("/**");
 	}
 	
-	@Override
-	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**")
-			.allowedOrigins("*")
-			.allowedHeaders("*")
-			.allowCredentials(true)
-			.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-			.maxAge(3600);
-	}
+//	@Override
+//	public void addCorsMappings(CorsRegistry registry) {
+//		registry.addMapping("/**")
+//			.allowedOrigins("*")
+//			.allowedHeaders("*")
+//			.allowCredentials(true)
+//			.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+//			.maxAge(3600);
+//	}
 }

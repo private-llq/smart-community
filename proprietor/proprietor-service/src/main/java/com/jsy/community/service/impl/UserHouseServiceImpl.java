@@ -459,34 +459,36 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		Set<Long> communityIds = new HashSet<>();
 		UserHouseVO userHouseVO=null;
 		List<HouseMemberEntity> entityList = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("uid", userId));
-
-		//房间成员
-		for (HouseMemberEntity memberEntity : entityList) {
-			//房间成员所有房间id
-			ids.add(memberEntity.getHouseId());
-			communityIds.add(memberEntity.getCommunityId());
+		if (entityList.size()!=0){
+			//房间成员
+			for (HouseMemberEntity memberEntity : entityList) {
+				//房间成员所有房间id
+				ids.add(memberEntity.getHouseId());
+				communityIds.add(memberEntity.getCommunityId());
+			}
+			//查询登录人员所有房间
+			List<HouseEntity> houseEntities = houseMapper.selectBatchIds(ids);
+			for (HouseEntity entity : houseEntities) {
+				houseMap.put(entity.getId(),entity.getBuilding()+entity.getUnit()+entity.getDoor());
+			}
+			//查询当前登录人员所有小区
+			List<CommunityEntity> list = communityMapper.selectBatchIds(communityIds);
+			for (CommunityEntity communityEntity : list) {
+				communityMap.put(communityEntity.getId(),communityEntity.getName());
+			}
+			for (HouseMemberEntity entity : entityList) {
+				userHouseVO = new UserHouseVO();
+				userHouseVO.setHouseSite(houseMap.get(entity.getHouseId()));
+				userHouseVO.setCommunityText(communityMap.get(entity.getCommunityId()));
+				userHouseVO.setRelation(entity.getRelation());
+				userHouseVO.setHouseId(entity.getHouseId());
+				userHouseVO.setCommunityId(entity.getCommunityId());
+				userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(entity.getRelation()));
+				linkedList.add(userHouseVO);
+			}
+			return linkedList;
 		}
-		//查询登录人员所有房间
-		List<HouseEntity> houseEntities = houseMapper.selectBatchIds(ids);
-		for (HouseEntity entity : houseEntities) {
-			houseMap.put(entity.getId(),entity.getBuilding()+entity.getUnit()+entity.getDoor());
-		}
-		//查询当前登录人员所有小区
-		List<CommunityEntity> list = communityMapper.selectBatchIds(communityIds);
-		for (CommunityEntity communityEntity : list) {
-			communityMap.put(communityEntity.getId(),communityEntity.getName());
-		}
-		for (HouseMemberEntity entity : entityList) {
-			userHouseVO = new UserHouseVO();
-			userHouseVO.setHouseSite(houseMap.get(entity.getHouseId()));
-			userHouseVO.setCommunityText(communityMap.get(entity.getCommunityId()));
-			userHouseVO.setRelation(entity.getRelation());
-			userHouseVO.setHouseId(entity.getHouseId());
-			userHouseVO.setCommunityId(entity.getCommunityId());
-			userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(entity.getRelation()));
-			linkedList.add(userHouseVO);
-		}
-		return linkedList;
+		return null;
 	}
 
 	/**

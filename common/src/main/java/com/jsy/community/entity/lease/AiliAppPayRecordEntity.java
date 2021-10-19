@@ -21,9 +21,6 @@ import lombok.EqualsAndHashCode;
 @TableName("t_alipay_record")
 public class AiliAppPayRecordEntity extends BaseEntity {
 	
-	@TableField(exist = false)
-	private Long id;
-	
 	@ApiModelProperty(value = "系统订单号")
 	private String orderNo;
 	

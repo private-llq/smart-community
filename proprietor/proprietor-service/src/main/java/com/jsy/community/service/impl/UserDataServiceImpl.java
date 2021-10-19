@@ -10,7 +10,7 @@ import com.jsy.community.mapper.UserAuthMapper;
 import com.jsy.community.mapper.UserDataMapper;
 import com.jsy.community.mapper.UserIMMapper;
 import com.jsy.community.qo.proprietor.UserDataQO;
-import com.jsy.community.utils.imutils.CallUtil;
+import com.jsy.community.utils.CallUtil;
 import com.jsy.community.utils.imutils.open.StringUtils;
 import com.jsy.community.vo.UserDataVO;
 import lombok.extern.slf4j.Slf4j;

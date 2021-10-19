@@ -177,6 +177,10 @@ public class CarPositionEntity implements Serializable {
      */
     @ExcelIgnore
     private  Long     houseId;
-
-
+    //车牌号
+    @ExcelIgnore
+    private String    carNumber;
+    //关联业主车辆id
+    @ExcelIgnore
+    private      Long carProprietorId;
 }
