@@ -348,11 +348,9 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         );
         return chargeEntityList;
     }
-
     /**
      * 查询所有临时停车收费标准
      */
-
     @Override
     public List<CarChargeEntity> ListCharge2(Long adminCommunityId) {
         List<CarChargeEntity> chargeEntityList = carChargeMapper.selectList(new QueryWrapper<CarChargeEntity>()
@@ -512,6 +510,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
             orderChargeDto.setInTime(openTime);//进闸时间
             orderChargeDto.setTime(time);//停车时长
             orderChargeDto.setMoney(money);//金额
+            orderChargeDto.setId(carOrderEntity.getId());//id
             return orderChargeDto;
         }
         return null;

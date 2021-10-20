@@ -40,6 +40,12 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
     @Transactional
     public Integer saveBinding(BindingPositionEntity bindingPositionEntity) {
 
+        //判断是否是（地上车辆）APP端进行的包月都是地上包月,地上包月车辆没有指定车位号 ，地上包月不存在一位多车情况
+
+        if (Objects.isNull(bindingPositionEntity.getPositionId())){
+            throw new PropertyException(-1,"该用户属于AAP端的地上包月，不存在一位多车的情况!");
+        }
+
         List<BindingPositionEntity> carList = bindingPositionMapper.selectList(new QueryWrapper<BindingPositionEntity>()
                 .eq("community_id", bindingPositionEntity.getCommunityId())
                 .eq("position_id", bindingPositionEntity.getPositionId())
@@ -55,9 +61,9 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
 
 
         if (list.size()==0){
-            bindingPositionEntity.setBindingStatus(0);//默认第一个添加进来的为绑定状态
+            bindingPositionEntity.setBindingStatus(1);//默认第一个添加进来的为绑定状态
         }else {
-            bindingPositionEntity.setBindingStatus(1);//未绑定状态
+            bindingPositionEntity.setBindingStatus(0);//未绑定状态
         }
 
         bindingPositionEntity.setUid(UserUtils.randomUUID());
@@ -113,6 +119,19 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
         vehicle.setCarNumber(carNumber);
         carMonthlyVehicleMapper.update(vehicle,new QueryWrapper<CarMonthlyVehicle>().eq("car_position",positionId).eq("community_id",communityId));
 
+    }
+
+
+    /**
+     * @Description: 新增绑定
+     * @author: Hu
+     * @since: 2021/10/20 10:57
+     * @Param: [entity]
+     * @return: void
+     */
+    @Override
+    public void saveBindingPosition(BindingPositionEntity bindingPositionEntity) {
+        bindingPositionMapper.insert(bindingPositionEntity);
     }
 
     @Override
