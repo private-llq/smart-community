@@ -276,11 +276,11 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     public Integer UpdateMonthlyVehicle(CarMonthlyVehicle carMonthlyVehicle) {
         String monthlyMethodId = carMonthlyVehicle.getMonthlyMethodId();
         CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", monthlyMethodId));
+        if (Objects.nonNull(carChargeEntity)){
+            carMonthlyVehicle.setMonthlyMethodName(carChargeEntity.getName());
+        }
 
-
-        carMonthlyVehicle.setMonthlyMethodName(carChargeEntity.getName());
         int update = carMonthlyVehicleMapper.update(carMonthlyVehicle, new UpdateWrapper<CarMonthlyVehicle>().eq("uid", carMonthlyVehicle.getUid()));
-
 
         //修改车位的信息：为已绑定 开始结束时间变更
         CarPositionEntity carPositionEntity = new CarPositionEntity();
