@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.PayTypeEntity;
 import com.jsy.community.service.IPayTypeService;
 import com.jsy.community.vo.CommonResult;
@@ -41,6 +42,7 @@ public class PayTypeController {
 	
 	@ApiOperation("根据城市id添加缴费类型")
 	@PostMapping("/addPayType")
+	@businessLog(operation = "新增",content = "新增了【缴费类型】")
 	public CommonResult addPayType(@ApiParam("城市id") @RequestParam Long id,
 	                               @RequestBody PayTypeEntity payType) {
 		payTypeService.addPayType(id, payType);

@@ -386,6 +386,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             PropertyFinanceOrderEntity orderEntity = new PropertyFinanceOrderEntity();
             orderEntity.setAssociatedType(2);
             orderEntity.setBuildType(4);
+            orderEntity.setType(12);
             orderEntity.setRise(communityEntity.getName()+"-"+carChargeEntity.getName());
             orderEntity.setCommunityId(entity.getCommunityId());
             orderEntity.setOrderTime(LocalDate.now());
@@ -509,6 +510,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 PropertyFinanceOrderEntity orderEntity = new PropertyFinanceOrderEntity();
                 orderEntity.setAssociatedType(2);
                 orderEntity.setBuildType(4);
+                orderEntity.setType(12);
                 orderEntity.setOrderNum(getOrderNum(entity.getCommunityId().toString()));
                 orderEntity.setCommunityId(entity.getCommunityId());
                 orderEntity.setOrderTime(LocalDate.now());

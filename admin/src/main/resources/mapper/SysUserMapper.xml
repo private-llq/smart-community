@@ -100,4 +100,13 @@
 		</set>
 		where id = #{entity.id}
 	</update>
+
+	<!-- 查出管理员姓名 -->
+	<select id="querySysNameByUid" resultType="java.lang.String">
+        select real_name from t_sys_user where id = #{userId} and deleted = 0
+    </select>
+
+	<select id="queryUidListByRealName" resultType="String">
+		SELECT id FROM t_sys_user WHERE real_name LIKE CONCAT(CONCAT('%', #{userName}), '%') AND deleted = 0
+	</select>
 </mapper>
