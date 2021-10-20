@@ -12,4 +12,13 @@ public interface IBindingPositionService extends IService<BindingPositionEntity>
     void binding(BindingPositionEntity bindingPositionEntity);
 
     void deleteBinding(String uid);
+
+    /**
+     * @Description: 新增绑定
+     * @author: Hu
+     * @since: 2021/10/20 10:57
+     * @Param:
+     * @return:
+     */
+    void saveBindingPosition(BindingPositionEntity bindingPositionEntity);
 }
