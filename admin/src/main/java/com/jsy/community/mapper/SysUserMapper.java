@@ -146,4 +146,30 @@ public interface SysUserMapper extends BaseMapper<SysUserEntity> {
 	 **/
 	@Update("update t_sys_user set mobile = #{newMobile} where mobile = #{oldMobile}")
 	int changeMobile(@Param("newMobile")String newMobile, @Param("oldMobile")String oldMobile);
+	
+	/**
+	 * 通过管理员id查出 管理员姓名
+	 * @param userId  管理员id
+	 * @return          返回管理员姓名
+	 */
+	String querySysNameByUid(String userId);
+	
+	/**
+	 * @Description: 获取uid根据姓名模糊查询
+	 * @Param: [userName]
+	 * @Return: java.util.List<java.lang.Long>
+	 * @Author: DKS
+	 * @Date: 2021/10/20 13:43
+	 **/
+	List<String> queryUidListByRealName(@Param("userName")String userName);
+	
+	/**
+	 * @Description: id查用户信息
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.entity.sys.SysUserEntity
+	 * @Author: DKS
+	 * @Date: 2021/10/20 13:43
+	 **/
+	@Select("select * from t_sys_user where id = #{id}")
+	SysUserEntity queryById(String id);
 }

@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.PayCompanyEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.service.IPayCompanyService;
@@ -36,6 +37,7 @@ public class PayCompanyController {
 	
 	@ApiOperation("添加缴费单位")
 	@PostMapping("/addPayCompany")
+	@businessLog(operation = "新增",content = "新增了【缴费单位】")
 	public CommonResult addPayCompany(@RequestBody PayCompanyEntity companyEntity){
 		payCompanyService.addPayCompany(companyEntity);
 		return CommonResult.ok();
