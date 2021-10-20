@@ -40,6 +40,12 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
     @Transactional
     public Integer saveBinding(BindingPositionEntity bindingPositionEntity) {
 
+        //判断是否是（地上车辆）APP端进行的包月都是地上包月,地上包月车辆没有指定车位号 ，地上包月不存在一位多车情况
+
+        if (Objects.isNull(bindingPositionEntity.getPositionId())){
+            throw new PropertyException(-1,"该用户属于AAP端的地上包月，不存在一位多车的情况!");
+        }
+
         List<BindingPositionEntity> carList = bindingPositionMapper.selectList(new QueryWrapper<BindingPositionEntity>()
                 .eq("community_id", bindingPositionEntity.getCommunityId())
                 .eq("position_id", bindingPositionEntity.getPositionId())
