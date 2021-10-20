@@ -122,8 +122,6 @@ public class CarChargeController {
         if (orderCharge==null) {
             return CommonResult.error(501,"暂无临时车信息");
         }
-
-        System.out.println("**************查询成功*****************"+orderCharge);
         return CommonResult.ok(orderCharge,"查询成功");
     }
 
