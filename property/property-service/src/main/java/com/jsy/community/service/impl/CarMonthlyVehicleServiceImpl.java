@@ -245,7 +245,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         String chargeName = carChargeEntity.getName();
         orderEntity.setRise(communityName+"-"+chargeName);//账单抬头
 
-
         PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                 .eq("status", 1)
                 .eq("deleted", 0)
