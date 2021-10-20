@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/carCharge")
 @ApiJSYController
-@CrossOrigin
 public class CarChargeController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -117,7 +116,6 @@ public class CarChargeController {
      * 订单支付返回收费详情
      */
     @PostMapping("/orderCharge")
-
     public CommonResult orderCharge(@RequestParam Long adminCommunityId,@RequestParam String carNumber){
         orderChargeDto orderCharge =carChargeService.orderCharge(adminCommunityId,carNumber);
 
