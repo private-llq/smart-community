@@ -371,15 +371,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         log.info("同步聊天头像昵称成功：userid -> {},nickName -> {},image -> {}", imId, user.getNickname(), avatar);
 
         //如果当前注册用户有房屋，则更新房屋信息
-        List<HouseMemberEntity> mobile = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("mobile", qo.getAccount()));
+        List<HouseMemberEntity> mobile = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("mobile", qo.getAccount()).eq("relation",1));
         Set<Long> ids = null;
+        Set<Long> houseIds = null;
         if (mobile.size() != 0) {
             ids = new HashSet<>();
+            houseIds = new HashSet<>();
             for (HouseMemberEntity houseMemberEntity : mobile) {
                 ids.add(houseMemberEntity.getId());
+                houseIds.add(houseMemberEntity.getHouseId());
             }
             houseMemberMapper.updateByMobile(ids, uuid);
-            userHouseService.updateMobile(ids, uuid);
+            userHouseService.updateMobile(houseIds, uuid);
         }
 
         return uuid;

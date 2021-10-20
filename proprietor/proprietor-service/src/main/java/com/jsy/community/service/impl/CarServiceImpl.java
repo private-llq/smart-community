@@ -1,4 +1,5 @@
 package com.jsy.community.service.impl;
+
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -15,6 +16,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.UserUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -58,6 +60,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarPositionService carPositionService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IBindingPositionService bindingPositionService;
 
     @DubboReference(version = Const.version,  group = Const.group_property, check = false)
     private ICarChargeService carChargeService;
@@ -518,6 +523,15 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 orderEntity.setOverTime(carEntity.getOverTime().toLocalDate());
                 orderEntity.setId(SnowFlake.nextId());
                 propertyFinanceOrderService.insert(orderEntity);
+
+
+                //存入车辆管理 默认是已绑定
+                BindingPositionEntity bindingPositionEntity = new BindingPositionEntity();
+                bindingPositionEntity.setUid(UserUtils.randomUUID());//uuid主键
+                bindingPositionEntity.setBindingStatus(1);//默认绑定
+                bindingPositionEntity.setCommunityId(entity.getCommunityId());//社区id
+                bindingPositionEntity.setCarNumber(entity.getCarPlate());//车牌号
+                bindingPositionService.saveBindingPosition(bindingPositionEntity);
 
                 //新增订单
                 CarOrderEntity carOrderEntity = new CarOrderEntity();

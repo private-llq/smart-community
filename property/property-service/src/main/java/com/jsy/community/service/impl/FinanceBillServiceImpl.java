@@ -14,6 +14,7 @@ import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
+import lombok.SneakyThrows;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +71,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
      * @Param: []
      * @return: void
      */
+    @SneakyThrows
     @Transactional(rollbackFor = Exception.class)
     public void updateMonth() {
         //上月個的天数
@@ -100,6 +102,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                         //查询所有缴费项目关联的房间
                         List<HouseEntity> house = houseMapper.selectInIds(ruleList);
                         for (HouseEntity houseEntity : house) {
+                            Thread.sleep(1);
                             entity = new PropertyFinanceOrderEntity();
                             entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
                             entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
@@ -122,6 +125,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                         List<CarPositionEntity> entityList = carPositionMapper.selectBatchIds(ruleList);
                         for (CarPositionEntity positionEntity : entityList) {
                             if (LocalDateTime.now().isAfter(positionEntity.getEndTime())) {
+                                Thread.sleep(1);
                                 entity = new PropertyFinanceOrderEntity();
                                 entity.setRise(communityEntity.getName()+"-"+feeRuleEntity.getName());
                                 entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
@@ -159,6 +163,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
      * @Param: []
      * @return: void
      */
+    @SneakyThrows
     public void updateAnnual() {
         List<PropertyFinanceOrderEntity> orderList = new LinkedList<>();
         PropertyFinanceOrderEntity entity = null;
@@ -178,6 +183,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                     //查询小区
                     CommunityEntity communityEntity = communityMapper.selectById(feeRuleEntity.getCommunityId());
                     for (HouseEntity houseEntity : list) {
+                        Thread.sleep(1);
                         entity = new PropertyFinanceOrderEntity();
                         //去年第一天
                         entity.setBeginTime(LocalDate.now().with(TemporalAdjusters.firstDayOfYear()));
@@ -297,6 +303,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
      * @Param: []
      * @return: void
      */
+    @SneakyThrows
     @Transactional(rollbackFor = Exception.class)
     public void updateTemporary(){
         List<PropertyFinanceOrderEntity> orderList = new LinkedList<>();
@@ -318,6 +325,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                     //装修管理费
                     if (feeRuleEntity.getType()==1){
                         for (HouseEntity positionEntity : list) {
+                            Thread.sleep(1);
                             entity = new PropertyFinanceOrderEntity();
                             entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
                             entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
@@ -340,6 +348,7 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
                     } else {
                         if (feeRuleEntity.getType()==9||feeRuleEntity.getType()==10){
                             for (HouseEntity houseEntity : list) {
+                                Thread.sleep(1);
                                 entity = new PropertyFinanceOrderEntity();
                                 entity.setBeginTime(LocalDate.of(date.getYear(), date.getMonthValue(), 1));
                                 entity.setOverTime(date.with(TemporalAdjusters.lastDayOfMonth()));
