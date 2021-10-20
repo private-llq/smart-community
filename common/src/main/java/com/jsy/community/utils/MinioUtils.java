@@ -31,7 +31,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Slf4j
 public class MinioUtils {
 	//ip
-	private static final String ENDPOINT = "http://222.178.212.29";
+	private static final String ENDPOINT = "https://222.178.212.29";
 	//端口
 	private static final int PROT = 9000;
 	//ACCESS_KEY
