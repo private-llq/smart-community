@@ -22,6 +22,7 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.ibatis.logging.jdbc.BaseJdbcLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
@@ -160,9 +161,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         }
 
         //查询数据库是否正在包月中
-        CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carMonthlyVehicle.getCarNumber()).ge("end_time",carMonthlyVehicle.getEndTime()));
+        CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carMonthlyVehicle.getCarNumber()).ge("end_time",LocalDateTime.now()));
         if (Objects.nonNull(vehicle)){
-            throw new PropertyException("该车辆已进行包月，如果需要延期，请查询记录执行时间延期操作！");
+            throw new PropertyException("该车辆已进行包月,还未到期，如果需要延期，请查询记录执行时间延期操作！");
         }
 
         //查询基础设置里面的最大续费月数
@@ -219,18 +220,20 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
         //保存车辆数据到基础车辆表t_car中
         CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carMonthlyVehicle.getCarPosition()));
-        if (Objects.nonNull(car_position)){
+
             CarEntity carEntity = new CarEntity();
             carEntity.setId(SnowFlake.nextId());//雪花算法生成ID
             carEntity.setCommunityId(communityId);//社区id
-            carEntity.setCarPositionId(car_position.getId());//车位id
+            if (Objects.nonNull(car_position)) {
+                carEntity.setCarPositionId(car_position.getId());//车位id
+            }
             carEntity.setCarPlate(carMonthlyVehicle.getCarNumber());//车辆牌照
             carEntity.setContact(carMonthlyVehicle.getPhone());//联系方式
             carEntity.setOwner(carMonthlyVehicle.getOwnerName());//车辆所属人
             carEntity.setType(2);//月租
             carEntity.setCreateTime(LocalDateTime.now());//创建时间
             carMapper.insert(carEntity);
-        }
+
 
 
         //生成月租账单
@@ -451,18 +454,23 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
         PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                 .eq("status", 1)
-                .eq("deleted", 0)
                 .eq("community_id", communityId)
                 .eq("type", 12)
                 .eq("disposable", 2)
         );
-        orderEntity.setFeeRuleId(propertyFeeRuleEntity.getId());//缴费项目id
-        orderEntity.setType(propertyFeeRuleEntity.getType());//账单类型
-        orderEntity.setAssociatedType(2);//关联类型车位
-        orderEntity.setOrderTime(LocalDate.now());//账单月份
-        String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(communityId));
-        orderEntity.setOrderNum(orderNum);//账单号
-        orderEntity.setTargetId(car_position.getId());//车位id
+        if (Objects.nonNull(propertyFeeRuleEntity)){
+            orderEntity.setFeeRuleId(propertyFeeRuleEntity.getId());//缴费项目id
+            orderEntity.setType(propertyFeeRuleEntity.getType());//账单类型
+            orderEntity.setAssociatedType(2);//关联类型车位
+            orderEntity.setOrderTime(LocalDate.now());//账单月份
+            String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(communityId));
+            orderEntity.setOrderNum(orderNum);//账单号
+            if (Objects.nonNull(car_position)){
+                orderEntity.setTargetId(car_position.getId());//车位id
+            }
+
+        }
+        propertyFinanceOrderMapper.insert(orderEntity);
     }
 
 
@@ -890,18 +898,20 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
         //保存车辆数据到基础车辆表t_car中
         CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carMonthlyVehicle.getCarPosition()));
-        if (Objects.nonNull(car_position)){
+
             CarEntity carEntity = new CarEntity();
             carEntity.setId(SnowFlake.nextId());//雪花算法生成ID
             carEntity.setCommunityId(communityId);//社区id
+        if (Objects.nonNull(car_position)){
             carEntity.setCarPositionId(car_position.getId());//车位id
+        }
             carEntity.setCarPlate(carMonthlyVehicle.getCarNumber());//车辆牌照
             carEntity.setContact(carMonthlyVehicle.getPhone());//联系方式
             carEntity.setOwner(carMonthlyVehicle.getOwnerName());//车辆所属人
             carEntity.setType(2);//月租
             carEntity.setCreateTime(LocalDateTime.now());//创建时间
             carMapper.insert(carEntity);
-        }
+
         //生成月租账单
         PropertyFinanceOrderEntity orderEntity = new PropertyFinanceOrderEntity();
         orderEntity.setCommunityId(communityId);//社区id
@@ -927,6 +937,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
                 .eq("type", 12)
                 .eq("disposable", 2)
         );
+
         if (Objects.nonNull(propertyFeeRuleEntity)){
             orderEntity.setFeeRuleId(propertyFeeRuleEntity.getId());//缴费项目id
             orderEntity.setType(propertyFeeRuleEntity.getType());//账单类型
@@ -937,6 +948,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             orderEntity.setTargetId(car_position.getId());//车位id
 
         }
+        propertyFinanceOrderMapper.insert(orderEntity);
         return insert;
     }
 
@@ -1072,19 +1084,19 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
             //保存车辆数据到基础车辆表t_car中
             CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carPosition));
-            if (Objects.nonNull(car_position)){
+
                 CarEntity carEntity = new CarEntity();
                 carEntity.setId(SnowFlake.nextId());//雪花算法生成ID
+                if (Objects.nonNull(car_position)){
+                    carEntity.setCarPositionId(car_position.getId());//车位id
+                }
                 carEntity.setCommunityId(communityId);//社区id
-                carEntity.setCarPositionId(car_position.getId());//车位id
                 carEntity.setCarPlate(carNumber);//车辆牌照
                 carEntity.setContact(phone);//联系方式
                 carEntity.setOwner(ownerName);//车辆所属人
                 carEntity.setType(2);//月租
                 carEntity.setCreateTime(LocalDateTime.now());//创建时间
                 carMapper.insert(carEntity);
-            }
-
 
 
             //生成月租账单
