@@ -13,6 +13,7 @@ import com.jsy.community.service.ISysOpLogService;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -58,11 +59,11 @@ public class SysOpLogServiceImpl extends ServiceImpl<SysOpLogMapper, SysOpLogEnt
 		MyPageUtils.setPageAndSize(page, baseQO);
 		QueryWrapper<SysOpLogEntity> queryWrapper = new QueryWrapper<>();
 		// 查操作
-		if (query.getOperation() != null) {
+		if (StringUtils.isNotBlank(query.getOperation())) {
 			queryWrapper.like("operation", query.getOperation());
 		}
 		// 模糊查询用户名
-		if (query.getUserName() != null) {
+		if (StringUtils.isNotBlank(query.getUserName())) {
 			List<String> idList = sysUserMapper.queryUidListByRealName(query.getUserName());
 			queryWrapper.in("user_id", idList);
 		}

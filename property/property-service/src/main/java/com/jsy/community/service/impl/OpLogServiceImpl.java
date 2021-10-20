@@ -14,6 +14,7 @@ import com.jsy.community.qo.property.OpLogQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,11 +64,11 @@ public class OpLogServiceImpl extends ServiceImpl<OpLogMapper, OpLogEntity> impl
 			queryWrapper.eq("community_id", query.getCommunityId());
 		}
 		// 查操作
-		if (query.getOperation() != null) {
+		if (StringUtils.isNotBlank(query.getOperation())) {
 			queryWrapper.like("operation", query.getOperation());
 		}
 		// 模糊查询用户名
-		if (query.getUserName() != null) {
+		if (StringUtils.isNotBlank(query.getUserName())) {
 			List<String> uidList = adminUserMapper.queryUidListByRealName(query.getUserName());
 			queryWrapper.in("user_id", uidList);
 		}
