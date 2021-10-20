@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.entity.sys.SysUserRoleEntity;
 import com.jsy.community.exception.JSYError;
@@ -169,6 +170,7 @@ public class SysUserController {
 	@Login
 	@PostMapping("add")
 	@Transactional(rollbackFor = Exception.class)
+	@businessLog(operation = "新增",content = "新增了【操作员】")
 	public CommonResult addOperator(@RequestBody SysUserEntity sysUserEntity){
 		ValidatorUtils.validateEntity(sysUserEntity);
 		sysUserService.addOperator(sysUserEntity);
@@ -185,6 +187,7 @@ public class SysUserController {
 	@Login
 	@PutMapping("update")
 	@Transactional(rollbackFor = Exception.class)
+	@businessLog(operation = "编辑",content = "更新了【操作员】")
 	public CommonResult updateOperator(@RequestBody SysUserEntity sysUserEntity){
 		sysUserService.updateOperator(sysUserEntity);
 		return CommonResult.ok("操作成功");
@@ -200,6 +203,7 @@ public class SysUserController {
 	@Login
 	@DeleteMapping("delete")
 	@Transactional(rollbackFor = Exception.class)
+	@businessLog(operation = "删除",content = "删除了【操作员】")
 	public CommonResult deleteOperator(Long id){
 		sysUserService.deleteOperator(id);
 		return CommonResult.ok("操作成功");

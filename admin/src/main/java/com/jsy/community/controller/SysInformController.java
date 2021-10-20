@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
@@ -52,6 +53,7 @@ public class SysInformController {
     @Login
     @ApiOperation("系统消息新增")
     @PostMapping()
+    @businessLog(operation = "新增",content = "新增了【系统消息】")
     public CommonResult<Boolean> add( @RequestBody OldPushInformQO qo){
         ValidatorUtils.validateEntity(qo, OldPushInformQO.AddPushInformValidate.class);
         return iSysInformService.add(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
@@ -61,6 +63,7 @@ public class SysInformController {
     @Login
     @ApiOperation("系统消息删除")
     @DeleteMapping()
+    @businessLog(operation = "删除",content = "删除了【系统消息】")
     public CommonResult<Boolean> delete(@RequestParam Long id){
         return iSysInformService.delete(id) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED.getCode(),"数据不存在!");
     }

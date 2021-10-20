@@ -188,4 +188,11 @@ public interface ISysUserService extends IService<SysUserEntity> {
 	 * @Date: 2021/10/13
 	 **/
 	boolean changeMobile(String newMobile,String oldMobile);
+	
+	/**
+	 * 通过管理员id 获取管理员真实名称
+	 * @param userId      管理员id
+	 * @return            真实名称
+	 */
+	String getSysRealName(String userId);
 }

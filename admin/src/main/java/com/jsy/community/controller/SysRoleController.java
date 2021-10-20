@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.sys.SysRoleEntity;
 import com.jsy.community.entity.sys.SysRoleMenuEntity;
 import com.jsy.community.exception.JSYError;
@@ -38,6 +39,7 @@ public class SysRoleController {
 	**/
 	@PostMapping("add")
 	@Transactional(rollbackFor = Exception.class)
+	@businessLog(operation = "新增",content = "新增了【系统角色】")
 	public CommonResult addRole(@RequestBody SysRoleEntity sysRoleEntity){
 		ValidatorUtils.validateEntity(sysRoleEntity);
 		boolean b = sysConfigService.addRole(sysRoleEntity);
@@ -52,6 +54,7 @@ public class SysRoleController {
 	 * @Date: 2020/12/14
 	**/
 	@DeleteMapping("delete")
+	@businessLog(operation = "删除",content = "删除了【系统角色】")
 	public CommonResult delMenu(@RequestParam("id") Long id){
 		boolean b = sysConfigService.delRole(id);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"删除失败");
@@ -66,6 +69,7 @@ public class SysRoleController {
 	**/
 	@PutMapping("update")
 	@Transactional(rollbackFor = Exception.class)
+	@businessLog(operation = "编辑",content = "更新了【系统角色】")
 	public CommonResult updateMenu(@RequestBody SysRoleQO sysRoleQO){
 		boolean b = sysConfigService.updateRole(sysRoleQO);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改失败");

@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.PropertyCompanyQO;
@@ -53,6 +54,7 @@ public class PropertyCompanyController {
 	 **/
 	@Login
 	@PostMapping("add")
+	@businessLog(operation = "新增",content = "新增了【物业公司】")
 	public CommonResult addCompany(@RequestBody PropertyCompanyEntity propertyCompanyEntity){
 		ValidatorUtils.validateEntity(propertyCompanyEntity);
 		return CommonResult.ok(propertyCompanyService.addCompany(propertyCompanyEntity) ? "添加成功" : "添加失败");
@@ -67,6 +69,7 @@ public class PropertyCompanyController {
 	 **/
 	@Login
 	@PutMapping("update")
+	@businessLog(operation = "编辑",content = "更新了【物业公司】")
 	public CommonResult updateCompany(@RequestBody PropertyCompanyEntity propertyCompanyEntity){
 		ValidatorUtils.validateEntity(propertyCompanyEntity);
 		return CommonResult.ok(propertyCompanyService.updateCompany(propertyCompanyEntity) ? "操作成功" : "操作失败");
@@ -81,6 +84,7 @@ public class PropertyCompanyController {
 	 **/
 	@Login
 	@DeleteMapping("delete")
+	@businessLog(operation = "删除",content = "删除了【物业公司】")
 	public CommonResult deleteCompany(Long id){
 		propertyCompanyService.deleteCompany(id);
 		return CommonResult.ok("删除成功");
