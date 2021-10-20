@@ -287,10 +287,24 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         }
         //查询用户是否设置支付密码
         UserAuthEntity userAuthEntity = userAuthService.selectByPayPassword(uid);
-        if (userAuthEntity != null&&userAuthEntity.getPayPassword()!=null) {
-            userInfoVo.setIsBindPayPassword(1);
+        if (userAuthEntity != null) {
+            if (userAuthEntity.getPayPassword() != null) {
+                userInfoVo.setIsBindPayPassword(1);
+            } else {
+                userInfoVo.setIsBindPayPassword(0);
+            }
+
+            if (userAuthEntity.getOpenId() != null) {
+                userInfoVo.setIsBindWechat(1);
+            } else {
+                userInfoVo.setIsBindWechat(0);
+            }
+        }
+        UserThirdPlatformEntity userThirdPlatformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("uid", uid).eq("third_platform_type", 5));
+        if (userThirdPlatformEntity != null) {
+            userInfoVo.setIsBindAlipay(1);
         } else {
-            userInfoVo.setIsBindPayPassword(0);
+            userInfoVo.setIsBindAlipay(0);
         }
         return userInfoVo;
     }
