@@ -25,6 +25,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.Collection;
 import java.util.List;
 
@@ -319,4 +323,21 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
     public List<Long> queryBindCarPositionByMobile(String mobile, Long communityId) {
         return carPositionMapper.queryBindCarPositionByMobile(mobile, communityId);
     }
+
+//    public static void main(String[] args) {
+//
+//        DatagramSocket ds = null;
+//        try {
+//            ds=   new DatagramSocket();
+//            byte[] bys = "0064FFFF3F10000000D3E5423435383643".getBytes();
+//            int length = bys.length;
+//            InetAddress address = InetAddress.getByName("192.168.12.253");
+//            int port = 7001;
+//            DatagramPacket dp = new DatagramPacket(bys, bys.length, InetAddress.getByName("192.168.12.253"), 9000);
+//            ds.send(dp);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        ds.close();
+//    }
 }

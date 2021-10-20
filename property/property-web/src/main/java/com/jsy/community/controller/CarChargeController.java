@@ -30,12 +30,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/carCharge")
 @ApiJSYController
+@CrossOrigin
 public class CarChargeController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarChargeService carChargeService;
-
-
 
     @Login
     @PostMapping("/listPage")
@@ -118,12 +117,15 @@ public class CarChargeController {
      * 订单支付返回收费详情
      */
     @PostMapping("/orderCharge")
+
     public CommonResult orderCharge(@RequestParam Long adminCommunityId,@RequestParam String carNumber){
         orderChargeDto orderCharge =carChargeService.orderCharge(adminCommunityId,carNumber);
 
         if (orderCharge==null) {
             return CommonResult.error(501,"暂无临时车信息");
         }
+
+        System.out.println("**************查询成功*****************"+orderCharge);
         return CommonResult.ok(orderCharge,"查询成功");
     }
 

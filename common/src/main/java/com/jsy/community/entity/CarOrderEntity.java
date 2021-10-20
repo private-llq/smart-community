@@ -2,6 +2,7 @@ package com.jsy.community.entity;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -17,6 +18,12 @@ import java.time.LocalDateTime;
 @Data
 @TableName("t_car_order")
 public class CarOrderEntity extends BaseEntity {
+
+    /**
+     * id
+     */
+    @ExcelIgnore
+    private Long id;
     /**
      *  车辆id
      */
