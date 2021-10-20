@@ -416,7 +416,7 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
         //包月查账单
         List<PropertyFinanceOrderEntity> propertyFinanceOrderEntities = propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>()
                 .eq("community_id", orderQO.getCommunityId())
-                .eq("type", 2)
+                .eq("type", 12)
                 .eq("order_status", 1)
                 .eq("deleted", 0)
                 .ge("pay_time", orderQO.getStartTime())
