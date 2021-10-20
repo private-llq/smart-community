@@ -358,8 +358,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         } else { //苹果三方登录等无手机号注册
             return uuid;
         }
-        String avatar = ResourceLoadUtil.loadJSONResource("/sys_default_content.json").getString("avatar");
-        signatureUserDTO.setImage(avatar);
+//        String avatar = ResourceLoadUtil.loadJSONResource("/sys_default_content.json").getString("avatar");
+        signatureUserDTO.setImage(user.getAvatarUrl());
         signatureUserDTO.setNickName(user.getNickname());
         boolean signUserResult = signatureService.insertUser(signatureUserDTO);
         if (!signUserResult) {
@@ -367,8 +367,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             throw new ProprietorException(JSYError.INTERNAL);
         }
         // 同步聊天头像昵称
-        CallUtil.updateUserInfo(imId, user.getNickname(), avatar);
-        log.info("同步聊天头像昵称成功：userid -> {},nickName -> {},image -> {}", imId, user.getNickname(), avatar);
+        CallUtil.updateUserInfo(imId, user.getNickname(), user.getAvatarUrl());
+        log.info("同步聊天头像昵称成功：userid -> {},nickName -> {},image -> {}", imId, user.getNickname(), user.getAvatarUrl());
 
         //如果当前注册用户有房屋，则更新房屋信息
         List<HouseMemberEntity> mobile = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("mobile", qo.getAccount()).eq("relation",1));
