@@ -91,11 +91,15 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
 
         List<CarOrderEntity> records = selectPage.getRecords();
         for (CarOrderEntity i: records) {
-            if (i.getBeginTime()!=null  && i.getOverTime()!=null){
-                HashMap<String, Long> datePoor = TimeUtils.getDatePoor(i.getBeginTime(), i.getOverTime());
-                String s = datePoor.get("day")+"天："+datePoor.get("hour")+" 小时："+datePoor.get("min")+" 分钟";
-                i.setStopCarTime(s);
-            }
+            String rise = i.getRise();
+            int indexOf = rise.indexOf("车");
+            i.setStopCarTime(rise.substring(indexOf+1));
+//            System.out.println("停车时长\n\n"+i.getStopCarTime());
+//            if (i.getBeginTime()!=null  && i.getOverTime()!=null){
+//                HashMap<String, Long> datePoor = TimeUtils.getDatePoor(i.getBeginTime(), i.getOverTime());
+//                String s = datePoor.get("day")+"天："+datePoor.get("hour")+" 小时："+datePoor.get("min")+" 分钟";
+//                i.setStopCarTime(s);
+//            }
 //            System.out.println(i.getCarPositionId());
             if (i.getCarPositionId()!=null){
                 CarPositionEntity entity = positionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("id", i.getCarPositionId()));
