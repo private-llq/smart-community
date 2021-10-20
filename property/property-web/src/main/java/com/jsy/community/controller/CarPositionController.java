@@ -535,11 +535,11 @@ public class CarPositionController {
                                 Long aLong = selectResidueCarPositionCount(communityId);//查询临时车余位
                                 String standard = Crc16Util.getStandard(aLong.intValue());
                                 String ultimatelyValue = Crc16Util.getUltimatelyValue("余位" + standard);
-                                //led
-                                Rs485Data e1 = new Rs485Data();
-                                e1.setEncodetype("hex2string");
-                                e1.setData(ultimatelyValue);//余位
-                                carVO.getRs485_data().add(e1);
+//                                //led
+//                                Rs485Data e1 = new Rs485Data();
+//                                e1.setEncodetype("hex2string");
+//                                e1.setData(ultimatelyValue);//余位
+//                                carVO.getRs485_data().add(e1);
 
                                 //语音播报内容
                                 Rs485Data e2 = new Rs485Data();
