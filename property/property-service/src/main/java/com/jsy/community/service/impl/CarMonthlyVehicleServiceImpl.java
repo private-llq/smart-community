@@ -164,21 +164,21 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
         //查询基础设置里面的最大续费月数
         CarBasicsEntity carBasicsEntity = carBasicsMapper.selectOne(new QueryWrapper<CarBasicsEntity>().eq("community_id", communityId));
-        Integer monthMaxTime = carBasicsEntity.getMonthMaxTime();//最大续费月数
-        LocalDateTime startTime = carMonthlyVehicle.getStartTime();
-        LocalDateTime endTime = carMonthlyVehicle.getEndTime();
-        long tempTime = Duration.between(startTime, endTime).toMinutes();//相差分钟
-        if (tempTime>monthMaxTime*30*24*60){
-            throw new PropertyException("当前包月时间已超过你设置的最大包月数，"+monthMaxTime+"个月！");
+        if (Objects.nonNull(carBasicsEntity)){
+            Integer monthMaxTime = carBasicsEntity.getMonthMaxTime();//最大续费月数
+            LocalDateTime startTime = carMonthlyVehicle.getStartTime();
+            LocalDateTime endTime = carMonthlyVehicle.getEndTime();
+            long tempTime = Duration.between(startTime, endTime).toMinutes();//相差分钟
+            if (tempTime>monthMaxTime*30*24*60){
+                throw new PropertyException("当前包月时间已超过你设置的最大包月数，"+monthMaxTime+"个月！");
+            }
         }
-
-
-
-
-
         //查询收费设置数据
         String monthlyMethodId = carMonthlyVehicle.getMonthlyMethodId();
         CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", monthlyMethodId));
+        if (Objects.isNull(carChargeEntity)){
+            throw new PropertyException(-1,"未找到改收费设置模板！");
+        }
         carMonthlyVehicle.setUid(UserUtils.randomUUID());
         carMonthlyVehicle.setCommunityId(communityId);
         carMonthlyVehicle.setDistributionStatus(0);//新增默认是未下发
@@ -215,17 +215,18 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
         //保存车辆数据到基础车辆表t_car中
         CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carMonthlyVehicle.getCarPosition()));
-        CarEntity carEntity = new CarEntity();
-        carEntity.setId(SnowFlake.nextId());//雪花算法生成ID
-        carEntity.setCommunityId(communityId);//社区id
-        carEntity.setCarPositionId(car_position.getId());//车位id
-        carEntity.setCarPlate(carMonthlyVehicle.getCarNumber());//车辆牌照
-        carEntity.setContact(carMonthlyVehicle.getPhone());//联系方式
-        carEntity.setOwner(carMonthlyVehicle.getOwnerName());//车辆所属人
-        carEntity.setType(2);//月租
-        carEntity.setCreateTime(LocalDateTime.now());//创建时间
-        carMapper.insert(carEntity);
-
+        if (Objects.nonNull(car_position)){
+            CarEntity carEntity = new CarEntity();
+            carEntity.setId(SnowFlake.nextId());//雪花算法生成ID
+            carEntity.setCommunityId(communityId);//社区id
+            carEntity.setCarPositionId(car_position.getId());//车位id
+            carEntity.setCarPlate(carMonthlyVehicle.getCarNumber());//车辆牌照
+            carEntity.setContact(carMonthlyVehicle.getPhone());//联系方式
+            carEntity.setOwner(carMonthlyVehicle.getOwnerName());//车辆所属人
+            carEntity.setType(2);//月租
+            carEntity.setCreateTime(LocalDateTime.now());//创建时间
+            carMapper.insert(carEntity);
+        }
 
 
         //生成月租账单
@@ -668,9 +669,15 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      */
     @Override
     public void issue(String uid, Long adminCommunityId) {
+        CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("uid", uid).eq("community_id", adminCommunityId).eq("distribution_status", 1));
+        if (Objects.nonNull(vehicle)){
+            if (vehicle.getDistributionStatus()==1){
+                throw new PropertyException(-1,"请勿重复下发！");
+            }
+        }
         CarMonthlyVehicle carMonthlyVehicle = new CarMonthlyVehicle();
         carMonthlyVehicle.setDistributionStatus(1);
-        carMonthlyVehicleMapper.update(carMonthlyVehicle,new UpdateWrapper<>(carMonthlyVehicle).eq("uid",uid).eq("community_id",adminCommunityId));
+        carMonthlyVehicleMapper.update(carMonthlyVehicle,new UpdateWrapper<CarMonthlyVehicle>().eq("uid",uid).eq("community_id",adminCommunityId));
     }
 
 
@@ -829,14 +836,16 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
         //查询基础设置里面的最大续费月数
         CarBasicsEntity carBasicsEntity = carBasicsMapper.selectOne(new QueryWrapper<CarBasicsEntity>().eq("community_id", communityId));
-        Integer monthMaxTime = carBasicsEntity.getMonthMaxTime();//最大续费月数
-        LocalDateTime startTime = carMonthlyVehicle.getStartTime();
-        LocalDateTime endTime = carMonthlyVehicle.getEndTime();
-        long tempTime = Duration.between(startTime, endTime).toMinutes();//相差分钟
-        if (tempTime>monthMaxTime*30*24*60){
-            throw new PropertyException("当前包月时间已超过你设置的最大包月数，"+monthMaxTime+"个月！");
-        }
+        if (Objects.nonNull(carBasicsEntity)){
+            Integer monthMaxTime = carBasicsEntity.getMonthMaxTime();//最大续费月数
+            LocalDateTime startTime = carMonthlyVehicle.getStartTime();
+            LocalDateTime endTime = carMonthlyVehicle.getEndTime();
+            long tempTime = Duration.between(startTime, endTime).toMinutes();//相差分钟
+            if (tempTime>monthMaxTime*30*24*60){
+                throw new PropertyException("当前包月时间已超过你设置的最大包月数，"+monthMaxTime+"个月！");
+            }
 
+        }
         //查询收费设置数据
         /*String monthlyMethodId = carMonthlyVehicle.getMonthlyMethodId();
         CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("uid", monthlyMethodId));*/
@@ -874,19 +883,18 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
         //保存车辆数据到基础车辆表t_car中
         CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carMonthlyVehicle.getCarPosition()));
-        CarEntity carEntity = new CarEntity();
-        carEntity.setId(SnowFlake.nextId());//雪花算法生成ID
-        carEntity.setCommunityId(communityId);//社区id
-        carEntity.setCarPositionId(car_position.getId());//车位id
-        carEntity.setCarPlate(carMonthlyVehicle.getCarNumber());//车辆牌照
-        carEntity.setContact(carMonthlyVehicle.getPhone());//联系方式
-        carEntity.setOwner(carMonthlyVehicle.getOwnerName());//车辆所属人
-        carEntity.setType(2);//月租
-        carEntity.setCreateTime(LocalDateTime.now());//创建时间
-        carMapper.insert(carEntity);
-
-
-
+        if (Objects.nonNull(car_position)){
+            CarEntity carEntity = new CarEntity();
+            carEntity.setId(SnowFlake.nextId());//雪花算法生成ID
+            carEntity.setCommunityId(communityId);//社区id
+            carEntity.setCarPositionId(car_position.getId());//车位id
+            carEntity.setCarPlate(carMonthlyVehicle.getCarNumber());//车辆牌照
+            carEntity.setContact(carMonthlyVehicle.getPhone());//联系方式
+            carEntity.setOwner(carMonthlyVehicle.getOwnerName());//车辆所属人
+            carEntity.setType(2);//月租
+            carEntity.setCreateTime(LocalDateTime.now());//创建时间
+            carMapper.insert(carEntity);
+        }
         //生成月租账单
         PropertyFinanceOrderEntity orderEntity = new PropertyFinanceOrderEntity();
         orderEntity.setCommunityId(communityId);//社区id
@@ -922,8 +930,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             orderEntity.setTargetId(car_position.getId());//车位id
 
         }
-
-
         return insert;
     }
 
@@ -1059,18 +1065,19 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
             //保存车辆数据到基础车辆表t_car中
             CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carPosition));
-            CarEntity carEntity = new CarEntity();
-            carEntity.setId(SnowFlake.nextId());//雪花算法生成ID
-            carEntity.setCommunityId(communityId);//社区id
-            carEntity.setCarPositionId(car_position.getId());//车位id
-            carEntity.setCarPlate(carNumber);//车辆牌照
-            carEntity.setContact(phone);//联系方式
-            carEntity.setOwner(ownerName);//车辆所属人
-            carEntity.setType(2);//月租
-            carEntity.setCreateTime(LocalDateTime.now());//创建时间
-            carMapper.insert(carEntity);
+            if (Objects.nonNull(car_position)){
+                CarEntity carEntity = new CarEntity();
+                carEntity.setId(SnowFlake.nextId());//雪花算法生成ID
+                carEntity.setCommunityId(communityId);//社区id
+                carEntity.setCarPositionId(car_position.getId());//车位id
+                carEntity.setCarPlate(carNumber);//车辆牌照
+                carEntity.setContact(phone);//联系方式
+                carEntity.setOwner(ownerName);//车辆所属人
+                carEntity.setType(2);//月租
+                carEntity.setCreateTime(LocalDateTime.now());//创建时间
+                carMapper.insert(carEntity);
+            }
 
-            UserUtils.randomUUID();
 
 
             //生成月租账单
@@ -1086,9 +1093,11 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             orderEntity.setBuildType(1);//系统生成
 
             CommunityEntity communityEntity = communityMapper.selectById(communityId);
-            String communityName= communityEntity.getName();
-            String chargeName = "包月车位(表格导入)";
-            orderEntity.setRise(communityName+"-"+chargeName);//账单抬头
+            if (Objects.nonNull(communityEntity)){
+                String communityName= communityEntity.getName();
+                String chargeName = "包月车位(表格导入)";
+                orderEntity.setRise(communityName+"-"+chargeName);//账单抬头
+            }
 
             PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                     .eq("status", 1)
@@ -1097,14 +1106,15 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
                     .eq("type", 12)
                     .eq("disposable", 2)
             );
-            orderEntity.setFeeRuleId(propertyFeeRuleEntity.getId());//缴费项目id
-            orderEntity.setType(propertyFeeRuleEntity.getType());//账单类型
-            orderEntity.setAssociatedType(2);//关联类型车位
-            orderEntity.setOrderTime(LocalDate.now());//账单月份
-            String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(communityId));
-            orderEntity.setOrderNum(orderNum);//账单号
-            orderEntity.setTargetId(car_position.getId());//车位id
-
+            if (Objects.nonNull(propertyFeeRuleEntity)){
+                orderEntity.setFeeRuleId(propertyFeeRuleEntity.getId());//缴费项目id
+                orderEntity.setType(propertyFeeRuleEntity.getType());//账单类型
+                orderEntity.setAssociatedType(2);//关联类型车位
+                orderEntity.setOrderTime(LocalDate.now());//账单月份
+                String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(communityId));
+                orderEntity.setOrderNum(orderNum);//账单号
+                orderEntity.setTargetId(car_position.getId());//车位id
+            }
         }
         resultMap.put("success", "成功" + success + "条");
         resultMap.put("fail", "失败" + fail + "条");
