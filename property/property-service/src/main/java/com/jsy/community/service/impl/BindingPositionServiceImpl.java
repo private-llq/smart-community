@@ -11,6 +11,7 @@ import com.jsy.community.mapper.BindingPositionMapper;
 import com.jsy.community.mapper.CarMonthlyVehicleMapper;
 import com.jsy.community.mapper.CarPositionMapper;
 import com.jsy.community.utils.UserUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -42,7 +43,7 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
 
         //判断是否是（地上车辆）APP端进行的包月都是地上包月,地上包月车辆没有指定车位号 ，地上包月不存在一位多车情况
 
-        if (Objects.isNull(bindingPositionEntity.getPositionId())){
+        if (StringUtils.isBlank(bindingPositionEntity.getPositionId())){
             throw new PropertyException(-1,"该用户属于AAP端的地上包月，不存在一位多车的情况!");
         }
 
