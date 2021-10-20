@@ -63,6 +63,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     @Autowired
     private CommunityMapper communityMapper;
 
+    @Autowired
+    private PropertyFinanceOrderMapper propertyFinanceOrderMapper;
+
 
 
 
@@ -179,6 +182,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         if (Objects.isNull(carChargeEntity)){
             throw new PropertyException(-1,"未找到改收费设置模板！");
         }
+        carMonthlyVehicle.setId(SnowFlake.nextId());
         carMonthlyVehicle.setUid(UserUtils.randomUUID());
         carMonthlyVehicle.setCommunityId(communityId);
         carMonthlyVehicle.setDistributionStatus(0);//新增默认是未下发
@@ -231,6 +235,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
         //生成月租账单
         PropertyFinanceOrderEntity orderEntity = new PropertyFinanceOrderEntity();
+        orderEntity.setId(SnowFlake.nextId());//生成主键
         orderEntity.setCommunityId(communityId);//社区id
         orderEntity.setPropertyFee(carMonthlyVehicle.getMonthlyFee());//包月费用
         orderEntity.setOrderStatus(1);//已收款
@@ -248,7 +253,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
         PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
                 .eq("status", 1)
-                .eq("deleted", 0)
                 .eq("community_id", communityId)
                 .eq("type", 12)
                 .eq("disposable", 2)
@@ -262,7 +266,10 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(communityId));
             orderEntity.setOrderNum(orderNum);//账单号
             orderEntity.setTargetId(car_position.getId());//车位id
+
         }
+        propertyFinanceOrderMapper.insert(orderEntity);
+
         return insert;
     }
 
