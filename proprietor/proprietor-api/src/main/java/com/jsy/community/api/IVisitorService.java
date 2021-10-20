@@ -28,7 +28,7 @@ public interface IVisitorService extends IService<VisitorEntity> {
      * @Author: chq45799974
      * @Date: 2020/11/12
     **/
-    VisitorEntryVO addVisitor(VisitorEntity visitorEntity);
+    VisitorEntryVO appAddVisitor(VisitorEntity visitorEntity);
     
 //    /**
 //    * @Description: 二维码开门验证

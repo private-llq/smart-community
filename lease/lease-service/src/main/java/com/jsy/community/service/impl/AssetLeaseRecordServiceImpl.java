@@ -42,6 +42,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -60,6 +61,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_lease)
 public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMapper, AssetLeaseRecordEntity> implements AssetLeaseRecordService {
+
+    @Value("${sign.user.protocol}")
+    private String SIGN_USER_PROTOCOL;
+    @Value("${sign.user.host}")
+    private String SIGN_USER_HOST;
+    @Value("${sign.user.port}")
+    private String SIGN_USER_PORT;
 
     @Autowired
     private AssetLeaseRecordMapper assetLeaseRecordMapper;
@@ -1557,7 +1565,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         Map<String, Object> bodyMap = new HashMap<>();
         bodyMap.put("conId", conId);
         //url
-        String url = BusinessConst.PROTOCOL_TYPE + BusinessConst.HOST + ":" + BusinessConst.PORT + BusinessConst.CONTRACT_OVERDUE;
+        String url = SIGN_USER_PROTOCOL + SIGN_USER_HOST + ":" + SIGN_USER_PORT + BusinessConst.CONTRACT_OVERDUE;
         // 加密参数
         String bodyString = ZhsjUtil.postEncrypt(JSON.toJSONString(bodyMap));
         //组装http请求
