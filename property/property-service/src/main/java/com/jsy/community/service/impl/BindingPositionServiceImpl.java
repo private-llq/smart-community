@@ -115,6 +115,19 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
 
     }
 
+
+    /**
+     * @Description: 新增绑定
+     * @author: Hu
+     * @since: 2021/10/20 10:57
+     * @Param: [entity]
+     * @return: void
+     */
+    @Override
+    public void saveBindingPosition(BindingPositionEntity bindingPositionEntity) {
+        bindingPositionMapper.insert(bindingPositionEntity);
+    }
+
     @Override
     @Transactional
     public void deleteBinding(String uid) {
