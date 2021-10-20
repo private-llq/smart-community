@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.CommonConst;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.service.ICommonConstService;
@@ -43,6 +44,7 @@ public class CommonConstController {
 	
 	@ApiOperation("添加常量")
 	@PostMapping("/addConst")
+	@businessLog(operation = "新增",content = "新增了【常量】")
 	public CommonResult addConst(@RequestBody CommonConst commonConst) {
 		long id = SnowFlake.nextId();
 		commonConst.setId(id);

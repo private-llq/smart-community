@@ -612,4 +612,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		}
 		return false;
 	}
+	
+	@Override
+	public String getSysRealName(String userId) {
+		return sysUserMapper.querySysNameByUid(userId);
+	}
 }
