@@ -90,13 +90,13 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
 
 
     @Override
-    public LeaseReleaseInfoVO queryLeaseHouseInfo(Long id, String type) {
-        Integer code = BusinessEnum.HouseTypeEnum.getCode(type);
-        if (code == null) {
+    public LeaseReleaseInfoVO queryLeaseHouseInfo(Long id, Integer type) {
+        String typeStr = BusinessEnum.HouseTypeEnum.getName(type);
+        if (StringUtils.isEmpty(typeStr)) {
             throw new AdminException("type类型不符合");
         }
         LeaseReleaseInfoVO result;
-        if ("住宅".equals(type)) {
+        if ("住宅".equals(typeStr)) {
             HouseLeaseEntity house = houseLeaseMapper.selectById(id);
             if (house == null) {
                 result = null;
@@ -112,7 +112,7 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
             }
         }
         if (result != null) {
-            buildOtherProperty(result, type);
+            buildOtherProperty(result, typeStr);
         }
         return result;
     }

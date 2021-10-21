@@ -39,7 +39,7 @@ public class LeaseReleaseController {
     @GetMapping("/release/info")
     @Login
     public CommonResult<LeaseReleaseInfoVO> queryLeaseHouseInfo(@RequestParam("id") Long id,
-                                                                @RequestParam("type") String type) {
+                                                                @RequestParam("type") Integer type) {
         return CommonResult.ok(leaseReleaseService.queryLeaseHouseInfo(id, type));
     }
 
