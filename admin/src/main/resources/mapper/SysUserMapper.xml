@@ -109,13 +109,4 @@
 	<select id="queryUidListByRealName" resultType="String">
 		SELECT id FROM t_sys_user WHERE real_name LIKE CONCAT(CONCAT('%', #{userName}), '%') AND deleted = 0
 	</select>
-
-	<!-- uid批量查姓名 -->
-	<select id="queryNameByUidBatch" resultType="Map">
-		select uid,real_name as name from t_admin_user
-		where uid in
-		<foreach collection="uidList" item="item" open="(" close=")" separator=",">
-			#{item}
-		</foreach>
-	</select>
 </mapper>

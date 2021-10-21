@@ -10,7 +10,6 @@ import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.service.IHouseService;
-import com.jsy.community.service.ISysUserService;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import org.springframework.beans.BeanUtils;
@@ -34,9 +33,6 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 
     @Resource
     private HouseMapper houseMapper;
-
-    @Resource
-    private ISysUserService sysUserService;
 
     /**
      * @Description: 查询楼栋、单元、房屋（改）(根据物业端原型)
@@ -186,21 +182,6 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
                 houseEntity.setHouseNumber(countMap != null ? countMap.get("count") : 0L);
                 houseEntity.setStatus(houseEntity.getHouseNumber() == 0 ? "空置" : "入住");
             }
-        }
-        //补创建人和更新人姓名
-        Set<String> createUidSet = new HashSet<>();
-        Set<String> updateUidSet = new HashSet<>();
-        for (HouseEntity houseEntity : pageData.getRecords()) {
-            createUidSet.add(houseEntity.getCreateBy());
-            updateUidSet.add(houseEntity.getUpdateBy());
-        }
-        Map<String, Map<String, String>> createUserMap = sysUserService.queryNameByUidBatch(createUidSet);
-        Map<String, Map<String, String>> updateUserMap = sysUserService.queryNameByUidBatch(updateUidSet);
-        for (HouseEntity houseEntity : pageData.getRecords()) {
-            houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()) == null ? null : createUserMap.get(houseEntity.getCreateBy()).get("name"));
-            houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()) == null ? null : updateUserMap.get(houseEntity.getUpdateBy()).get("name"));
-            // 补充pidStr
-            houseEntity.setPidStr(String.valueOf(houseEntity.getPid()));
         }
         PageInfo<HouseEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(pageData, pageInfo);
@@ -368,19 +349,6 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
                 houseEntity.setHouseNumber(countMap != null ? countMap.get("count") : 0L);
                 houseEntity.setStatus(houseEntity.getHouseNumber() == 0 ? "空置" : "入住");
             }
-        }
-        //补创建人和更新人姓名
-        Set<String> createUidSet = new HashSet<>();
-        Set<String> updateUidSet = new HashSet<>();
-        for (HouseEntity houseEntity : houseEntities) {
-            createUidSet.add(houseEntity.getCreateBy());
-            updateUidSet.add(houseEntity.getUpdateBy());
-        }
-        Map<String, Map<String, String>> createUserMap = sysUserService.queryNameByUidBatch(createUidSet);
-        Map<String, Map<String, String>> updateUserMap = sysUserService.queryNameByUidBatch(updateUidSet);
-        for (HouseEntity houseEntity : houseEntities) {
-            houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()) == null ? null : createUserMap.get(houseEntity.getCreateBy()).get("name"));
-            houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()) == null ? null : updateUserMap.get(houseEntity.getUpdateBy()).get("name"));
         }
         return houseEntities;
     }

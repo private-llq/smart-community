@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseEntity;
 import org.apache.ibatis.annotations.MapKey;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -15,6 +16,7 @@ import java.util.Map;
  * @author jsy
  * @since 2020-11-20
  */
+@Mapper
 public interface HouseMapper extends BaseMapper<HouseEntity> {
 	
 	/**
