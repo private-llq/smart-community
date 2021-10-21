@@ -171,7 +171,7 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
         LinkedList<PropertyFinanceOrderEntity> orderEntities = null;
         BigDecimal totalAmount = null;
 
-                //查个人小区物业费账单(多房间)
+        //查个人小区物业费账单(多房间)
         List<PropertyFinanceOrderEntity> list = propertyFinanceOrderService.selectByUserList(qo);
         if(CollectionUtils.isEmpty(list)){
             return null;
