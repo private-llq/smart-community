@@ -412,34 +412,4 @@ public interface BusinessConst {
      */
     long ONE_DAY = 1000 * 60 * 60 * 24;
 
-    /**
-     * URL头部
-     */
-    String PROTOCOL_TYPE = "http://";
-
-    /**
-     * 签章项目线上IP
-     */
-     String HOST = "222.178.212.29";
-
-    /**
-     * 签章项目本地测试IP
-     */
-//    String HOST = "192.168.12.154";
-
-    /**
-     * 签章项目端口
-     */
-    String PORT = "13000";
-
-    /**
-     * 修改签章租房合同支付状态接口URL
-     */
-    String MODIFY_ORDER_PAY_STATUS = "/zh-sign/contract-server/houseLeaseContract/updateHouseLeaseContractPay";
-
-    /**
-     * 签章合同作废
-     */
-    String CONTRACT_OVERDUE = "/zh-sign/contract-server/community/sign/contractOverdue";
-
 }

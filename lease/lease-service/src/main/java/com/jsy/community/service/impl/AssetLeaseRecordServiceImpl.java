@@ -68,6 +68,8 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     private String SIGN_USER_HOST;
     @Value("${sign.user.port}")
     private String SIGN_USER_PORT;
+    @Value("${sign.user.api.contract_overdue}")
+    private String CONTRACT_OVERDUE;
 
     @Autowired
     private AssetLeaseRecordMapper assetLeaseRecordMapper;
@@ -1565,7 +1567,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         Map<String, Object> bodyMap = new HashMap<>();
         bodyMap.put("conId", conId);
         //url
-        String url = SIGN_USER_PROTOCOL + SIGN_USER_HOST + ":" + SIGN_USER_PORT + BusinessConst.CONTRACT_OVERDUE;
+        String url = SIGN_USER_PROTOCOL + SIGN_USER_HOST + ":" + SIGN_USER_PORT + CONTRACT_OVERDUE;
         // 加密参数
         String bodyString = ZhsjUtil.postEncrypt(JSON.toJSONString(bodyMap));
         //组装http请求

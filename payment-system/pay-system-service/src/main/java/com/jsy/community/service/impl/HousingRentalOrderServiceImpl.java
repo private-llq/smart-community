@@ -32,6 +32,9 @@ public class HousingRentalOrderServiceImpl implements HousingRentalOrderService 
     private String SIGN_USER_HOST;
     @Value("${sign.user.port}")
     private String SIGN_USER_PORT;
+    @Value("${sign.user.api.update-contract-pay-status}")
+    private String MODIFY_ORDER_PAY_STATUS;
+
 
     /**
      * @author: Pipi
@@ -49,7 +52,7 @@ public class HousingRentalOrderServiceImpl implements HousingRentalOrderService 
         bodyMap.put("isPayment", true);
         bodyMap.put("orderUuid", orderNo);
         //url
-        String url = SIGN_USER_PROTOCOL + SIGN_USER_HOST + ":" + SIGN_USER_PORT + BusinessConst.MODIFY_ORDER_PAY_STATUS;
+        String url = SIGN_USER_PROTOCOL + SIGN_USER_HOST + ":" + SIGN_USER_PORT + MODIFY_ORDER_PAY_STATUS;
         // 加密参数
         String bodyString = ZhsjUtil.postEncrypt(JSON.toJSONString(bodyMap));
         //组装http请求
