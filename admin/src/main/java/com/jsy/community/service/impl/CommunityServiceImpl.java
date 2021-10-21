@@ -155,9 +155,10 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
     public List<CommunityPropertyListVO> queryCommunityAndPropertyList() {
         List<CommunityPropertyListVO> communityPropertyList =
                 communityMapper.queryCommunityAndPropertyListByArea(null, null, null);
-        communityPropertyList.stream().peek(
-                r -> r.setCommunityName(r.getPropertyName() + r.getCommunityName())
-        ).collect(Collectors.toList());
+        communityPropertyList.stream().peek(r -> {
+            r.setCommunityName(r.getPropertyName() + r.getCommunityName());
+            r.setCommunityIdStr(String.valueOf(r.getCommunityId()));
+        }).collect(Collectors.toList());
         return communityPropertyList;
     }
 }

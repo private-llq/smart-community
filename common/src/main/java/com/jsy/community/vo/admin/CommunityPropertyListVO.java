@@ -16,4 +16,7 @@ public class CommunityPropertyListVO implements Serializable {
 
     @ApiModelProperty("小区id")
     private Long communityId;
+
+    @ApiModelProperty("小区idStr")
+    private String communityIdStr;
 }
