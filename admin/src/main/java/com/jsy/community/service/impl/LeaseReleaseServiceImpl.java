@@ -72,6 +72,7 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
                     r.setCommunity(communityEntity.getName());
                 }
             }
+            r.setIdStr(String.valueOf(r.getId()));
             // 填充租赁状态
             r.setLeaseStatus(leaseStatus(r.getTLeaseStatus()));
         }).collect(Collectors.toList());
