@@ -16,5 +16,5 @@ public interface LeaseReleaseService {
      */
     PageInfo<LeaseReleasePageVO> queryLeaseReleasePage(BaseQO<LeaseReleasePageQO> baseQO);
 
-    LeaseReleaseInfoVO queryLeaseHouseInfo(Long id, String type);
+    LeaseReleaseInfoVO queryLeaseHouseInfo(Long id, Integer type);
 }

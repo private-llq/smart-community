@@ -307,6 +307,10 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	@Transactional
 	public String membersSave(MembersQO membersQO, String userId) {
 
+		HouseMemberEntity entity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("house_id", membersQO.getHouseId()).eq("mobile", membersQO.getMobile()).eq("relation", 1));
+		if (entity!=null){
+			throw new ProprietorException("您现在添加的人是当前房间的业主哦！");
+		}
 		HouseMemberEntity memberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("house_id", membersQO.getHouseId()).eq("mobile", membersQO.getMobile()).eq("relation",membersQO.getRelation()));
 		if (memberEntity!=null){
 			throw new ProprietorException("当前成员以添加，请勿重复添加！");

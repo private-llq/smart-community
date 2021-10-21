@@ -7,7 +7,6 @@ import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
-import com.jsy.community.entity.shop.ShopImgEntity;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
@@ -17,7 +16,6 @@ import com.jsy.community.service.LeaseReleaseService;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.imutils.open.StringUtils;
-import com.jsy.community.vo.admin.LeaseContractInfoVO;
 import com.jsy.community.vo.admin.LeaseReleaseInfoVO;
 import com.jsy.community.vo.admin.LeaseReleasePageVO;
 import org.springframework.beans.BeanUtils;
@@ -74,6 +72,7 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
                     r.setCommunity(communityEntity.getName());
                 }
             }
+            r.setIdStr(String.valueOf(r.getId()));
             // 填充租赁状态
             r.setLeaseStatus(leaseStatus(r.getTLeaseStatus()));
         }).collect(Collectors.toList());
@@ -91,13 +90,13 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
 
 
     @Override
-    public LeaseReleaseInfoVO queryLeaseHouseInfo(Long id, String type) {
-        Integer code = BusinessEnum.HouseTypeEnum.getCode(type);
-        if (code == null) {
+    public LeaseReleaseInfoVO queryLeaseHouseInfo(Long id, Integer type) {
+        String typeStr = BusinessEnum.HouseTypeEnum.getName(type);
+        if (StringUtils.isEmpty(typeStr)) {
             throw new AdminException("type类型不符合");
         }
         LeaseReleaseInfoVO result;
-        if ("住宅".equals(type)) {
+        if ("住宅".equals(typeStr)) {
             HouseLeaseEntity house = houseLeaseMapper.selectById(id);
             if (house == null) {
                 result = null;
@@ -113,7 +112,7 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
             }
         }
         if (result != null) {
-            buildOtherProperty(result, type);
+            buildOtherProperty(result, typeStr);
         }
         return result;
     }
@@ -174,8 +173,6 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
         //装修情况
         releaseInfo.setDecorationType(decorationType(releaseInfo.getDecorationTypeId()));
         if ("商铺".equals(type)) {
-            //商铺设施 好像没有
-//            releaseInfo.setRoomFacilities(houseConst(releaseInfo.getRoomFacilitiesId(), 16));
             // 查商铺图片
             List<String> imgUrls = shopLeaseMapper.queryAllShopImg(releaseInfo.getId());
             releaseInfo.setImgUrl(imgUrls);
@@ -331,33 +328,33 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
      * @param type
 
     public LeaseContractInfoVO queryContractInfo(Long id, String type) {
-        Integer code = BusinessEnum.HouseTypeEnum.getCode(type);
-        if (code == null) {
-            throw new AdminException("type类型不符合");
-        }
-        //查询是否已成交
-        if ("住宅".equals(type)) {
-            HouseLeaseEntity house = houseLeaseMapper.selectById(id);
-            if (house.getLeaseStatus() == 0) {
-                throw new AdminException("该住宅尚未出租，暂无租赁存证。");
-            }
-        } else {
-            ShopLeaseEntity shop = shopLeaseMapper.selectById(id);
-            if (shop.getLeaseStatus() == 0) {
-                throw new AdminException("该商铺尚未出租，暂无租赁存证。");
-            }
-        }
-        //调取签章
+    Integer code = BusinessEnum.HouseTypeEnum.getCode(type);
+    if (code == null) {
+    throw new AdminException("type类型不符合");
+    }
+    //查询是否已成交
+    if ("住宅".equals(type)) {
+    HouseLeaseEntity house = houseLeaseMapper.selectById(id);
+    if (house.getLeaseStatus() == 0) {
+    throw new AdminException("该住宅尚未出租，暂无租赁存证。");
+    }
+    } else {
+    ShopLeaseEntity shop = shopLeaseMapper.selectById(id);
+    if (shop.getLeaseStatus() == 0) {
+    throw new AdminException("该商铺尚未出租，暂无租赁存证。");
+    }
+    }
+    //调取签章
 
 
-        //
+    //
 
-        //查询甲乙双方签名，联系方式，签约日期等
+    //查询甲乙双方签名，联系方式，签约日期等
 
 
-        //todo 身份证（营业执照信息暂时无法获取，流程中没有存储，待后期版本优化再添加）
+    //todo 身份证（营业执照信息暂时无法获取，流程中没有存储，待后期版本优化再添加）
 
-        return null;
+    return null;
     }
      */
 

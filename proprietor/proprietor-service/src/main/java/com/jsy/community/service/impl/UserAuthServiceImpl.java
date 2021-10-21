@@ -6,10 +6,8 @@ import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.api.ICommonService;
-import com.jsy.community.api.ISignatureService;
-import com.jsy.community.api.IUserAuthService;
-import com.jsy.community.api.ProprietorException;
+import com.jsy.community.api.*;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.signature.SignatureUserDTO;
 import com.jsy.community.entity.UserAuthEntity;
@@ -18,17 +16,24 @@ import com.jsy.community.mapper.UserAuthMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
+import com.jsy.community.qo.proprietor.MobileCodePayPasswordQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.RegexUtils;
+import com.jsy.community.utils.SmsUtil;
+import com.jsy.community.utils.imutils.open.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //import org.springframework.integration.redis.util.RedisLockRegistry;
 
@@ -42,6 +47,12 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 
     @Resource
     private ICommonService commonService;
+
+    @Resource
+    private IUserAccountService userAccountService;
+
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
 
     @Resource
     private UserAuthMapper userAuthMapper;
@@ -69,7 +80,7 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
      */
     @Override
     public UserAuthEntity selectByIsWeChat(String userId) {
-        return userAuthMapper.selectOne(new QueryWrapper<UserAuthEntity>().eq("uid",userId));
+        return userAuthMapper.selectOne(new QueryWrapper<UserAuthEntity>().eq("uid", userId));
     }
 
 
@@ -106,7 +117,7 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
      */
     @Override
     public UserAuthEntity selectByPayPassword(String uid) {
-        return userAuthMapper.selectOne(new QueryWrapper<UserAuthEntity>().eq("uid",uid));
+        return userAuthMapper.selectOne(new QueryWrapper<UserAuthEntity>().eq("uid", uid));
     }
 
     @Override
@@ -174,9 +185,23 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
         if (!qo.getPayPassword().equals(qo.getConfirmPayPassword())) {
             throw new ProprietorException("密码不一致");
         }
+        //对比原密码，如果有的话
+        QueryWrapper<UserAuthEntity> eq = new QueryWrapper<UserAuthEntity>().select("*").eq("uid", uid);
+        UserAuthEntity userAuthEntity = userAuthMapper.selectOne(eq);
+        if (userAuthEntity == null) {
+            return false;
+        }
+        if (!StringUtils.isEmpty(userAuthEntity.getPayPassword())) {
+            if (!userAccountService.checkPayPassword(uid, qo.getOldPayPassword())) {
+                throw new ProprietorException("原支付密码错误");
+            }
+        }
+        return updatePayPassword(qo.getPayPassword(), uid);
+    }
 
+    private boolean updatePayPassword(String payPassword, String uid) {
         String salt = RandomUtil.randomString(8);
-        String encryptedPassword = SecureUtil.sha256(qo.getPayPassword() + salt);
+        String encryptedPassword = SecureUtil.sha256(payPassword + salt);
 
         UserAuthEntity entity = new UserAuthEntity();
         entity.setPayPassword(encryptedPassword);
@@ -255,5 +280,57 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
         }
         return userAuthEntity.getMobile();
     }
+
+    /**
+     * 发送 修改支付密码 的手机短信验证码
+     *
+     * @param account 手机号
+     */
+    @Override
+    public void sendPayPasswordVerificationCode(String account) {
+        //发送短信验证码
+        String code = SmsUtil.sendVcode(account, BusinessConst.SMS_VCODE_LENGTH_DEFAULT);
+        //5分钟有效期
+        redisTemplate.opsForValue().set("vProprietorCodePayPassword" + account, code, 5, TimeUnit.MINUTES);
+    }
+
+    /**
+     * 根据手机短信验证码 修改支付密码
+     *
+     * @param qo      验证码以及新支付密码
+     * @param account 手机号
+     * @param uid     用户id
+     */
+    @Override
+    public void updatePayPasswordByMobileCode(MobileCodePayPasswordQO qo, String account, String uid) {
+        //验证支付密码与确认密码一致性
+        if (!qo.getPayPassword().equals(qo.getConfirmPayPassword())) {
+            throw new ProprietorException("密码不一致");
+        }
+        boolean b = checkMobileVerificationCode(account, qo.getCode());
+        if (!b) {
+            throw new ProprietorException("短信验证码不正确");
+        }
+        //清理缓存中的验证码
+        redisTemplate.delete("vProprietorCodePayPassword" + account);
+        updatePayPassword(qo.getPayPassword(), uid);
+    }
+
+    /**
+     * 验证修改支付密码的短信验证码
+     *
+     * @param account    手机号
+     * @param mobileCode 验证码
+     * @return
+     */
+    private boolean checkMobileVerificationCode(String account, String mobileCode) {
+        //检查验证码
+        String code = redisTemplate.opsForValue().get("vProprietorCodePayPassword" + account);
+        if (!StringUtils.isEmpty(code)) {
+            return code.equals(mobileCode);
+        }
+        return false;
+    }
+
 
 }

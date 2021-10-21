@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
+import com.jsy.community.qo.proprietor.MobileCodePayPasswordQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 
 import java.util.List;
@@ -119,4 +120,20 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
 	 * @return:
 	 */
     void updateByOpenId(Long id);
+
+	/**
+	 * 发送 修改支付密码 的手机短信验证码
+	 *
+	 * @param account 手机号
+	 */
+	void sendPayPasswordVerificationCode(String account);
+
+	/**
+	 * 根据手机短信验证码 修改支付密码
+	 *
+	 * @param qo      验证码以及新支付密码
+	 * @param account 手机号
+	 * @param uid     用户id
+	 */
+    void updatePayPasswordByMobileCode(MobileCodePayPasswordQO qo, String account, String uid);
 }

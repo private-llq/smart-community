@@ -38,7 +38,7 @@ public class SelectPropertyFinanceOrderController {
         qo.setUid(UserUtils.getUserId());
         qo.setCommunityId(communityId);
         qo.setOrderStatus(orderStatus);
-        return CommonResult.ok(selectPropertyFinanceOrderService.list(qo),"查询成功");
+        return CommonResult.ok(selectPropertyFinanceOrderService.listV2(qo),"查询成功");
     }
     @ApiOperation("查询物业账单（详情）")
     @GetMapping("/findOne")
