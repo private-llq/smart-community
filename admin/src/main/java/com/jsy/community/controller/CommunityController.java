@@ -46,7 +46,7 @@ public class CommunityController {
      **/
     @Login
     @PostMapping("/add")
-    @businessLog(operation = "新增",content = "新增了【社区】")
+    @businessLog(operation = "新增", content = "新增了【社区】")
     public CommonResult addCommunity(@RequestBody CommunityEntity communityEntity) {
         ValidatorUtils.validateEntity(communityEntity, CommunityEntity.ProperyuAddValidatedGroup.class);
         // 新增数据
@@ -62,7 +62,7 @@ public class CommunityController {
      **/
     @Login
     @PostMapping("/query")
-    public CommonResult communityList(@RequestBody BaseQO<CommunityQO> baseQO) {
+    public CommonResult<PageInfo<CommunityEntity>> communityList(@RequestBody BaseQO<CommunityQO> baseQO) {
         PageInfo<CommunityEntity> communityEntityPage = communityService.queryCommunity(baseQO);
         return CommonResult.ok(communityEntityPage);
     }
@@ -76,7 +76,7 @@ public class CommunityController {
      **/
     @Login
     @PutMapping("/update")
-    @businessLog(operation = "更新",content = "更新了【社区】")
+    @businessLog(operation = "更新", content = "更新了【社区】")
     public CommonResult updateCommunity(@RequestBody CommunityEntity communityEntity) {
         if (communityEntity.getId() == null) {
             throw new JSYException(400, "社区ID不能为空!");
@@ -99,8 +99,8 @@ public class CommunityController {
      **/
     @Login
     @DeleteMapping("delete")
-    @businessLog(operation = "删除",content = "删除了【社区】")
-    public CommonResult delCommunity(@RequestParam("id") Long id) {
+    @businessLog(operation = "删除", content = "删除了【社区】")
+    public CommonResult<Boolean> delCommunity(@RequestParam("id") Long id) {
         return communityService.delCommunity(id) ? CommonResult.ok("删除成功") : CommonResult.error(JSYError.INTERNAL.getCode(), "删除失败");
     }
 
@@ -113,7 +113,7 @@ public class CommunityController {
      **/
     @Login
     @GetMapping("list")
-    public CommonResult queryCommunityList() {
+    public CommonResult<List<CommunityEntity>> queryCommunityList() {
         return CommonResult.ok(communityService.queryCommunityList());
     }
 

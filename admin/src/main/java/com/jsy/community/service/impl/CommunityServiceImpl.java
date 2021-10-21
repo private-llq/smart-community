@@ -21,7 +21,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -39,7 +40,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
     private PropertyCompanyMapper propertyCompanyMapper;
 
     @Resource
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     /**
      * @Description: 社区新增
@@ -105,9 +106,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
         }
         // 补充地区地址
         for (CommunityEntity record : communityEntityPage.getRecords()) {
-            String province = (String) redisTemplate.opsForValue().get("RegionSingle:" + String.valueOf(record.getProvinceId()));
-            String city = (String) redisTemplate.opsForValue().get("RegionSingle:" + String.valueOf(record.getCityId()));
-            String area = (String) redisTemplate.opsForValue().get("RegionSingle:" + String.valueOf(record.getAreaId()));
+            String province = redisTemplate.opsForValue().get("RegionSingle:" + record.getProvinceId());
+            String city = redisTemplate.opsForValue().get("RegionSingle:" + record.getCityId());
+            String area = redisTemplate.opsForValue().get("RegionSingle:" + record.getAreaId());
             province = org.apache.commons.lang3.StringUtils.isNotBlank(province) ? province : "";
             city = org.apache.commons.lang3.StringUtils.isNotBlank(city) ? city : "";
             area = org.apache.commons.lang3.StringUtils.isNotBlank(area) ? area : "";
@@ -145,10 +146,18 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
         return communityMapper.selectList(new QueryWrapper<CommunityEntity>().select("*"));
     }
 
+    /**
+     * 查询小区名字和物业公司名字以及小区id
+     *
+     * @return
+     */
     @Override
     public List<CommunityPropertyListVO> queryCommunityAndPropertyList() {
-        List<CommunityPropertyListVO> communityPropertyList = communityMapper.queryCommunityAndPropertyList();
-        communityPropertyList.stream().peek(r -> r.setCommunityName(r.getPropertyName() + r.getCommunityName())).collect(Collectors.toList());
+        List<CommunityPropertyListVO> communityPropertyList =
+                communityMapper.queryCommunityAndPropertyListByArea(null, null, null);
+        communityPropertyList.stream().peek(
+                r -> r.setCommunityName(r.getPropertyName() + r.getCommunityName())
+        ).collect(Collectors.toList());
         return communityPropertyList;
     }
 }

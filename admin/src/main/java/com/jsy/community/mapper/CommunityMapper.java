@@ -15,6 +15,11 @@ import java.util.List;
 @Mapper
 public interface CommunityMapper extends BaseMapper<CommunityEntity> {
 
-    List<CommunityPropertyListVO> queryCommunityAndPropertyList();
+    /**
+     * 根据省市区查询小区，省市区可以不传查全部
+     *
+     * @return
+     */
+    List<CommunityPropertyListVO> queryCommunityAndPropertyListByArea(Integer provinceId, Integer cityId, Integer areaId);
 
 }
