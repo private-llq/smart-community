@@ -51,15 +51,20 @@ public class WeChatListener{
      */
     @RabbitListener(queues = {"queue_wechat_delay"})
     public void receive_wechat_delay (String msg, Message message, Channel channel) throws Exception {
-        String[] split = msg.split(",");
-        CompanyPayConfigEntity companyConfig = companyPayConfigService.getCompanyConfig(Long.parseLong(split[1]),1);
-        WechatConfig.setConfig(companyConfig);
-        WeChatOrderEntity one = weChatService.getOrderOne(split[0]);
-        if (one!=null){
-            if (one.getOrderStatus()!=2){
-                weChatService.deleteByOrder(msg);
-                PublicConfig.closeOrder(msg);
+        try {
+            String[] split = msg.split(",");
+            CompanyPayConfigEntity companyConfig = companyPayConfigService.getCompanyConfig(Long.parseLong(split[1]),1);
+            WechatConfig.setConfig(companyConfig);
+            WeChatOrderEntity one = weChatService.getOrderOne(split[0]);
+            if (one!=null){
+                if (one.getOrderStatus()!=2){
+                    weChatService.deleteByOrder(msg);
+                    PublicConfig.closeOrder(msg);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
         }
         //手动确认
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
