@@ -158,4 +158,63 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
 
     }
 
+    /**
+     * @Description: 查询物业账单
+     * @author: Hu
+     * @since: 2021/7/5 11:08
+     * @Param: [userId]
+     * @return: void
+     */
+    public List<Map<String,Object>> listV2(PropertyFinanceOrderEntity qo) {
+        HashMap<Long, String> houseMap = new HashMap<>();
+        Map<String,Object> map = null;
+        LinkedList<PropertyFinanceOrderEntity> orderEntities = null;
+        BigDecimal totalAmount = null;
+
+                //查个人小区物业费账单(多房间)
+        List<PropertyFinanceOrderEntity> list = propertyFinanceOrderService.selectByUserList(qo);
+        if(CollectionUtils.isEmpty(list)){
+            return null;
+        }
+
+        //最終返回封装数据
+        List<Map<String,Object>> returnList = new ArrayList<>();
+
+        //房间id集合
+        Set<Long> ids = new HashSet<>();
+        for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : list) {
+            ids.add(propertyFinanceOrderEntity.getTargetId());
+        }
+        //房间数据集合
+        List<HouseEntity> houseEntities = houseMapper.selectBatchIds(ids);
+        for (HouseEntity houseEntity : houseEntities) {
+            houseMap.put(houseEntity.getId(),houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
+        }
+
+        //根据房间封装返回账单
+        for (HouseEntity houseEntity : houseEntities) {
+            map = new HashMap<>();
+            totalAmount = new BigDecimal(0.00);
+            orderEntities = new LinkedList<>();
+            for (PropertyFinanceOrderEntity orderEntity : list) {
+                if (houseEntity.getId().equals(orderEntity.getTargetId())){
+                    orderEntities.add(orderEntity);
+                    if (!orderEntity.getPenalSum().equals(0.00)){
+                        totalAmount = totalAmount.add(orderEntity.getPropertyFee());
+                        orderEntity.setTotalMoney(orderEntity.getPropertyFee());
+                    } else {
+                        orderEntity.setTotalMoney(orderEntity.getPropertyFee().add(orderEntity.getPenalSum()));
+                        totalAmount = totalAmount.add(orderEntity.getPropertyFee().add(orderEntity.getPenalSum()));
+                    }
+                }
+            }
+            map.put("totalAmount",totalAmount);
+            map.put("list",orderEntities);
+            map.put("roomName",houseMap.get(houseEntity.getId()));
+            map.put("id",houseEntity.getId());
+            returnList.add(map);
+        }
+        return returnList;
+    }
+
 }
