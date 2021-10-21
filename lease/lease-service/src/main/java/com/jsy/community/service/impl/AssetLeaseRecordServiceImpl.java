@@ -1314,6 +1314,20 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 updateWrapper.eq("id", leaseRecordEntity.getAssetId());
                 updateWrapper.set("lease_status", 1);
                 houseLeaseMapper.update(new HouseLeaseEntity(), updateWrapper);
+                // 绑定租客为房屋租客身份,向house_member表增加数据
+                // 查询资产对应的真实房屋ID
+                QueryWrapper<HouseLeaseEntity> houseLeaseEntityQueryWrapper = new QueryWrapper<>();
+                houseLeaseEntityQueryWrapper.eq("id", leaseRecordEntity.getAssetId());
+                HouseLeaseEntity houseLeaseEntity = houseLeaseMapper.selectOne(houseLeaseEntityQueryWrapper);
+                if (houseLeaseEntity != null) {
+                    houseMemberService.addMember(leaseRecordEntity.getTenantUid(),
+                            leaseRecordEntity.getHomeOwnerUid(),
+                            leaseRecordEntity.getCommunityId(),
+                            houseLeaseEntity.getHouseId(),
+                            leaseRecordEntity.getEndDate().atStartOfDay()
+                    );
+                }
+
             } else if (leaseRecordEntity.getAssetType().equals(BusinessEnum.HouseTypeEnum.SHOP.getCode())) {
                 // 商铺
                 UpdateWrapper<ShopLeaseEntity> updateWrapper = new UpdateWrapper<>();
@@ -1321,14 +1335,6 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 updateWrapper.set("lease_status", 1);
                 shopLeaseMapper.update(new ShopLeaseEntity(), updateWrapper);
             }
-
-            // 绑定租客为房屋租客身份,向house_member表增加数据
-            houseMemberService.addMember(leaseRecordEntity.getTenantUid(),
-                    leaseRecordEntity.getHomeOwnerUid(),
-                    leaseRecordEntity.getCommunityId(),
-                    leaseRecordEntity.getAssetId(),
-                    leaseRecordEntity.getEndDate().atStartOfDay()
-            );
 
             CommunityEntity communityEntity = communityService.getCommunityNameById(leaseRecordEntity.getCommunityId());
             //租客
