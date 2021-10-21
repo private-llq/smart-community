@@ -17,6 +17,9 @@ public class LeaseReleasePageVO implements Serializable {
     @ApiModelProperty("主键")
     private Long id;
 
+    @ApiModelProperty("主键Str")
+    private String idStr;
+
     @ApiModelProperty("房源标题")
     private String tTitle;
 

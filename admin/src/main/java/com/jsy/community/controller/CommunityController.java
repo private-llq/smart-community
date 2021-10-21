@@ -118,7 +118,7 @@ public class CommunityController {
     }
 
     @ApiOperation("查询小区名字和物业公司名字")
-    @Login(allowAnonymous = true)
+    @Login
     @GetMapping("/property/list")
     public CommonResult<List<CommunityPropertyListVO>> queryCommunityAndPropertyList() {
         return CommonResult.ok(communityService.queryCommunityAndPropertyList());

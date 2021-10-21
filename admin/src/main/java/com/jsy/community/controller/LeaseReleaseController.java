@@ -27,7 +27,7 @@ public class LeaseReleaseController {
 
     @ApiOperation("商铺和房屋租赁信息发布列表")
     @PostMapping("/release/page")
-    @Login(allowAnonymous = true)
+    @Login
     public CommonResult<PageInfo<LeaseReleasePageVO>> queryLeaseReleasePage(@RequestBody BaseQO<LeaseReleasePageQO> baseQO) {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new LeaseReleasePageQO());
@@ -37,7 +37,7 @@ public class LeaseReleaseController {
 
     @ApiOperation("商铺和房屋租赁信息发布详情")
     @GetMapping("/release/info")
-    @Login(allowAnonymous = true)
+    @Login
     public CommonResult<LeaseReleaseInfoVO> queryLeaseHouseInfo(@RequestParam("id") Long id,
                                                                 @RequestParam("type") String type) {
         return CommonResult.ok(leaseReleaseService.queryLeaseHouseInfo(id, type));
