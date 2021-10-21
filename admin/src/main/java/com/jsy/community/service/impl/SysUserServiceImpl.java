@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -616,5 +617,20 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	@Override
 	public String getSysRealName(String userId) {
 		return sysUserMapper.querySysNameByUid(userId);
+	}
+	
+	/**
+	 * @Description: uid批量查姓名
+	 * @Param: [uidList]
+	 * @Return: java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/1
+	 **/
+	@Override
+	public Map<String,Map<String,String>> queryNameByUidBatch(Collection<String> uidList){
+		if(CollectionUtils.isEmpty(uidList) || (uidList.size() == 1 && uidList.contains(null))){
+			return new HashMap<>();
+		}
+		return sysUserMapper.queryNameByUidBatch(uidList);
 	}
 }

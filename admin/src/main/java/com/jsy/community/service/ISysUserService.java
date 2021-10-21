@@ -10,6 +10,7 @@ import com.jsy.community.qo.sys.NameAndCreatorQO;
 import com.jsy.community.qo.sys.SysUserQO;
 import com.jsy.community.utils.PageInfo;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -195,4 +196,13 @@ public interface ISysUserService extends IService<SysUserEntity> {
 	 * @return            真实名称
 	 */
 	String getSysRealName(String userId);
+	
+	/**
+	 * @Description: uid批量查姓名
+	 * @Param: [uidList]
+	 * @Return: java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>
+	 * @Author: chq459799974
+	 * @Date: 2021/4/1
+	 **/
+	Map<String,Map<String,String>> queryNameByUidBatch(Collection<String> uidList);
 }

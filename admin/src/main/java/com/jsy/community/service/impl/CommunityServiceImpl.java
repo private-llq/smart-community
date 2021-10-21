@@ -21,8 +21,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -84,8 +83,8 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
         QueryWrapper<CommunityEntity> queryWrapper = new QueryWrapper<CommunityEntity>().select("*");
         CommunityQO query = baseQO.getQuery();
         if (query != null) {
-            if (!StringUtils.isEmpty(query.getName())) {
-                queryWrapper.like("name", query.getName());
+            if (query.getId() != null) {
+                queryWrapper.eq("id", query.getId());
             }
             if (query.getProvinceId() != null) {
                 queryWrapper.eq("province_id", query.getProvinceId());

@@ -6,7 +6,9 @@ import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.qo.sys.SysUserQO;
 import org.apache.ibatis.annotations.*;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 系统用户
@@ -172,4 +174,14 @@ public interface SysUserMapper extends BaseMapper<SysUserEntity> {
 	 **/
 	@Select("select * from t_sys_user where id = #{id}")
 	SysUserEntity queryById(String id);
+	
+	/**
+	 * @Description: uid批量查姓名
+	 * @Param: [list]
+	 * @Return: com.jsy.community.entity.admin.AdminUserEntity
+	 * @Author: chq459799974
+	 * @Date: 2021/3/25
+	 **/
+	@MapKey("uid")
+	Map<String, Map<String,String>> queryNameByUidBatch(Collection<String> uidList);
 }
