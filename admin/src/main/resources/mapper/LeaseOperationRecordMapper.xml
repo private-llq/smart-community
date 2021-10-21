@@ -22,7 +22,7 @@
 					mobile AS t_mobile,
 					create_time,
 					lease_status AS t_lease_status
-				FROM t_shop_lease ) AS s UNION ALL (
+				FROM t_shop_lease where deleted = 0 ) AS s UNION ALL (
 				SELECT
 					id,
 					house_title AS t_title,
@@ -32,7 +32,7 @@
 					house_contact AS t_mobile,
 					create_time,
 					lease_status AS t_lease_status
-				FROM t_house_lease )
+				FROM t_house_lease where deleted = 0 )
 			) AS r
 		WHERE 1=1
         <if test="qo.communityId!=null">

@@ -7,7 +7,7 @@
         c.`name` communityName,
         p.`name` propertyName
         from t_community c left join t_property_company p on c.property_id = p.id
-        where 1=1
+        where c.deleted = 0
         <if test="provinceId!=null">
             and c.province_id = #{provinceId}
         </if>
