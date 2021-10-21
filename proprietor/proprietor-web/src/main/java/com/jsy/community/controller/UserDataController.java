@@ -17,15 +17,12 @@ import com.jsy.community.vo.UserDataVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.UnsupportedEncodingException;
 import java.math.RoundingMode;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -91,7 +88,7 @@ public class UserDataController {
         try {
             String s = new String(nickname.getBytes("GBK"));
             if(!"".equals(nickname)&&nickname!=null){
-                if (s.length()<=2||s.length()>=16){
+                if (s.length()<2||s.length()>16){
                     return CommonResult.error("请输入2到16个字符，可使用英文、数字、汉字！");
                 }
                 if (BadWordUtil2.isContaintBadWord(nickname,BadWordUtil2.minMatchTYpe)){
