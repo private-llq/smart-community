@@ -686,9 +686,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     public void issue(String uid, Long adminCommunityId) {
         CarMonthlyVehicle vehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("uid", uid).eq("community_id", adminCommunityId).eq("distribution_status", 1));
         if (Objects.nonNull(vehicle)){
-            if (vehicle.getDistributionStatus()==1){
-                throw new PropertyException(-1,"请勿重复下发！");
-            }
+            throw new PropertyException("你已经下发，请勿重复操作！");
         }
         CarMonthlyVehicle carMonthlyVehicle = new CarMonthlyVehicle();
         carMonthlyVehicle.setDistributionStatus(1);

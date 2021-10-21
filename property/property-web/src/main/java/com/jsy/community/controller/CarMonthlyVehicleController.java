@@ -123,14 +123,9 @@ public class CarMonthlyVehicleController {
     @CarOperation(operation = "同步下发了【月租停车】")
     public CommonResult issue(@RequestParam("uid") String uid){
         Long adminCommunityId = UserUtils.getAdminCommunityId();
-        try {
-            vehicleService.issue(uid,adminCommunityId);
-            return CommonResult.ok("下发成功");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return CommonResult.ok("下发失败，请联系管理员");
+        vehicleService.issue(uid,adminCommunityId);
+        return CommonResult.ok("操作成功");
 
-        }
 
     }
 
