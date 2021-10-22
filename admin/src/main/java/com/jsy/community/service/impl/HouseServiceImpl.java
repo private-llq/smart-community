@@ -16,6 +16,7 @@ import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.service.IHouseService;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -68,7 +69,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
             queryWrapper.eq("community_id", query.getCommunityId());
         }
         //是否查房号/业主
-        if (query.getDoorOrOwner() != null) {
+        if (StringUtils.isNotBlank(query.getDoorOrOwner())) {
             List<Long> houseIdList = houseMemberMapper.getAllHouseIdByOwnerName(query.getDoorOrOwner());
             queryWrapper.like("door",query.getDoorOrOwner());
             if (houseIdList.size() > 0) {
