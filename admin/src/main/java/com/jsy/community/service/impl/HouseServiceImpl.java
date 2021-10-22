@@ -73,7 +73,9 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         if (query.getDoorOrOwner() != null) {
             List<Long> houseIdList = houseMemberMapper.getAllHouseIdByOwnerName(query.getDoorOrOwner());
             queryWrapper.like("door",query.getDoorOrOwner());
-            queryWrapper.or().in("id", houseIdList);
+            if (houseIdList.size() > 0) {
+                queryWrapper.or().in("id", houseIdList);
+            }
         }
         queryWrapper.orderByDesc("create_time");
         Page<HouseEntity> pageData = houseMapper.selectPage(page, queryWrapper);
