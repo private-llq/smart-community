@@ -14,7 +14,6 @@ import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,16 +73,16 @@ public class HouseController {
 	@Login
 	@ApiOperation("导出房屋信息")
 	@PostMapping("/downloadHouseList")
-	public ResponseEntity<byte[]> downloadOrderList(@RequestBody HouseEntity houseEntity) {
-		houseEntity.setCommunityId(UserUtils.getAdminCommunityId());
-		List<HouseEntity> houseEntities = houseService.queryExportHouseExcel(houseEntity);
+	public ResponseEntity<byte[]> downloadOrderList(@RequestBody HouseQO houseQO) {
+		houseQO.setCommunityId(UserUtils.getAdminCommunityId());
+		List<HouseEntity> houseEntities = houseService.queryExportHouseExcel(houseQO);
 		//设置excel 响应头信息
 		MultiValueMap<String, String> multiValueMap = new HttpHeaders();
 		//设置响应类型为附件类型直接下载这种
 		multiValueMap.set("Content-Disposition", "attachment;filename=" + URLEncoder.encode("房屋信息表.xlsx", StandardCharsets.UTF_8));
 		//设置响应的文件mime类型为 xls类型
 		multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
-		Workbook workbook = new XSSFWorkbook();
+		Workbook workbook;
 		workbook = houseExcelHandler.exportHouse(houseEntities);
 		//把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
 		try {

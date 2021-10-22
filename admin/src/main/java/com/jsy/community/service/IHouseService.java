@@ -16,11 +16,11 @@ import java.util.List;
 public interface IHouseService extends IService<HouseEntity> {
 	
 	/**
-	* @Description: 查询(单元/楼层/房间等)
+	* @Description: 【楼宇房屋】条件查询
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseEntity>
-	 * @Author: chq459799974
-	 * @Date: 2021/3/11
+	 * @Author: DKS
+	 * @Date: 2021/10/22
 	**/
 	PageInfo<HouseEntity> queryHouse(BaseQO<HouseQO> baseQO);
 	
@@ -31,5 +31,5 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Author: DKS
 	 * @Date: 2021/8/9
 	 **/
-	List<HouseEntity> queryExportHouseExcel(HouseEntity houseEntity);
+	List<HouseEntity> queryExportHouseExcel(HouseQO houseQO);
 }

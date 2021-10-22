@@ -13,23 +13,23 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * @Author: Pipi
+ * @Author: DKS
  * @Description:
- * @Date: 2021/5/18 16:19
+ * @Date: 2021/10/22 10:16
  * @Version: 1.0
  **/
 @Service
 public class HouseExcelHandlerImpl implements HouseExcelHandler {
     
     // 导出房屋信息表字段 如果增加字段 需要改变实现类逻辑
-    protected static final String[] House_TITLE_FIELD = {"ID", "房屋号码", "所属楼宇", "所属单元", "所在楼层", "房屋地址", "建筑面积", "实用面积", "状态", "住户数量", "备注"};
+    protected static final String[] House_TITLE_FIELD = {"物业", "小区", "楼宇", "单元", "房号", "建筑面积", "状态", "业主", "住户量"};
     
     /**
      *@Author: DKS
      *@Description: 导出房屋信息表
      *@Param: entityList:
      *@Return: org.apache.poi.ss.usermodel.Workbook
-     *@Date: 2021/8/9 14:46
+     *@Date: 2021/10/22 12:56
      **/
     @Override
     public Workbook exportHouse(List<?> entityList) {
@@ -49,17 +49,15 @@ public class HouseExcelHandlerImpl implements HouseExcelHandler {
         //每列数据
         XSSFCell cell;
         // 设置列宽
-        sheet.setColumnWidth(0, 10000);
         sheet.setColumnWidth(1, 3000);
         sheet.setColumnWidth(2, 3000);
         sheet.setColumnWidth(3, 3000);
         sheet.setColumnWidth(4, 3000);
-        sheet.setColumnWidth(5, 6000);
-        sheet.setColumnWidth(6, 4000);
-        sheet.setColumnWidth(7, 4000);
+        sheet.setColumnWidth(5, 3000);
+        sheet.setColumnWidth(6, 3000);
+        sheet.setColumnWidth(7, 3000);
         sheet.setColumnWidth(8, 3000);
-        sheet.setColumnWidth(9, 2000);
-        sheet.setColumnWidth(10, 6000);
+        sheet.setColumnWidth(9, 3000);
         for (int index = 0; index < entityList.size(); index++) {
             row = sheet.createRow(index + 2);
             //创建列
@@ -68,48 +66,42 @@ public class HouseExcelHandlerImpl implements HouseExcelHandler {
                 HouseEntity entity = (HouseEntity) entityList.get(index);
                 switch (j) {
                     case 0:
-                        // ID
-                        cell.setCellValue(entity.getId());
+                        // 物业
+                        cell.setCellValue(entity.getCompanyName());
                         break;
                     case 1:
-                        // 房屋号码
-                        cell.setCellValue(entity.getDoor());
+                        // 小区
+                        cell.setCellValue(entity.getCommunityName());
                         break;
                     case 2:
-                        // 所属楼宇
+                        // 楼宇
                         cell.setCellValue(entity.getBuilding());
                         break;
                     case 3:
-                        // 所属单元
+                        // 单元
                         cell.setCellValue(entity.getUnit());
                         break;
                     case 4:
-                        // 所在楼层
-                        cell.setCellValue(entity.getFloor());
+                        // 房号
+                        cell.setCellValue(entity.getDoor());
                         break;
                     case 5:
-                        // 房屋地址
-                        cell.setCellValue(entity.getBuilding() + entity.getUnit() + entity.getDoor());
+                        // 建筑面积
+                        if (entity.getBuildArea() != null) {
+                            cell.setCellValue(entity.getBuildArea());
+                        }
                         break;
                     case 6:
-                        // 建筑面积
-                        cell.setCellValue(entity.getBuildArea());
-                        break;
-                    case 7:
-                        // 实用面积
-                        cell.setCellValue(entity.getPracticalArea());
-                        break;
-                    case 8:
                         // 状态
                         cell.setCellValue(entity.getStatus());
                         break;
-                    case 9:
-                        // 住户数量
-                        cell.setCellValue(entity.getHouseNumber());
+                    case 7:
+                        // 业主
+                        cell.setCellValue(entity.getOwner());
                         break;
-                    case 10:
-                        // 备注
-                        cell.setCellValue(entity.getComment());
+                    case 8:
+                        // 住户量
+                        cell.setCellValue(entity.getHouseNumber());
                         break;
                     default:
                         break;
