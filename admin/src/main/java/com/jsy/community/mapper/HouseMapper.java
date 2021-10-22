@@ -13,8 +13,8 @@ import java.util.Map;
 
 /**
  * 物业端社区楼栋 Mapper 接口
- * @author jsy
- * @since 2020-11-20
+ * @author DKS
+ * @since 2021-10-22
  */
 @Mapper
 public interface HouseMapper extends BaseMapper<HouseEntity> {
