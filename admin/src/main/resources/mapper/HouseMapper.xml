@@ -30,4 +30,8 @@
 		</foreach>
 		group by house_id
 	</select>
+
+	<select id="getHouseIdByDoor" resultType="java.lang.Long">
+		select id from t_house where deleted = 0 and door like concat('%',#{door},'%')
+	</select>
 </mapper>

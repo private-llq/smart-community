@@ -84,6 +84,10 @@ public class HouseMemberEntity extends BaseEntity {
      * 标签：1独居，2孤寡，3残疾，4留守
      */
     private Integer tally;
+    
+    @TableField(exist = false)
+    private String tallyName;
+    
     /**
      * 出生日期
      */
@@ -194,6 +198,12 @@ public class HouseMemberEntity extends BaseEntity {
      * 有效时间
      */
     private LocalDateTime validTime;
+    
+    @TableField(exist = false)
+    private String companyName;
+    
+    @TableField(exist = false)
+    private String communityName;
 
 
     //新增修改验证

@@ -19,4 +19,13 @@ public interface HouseExcelHandler {
      *@Date: 2021/10/22 12:56
      **/
     Workbook exportHouse(List<?> entityList);
+    
+    /**
+     *@Author: DKS
+     *@Description: 导出住户信息表
+     *@Param: :
+     *@Return: org.apache.poi.ss.usermodel.Workbook
+     *@Date: 2021/10/22 15:59
+     **/
+    Workbook exportHouseMember(List<?> entityList);
 }

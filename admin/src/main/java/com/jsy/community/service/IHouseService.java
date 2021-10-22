@@ -29,7 +29,7 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Param: HouseEntity
 	 * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseEntity>
 	 * @Author: DKS
-	 * @Date: 2021/8/9
+	 * @Date: 2021/10/22
 	 **/
 	List<HouseEntity> queryExportHouseExcel(HouseQO houseQO);
 }

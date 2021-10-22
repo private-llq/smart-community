@@ -40,4 +40,9 @@ public class HouseMemberQO implements Serializable {
      * 标签
      */
     private Integer tally;
+    
+    /**
+     * 住户姓名或者手机或者房号
+     */
+    private String nameOrMobileOrDoor;
 }

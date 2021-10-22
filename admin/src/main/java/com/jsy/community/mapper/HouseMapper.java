@@ -53,8 +53,17 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @author: DKS
 	 * @since: 2021/8/6 16:38
 	 * @Param:
-	 * @return:
+	 * @return:java.util.List<java.lang.Long>
 	 */
 	@MapKey("houseId")
 	Map<Long,Map<String,Long>> selectHouseNumberCount(@Param("list") Collection<Long> houseIds);
+	
+	/**
+	 * @Description: 根据房号模糊查询房屋id
+	 * @author: DKS
+	 * @since: 2021/10/22 14:47
+	 * @Param: door
+	 * @return: java.util.List<java.lang.Long>
+	 */
+	List<Long> getHouseIdByDoor(String door);
 }
