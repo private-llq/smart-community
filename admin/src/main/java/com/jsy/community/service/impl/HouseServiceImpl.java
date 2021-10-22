@@ -7,6 +7,7 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.PropertyEnum;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.mapper.HouseMapper;
+import com.jsy.community.mapper.HouseMemberMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.service.IHouseService;
@@ -15,10 +16,12 @@ import com.jsy.community.utils.PageInfo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -33,6 +36,9 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 
     @Resource
     private HouseMapper houseMapper;
+    
+    @Resource
+    private HouseMemberMapper houseMemberMapper;
 
     /**
      * @Description: 查询楼栋、单元、房屋（改）(根据物业端原型)
@@ -47,60 +53,14 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         Page<HouseEntity> page = new Page<>();
         MyPageUtils.setPageAndSize(page, baseQO);
         QueryWrapper<HouseEntity> queryWrapper = new QueryWrapper<>();
-        if (BusinessConst.BUILDING_TYPE_UNIT_BUILDING == query.getType()) {
-            queryWrapper.eq("type", BusinessConst.BUILDING_TYPE_UNIT);
-        } else if (BusinessConst.BUILDING_TYPE_DOOR_BUILDING == query.getType() || BusinessConst.BUILDING_TYPE_DOOR_UNIT == query.getType()
-            || BusinessConst.BUILDING_TYPE_DOOR_BUILDING_UNIT == query.getType()) {
-	        queryWrapper.eq("type", BusinessConst.BUILDING_TYPE_DOOR);
-        } else {
-            queryWrapper.eq("type", query.getType());
+        //是否查小区
+        if (query.getCommunityId() != null) {
+            queryWrapper.eq("community_id", query.getCommunityId());
         }
-        queryWrapper.eq("community_id", query.getCommunityId());
-        setQueryWrapper(queryWrapper, query);
-        if (BusinessConst.BUILDING_TYPE_UNIT_BUILDING == query.getType() || BusinessConst.BUILDING_TYPE_DOOR_UNIT == query.getType()
-            || BusinessConst.BUILDING_TYPE_DOOR_BUILDING_UNIT == query.getType()) {
-            //当类型为单元查楼栋，房屋查单元，房屋查楼栋单元，传入id为需要查询的pid
-            queryWrapper.eq("pid", query.getId());
-        } else if (BusinessConst.BUILDING_TYPE_DOOR_BUILDING == query.getType()) {
-            //通过楼栋id查询子集所有单元id
-            List<Long> unitIdList = houseMapper.getSubIdList(Arrays.asList(query.getId()));
-            if (!CollectionUtils.isEmpty(unitIdList)) {
-                queryWrapper.in("pid", unitIdList);
-            }
-        } else {
-            //是否查详情
-            if (query.getId() != null) {
-                queryWrapper.eq("id", query.getId());
-            }
-        }
-        //是否有电梯
-//        if (query.getHasElevator() != null) {
-//            queryWrapper.eq("has_elevator", query.getHasElevator());
-//        }
-        if (BusinessConst.BUILDING_TYPE_UNIT_BUILDING == query.getType()) {
-            queryWrapper.like("unit",query.getName());
-        } else if (BusinessConst.BUILDING_TYPE_DOOR_BUILDING == query.getType() || BusinessConst.BUILDING_TYPE_DOOR_UNIT == query.getType()
-            || BusinessConst.BUILDING_TYPE_DOOR_BUILDING_UNIT == query.getType()) {
-            queryWrapper.like("door",query.getName());
-        } else {
-            //是否查关键字
-            if (query.getName() != null) {
-                if (BusinessConst.BUILDING_TYPE_BUILDING == query.getType()) {
-                    queryWrapper.like("building",query.getName());
-                } else if (BusinessConst.BUILDING_TYPE_UNIT == query.getType()) {
-                    queryWrapper.like("unit",query.getName());
-                } else if (BusinessConst.BUILDING_TYPE_DOOR == query.getType()) {
-                    queryWrapper.like("door",query.getName());
-                }
-            }
-        }
-        //是否查楼栋层数
-        if (query.getTotalFloor() != null) {
-            queryWrapper.eq("total_floor",query.getTotalFloor());
-        }
-        //是否查楼宇分类
-        if (query.getBuildingType() != null) {
-            queryWrapper.eq("building_type",query.getBuildingType());
+        //是否查房号/业主
+        if (query.getDoorOrOwner() != null) {
+            queryWrapper.like("door",query.getDoorOrOwner());
+            queryWrapper.or().in("");
         }
         //楼栋和单元均不为空 只取单元id
         if (query.getBuildingId() != null && query.getUnitId() != null) {
@@ -186,22 +146,6 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         PageInfo<HouseEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(pageData, pageInfo);
         return pageInfo;
-    }
-
-    //设置通用查询条件
-    private void setQueryWrapper(QueryWrapper<HouseEntity> queryWrapper, HouseQO query) {
-//		if(!StringUtils.isEmpty(query.getNumber())){
-//			queryWrapper.like("number",query.getNumber());
-//		}
-        if (!StringUtils.isEmpty(query.getBuilding())) {
-            queryWrapper.and(wrapper -> wrapper.like("building", query.getBuilding()).or().like("number", query.getBuilding()));
-        }
-        if (!StringUtils.isEmpty(query.getUnit())) {
-            queryWrapper.and(wrapper -> wrapper.like("unit", query.getUnit()).or().like("number", query.getUnit()));
-        }
-        if (!StringUtils.isEmpty(query.getDoor())) {
-            queryWrapper.and(wrapper -> wrapper.like("door", query.getDoor()).or().like("number", query.getDoor()));
-        }
     }
 
     //设置户型
@@ -351,31 +295,6 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
             }
         }
         return houseEntities;
-    }
-    
-    /**
-     * @Description: 查询小区下所有楼栋、单元、房屋
-     * @author: DKS
-     * @since: 2021/8/13 14:08
-     * @Param: communityId
-     * @return: java.util.List<com.jsy.community.entity.HouseEntity>
-     */
-    @Override
-    public List<HouseEntity> selectAllBuildingUnitDoor(Long communityId) {
-	    return houseMapper.selectAllBuildingUnitDoor(communityId);
-    }
-
-
-    /**
-     * @Description: 查询当前小区所有房屋地址
-     * @author: Hu
-     * @since: 2021/9/1 14:23
-     * @Param: [adminCommunityId]
-     * @return: java.util.List<com.jsy.community.entity.HouseEntity>
-     */
-    @Override
-    public List<HouseEntity> getHouse(Long adminCommunityId) {
-        return houseMapper.selectList(new QueryWrapper<HouseEntity>().select("id,concat(building,unit,door) as address").eq("community_id",adminCommunityId).eq("type",4));
     }
     
 }

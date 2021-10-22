@@ -32,23 +32,4 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @Date: 2021/8/9
 	 **/
 	List<HouseEntity> queryExportHouseExcel(HouseEntity houseEntity);
-	
-	/**
-	 * @Description: 查询小区下所有楼栋、单元、房屋
-	 * @author: DKS
-	 * @since: 2021/8/13 14:08
-	 * @Param: communityId
-	 * @return: java.util.List<com.jsy.community.entity.HouseEntity>
-	 */
-	List<HouseEntity> selectAllBuildingUnitDoor(Long communityId);
-
-
-	/**
-	 * @Description: 查询当前小区所有房屋
-	 * @author: Hu
-	 * @since: 2021/9/1 14:21
-	 * @Param:
-	 * @return:
-	 */
-	List<HouseEntity> getHouse(Long adminCommunityId);
 }

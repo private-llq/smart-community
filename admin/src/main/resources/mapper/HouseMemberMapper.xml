@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsy.community.mapper.HouseMemberMapper">
+
+    <select id="getAllOwnerByCommunity" resultType="com.jsy.community.entity.HouseMemberEntity">
+        select
+        *
+        from t_house_member
+        <where>
+            relation = 1
+            and community_id = #{communityId}
+            and deleted = 0
+        </where>
+    </select>
+
+    <select id="getAllTenantByCommunity" resultType="com.jsy.community.entity.HouseMemberEntity">
+        select
+        *
+        from t_house_member
+        <where>
+            relation = 7
+            and community_id = #{communityId}
+            and deleted = 0
+        </where>
+    </select>
+
+    <select id="selectAllPeopleByCommunityIds" resultType="java.lang.Integer">
+        select count(0) from t_house_member where community_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectMobileListByCommunityIds" resultType="java.lang.String">
+        select mobile from t_house_member where mobile is not null and mobile &lt;&gt; "" and community_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectDistinctMobileListByCommunityIds" resultType="java.lang.String">
+        select distinct mobile from t_house_member where mobile is not null and mobile &lt;&gt; "" and community_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectAllownerByCommunityIds" resultType="java.lang.Integer">
+        select count(0) from t_house_member where relation = 1 and community_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectAlltenantByCommunityIds" resultType="java.lang.Integer">
+        select count(0) from t_house_member where relation = 7 and community_id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>
