@@ -321,41 +321,4 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
         return new ArrayList<>(set);
     }
 
-    /**
-     * 查询租赁存证详情
-     *
-     * @param id   租赁数据id
-     * @param type
-
-    public LeaseContractInfoVO queryContractInfo(Long id, String type) {
-    Integer code = BusinessEnum.HouseTypeEnum.getCode(type);
-    if (code == null) {
-    throw new AdminException("type类型不符合");
-    }
-    //查询是否已成交
-    if ("住宅".equals(type)) {
-    HouseLeaseEntity house = houseLeaseMapper.selectById(id);
-    if (house.getLeaseStatus() == 0) {
-    throw new AdminException("该住宅尚未出租，暂无租赁存证。");
-    }
-    } else {
-    ShopLeaseEntity shop = shopLeaseMapper.selectById(id);
-    if (shop.getLeaseStatus() == 0) {
-    throw new AdminException("该商铺尚未出租，暂无租赁存证。");
-    }
-    }
-    //调取签章
-
-
-    //
-
-    //查询甲乙双方签名，联系方式，签约日期等
-
-
-    //todo 身份证（营业执照信息暂时无法获取，流程中没有存储，待后期版本优化再添加）
-
-    return null;
-    }
-     */
-
 }

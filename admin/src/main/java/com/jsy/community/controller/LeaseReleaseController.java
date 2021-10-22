@@ -42,12 +42,4 @@ public class LeaseReleaseController {
                                                                 @RequestParam("type") Integer type) {
         return CommonResult.ok(leaseReleaseService.queryLeaseHouseInfo(id, type));
     }
-
-//    @ApiOperation("商铺或房屋租赁合同")
-//    @GetMapping("/release/contract")
-//    @Login(allowAnonymous = true)
-//    public CommonResult<LeaseReleaseInfoVO> queryContractInfo(@RequestParam("id") Long id,
-//                                                              @RequestParam("type") String type) {
-//        return CommonResult.ok(leaseReleaseService.queryLeaseHouseInfo(id, type));
-//    }
 }
