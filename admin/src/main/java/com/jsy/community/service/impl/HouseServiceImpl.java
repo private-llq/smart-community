@@ -110,27 +110,13 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         BeanUtils.copyProperties(pageData, pageInfo);
         return pageInfo;
     }
-
-    //设置户型
-    private void setHouseTypeCodeStr(HouseEntity houseEntity) {
-        String houseTypeCode = houseEntity.getHouseTypeCode();
-        if (houseTypeCode == null || houseTypeCode.length() != 8) {
-            houseEntity.setHouseTypeCodeStr(houseEntity.getHouseTypeCode());
-            return;
-        }
-        String bedRoom = Integer.valueOf(houseTypeCode.substring(0, 2)) + "室";
-        String livingRoom = Integer.valueOf(houseTypeCode.substring(2, 4)) + "厅";
-        String kitchen = Integer.valueOf(houseTypeCode.substring(4, 6)) + "厨";
-        String toilet = Integer.valueOf(houseTypeCode.substring(6, 8)) + "卫";
-        houseEntity.setHouseTypeCodeStr(bedRoom.concat(livingRoom).concat(kitchen).concat(toilet));
-    }
     
     /**
      * @Description: 查询楼栋、单元、房屋导出数据
      * @Param: HouseEntity
      * @Return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseEntity>
      * @Author: DKS
-     * @Date: 2021/8/9
+     * @Date: 2021/10/22
      **/
     @Override
     public List<HouseEntity> queryExportHouseExcel(HouseQO houseQO) {
