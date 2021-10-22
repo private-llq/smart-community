@@ -24,4 +24,22 @@ public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
 	 *@Date: 2021/10/22 10:01
 	 **/
 	List<Long> getAllHouseIdByOwnerName(String ownerName);
+	
+	/**
+	 * @Description: 根据房屋Id查询业主姓名
+	 * @author: DKS
+	 * @since: 2021/10/22 10:54
+	 * @Param: houseId
+	 * @return: java.util.String
+	 */
+	String getOwnerNameByHouseId(Long houseId);
+	
+	/**
+	 * @Description: 根据房屋Id查询租户数量
+	 * @author: DKS
+	 * @since: 2021/10/22 11:34
+	 * @Param: houseId
+	 * @return: java.util.Integer
+	 */
+	Integer getTenantByHouseId(Long houseId);
 }

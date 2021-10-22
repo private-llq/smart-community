@@ -5,9 +5,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.PropertyEnum;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.PropertyCompanyEntity;
+import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.mapper.HouseMapper;
 import com.jsy.community.mapper.HouseMemberMapper;
+import com.jsy.community.mapper.PropertyCompanyMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
 import com.jsy.community.service.IHouseService;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +44,12 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
     
     @Resource
     private HouseMemberMapper houseMemberMapper;
+    
+    @Resource
+    private PropertyCompanyMapper propertyCompanyMapper;
+    
+    @Resource
+    private CommunityMapper communityMapper;
 
     /**
      * @Description: 查询楼栋、单元、房屋（改）(根据物业端原型)
@@ -53,6 +64,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         Page<HouseEntity> page = new Page<>();
         MyPageUtils.setPageAndSize(page, baseQO);
         QueryWrapper<HouseEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("type", BusinessConst.BUILDING_TYPE_DOOR);
         //是否查小区
         if (query.getCommunityId() != null) {
             queryWrapper.eq("community_id", query.getCommunityId());
@@ -67,6 +79,31 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         Page<HouseEntity> pageData = houseMapper.selectPage(page, queryWrapper);
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return new PageInfo<>();
+        }
+        List<Long> paramList = new ArrayList<>();
+        for (HouseEntity houseEntity : pageData.getRecords()) {
+            // 补充物业公司名称
+            CommunityEntity communityEntity = communityMapper.selectById(houseEntity.getCommunityId());
+            PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(communityEntity.getPropertyId());
+            houseEntity.setCompanyName(companyEntity.getName());
+            // 补充社区名称
+            houseEntity.setCommunityName(communityEntity.getName());
+            // 补充业主名字
+            houseEntity.setOwner(houseMemberMapper.getOwnerNameByHouseId(houseEntity.getId()));
+            paramList.add(houseEntity.getId());
+        }
+        // 补充住户量
+        Map<Long, Map<String, Long>> bindMap = houseMapper.selectHouseNumberCount(paramList);
+        for (HouseEntity houseEntity : pageData.getRecords()) {
+            Map<String, Long> countMap = bindMap.get(BigInteger.valueOf(houseEntity.getId()));
+            houseEntity.setHouseNumber(countMap != null ? countMap.get("count") : 0L);
+            // 补充状态
+            houseEntity.setStatus(houseEntity.getHouseNumber() == 0 ? "空置" : "已绑定");
+            // 查询该房间是否有租户
+            Integer row = houseMemberMapper.getTenantByHouseId(houseEntity.getId());
+            if (row > 0) {
+                houseEntity.setStatus("已租用");
+            }
         }
         PageInfo<HouseEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(pageData, pageInfo);

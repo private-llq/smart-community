@@ -201,6 +201,10 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "单元编号")
     private String unitNumber;
     
+    @TableField(exist = false)
+    @ApiModelProperty(value = "物业公司名称")
+    private String companyName;
+    
     /**
      * 新增house验证组
      */

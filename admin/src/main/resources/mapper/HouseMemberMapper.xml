@@ -12,4 +12,12 @@
             and deleted = 0
         </where>
     </select>
+
+    <select id="getOwnerNameByHouseId" resultType="java.lang.String">
+        select name from t_house_member WHERE relation = 1 and house_id = #{houseId} and deleted = 0 and status = 1
+    </select>
+
+    <select id="getTenantByHouseId" resultType="java.lang.Integer">
+        select count(0) from t_house_member WHERE relation = 7 and house_id = #{houseId} and deleted = 0 and status = 1
+    </select>
 </mapper>
