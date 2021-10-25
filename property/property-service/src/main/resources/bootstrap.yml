@@ -50,7 +50,7 @@ dubbo:
   protocol:
     name: dubbo
     port: -1
-    threadname: property-service
+    threadname: property-service,proprietor-service,lease-service
     dispatcher: message
     threads: 50
   application:

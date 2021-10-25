@@ -56,7 +56,7 @@ dubbo:
   application:
     name: ${spring.application.name}
   cloud:
-    subscribed-services: lease-web
+    subscribed-services: proprietor-service,property-service,payment-service,lease-service
   consumer:
     retries: 0
     timeout: 99999
