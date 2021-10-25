@@ -74,6 +74,10 @@ public class CommunityEntity extends BaseEntity {
     // 物业id
     // @NotNull(groups = ProperyuAddValidatedGroup.class, message = "请填写物业信息")
     private Long propertyId;
+    
+    // 物业idStr
+    @TableField(exist=false)
+    private String propertyIdStr;
 
     // 联系人
     private String contact;

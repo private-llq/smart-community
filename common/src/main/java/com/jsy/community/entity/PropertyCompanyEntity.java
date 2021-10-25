@@ -50,10 +50,10 @@ public class PropertyCompanyEntity extends BaseEntity {
     private LocalDate overTime;
     
     @ApiModelProperty(value = "经度")
-    private BigDecimal longitude;
+    private BigDecimal lon;
     
     @ApiModelProperty(value = "纬度")
-    private BigDecimal latitude;
+    private BigDecimal lat;
     
     @ApiModelProperty(value = "公司简介")
     private String profile;

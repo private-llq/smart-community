@@ -81,11 +81,6 @@ public class CommunityController {
         if (communityEntity.getId() == null) {
             throw new JSYException(400, "社区ID不能为空!");
         }
-        // 需要判定用户有权限的社区是否包含该社区
-//		AdminInfoVo adminUserInfo = UserUtils.getAdminUserInfo();
-//		if (!adminUserInfo.getCommunityIdList().contains(communityEntity.getId())) {
-//			throw new JSYException(400, "你没有该社区的操作权限!");
-//		}
         ValidatorUtils.validateEntity(communityEntity, CommunityEntity.ProperyuAddValidatedGroup.class);
         return communityService.updateCommunity(communityEntity) > 0 ? CommonResult.ok("更新成功") : CommonResult.error("更新失败");
     }

@@ -2,14 +2,13 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.property.HouseQO;
+import com.jsy.community.qo.property.HouseMemberQO;
 import com.jsy.community.service.HouseExcelHandler;
-import com.jsy.community.service.IHouseService;
+import com.jsy.community.service.IHouseMemberService;
 import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,51 +30,50 @@ import java.util.List;
 
 /**
  * <p>
- * 房屋信息 前端控制器
+ * 住户信息 前端控制器
  * </p>
  *
  * @author DKS
- * @since 2021-10-21
+ * @since 2021-10-22
  */
-@Api(tags = "房屋信息控制器")
+@Api(tags = "住户信息控制器")
 @RestController
-@RequestMapping("house")
+@RequestMapping("house/member")
 @ApiJSYController
-public class HouseController {
+public class HouseMemberController {
 
 	@Resource
-	private IHouseService houseService;
+	private IHouseMemberService houseMemberService;
 
 	@Resource
 	private HouseExcelHandler houseExcelHandler;
 
 	/**
-	* @Description: 【楼宇房屋】条件查询
+	* @Description: 【住户】条件查询
 	 * @Param: [baseQO]
-	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseEntity>>
+	 * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo<com.jsy.community.entity.HouseMemberEntity>>
 	 * @Author: chq459799974
 	 * @Date: 2021/4/1
 	**/
 	@Login
-	@ApiOperation("【楼宇房屋】条件查询")
+	@ApiOperation("【住户】条件查询")
 	@PostMapping("query")
-	public CommonResult<PageInfo<HouseEntity>> queryHouse(@RequestBody BaseQO<HouseQO> baseQO){
-		return CommonResult.ok(houseService.queryHouse(baseQO));
+	public CommonResult<PageInfo<HouseMemberEntity>> queryHouseMember(@RequestBody BaseQO<HouseMemberQO> baseQO){
+		return CommonResult.ok(houseMemberService.queryHouseMember(baseQO));
 	}
 
 	/**
 	 *@Author: DKS
-	 *@Description: 导出房屋信息
+	 *@Description: 导出住户信息
 	 *@Param: excel:
 	 *@Return: com.jsy.community.vo.CommonResult
-	 *@Date: 2021/10/22 14:26
+	 *@Date: 2021/10/22 16:38
 	 **/
 	@Login
-	@ApiOperation("导出房屋信息")
-	@PostMapping("/downloadHouseList")
-	public ResponseEntity<byte[]> downloadOrderList(@RequestBody HouseQO houseQO) {
-		houseQO.setCommunityId(UserUtils.getAdminCommunityId());
-		List<HouseEntity> houseEntities = houseService.queryExportHouseExcel(houseQO);
+	@ApiOperation("导出住户信息")
+	@PostMapping("/downloadHouseMemberList")
+	public ResponseEntity<byte[]> downloadOrderList(@RequestBody HouseMemberQO houseMemberQO) {
+		List<HouseMemberEntity> houseMemberEntities = houseMemberService.queryExportHouseMemberExcel(houseMemberQO);
 		//设置excel 响应头信息
 		MultiValueMap<String, String> multiValueMap = new HttpHeaders();
 		//设置响应类型为附件类型直接下载这种
@@ -83,7 +81,7 @@ public class HouseController {
 		//设置响应的文件mime类型为 xls类型
 		multiValueMap.set("Content-type", "application/vnd.ms-excel;charset=utf-8");
 		Workbook workbook;
-		workbook = houseExcelHandler.exportHouse(houseEntities);
+		workbook = houseExcelHandler.exportHouseMember(houseMemberEntities);
 		//把workbook工作簿转换为字节数组 放入响应实体以附件形式输出
 		try {
 			return new ResponseEntity<>(ExcelUtil.readWorkbook(workbook), multiValueMap, HttpStatus.OK);

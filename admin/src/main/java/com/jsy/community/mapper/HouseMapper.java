@@ -13,8 +13,8 @@ import java.util.Map;
 
 /**
  * 物业端社区楼栋 Mapper 接口
- * @author jsy
- * @since 2020-11-20
+ * @author DKS
+ * @since 2021-10-22
  */
 @Mapper
 public interface HouseMapper extends BaseMapper<HouseEntity> {
@@ -53,17 +53,17 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @author: DKS
 	 * @since: 2021/8/6 16:38
 	 * @Param:
-	 * @return:
+	 * @return:java.util.List<java.lang.Long>
 	 */
 	@MapKey("houseId")
 	Map<Long,Map<String,Long>> selectHouseNumberCount(@Param("list") Collection<Long> houseIds);
 	
 	/**
-	 * @Description: 查询小区下所有楼栋、单元、房屋
+	 * @Description: 根据房号模糊查询房屋id
 	 * @author: DKS
-	 * @since: 2021/8/13 14:08
-	 * @Param: communityId
-	 * @return: java.util.List<com.jsy.community.entity.HouseEntity>
+	 * @since: 2021/10/22 14:47
+	 * @Param: door
+	 * @return: java.util.List<java.lang.Long>
 	 */
-	List<HouseEntity> selectAllBuildingUnitDoor(Long communityId);
+	List<Long> getHouseIdByDoor(String door);
 }

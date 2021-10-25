@@ -115,6 +115,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
             // 补充物业公司名称
             PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(record.getPropertyId());
             record.setCompanyName(companyEntity.getName());
+            record.setPropertyIdStr(String.valueOf(record.getPropertyId()));
         }
         PageInfo<CommunityEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(communityEntityPage, pageInfo);

@@ -58,4 +58,7 @@ public class HouseQO implements Serializable {
     
     @ApiModelProperty(value = "楼宇分类")
     private Long buildingType;
+    
+    @ApiModelProperty(value = "房号/业主", hidden = true)
+    private String doorOrOwner;
 }
