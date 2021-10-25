@@ -305,14 +305,16 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
     public void updatePayPasswordByMobileCode(MobileCodePayPasswordQO qo, String account, String uid) {
         //验证支付密码与确认密码一致性
         if (!qo.getPayPassword().equals(qo.getConfirmPayPassword())) {
-            throw new ProprietorException("密码不一致");
+            throw new ProprietorException("新密码和确认密码不一致");
         }
+        // 校验修改支付密码的短信验证码
         boolean b = checkMobileVerificationCode(account, qo.getCode());
         if (!b) {
             throw new ProprietorException("短信验证码不正确");
         }
         //清理缓存中的验证码
         redisTemplate.delete("vProprietorCodePayPassword" + account);
+        //修改支付密码
         updatePayPassword(qo.getPayPassword(), uid);
     }
 
