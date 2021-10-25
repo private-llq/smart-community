@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.jsy.common"})
 @PropertySources({
 	@PropertySource(value = "classpath:common-web.properties"),
 	@PropertySource(value = "classpath:common-service.properties")
