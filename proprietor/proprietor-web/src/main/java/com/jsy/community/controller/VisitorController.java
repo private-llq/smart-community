@@ -87,7 +87,7 @@ public class VisitorController {
 			}
 		}
 		visitorEntity.setUid(UserUtils.getUserId());
-		return CommonResult.ok(visitorService.addVisitor(visitorEntity),"操作成功");
+		return CommonResult.ok(visitorService.appAddVisitor(visitorEntity),"操作成功");
 	}
 
 	//TODO 权限和一次访客登记对应还是和每个随行人员一一对应？

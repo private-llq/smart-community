@@ -63,6 +63,8 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
     public Boolean addPushInform(PushInformQO qo){
         // 组装消息数据
         PushInformEntity entity = PushInformEntity.getInstance();
+//        entity.setAcctId("");
+//        entity.setAcctName();
         entity.setPushTitle(qo.getPushTitle());
         entity.setPushMsg(qo.getPushMsg());
         entity.setPushTarget(qo.getPushTarget());

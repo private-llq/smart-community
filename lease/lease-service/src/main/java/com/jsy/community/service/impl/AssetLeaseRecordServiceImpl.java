@@ -42,6 +42,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -60,6 +61,15 @@ import java.util.stream.Collectors;
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_lease)
 public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMapper, AssetLeaseRecordEntity> implements AssetLeaseRecordService {
+
+    @Value("${sign.user.protocol}")
+    private String SIGN_USER_PROTOCOL;
+    @Value("${sign.user.host}")
+    private String SIGN_USER_HOST;
+    @Value("${sign.user.port}")
+    private String SIGN_USER_PORT;
+    @Value("${sign.user.api.contract_overdue}")
+    private String CONTRACT_OVERDUE;
 
     @Autowired
     private AssetLeaseRecordMapper assetLeaseRecordMapper;
@@ -1304,6 +1314,20 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 updateWrapper.eq("id", leaseRecordEntity.getAssetId());
                 updateWrapper.set("lease_status", 1);
                 houseLeaseMapper.update(new HouseLeaseEntity(), updateWrapper);
+                // 绑定租客为房屋租客身份,向house_member表增加数据
+                // 查询资产对应的真实房屋ID
+                QueryWrapper<HouseLeaseEntity> houseLeaseEntityQueryWrapper = new QueryWrapper<>();
+                houseLeaseEntityQueryWrapper.eq("id", leaseRecordEntity.getAssetId());
+                HouseLeaseEntity houseLeaseEntity = houseLeaseMapper.selectOne(houseLeaseEntityQueryWrapper);
+                if (houseLeaseEntity != null) {
+                    houseMemberService.addMember(leaseRecordEntity.getTenantUid(),
+                            leaseRecordEntity.getHomeOwnerUid(),
+                            leaseRecordEntity.getCommunityId(),
+                            houseLeaseEntity.getHouseId(),
+                            leaseRecordEntity.getEndDate().atStartOfDay()
+                    );
+                }
+
             } else if (leaseRecordEntity.getAssetType().equals(BusinessEnum.HouseTypeEnum.SHOP.getCode())) {
                 // 商铺
                 UpdateWrapper<ShopLeaseEntity> updateWrapper = new UpdateWrapper<>();
@@ -1311,14 +1335,6 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 updateWrapper.set("lease_status", 1);
                 shopLeaseMapper.update(new ShopLeaseEntity(), updateWrapper);
             }
-
-            // 绑定租客为房屋租客身份,向house_member表增加数据
-            houseMemberService.addMember(leaseRecordEntity.getTenantUid(),
-                    leaseRecordEntity.getHomeOwnerUid(),
-                    leaseRecordEntity.getCommunityId(),
-                    leaseRecordEntity.getAssetId(),
-                    leaseRecordEntity.getEndDate().atStartOfDay()
-            );
 
             CommunityEntity communityEntity = communityService.getCommunityNameById(leaseRecordEntity.getCommunityId());
             //租客
@@ -1557,7 +1573,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         Map<String, Object> bodyMap = new HashMap<>();
         bodyMap.put("conId", conId);
         //url
-        String url = BusinessConst.PROTOCOL_TYPE + BusinessConst.HOST + ":" + BusinessConst.PORT + BusinessConst.CONTRACT_OVERDUE;
+        String url = SIGN_USER_PROTOCOL + SIGN_USER_HOST + ":" + SIGN_USER_PORT + CONTRACT_OVERDUE;
         // 加密参数
         String bodyString = ZhsjUtil.postEncrypt(JSON.toJSONString(bodyMap));
         //组装http请求

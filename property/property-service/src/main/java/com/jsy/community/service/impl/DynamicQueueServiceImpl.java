@@ -2,7 +2,7 @@ package com.jsy.community.service.impl;
 
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.IDynamicQueueService;
-import com.jsy.community.config.TopicExConfig;
+import com.jsy.community.config.PropertyTopicNameEntity;
 import com.jsy.community.constant.Const;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Properties;
 
@@ -40,7 +39,9 @@ public class DynamicQueueServiceImpl implements IDynamicQueueService {
 	 * @Author: chq459799974
 	 * @Date: 2021/6/26
 	**/
-	@PostConstruct
+	// @PostConstruct该注解被用来修饰一个非静态的void（）方法。被@PostConstruct修饰的方法会在服务器加载Servlet的时候运行，
+	// 并且只会被服务器执行一次。PostConstruct在构造函数之后执行，init（）方法之前执行
+	// @PostConstruct
 	public void createCommunityQueues(){
 		//获取所有小区ID
 		List<Long> communityIds = communityService.queryAllCommunityIdList();
@@ -49,7 +50,7 @@ public class DynamicQueueServiceImpl implements IDynamicQueueService {
 		}
 		for(Long communityId : communityIds){
 			//创建小区队列
-			createMQIfNotExist(TopicExConfig.QUEUE_TO_COMMUNITY + "." + communityId,new TopicExchange(TopicExConfig.EX_TOPIC_TO_COMMUNITY));
+			createMQIfNotExist(PropertyTopicNameEntity.queueToCommunity + "." + communityId,new TopicExchange(PropertyTopicNameEntity.exTopicToCommunity));
 		}
 	}
 	

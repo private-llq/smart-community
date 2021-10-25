@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
-import com.jsy.community.config.TopicExConfig;
+import com.jsy.community.config.ProprietorTopicNameEntity;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
@@ -870,7 +870,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
         pushMap.put("sex", userEntity.getSex());
         pushMap.put("realName", userEntity.getRealName());
-        rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, pushMap);
+        rabbitTemplate.convertAndSend(ProprietorTopicNameEntity.exFaceXu, ProprietorTopicNameEntity.topicFaceXuServer, pushMap);
     }
 
 

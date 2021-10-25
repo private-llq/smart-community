@@ -11,6 +11,7 @@ import com.jsy.community.utils.signature.ZhsjUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.client.methods.HttpPost;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +25,16 @@ import java.util.Map;
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_payment)
 public class HousingRentalOrderServiceImpl implements HousingRentalOrderService {
+
+    @Value("${sign.user.protocol}")
+    private String SIGN_USER_PROTOCOL;
+    @Value("${sign.user.host}")
+    private String SIGN_USER_HOST;
+    @Value("${sign.user.port}")
+    private String SIGN_USER_PORT;
+    @Value("${sign.user.api.update-contract-pay-status}")
+    private String MODIFY_ORDER_PAY_STATUS;
+
 
     /**
      * @author: Pipi
@@ -41,7 +52,7 @@ public class HousingRentalOrderServiceImpl implements HousingRentalOrderService 
         bodyMap.put("isPayment", true);
         bodyMap.put("orderUuid", orderNo);
         //url
-        String url = BusinessConst.PROTOCOL_TYPE + BusinessConst.HOST + ":" + BusinessConst.PORT + BusinessConst.MODIFY_ORDER_PAY_STATUS;
+        String url = SIGN_USER_PROTOCOL + SIGN_USER_HOST + ":" + SIGN_USER_PORT + MODIFY_ORDER_PAY_STATUS;
         // 加密参数
         String bodyString = ZhsjUtil.postEncrypt(JSON.toJSONString(bodyMap));
         //组装http请求

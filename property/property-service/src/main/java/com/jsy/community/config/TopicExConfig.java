@@ -2,7 +2,6 @@ package com.jsy.community.config;
 
 import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,98 +17,72 @@ import java.util.Map;
 public class TopicExConfig {
 
 //	@Value("${topic-environment}")
-//	public final static String ENVIRONMENT = "20";
-	
-	//小区相关-topic交换机名称
-	public final static String EX_TOPIC_TO_COMMUNITY = "cloud2CommunityTopicExchange";
-	
-	//绑定topic名称
-	public final static String QUEUE_TO_COMMUNITY = "queue.2community"; //小区监听云端队列(根据社区id加后缀动态创建) 如小区id是1 创建出来就是queue.community.1 小区id是2 创建出来就是queue.community.2
-	
-	//监听topic名称
-	public final static String QUEUE_FROM_COMMUNITY = "queue.2cloud"; //云端监听小区队列，根据参数communityId判断是哪个小区(摄像头相关)
-	// todo 防止冲突,加的20
-	public final static String QUEUE_VISITOR_HIS_FROM_COMMUNITY = "queue.visitor.his.2cloud"; //云端监听小区队列，根据参数communityId判断是哪个小区(访客记录相关)
+//	public static final String ENVIRONMENT = "20";
 	
 	//小区相关-声明交换机
 	@Bean
 	TopicExchange topicExOfToCommunity() {
-		return new TopicExchange(EX_TOPIC_TO_COMMUNITY);
+		return new TopicExchange(PropertyTopicNameEntity.exTopicToCommunity);
 	}
 	//小区相关-声明队列
 	@Bean
 	public Queue queueOf2Community() {
-		return new Queue(QUEUE_TO_COMMUNITY,true);
+		return new Queue(PropertyTopicNameEntity.queueToCommunity,true);
 	}
 	//小区相关-队列绑定交换机
 	@Bean
 	Binding bindingOfTopicEx2CommunityAndQueue2Community() {
-		return BindingBuilder.bind(queueOf2Community()).to(topicExOfToCommunity()).with(QUEUE_TO_COMMUNITY);
+		return BindingBuilder.bind(queueOf2Community()).to(topicExOfToCommunity()).with(PropertyTopicNameEntity.queueToCommunity);
 	}
 
 
-	//交换机名称
-	public final static String EX_FACE_XU = "topicExOfXUFace"; //炫优人脸识别一体机 - 交换机
-
-	//绑定topic名称
-	public final static String TOPIC_FACE_XU_SERVER = "topic.face.xu.server"; //炫优人脸识别一体机 - topic - server
-	//监听topic名称
-	public final static String TOPIC_FACE_XU_CLIENT = "topic.face.xu.client"; //炫优人脸识别一体机 - topic - client
 
 	//声明队列
 	@Bean
 	public Queue queueOfXUFaceServer() {
-		return new Queue(TOPIC_FACE_XU_SERVER,true);
+		return new Queue(PropertyTopicNameEntity.topicFaceXuServer,true);
 	}
 	@Bean
 	public Queue queueOfXUFaceClient() {
-		return new Queue(TOPIC_FACE_XU_CLIENT,true);
+		return new Queue(PropertyTopicNameEntity.topicFaceXuClient,true);
 	}
 	//声明交换机
 	@Bean
 	TopicExchange topicExOfXUFace() {
-		return new TopicExchange(EX_FACE_XU);
+		return new TopicExchange(PropertyTopicNameEntity.exFaceXu);
 	}
 	//队列绑定交换机
 	@Bean
 	Binding bindingExchangeMessage1() {
-		return BindingBuilder.bind(queueOfXUFaceServer()).to(topicExOfXUFace()).with(TOPIC_FACE_XU_SERVER);
+		return BindingBuilder.bind(queueOfXUFaceServer()).to(topicExOfXUFace()).with(PropertyTopicNameEntity.topicFaceXuServer);
 	}
 	//队列绑定交换机
 	@Bean
 	Binding bindingExchangeMessage2() {
-		return BindingBuilder.bind(queueOfXUFaceClient()).to(topicExOfXUFace()).with(TOPIC_FACE_XU_CLIENT);
+		return BindingBuilder.bind(queueOfXUFaceClient()).to(topicExOfXUFace()).with(PropertyTopicNameEntity.topicFaceXuClient);
 	}
 
 
 
-
-
-	//炫优延时交换机名称
-	public final static String DELAY_EX_FACE_XU = "DelayExOfXUFace"; //炫优人脸识别一体机 - 延时交换机
-
-	//绑定topic名称
-	public final static String DELAY_FACE_XU_SERVER = "delay.face.xu.server"; //炫优人脸识别一体机 - 延时 - server
-
 	//声明延时交换机
-	@Bean(DELAY_EX_FACE_XU)
+	@Bean("DelayExOfXUFace")
 	CustomExchange delayExchangeExOfXUFace() {
 		Map<String, Object> args = new HashMap<>(1);
 		args.put("x-delayed-type", "direct");
-		return new CustomExchange(DELAY_EX_FACE_XU, "x-delayed-message", true, false, args);
+		return new CustomExchange(PropertyTopicNameEntity.delayExFaceXu, "x-delayed-message", true, false, args);
 	}
 
 	//声明延时队列
-	@Bean(DELAY_FACE_XU_SERVER)
+	@Bean("delay.face.xu.server")
 	public Queue delayQueueOfXUFaceServer() {
-		return new Queue(DELAY_FACE_XU_SERVER, true);
+		return new Queue(PropertyTopicNameEntity.delayFaceXuServer, true);
 	}
 
 	//延时队列绑定延时交换机
 	@Bean
-	Binding bindingExchangeMessage3(@Qualifier(DELAY_FACE_XU_SERVER) Queue queue,
-									@Qualifier(DELAY_EX_FACE_XU) Exchange exchange) {
-		return BindingBuilder.bind(queue).to(exchange).with(DELAY_FACE_XU_SERVER).noargs();
+	Binding bindingExchangeMessage3(@Qualifier("delay.face.xu.server") Queue queue,
+									@Qualifier("DelayExOfXUFace") Exchange exchange) {
+		return BindingBuilder.bind(queue).to(exchange).with(PropertyTopicNameEntity.delayFaceXuServer).noargs();
 	}
 
 }

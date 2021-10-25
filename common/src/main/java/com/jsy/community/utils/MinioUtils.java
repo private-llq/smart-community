@@ -1,27 +1,20 @@
 package com.jsy.community.utils;
 
+import com.jsy.community.config.service.MinionConfig;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import io.minio.MinioClient;
 import io.minio.ObjectStat;
 import io.minio.policy.PolicyType;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.entity.ContentType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.PropertyException;
-import java.beans.PropertyVetoException;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
@@ -30,14 +23,15 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Slf4j
 public class MinioUtils {
+
 	//ip
-	private static final String ENDPOINT = "https://222.178.212.29";
+	private static final String ENDPOINT = MinionConfig.endPoint;
 	//端口
-	private static final int PROT = 9000;
+	private static final int PROT = MinionConfig.port;
 	//ACCESS_KEY
-	private static final String ACCESSKEY = "minio";
+	private static final String ACCESSKEY = MinionConfig.accessKey;
 	//SECRET_KEY
-	private static final String SECRETKET = "minimini";
+	private static final String SECRETKET = MinionConfig.secretKey;
 	//存储桶名称
 	private static String BUCKETNAME = null;
 

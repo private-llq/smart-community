@@ -14,65 +14,50 @@ import org.springframework.context.annotation.Configuration;
  **/
 @Configuration
 public class TopicExConfig {
-	
-	//小区相关-topic交换机名称
-	public final static String EX_TOPIC_VISITOR_TO_COMMUNITY = "visitorTopicExchange2Community";
-
-	//绑定topic名称
-	public final static String QUEUE_VISITOR_TO_COMMUNITY = "queue.visitor.2community"; //小区监听云端队列(根据社区id加后缀动态创建) 如小区id是1 创建出来就是queue.community.1 小区id是2 创建出来就是queue.community.2
-
-	//监听topic名称
-	public final static String QUEUE_VISITOR_HIS_FROM_COMMUNITY = "queue.visitor.his.2cloud"; //云端监听小区队列，根据参数communityId判断是哪个小区
 
 	//小区相关-声明交换机
 	@Bean
 	TopicExchange topicExOfVisitorToCommunity() {
-		return new TopicExchange(EX_TOPIC_VISITOR_TO_COMMUNITY);
+		return new TopicExchange(ProprietorTopicNameEntity.exTopicVisitorToCommunity);
 	}
 	//小区相关-声明队列
 	@Bean
 	public Queue queueOfVisitor2Community() {
-		return new Queue(QUEUE_VISITOR_TO_COMMUNITY,true);
+		return new Queue(ProprietorTopicNameEntity.queueVisitorToCommunity,true);
 	}
 	//小区相关-队列绑定交换机
 	@Bean
 	Binding bindingOfVisitorTopicExAndQueue() {
-		return BindingBuilder.bind(queueOfVisitor2Community()).to(topicExOfVisitorToCommunity()).with(QUEUE_VISITOR_TO_COMMUNITY);
+		return BindingBuilder.bind(queueOfVisitor2Community()).to(topicExOfVisitorToCommunity()).with(ProprietorTopicNameEntity.queueVisitorToCommunity);
 	}
-	
-	
-	
-	//交换机名称
-	public final static String EX_FACE_XU = "topicExOfXUFace"; //炫优人脸识别一体机 - 交换机
-	
-	//topic名称
-	public final static String TOPIC_FACE_XU_SERVER = "topic.face.xu.server"; //炫优人脸识别一体机 - topic - server
-	//topic名称
-	public final static String TOPIC_FACE_XU_CLIENT = "topic.face.xu.client"; //炫优人脸识别一体机 - topic - client
-	
+
+
+
+
+
 	//声明队列
 	@Bean
 	public Queue queueOfXUFaceServer() {
-		return new Queue(TOPIC_FACE_XU_SERVER,true);
+		return new Queue(ProprietorTopicNameEntity.topicFaceXuServer,true);
 	}
 	@Bean
 	public Queue queueOfXUFaceClient() {
-		return new Queue(TOPIC_FACE_XU_CLIENT,true);
+		return new Queue(ProprietorTopicNameEntity.topicFaceXuClient,true);
 	}
 	//声明交换机
 	@Bean
 	TopicExchange topicExOfXUFace() {
-		return new TopicExchange(EX_FACE_XU);
+		return new TopicExchange(ProprietorTopicNameEntity.exFaceXu);
 	}
 	//队列绑定交换机
 	@Bean
 	Binding bindingExchangeMessage1() {
-		return BindingBuilder.bind(queueOfXUFaceServer()).to(topicExOfXUFace()).with(TOPIC_FACE_XU_SERVER);
+		return BindingBuilder.bind(queueOfXUFaceServer()).to(topicExOfXUFace()).with(ProprietorTopicNameEntity.topicFaceXuServer);
 	}
 	//队列绑定交换机
 	@Bean
 	Binding bindingExchangeMessage2() {
-		return BindingBuilder.bind(queueOfXUFaceClient()).to(topicExOfXUFace()).with(TOPIC_FACE_XU_CLIENT);
+		return BindingBuilder.bind(queueOfXUFaceClient()).to(topicExOfXUFace()).with(ProprietorTopicNameEntity.topicFaceXuClient);
 	}
-	
+
 }

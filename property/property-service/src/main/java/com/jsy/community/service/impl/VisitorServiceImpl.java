@@ -8,10 +8,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.PropertyUserService;
 import com.jsy.community.api.IVisitorService;
-import com.jsy.community.config.TopicExConfig;
+import com.jsy.community.config.PropertyTopicNameEntity;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
-import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
+import com.jsy.community.dto.face.xu.XUFaceVisitorEditPersonDTO;
 import com.jsy.community.entity.*;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.mapper.*;
@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author chq459799974
@@ -290,7 +291,47 @@ public class VisitorServiceImpl implements IVisitorService {
 		visitorEntity.setId(SnowFlake.nextId());
 		int resultNum = visitorMapper.insert(visitorEntity);
 		// 添加成功且有人脸信息
-		if (!StringUtils.isEmpty(visitorEntity.getFaceUrl()) && resultNum > 0) {
+		if (resultNum > 0) {
+			// 查询所有社区所有扫脸一体机设备
+			QueryWrapper<CommunityHardWareEntity> hardWareEntityQueryWrapper = new QueryWrapper<>();
+			hardWareEntityQueryWrapper.eq("community_id", visitorEntity.getCommunityId());
+			List<CommunityHardWareEntity> communityHardWareEntities = communityHardWareMapper.selectList(hardWareEntityQueryWrapper);
+			if (!CollectionUtils.isEmpty(communityHardWareEntities)) {
+				Set<String> facilityIds = communityHardWareEntities.stream().map(CommunityHardWareEntity::getHardwareId).collect(Collectors.toSet());
+				XUFaceVisitorEditPersonDTO xuFaceEditPersonDTO = new XUFaceVisitorEditPersonDTO();
+				xuFaceEditPersonDTO.setOperator("addVisitor");
+				xuFaceEditPersonDTO.setHardwareIds(facilityIds);
+				xuFaceEditPersonDTO.setCommunityId(String.valueOf(visitorEntity.getCommunityId()));
+				xuFaceEditPersonDTO.setVisitorEntity(visitorEntity);
+				if (!StringUtils.isEmpty(visitorEntity.getFaceUrl())) {
+					// 有人脸信息
+					// 增加每个机器的同步记录
+					List<VisitorFaceSyncRecordEntity> visitorFaceSyncRecordEntities = new ArrayList<>();
+					for (CommunityHardWareEntity communityHardWareEntity : communityHardWareEntities) {
+						VisitorFaceSyncRecordEntity visitorFaceSyncRecordEntity = new VisitorFaceSyncRecordEntity();
+						visitorFaceSyncRecordEntity.setVisitorId(visitorEntity.getId());
+						visitorFaceSyncRecordEntity.setCommunityId(visitorEntity.getCommunityId());
+						visitorFaceSyncRecordEntity.setFaceUrl(visitorEntity.getFaceUrl());
+						visitorFaceSyncRecordEntity.setFacilityId(communityHardWareEntity.getHardwareId());
+						visitorFaceSyncRecordEntity.setId(SnowFlake.nextId());
+						visitorFaceSyncRecordEntity.setDeleted(0);
+						visitorFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
+						visitorFaceSyncRecordEntities.add(visitorFaceSyncRecordEntity);
+					}
+					faceSyncRecordMapper.batchInsertRecord(visitorFaceSyncRecordEntities);
+					// 添加设备处理信息
+					xuFaceEditPersonDTO.setCustomId(visitorEntity.getContact());
+					xuFaceEditPersonDTO.setName(visitorEntity.getName());
+					xuFaceEditPersonDTO.setPersonType(0);
+					xuFaceEditPersonDTO.setTempCardType(0);
+					xuFaceEditPersonDTO.setPicURI(visitorEntity.getFaceUrl());
+				}
+				// =================================== 向队列发送同步消息 =============================================
+				log.info("发送消息到队列{}", PropertyTopicNameEntity.topicFaceXuServer);
+				rabbitTemplate.convertAndSend(PropertyTopicNameEntity.exFaceXu, PropertyTopicNameEntity.topicFaceXuServer, JSON.toJSONString(xuFaceEditPersonDTO));
+			}
+		}
+		/*if (!StringUtils.isEmpty(visitorEntity.getFaceUrl()) && resultNum > 0) {
 			// 查询所有社区所有扫脸一体机设备
 			QueryWrapper<CommunityHardWareEntity> hardWareEntityQueryWrapper = new QueryWrapper<>();
 			hardWareEntityQueryWrapper.eq("community_id", visitorEntity.getCommunityId());
@@ -322,10 +363,10 @@ public class VisitorServiceImpl implements IVisitorService {
 				xuFaceEditPersonDTO.setHardwareIds(facilityIds);
 				xuFaceEditPersonDTO.setCommunityId(String.valueOf(visitorEntity.getCommunityId()));
 				xuFaceEditPersonDTO.setOperator("editPerson");
-				log.info("发送消息到队列{}", TopicExConfig.TOPIC_FACE_XU_SERVER + "." + visitorEntity.getCommunityId());
-				rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, JSON.toJSONString(xuFaceEditPersonDTO));
+				log.info("发送消息到队列{}", TopicNameEntity.topicFaceXuServer + "." + visitorEntity.getCommunityId());
+				rabbitTemplate.convertAndSend(TopicNameEntity.exFaceXu, TopicNameEntity.topicFaceXuServer, JSON.toJSONString(xuFaceEditPersonDTO));
 			}
-		}
+		}*/
 		return resultNum;
 	}
 

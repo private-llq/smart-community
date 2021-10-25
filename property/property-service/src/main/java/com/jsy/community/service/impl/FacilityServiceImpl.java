@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IFacilityService;
 import com.jsy.community.api.PropertyException;
-import com.jsy.community.config.TopicExConfig;
+import com.jsy.community.config.PropertyTopicNameEntity;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.UserEntity;
@@ -101,7 +101,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		//MQ通知小区服务器登录设备
 		facilityEntity.setOp("add");
 		facilityEntity.setAct(PropertyConsts.ACT_HK_CAMERA);
-		rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_TO_COMMUNITY, TopicExConfig.QUEUE_TO_COMMUNITY + "." + facilityEntity.getCommunityId(), JSON.toJSONString(facilityEntity));
+		rabbitTemplate.convertAndSend(PropertyTopicNameEntity.exTopicToCommunity, PropertyTopicNameEntity.queueToCommunity + "." + facilityEntity.getCommunityId(), JSON.toJSONString(facilityEntity));
 	}
 	
 	@Override
@@ -117,7 +117,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		facilityEntity.setCommunityId(communityId);
 		facilityEntity.setOp("del");
 		facilityEntity.setAct(PropertyConsts.ACT_HK_CAMERA);
-		rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_TO_COMMUNITY, TopicExConfig.QUEUE_TO_COMMUNITY + "." +communityId,JSON.toJSONString(facilityEntity));
+		rabbitTemplate.convertAndSend(PropertyTopicNameEntity.exTopicToCommunity, PropertyTopicNameEntity.queueToCommunity + "." +communityId,JSON.toJSONString(facilityEntity));
 		//直接删除设备，返回成功(反正也查不到了，不用等待异步注销成功)
 		facilityMapper.deleteFacilityById(id);
 		// 删除设备状态信息
@@ -149,7 +149,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 			//异步通知小区服务器
 			facilityEntity.setOp("update");
 			facilityEntity.setAct(PropertyConsts.ACT_HK_CAMERA);
-			rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_TO_COMMUNITY, TopicExConfig.QUEUE_TO_COMMUNITY + "." +facilityEntity.getCommunityId(), JSON.toJSONString(facilityEntity));
+			rabbitTemplate.convertAndSend(PropertyTopicNameEntity.exTopicToCommunity, PropertyTopicNameEntity.queueToCommunity + "." +facilityEntity.getCommunityId(), JSON.toJSONString(facilityEntity));
 		}
 	}
 	
@@ -175,7 +175,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		map.put("idList",idList);
 		map.put("communityId",communityId);
 		map.put("act",PropertyConsts.ACT_HK_CAMERA);
-		rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_TO_COMMUNITY, TopicExConfig.QUEUE_TO_COMMUNITY + "." + communityId, JSON.toJSONString(map));
+		rabbitTemplate.convertAndSend(PropertyTopicNameEntity.exTopicToCommunity, PropertyTopicNameEntity.queueToCommunity + "." + communityId, JSON.toJSONString(map));
 	}
 	
 	@Override
@@ -262,7 +262,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 		map.put("userList",userList);
 		map.put("op","sync");
 		map.put("act",PropertyConsts.ACT_HK_CAMERA);
-		rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_TO_COMMUNITY,TopicExConfig.QUEUE_TO_COMMUNITY + "." + communityId, JSON.toJSONString(map));
+		rabbitTemplate.convertAndSend(PropertyTopicNameEntity.exTopicToCommunity, PropertyTopicNameEntity.queueToCommunity + "." + communityId, JSON.toJSONString(map));
 	}
 
 

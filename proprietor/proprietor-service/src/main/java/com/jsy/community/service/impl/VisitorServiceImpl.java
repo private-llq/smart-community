@@ -6,10 +6,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.config.ProprietorTopicNameEntity;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.dto.face.xu.XUFaceVisitorEditPersonDTO;
 import com.jsy.community.entity.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
@@ -18,6 +20,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.vo.VisitorEntryVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
@@ -37,6 +40,7 @@ import java.util.*;
  * @author chq459799974
  * @since 2020-11-11
  */
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_proprietor)
 public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity> implements IVisitorService {
 
@@ -75,7 +79,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         int insert = visitorMapper.insert(visitorEntity);
 
         //把访客登记数据推送给小区
-        rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_VISITOR_TO_COMMUNITY,TopicExConfig.QUEUE_VISITOR_TO_COMMUNITY + "." + visitorEntity.getCommunityId(),JSON.toJSONString(visitorEntity));
+        rabbitTemplate.convertAndSend(ProprietorTopicNameEntity.exTopicVisitorToCommunity,ProprietorTopicNameEntity.queueVisitorToCommunity,JSON.toJSONString(visitorEntity));
 
         //社区二维码权限，需要生成二维码 (演示版本，只有一个机器，分小区没分机器)
         if(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCommunityAccess())){
@@ -117,7 +121,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     **/
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public VisitorEntryVO addVisitor(VisitorEntity visitorEntity){
+    public VisitorEntryVO appAddVisitor(VisitorEntity visitorEntity){
         long visitorId = SnowFlake.nextId();
         visitorEntity.setId(visitorId);
         int insert = visitorMapper.insert(visitorEntity);
@@ -175,7 +179,12 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
 //        }
         
         //把访客登记数据推送给小区
-        rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_VISITOR_TO_COMMUNITY,TopicExConfig.QUEUE_VISITOR_TO_COMMUNITY + "." + visitorEntity.getCommunityId(),JSON.toJSONString(visitorEntity));
+        log.info("发送消息到队列{}", ProprietorTopicNameEntity.topicFaceXuServer);
+        XUFaceVisitorEditPersonDTO xuFaceEditPersonDTO = new XUFaceVisitorEditPersonDTO();
+        xuFaceEditPersonDTO.setOperator("addVisitor");
+        xuFaceEditPersonDTO.setCommunityId(String.valueOf(visitorEntity.getCommunityId()));
+        xuFaceEditPersonDTO.setVisitorEntity(visitorEntity);
+        rabbitTemplate.convertAndSend(ProprietorTopicNameEntity.exFaceXu,ProprietorTopicNameEntity.topicFaceXuServer,JSON.toJSONString(xuFaceEditPersonDTO));
         
         //社区二维码权限，需要生成二维码 (演示版本，只有一个机器，分小区没分机器)
         if(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCommunityAccess())
