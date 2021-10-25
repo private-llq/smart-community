@@ -2,7 +2,7 @@
 #  main:
 #    allow-bean-definition-overriding: true
 #  application:
-#    name: facility-web
+#    name: tx-manager
 #  profiles:
 #    active: dev
 #  cloud:
@@ -19,19 +19,23 @@
 #          data-id: common-web-fixed.yaml
 #          refresh: true
 #        extension-configs[1]:
+#          data-id: common-service-fixed.yaml
+#          refresh: true
+#        extension-configs[2]:
 #          data-id: common.yaml
 #          refresh: true
+
 #配置中心的地址
 spring:
   main:
     allow-bean-definition-overriding: true
   application:
-    name: facility-web
+    name: gateway-service
   cloud:
     config:
       uri: http://localhost:2020 #zuul要从配置中心拉取文件
       #你要拉取具体的哪个配置文件
-      name: facility-web,common,common-web  #配置文件名字   dev是环境
+      name: gateway-service  #配置文件名字   dev是环境
       profile: dev #环境  组成完整的文件名：gateway-service-dev.yml
       label: master #主分支
 
@@ -42,7 +46,7 @@ eureka:
       defaultZone: http://localhost:1010/eureka/ #注册中心地址
   instance:
     prefer-ip-address: true #使用ip地址注册
-    instance-id: facility-web:9001  #指定服务的id
+    instance-id: gateway-service:9527  #指定服务的id
 #服务调用
 dubbo:
   registry:
@@ -54,15 +58,10 @@ dubbo:
   application:
     name: ${spring.application.name}
   cloud:
-    subscribed-services: facility-service
+    subscribed-services: gateway-service
   consumer:
     retries: 0
     timeout: 99999
   provider:
     retries: 0
     timeout: 99999
-jsy:
-  redis:
-    annotation:
-      # 当前模块@Cacheable 缓存的数据的超时时间/s
-      cacheTimeout: 1800

@@ -3,13 +3,13 @@ package com.jsy.community;
 import com.codingapi.txlcn.tm.config.EnableTransactionManagerServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.context.ApplicationPidFileWriter;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 
 @SpringBootApplication
 //@SpringBootApplication(exclude= {DataSourceAutoConfiguration.class})
 @EnableTransactionManagerServer
+@EnableDiscoveryClient
 //@ComponentScan(value = "com.jsy.community", excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {RedisConfig.class}))
 public class TxManagerApplication {
 

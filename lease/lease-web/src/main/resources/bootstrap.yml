@@ -1,32 +1,57 @@
+#spring:
+#  main:
+#    allow-bean-definition-overriding: true
+#  application:
+#    name: lease-web
+#  profiles:
+#    active: dev
+#  cloud:
+#    nacos:
+#      # 服务发现
+#      discovery:
+#        server-addr: 127.0.0.1:8848
+#      # 配置中心
+#      config:
+#        server-addr: 127.0.0.1:8848
+#        file-extension: yaml
+#        # 全部服务提供模块固定不变的配置，比如mybatis plus配置，三方登录配置，
+#        extension-configs[0]:
+#          data-id: common-web-fixed.yaml
+#          refresh: true
+#        extension-configs[1]:
+#          data-id: common.yaml
+#          refresh: true
+#  thymeleaf:
+#    prefix: classpath:/templates/
+
+#配置中心的地址
 spring:
+  thymeleaf:
+    prefix: classpath:/templates/
   main:
     allow-bean-definition-overriding: true
   application:
     name: lease-web
-  profiles:
-    active: dev
   cloud:
-    nacos:
-      # 服务发现
-      discovery:
-        server-addr: 127.0.0.1:8848
-      # 配置中心
-      config:
-        server-addr: 127.0.0.1:8848
-        file-extension: yaml
-        # 全部服务提供模块固定不变的配置，比如mybatis plus配置，三方登录配置，
-        extension-configs[0]:
-          data-id: common-web-fixed.yaml
-          refresh: true
-        extension-configs[1]:
-          data-id: common.yaml
-          refresh: true
-  thymeleaf:
-    prefix: classpath:/templates/
+    config:
+      uri: http://localhost:2020 #zuul要从配置中心拉取文件
+      #你要拉取具体的哪个配置文件
+      name: lease-web,common,common-web  #配置文件名字   dev是环境
+      profile: dev #环境  组成完整的文件名：gateway-service-dev.yml
+      label: master #主分支
 
+#服务发现
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:1010/eureka/ #注册中心地址
+  instance:
+    prefer-ip-address: true #使用ip地址注册
+    instance-id: lease-web:8001  #指定服务的id
+#服务调用
 dubbo:
   registry:
-    address: nacos://127.0.0.1:8848
+    address: spring-cloud://localhost
     use-as-metadata-center: false
   protocol:
     name: dubbo

@@ -60,10 +60,18 @@
         <kaptcha.version>0.0.9</kaptcha.version>
         <aliyun-oss.version>3.10.2</aliyun-oss.version>
         <spring.rabbitmq.version>2.3.2.RELEASE</spring.rabbitmq.version>
+        <spring-cloud.version>Hoxton.SR9</spring-cloud.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <!-- web -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
