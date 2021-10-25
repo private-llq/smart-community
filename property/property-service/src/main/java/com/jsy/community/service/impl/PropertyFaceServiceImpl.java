@@ -6,11 +6,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.api.PropertyFaceService;
-import com.jsy.community.config.TopicExConfig;
+import com.jsy.community.config.PropertyTopicNameEntity;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
 import com.jsy.community.entity.CommunityHardWareEntity;
-import com.jsy.community.entity.UserFaceSyncRecordEntity;
 import com.jsy.community.entity.property.PropertyFaceEntity;
 import com.jsy.community.entity.property.PropertyFaceSyncRecordEntity;
 import com.jsy.community.mapper.CommunityHardWareMapper;
@@ -114,7 +113,7 @@ public class PropertyFaceServiceImpl extends ServiceImpl<PropertyFaceMapper, Pro
             xuFaceEditPersonDTO.setCustomId(faceEntity.getMobile());
             xuFaceEditPersonDTO.setHardwareIds(hardwareIds);
             xuFaceEditPersonDTO.setCommunityId(String.valueOf(communityId));
-            rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, JSON.toJSONString(xuFaceEditPersonDTO));
+            rabbitTemplate.convertAndSend(PropertyTopicNameEntity.exFaceXu, PropertyTopicNameEntity.topicFaceXuServer, JSON.toJSONString(xuFaceEditPersonDTO));
         }
         return updateById;
     }
@@ -157,7 +156,7 @@ public class PropertyFaceServiceImpl extends ServiceImpl<PropertyFaceMapper, Pro
             xuFaceEditPersonDTO.setCustomId(faceEntity.getMobile());
             xuFaceEditPersonDTO.setHardwareIds(hardwareIds);
             xuFaceEditPersonDTO.setCommunityId(String.valueOf(communityId));
-            rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, JSON.toJSONString(xuFaceEditPersonDTO));
+            rabbitTemplate.convertAndSend(PropertyTopicNameEntity.exFaceXu, PropertyTopicNameEntity.topicFaceXuServer, JSON.toJSONString(xuFaceEditPersonDTO));
         }
         return updateById;
     }
@@ -235,7 +234,7 @@ public class PropertyFaceServiceImpl extends ServiceImpl<PropertyFaceMapper, Pro
                 xuFaceEditPersonDTO.setCustomId(faceEntity.getMobile());
                 xuFaceEditPersonDTO.setHardwareIds(hardwareIds);
                 xuFaceEditPersonDTO.setCommunityId(String.valueOf(communityId));
-                rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, JSON.toJSONString(xuFaceEditPersonDTO));
+                rabbitTemplate.convertAndSend(PropertyTopicNameEntity.exFaceXu, PropertyTopicNameEntity.topicFaceXuServer, JSON.toJSONString(xuFaceEditPersonDTO));
             }
         }
         return result;

@@ -23,7 +23,7 @@ import java.util.Map;
 @Component
 public class TopicListener {
 	
-//	@RabbitListener(queues = TopicExConfig.QUEUE_VISITOR_HIS_FROM_COMMUNITY)
+//	@RabbitListener(queues = TopicNameEntity.queueVisitorHisFromCommunity)
 //	public void syncVisitorHistory(String msg, Message message, Channel channel) throws IOException {
 //		log.info("监听到访客进出记录定时同步消息: " + msg);
 //		try {

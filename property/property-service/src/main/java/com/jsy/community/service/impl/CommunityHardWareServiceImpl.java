@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
-import com.jsy.community.config.TopicExConfig;
+import com.jsy.community.config.PropertyTopicNameEntity;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
 import com.jsy.community.mapper.CommunityHardWareMapper;
@@ -288,8 +288,8 @@ public class CommunityHardWareServiceImpl extends ServiceImpl<CommunityHardWareM
         pushMap.put("info", personDTOS);
         // 用于小区检查监听队列是否正确
         pushMap.put("communityId", communityId);
-        log.info("发送消息到队列{}", TopicExConfig.DELAY_FACE_XU_SERVER + "." + communityId);
-        rabbitTemplate.convertAndSend(TopicExConfig.DELAY_EX_FACE_XU, TopicExConfig.DELAY_FACE_XU_SERVER, pushMap.toString(), new MessagePostProcessor() {
+        log.info("发送消息到队列{}", PropertyTopicNameEntity.delayFaceXuServer + "." + communityId);
+        rabbitTemplate.convertAndSend(PropertyTopicNameEntity.delayExFaceXu, PropertyTopicNameEntity.delayFaceXuServer, pushMap.toString(), new MessagePostProcessor() {
             @Override
             public Message postProcessMessage(Message message) throws AmqpException {
                 message.getMessageProperties().setHeader("x-delay",60000 * 3 * (times + 1));

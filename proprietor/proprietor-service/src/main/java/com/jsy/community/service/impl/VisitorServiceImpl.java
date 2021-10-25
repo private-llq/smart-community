@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
+import com.jsy.community.config.ProprietorTopicNameEntity;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
@@ -78,7 +79,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         int insert = visitorMapper.insert(visitorEntity);
 
         //把访客登记数据推送给小区
-        rabbitTemplate.convertAndSend(TopicExConfig.EX_TOPIC_VISITOR_TO_COMMUNITY,TopicExConfig.QUEUE_VISITOR_TO_COMMUNITY,JSON.toJSONString(visitorEntity));
+        rabbitTemplate.convertAndSend(ProprietorTopicNameEntity.exTopicVisitorToCommunity,ProprietorTopicNameEntity.queueVisitorToCommunity,JSON.toJSONString(visitorEntity));
 
         //社区二维码权限，需要生成二维码 (演示版本，只有一个机器，分小区没分机器)
         if(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCommunityAccess())){
@@ -178,12 +179,12 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
 //        }
         
         //把访客登记数据推送给小区
-        log.info("发送消息到队列{}", TopicExConfig.TOPIC_FACE_XU_SERVER);
+        log.info("发送消息到队列{}", ProprietorTopicNameEntity.topicFaceXuServer);
         XUFaceVisitorEditPersonDTO xuFaceEditPersonDTO = new XUFaceVisitorEditPersonDTO();
         xuFaceEditPersonDTO.setOperator("addVisitor");
         xuFaceEditPersonDTO.setCommunityId(String.valueOf(visitorEntity.getCommunityId()));
         xuFaceEditPersonDTO.setVisitorEntity(visitorEntity);
-        rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU,TopicExConfig.TOPIC_FACE_XU_SERVER,JSON.toJSONString(xuFaceEditPersonDTO));
+        rabbitTemplate.convertAndSend(ProprietorTopicNameEntity.exFaceXu,ProprietorTopicNameEntity.topicFaceXuServer,JSON.toJSONString(xuFaceEditPersonDTO));
         
         //社区二维码权限，需要生成二维码 (演示版本，只有一个机器，分小区没分机器)
         if(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCommunityAccess())

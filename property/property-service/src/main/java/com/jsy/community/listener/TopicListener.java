@@ -2,7 +2,6 @@ package com.jsy.community.listener;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.*;
-import com.jsy.community.config.TopicExConfig;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -37,7 +36,7 @@ public class TopicListener {
 	private StrangerRecordService strangerRecordService;
 
 	//监听来自小区的访客记录新增需求
-	@RabbitListener(queues = TopicExConfig.QUEUE_VISITOR_HIS_FROM_COMMUNITY)
+	@RabbitListener(queues = "${rabbit-mq-name.topicFaceXuClient}")
 	public void addVisitorRecord(String msg, Message message, Channel channel) throws IOException {
 		log.info("监听到来自小区的访客进出记录新增topic消息");
 		try {
@@ -67,7 +66,7 @@ public class TopicListener {
 	/**
 	 * 小区消息监听
 	 */
-	@RabbitListener(queues = TopicExConfig.QUEUE_FROM_COMMUNITY)
+	@RabbitListener(queues = "${rabbit-mq-name.queueFromCommunity}")
 	public void msgFromCommunity(String mapStr, Message message, Channel channel) throws IOException {
 		log.info("监听到小区消息: \n" + mapStr);
 		try {
@@ -108,7 +107,7 @@ public class TopicListener {
 	 * @return: void
 	 * @date: 2021/8/18 17:36
 	 **/
-	@RabbitListener(queues = TopicExConfig.TOPIC_FACE_XU_CLIENT)
+	@RabbitListener(queues = "${rabbit-mq-name.topicFaceXuClient}")
 	public void listeningToOnlineStatus(String mapStr, Message message, Channel channel) throws IOException  {
 		try {
 			log.info("监听到小区设备状态消息: {}", mapStr);

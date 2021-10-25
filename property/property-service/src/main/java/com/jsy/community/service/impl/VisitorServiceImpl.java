@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.PropertyUserService;
 import com.jsy.community.api.IVisitorService;
-import com.jsy.community.config.TopicExConfig;
+import com.jsy.community.config.PropertyTopicNameEntity;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.dto.face.xu.XUFaceVisitorEditPersonDTO;
@@ -327,8 +327,8 @@ public class VisitorServiceImpl implements IVisitorService {
 					xuFaceEditPersonDTO.setPicURI(visitorEntity.getFaceUrl());
 				}
 				// =================================== 向队列发送同步消息 =============================================
-				log.info("发送消息到队列{}", TopicExConfig.TOPIC_FACE_XU_SERVER);
-				rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, JSON.toJSONString(xuFaceEditPersonDTO));
+				log.info("发送消息到队列{}", PropertyTopicNameEntity.topicFaceXuServer);
+				rabbitTemplate.convertAndSend(PropertyTopicNameEntity.exFaceXu, PropertyTopicNameEntity.topicFaceXuServer, JSON.toJSONString(xuFaceEditPersonDTO));
 			}
 		}
 		/*if (!StringUtils.isEmpty(visitorEntity.getFaceUrl()) && resultNum > 0) {
@@ -363,8 +363,8 @@ public class VisitorServiceImpl implements IVisitorService {
 				xuFaceEditPersonDTO.setHardwareIds(facilityIds);
 				xuFaceEditPersonDTO.setCommunityId(String.valueOf(visitorEntity.getCommunityId()));
 				xuFaceEditPersonDTO.setOperator("editPerson");
-				log.info("发送消息到队列{}", TopicExConfig.TOPIC_FACE_XU_SERVER + "." + visitorEntity.getCommunityId());
-				rabbitTemplate.convertAndSend(TopicExConfig.EX_FACE_XU, TopicExConfig.TOPIC_FACE_XU_SERVER, JSON.toJSONString(xuFaceEditPersonDTO));
+				log.info("发送消息到队列{}", TopicNameEntity.topicFaceXuServer + "." + visitorEntity.getCommunityId());
+				rabbitTemplate.convertAndSend(TopicNameEntity.exFaceXu, TopicNameEntity.topicFaceXuServer, JSON.toJSONString(xuFaceEditPersonDTO));
 			}
 		}*/
 		return resultNum;
