@@ -43,6 +43,7 @@ public class RedisUtils {
 	**/
 	public void setUserToken(String token, SysUserEntity sysUserEntity){
 		stringRedisTemplate.opsForValue().set("Sys:Login:" + token, JSON.toJSONString(sysUserEntity), loginExpireHour, TimeUnit.HOURS);
+		stringRedisTemplate.opsForValue().set("Sys:LoginAccount:" + sysUserEntity.getMobile(), token, loginExpireHour, TimeUnit.HOURS);
 	}
 	
 	/**
