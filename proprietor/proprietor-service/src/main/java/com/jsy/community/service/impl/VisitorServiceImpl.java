@@ -147,6 +147,10 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     public VisitorEntryVO appAddVisitor(VisitorEntity visitorEntity){
         long visitorId = SnowFlake.nextId();
         visitorEntity.setId(visitorId);
+        if (visitorEntity.getTempCodeStatus() == 1) {
+            visitorEntity.setStartTime(LocalDateTime.now());
+            visitorEntity.setEndTime(LocalDateTime.now().plusMinutes(visitorEntity.getEffectiveTime()));
+        }
         int insert = visitorMapper.insert(visitorEntity);
         if(1 != insert){
             throw new ProprietorException(JSYError.INTERNAL.getCode(),"访客登记 新增失败");

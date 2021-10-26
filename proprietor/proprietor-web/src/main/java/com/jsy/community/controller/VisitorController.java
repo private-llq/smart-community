@@ -6,6 +6,7 @@ import com.jsy.community.api.IVisitingCarService;
 import com.jsy.community.api.IVisitorPersonService;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.constant.BusinessConst;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.VisitingCarEntity;
 import com.jsy.community.entity.VisitorEntity;
@@ -90,6 +91,7 @@ public class VisitorController {
 			visitorEntity.setCarAlternativePaymentStatus(0);
 		}
 		visitorEntity.setUid(UserUtils.getUserId());
+		visitorEntity.setTempCodeStatus(0);
 		return CommonResult.ok(visitorService.appAddVisitor(visitorEntity),"操作成功");
 	}
 
@@ -326,6 +328,22 @@ public class VisitorController {
 		ValidatorUtils.validateEntity(visitorEntity, VisitorEntity.queryVisitorCarValidate.class);
 		visitorEntity.setUid(UserUtils.getUserId());
 		return CommonResult.ok(visitorService.queryVisitorCar(visitorEntity));
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 生成临时通行二维码
+	 * @param visitorEntity:
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/10/26 16:19
+	 **/
+	@PostMapping("/v2/addTempCode")
+	public CommonResult addTempCode(@RequestBody VisitorEntity visitorEntity) {
+		ValidatorUtils.validateEntity(visitorEntity, VisitorEntity.addTempCodeValidate.class);
+		visitorEntity.setUid(UserUtils.getUserId());
+		visitorEntity.setTempCodeStatus(1);
+		visitorEntity.setIsCommunityAccess(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode());
+		return CommonResult.ok(visitorService.appAddVisitor(visitorEntity),"操作成功");
 	}
 
 }

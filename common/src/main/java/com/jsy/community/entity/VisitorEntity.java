@@ -35,7 +35,7 @@ public class VisitorEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "社区ID")
-    @NotNull(groups = {queryVisitorCarValidate.class, addVisitorValidate.class}, message = "缺少社区ID")
+    @NotNull(groups = {queryVisitorCarValidate.class, addVisitorValidate.class, addTempCodeValidate.class}, message = "缺少社区ID")
     private Long communityId;
 
     @ApiModelProperty(value = "楼栋ID")
@@ -118,6 +118,13 @@ public class VisitorEntity extends BaseEntity {
     // 人脸图片地址
     private String faceUrl;
 
+    // 临时通行码有效时间
+    @NotNull(groups = {addTempCodeValidate.class}, message = "临时通行码有效时间不能为空")
+    private Integer effectiveTime;
+
+    // 是否是临时通行码;0:不是;1是;
+    private Integer tempCodeStatus;
+
     @ApiModelProperty(value = "来访事由名")
     @TableField(exist = false)
     private String reasonStr;
@@ -172,5 +179,8 @@ public class VisitorEntity extends BaseEntity {
 
     // 查询邀请过的车俩验证组
     public interface queryVisitorCarValidate{}
+
+    // 生成临时通行二维码验证组
+    public interface addTempCodeValidate{}
 
 }
