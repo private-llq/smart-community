@@ -35,7 +35,7 @@ public class VisitorEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "社区ID")
-    @NotNull(message = "缺少社区ID")
+    @NotNull(groups = {queryVisitorCarValidate.class, addVisitorValidate.class}, message = "缺少社区ID")
     private Long communityId;
 
     @ApiModelProperty(value = "楼栋ID")
@@ -92,6 +92,9 @@ public class VisitorEntity extends BaseEntity {
 
     @ApiModelProperty(value = "来访车辆车牌", hidden = true)
     private String carPlate;
+
+    // 车费代缴状态;0:不代缴;1:代缴
+    private Integer carAlternativePaymentStatus;
 
     @ApiModelProperty(value = "来访车辆类型 1.微型车 2.小型车 3.紧凑型车 4.中型车 5.中大型车 6.其他车型", hidden = true)
     private Integer carType;
@@ -163,5 +166,8 @@ public class VisitorEntity extends BaseEntity {
     private String checkStatusStr;
 
     public interface addVisitorValidate{}
+
+    // 查询邀请过的车俩验证组
+    public interface queryVisitorCarValidate{}
 
 }

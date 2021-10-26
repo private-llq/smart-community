@@ -20,6 +20,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.qo.proprietor.VisitorQO;
 import com.jsy.community.vo.VisitorEntryVO;
+import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -27,7 +28,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -113,6 +113,28 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     }
 
     /**
+     * @param visitorEntity :
+     * @author: Pipi
+     * @description: 查询邀请过的车辆列表
+     * @return: java.util.List<com.jsy.community.entity.VisitorEntity>
+     * @date: 2021/10/26 11:41
+     **/
+    @Override
+    public List<VisitorEntity> queryVisitorCar(VisitorEntity visitorEntity) {
+        QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("car_plate, car_alternative_payment_status");
+        queryWrapper.eq("community_id", visitorEntity.getCommunityId());
+        queryWrapper.eq("uid", visitorEntity.getUid());
+        if (!StringUtil.isNullOrEmpty(visitorEntity.getCarPlate())) {
+            queryWrapper.like("car_plate", visitorEntity.getCarPlate());
+            queryWrapper.last("order by create_time desc limit 5");
+        } else {
+            queryWrapper.last("order by create_time desc limit 3");
+        }
+        return visitorMapper.selectList(queryWrapper);
+    }
+
+    /**
     * @Description: 访客登记 新增
      * @Param: [visitorEntity]
      * @Return: void
@@ -128,7 +150,8 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         if(1 != insert){
             throw new ProprietorException(JSYError.INTERNAL.getCode(),"访客登记 新增失败");
         }
-        //添加随行人员记录
+        // ================================== 这部分业务逻辑现在不涉及start ======================================
+        /*//添加随行人员记录
         List<VisitorPersonRecordEntity> personRecordList = visitorEntity.getVisitorPersonRecordList();
         if (!CollectionUtils.isEmpty(personRecordList)) {
             for (VisitorPersonRecordEntity personRecord : personRecordList) {
@@ -171,22 +194,23 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
                 carRecord.setId(SnowFlake.nextId());
             }
             addCarBatch(carRecordList);
-        }
+        }*/
+        // ================================== 这部分业务逻辑现在不涉及end ======================================
+
         //0是无权限 小区和楼栋都是0 则不需要后续操作
 //        if((visitorEntity.getIsCommunityAccess() != null && visitorEntity.getCommunityId() != 0)
 //           || (visitorEntity.getIsBuildingAccess() != null && visitorEntity.getIsBuildingAccess() != 0)){
 //           return getVisitorEntry(visitorEntity);// 返回门禁权限VO
 //        }
         
-        //把访客登记数据推送给小区
+        // 把访客登记数据推送给小区
         log.info("发送消息到队列{}", ProprietorTopicNameEntity.topicFaceXuServer);
         XUFaceVisitorEditPersonDTO xuFaceEditPersonDTO = new XUFaceVisitorEditPersonDTO();
         xuFaceEditPersonDTO.setOperator("addVisitor");
         xuFaceEditPersonDTO.setCommunityId(String.valueOf(visitorEntity.getCommunityId()));
         xuFaceEditPersonDTO.setVisitorEntity(visitorEntity);
         rabbitTemplate.convertAndSend(ProprietorTopicNameEntity.exFaceXu,ProprietorTopicNameEntity.topicFaceXuServer,JSON.toJSONString(xuFaceEditPersonDTO));
-        
-        //社区二维码权限，需要生成二维码 (演示版本，只有一个机器，分小区没分机器)
+
         if(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCommunityAccess())
             || BusinessEnum.BuildingAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCarBanAccess())){
             //小区是否有二维码设备(目前只用炫优一体机判断)
