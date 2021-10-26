@@ -369,11 +369,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
         CarEntity carEntity = carMapper.selectById(entity.getCarId());
         if (carEntity!=null){
-            if (carEntity.getOverTime().isBefore(LocalDateTime.now())){
-                carEntity.setOverTime(LocalDateTime.now().plusMonths(entity.getMonth()));
-            } else {
-                carEntity.setOverTime(carEntity.getOverTime().plusMonths(entity.getMonth()));
-            }
+            carEntity.setOverTime(carEntity.getOverTime().plusMonths(entity.getMonth()));
             carMapper.updateById(carEntity);
 
 
