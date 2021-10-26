@@ -1,21 +1,27 @@
 package com.jsy.community.controller;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.nacos.common.utils.UuidUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.ICarMonthlyVehicleService;
+import com.jsy.community.api.ICarPositionService;
+import com.jsy.community.api.ICarPositionTypeService;
 import com.jsy.community.api.*;
 import com.jsy.community.config.ExcelListener;
 import com.jsy.community.config.ExcelUtils;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderEntity;
+import com.jsy.community.entity.property.CarCutOffEntity;
+import com.jsy.community.entity.property.CarEquipmentManageEntity;
+import com.jsy.community.entity.property.CarPositionEntity;
+import com.jsy.community.entity.property.CarPositionTypeEntity;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.qo.property.*;
-import com.jsy.community.util.CarOperation;
-import com.jsy.community.util.Crc16Util;
-import com.jsy.community.util.HttpClientHelper;
-import com.jsy.community.util.OrderNoUtil;
+import com.jsy.community.util.*;
 import com.jsy.community.utils.MD5Util;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.SnowFlake;
@@ -30,16 +36,17 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.annotation.OrderUtils;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import javax.websocket.server.ServerEndpoint;
+import java.io.*;
+import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -861,6 +868,86 @@ public class CarPositionController {
 
         }
     }
+    @ApiOperation("心跳")
+    @RequestMapping(value = "/test1", method = RequestMethod.POST)
+    public void carBeforeRecord(@RequestParam Map<String, Object> body
+            , HttpServletResponse response, HttpServletRequest request) throws IOException {
+        System.out.println(body.get("type")+"-----type类型");
+        CarVO carVO = getType(body);
+
+        response.setStatus(200);
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("application/json; charset=utf-8");
+        response.setContentLength(carVO.toString().length());
+        PrintWriter writer = response.getWriter();
+        System.out.println("\n\nJSON\n"+JSONArray.toJSON(carVO).toString());
+        writer.write(JSONArray.toJSON(carVO).toString());
+        writer.flush();
+        writer.close();
+    }
+
+    public CarVO getType(Map<String, Object> body){
+        CarVO carVO = new CarVO();
+        carVO.setError_num(0);
+        carVO.setError_str("noerror");
+        carVO.setPasswd("123456");
+        ArrayList<Rs485Data> list = new ArrayList<>();
+        Rs485Data e2 = new Rs485Data();
+
+        CarIdentifyEntity entity = JSON.parseObject(JSON.toJSONString(body), CarIdentifyEntity.class);
+        System.out.println("\nentity\n"+entity);
+        String type = entity.getType();
+        //推送例子为识别结果
+        if (type.equals("online")){
+            e2.setEncodetype("hex2string");
+            e2.setData( Crc16Util.getUltimatelyValue2("渝A5486C","00",type));//一路顺风  语音0064FFFF300901D2BBC2B7CBB3B7E79F40
+            list.add(e2);
+
+        }else {
+            e2.setEncodetype("hex2string");
+            e2.setData( Crc16Util.getUltimatelyValue2("余位999个","00",type));//一路顺风  语音0064FFFF300901D2BBC2B7CBB3B7E79F40
+            list.add(e2);
+
+            e2.setEncodetype("hex2string");
+            e2.setData( Crc16Util.getUltimatelyValue2("您还未缴费，请缴费在通行","01",type));//一路顺风  语音0064FFFF300901D2BBC2B7CBB3B7E79F40
+            list.add(e2);
+        }
+
+
+            carVO.setRs485_data(list);
+           return carVO;
+
+    }
+
+
+
+
+//    @ApiOperation("云平台")
+//    @RequestMapping(value = "/test2", method = RequestMethod.POST)
+
+
+//    public void carBeforeRecord(@RequestParam("mode") Integer mode,//mode 协议模式，数字表示 模式 5 以上才有此字段
+//                                @RequestParam("park_id") String parkId,//车场 ID，最大支持 60 个字符
+//                                @RequestParam("cam_id") String camId,//车场 ID，最大支持 60 个字符
+//                                @RequestParam("cam_ip") String camIp,//车场 ID，最大支持 60 个字符
+//                                @RequestParam("cmd") String cmd,//devreg 表示设备注册
+//                                @RequestParam("msg_id") String msgId,//devreg 表示设备注册
+//                                @RequestParam("utc_ts") Integer utcTs,//devreg 表示设备注册
+//                                @RequestParam("local_ts") Integer localTs,//devreg 表示设备注册
+//                                @RequestParam("local_time") String localTime,//devreg 表示设备注册
+//                                @RequestParam("version") String version//devreg 表示设备注册
+//
+//
+//
+//
+//            , HttpServletResponse response, HttpServletRequest request) throws IOException {
+//        System.out.println(localTs+"    localts");
+//        System.out.println(cmd +"      cmd");
+//        System.out.println(mode);
+//        System.out.println(parkId);
+//        System.out.println(camId);
+//        System.out.println(camIp);
+//    }
 
     //包月车辆剩余天数
     private Long extracted(String plateNum, String plateColor, Long CommunityId) {
