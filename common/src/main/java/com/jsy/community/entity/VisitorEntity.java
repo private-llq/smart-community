@@ -165,6 +165,9 @@ public class VisitorEntity extends BaseEntity {
     @TableField(exist = false)
     private String checkStatusStr;
 
+    // 邀请过期状态;0:未过期;1已过期;
+    private Integer expireStatus;
+
     public interface addVisitorValidate{}
 
     // 查询邀请过的车俩验证组

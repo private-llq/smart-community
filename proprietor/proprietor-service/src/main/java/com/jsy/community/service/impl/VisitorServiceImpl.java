@@ -30,6 +30,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -468,12 +469,20 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     **/
     @Override
     public VisitorEntity selectOneById(Long id){
-        VisitorEntity VisitorEntity = visitorMapper.selectOne(new QueryWrapper<VisitorEntity>().select("*").eq("id", id));
-        VisitorEntity.setReasonStr(BusinessEnum.VisitReasonEnum.visitReasonMap.get(VisitorEntity.getReason()));
-        VisitorEntity.setCarTypeStr(BusinessEnum.CarTypeEnum.CAR_TYPE_MAP.get(VisitorEntity.getCarType()));
-        VisitorEntity.setIsCommunityAccessStr(BusinessEnum.CommunityAccessEnum.communityAccessMap.get(VisitorEntity.getIsCommunityAccess()));
-        VisitorEntity.setIsCarBanAccessStr(BusinessEnum.BuildingAccessEnum.buildingAccessMap.get(VisitorEntity.getIsCarBanAccess()));
-        return VisitorEntity;
+        VisitorEntity visitorEntity = visitorMapper.selectOne(new QueryWrapper<VisitorEntity>().select("*").eq("id", id));
+        if (visitorEntity == null) {
+            return visitorEntity;
+        }
+        visitorEntity.setReasonStr(BusinessEnum.VisitReasonEnum.visitReasonMap.get(visitorEntity.getReason()));
+        visitorEntity.setCarTypeStr(BusinessEnum.CarTypeEnum.CAR_TYPE_MAP.get(visitorEntity.getCarType()));
+        visitorEntity.setIsCommunityAccessStr(BusinessEnum.CommunityAccessEnum.communityAccessMap.get(visitorEntity.getIsCommunityAccess()));
+        visitorEntity.setIsCarBanAccessStr(BusinessEnum.BuildingAccessEnum.buildingAccessMap.get(visitorEntity.getIsCarBanAccess()));
+        if (visitorEntity.getEndTime() != null && visitorEntity.getEndTime().isBefore(LocalDateTime.now())) {
+            visitorEntity.setExpireStatus(1);
+        } else {
+            visitorEntity.setExpireStatus(0);
+        }
+        return visitorEntity;
     }
     
     /**
