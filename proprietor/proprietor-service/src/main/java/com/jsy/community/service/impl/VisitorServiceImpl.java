@@ -7,12 +7,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.config.ProprietorTopicNameEntity;
-import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceVisitorEditPersonDTO;
-import com.jsy.community.entity.*;
+import com.jsy.community.entity.VisitingCarRecordEntity;
+import com.jsy.community.entity.VisitorEntity;
+import com.jsy.community.entity.VisitorPersonRecordEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.CommunityHardWareMapper;
 import com.jsy.community.mapper.VisitingCarRecordMapper;
@@ -36,9 +37,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>

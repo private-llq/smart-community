@@ -139,17 +139,22 @@ public class CarOrderEntity extends BaseEntity {
     private Long minute;
 
     /**
-     * 收费标准
+     * 收费标准xxx/小时
      */
     @TableField(exist = false)
-    private Long expenseRule;
+    private BigDecimal expenseRule;
 
     /**
-     * 收费标准
+     * 多少小时后按天算
      */
-//    @TableField(exist = false)
-//    private Long expenseRule;
+    @TableField(exist = false)
+    private Integer retentionHour;
 
+    /**
+     * 缴费后允许停留留时间
+     */
+    @TableField(exist = false)
+    private Integer retentionMinute;
 
 
     /**

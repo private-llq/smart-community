@@ -190,7 +190,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         List<CarOrderEntity> entities = carMapper.getTemporaryOrder(communityId,userId);
         if (entities.size()!=0) {
             for (CarOrderEntity entity : entities) {
-                entity.setHour(ChronoUnit.HOURS.between(entity.getBeginTime(), entity.getOrderTime()));
+                entity.setMinute(ChronoUnit.MINUTES.between(entity.getBeginTime(), entity.getOrderTime()));
                 entity.setCarTypeText("临时车");
             }
         }
@@ -247,7 +247,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     public CarOrderEntity getTemporaryOrderById(Long id, String userId) {
         CarOrderEntity carOrderEntity = appCarOrderMapper.selectById(id);
-        carOrderEntity.setHour(ChronoUnit.HOURS.between(carOrderEntity.getBeginTime(), carOrderEntity.getOrderTime()));
+        carOrderEntity.setMinute(ChronoUnit.MINUTES.between(carOrderEntity.getBeginTime(), carOrderEntity.getOrderTime()));
         carOrderEntity.setCarTypeText("临时车");
         return carOrderEntity;
     }
