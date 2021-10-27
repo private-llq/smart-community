@@ -34,7 +34,7 @@ public class AliAppPayQO implements Serializable {
 	@ApiModelProperty(value = "支付类型 1.APP 2.H5")
 	private int payType;
 	
-	@ApiModelProperty(value = "交易来源 1.充值提现2.商城购物3.水电缴费4.物业管理5.房屋租金6.红包7.红包退回.8停车缴费.9房屋租赁")
+	@ApiModelProperty(value = "交易来源 1.充值提现2.商城购物3.水电缴费4.物业管理5.房屋租金6.红包7.红包退回.8停车缴费.9房屋租赁.10临时车辆缴费")
 	@NotNull(groups = addOrderGroup.class, message = "缺少交易来源")
 	@Range(min = 1, max = 7, message = "缴费类型错误")
 	private Integer tradeFrom;

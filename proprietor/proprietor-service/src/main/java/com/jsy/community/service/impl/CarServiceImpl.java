@@ -210,11 +210,16 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      * @return: void
      */
     @Override
-    public void updateByOrder(String id) {
+    @TxcTransaction
+    public void updateByOrder(String id,BigDecimal total,String outTradeNo) {
         CarOrderEntity carOrderEntity = appCarOrderMapper.selectById(id);
+        String orderNum = getOrderNum(carOrderEntity.getCommunityId().toString());
         if (carOrderEntity != null) {
             carOrderEntity.setPayType(1);
             carOrderEntity.setOrderStatus(1);
+            carOrderEntity.setMoney(total);
+            carOrderEntity.setOverTime(LocalDateTime.now());
+            carOrderEntity.setBillNum(orderNum);
             appCarOrderMapper.updateById(carOrderEntity);
 
             //向账单表添加数据
@@ -227,10 +232,11 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             orderEntity.setCommunityId(carOrderEntity.getCommunityId());
             orderEntity.setOrderTime(LocalDate.now());
             orderEntity.setUid(carOrderEntity.getUid());
-            orderEntity.setPropertyFee(carOrderEntity.getMoney());
-            orderEntity.setOrderNum(getOrderNum(carOrderEntity.getCommunityId().toString()));
+            orderEntity.setPropertyFee(total);
+            orderEntity.setOrderNum(orderNum);
             orderEntity.setOrderStatus(1);
             orderEntity.setPayType(2);
+            orderEntity.setTripartiteOrder(outTradeNo);
             orderEntity.setPayTime(LocalDateTime.now());
             orderEntity.setBeginTime(carOrderEntity.getBeginTime().toLocalDate());
             orderEntity.setOverTime(carOrderEntity.getOverTime().toLocalDate());

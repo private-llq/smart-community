@@ -233,6 +233,9 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 					}
 				}
 				log.info("处理完成");
+			} else if (PaymentEnum.TradeFromEnum.TEMPORARY_CAR_PAYMENT.getIndex().equals(order.getTradeName())) {
+				carService.updateByOrder(order.getServiceOrderNo(),order.getTradeAmount(),orderNo);
+				log.info("处理完成");
 			}
 		}else if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex().equals(order.getTradeType())){  // 提现
 			log.info("开始处理提现订单");
