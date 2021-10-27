@@ -13,6 +13,7 @@ import com.jsy.community.entity.*;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.CarChargeQO;
 import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
@@ -191,7 +192,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         CommunityEntity communityEntity = communityMapper.selectById(communityId);
         if (entities.size()!=0) {
             for (CarOrderEntity entity : entities) {
-                entity.setMinute(ChronoUnit.MINUTES.between(entity.getBeginTime(), entity.getOverTime()));
+//                entity.setMinute(ChronoUnit.MINUTES.between(entity.getBeginTime(), LocalDateTime.now()));
                 entity.setCarTypeText("临时车");
                 entity.setCarPositionText(communityEntity.getName());
             }
@@ -249,6 +250,15 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     public CarOrderEntity getTemporaryOrderById(Long id, String userId) {
         CarOrderEntity carOrderEntity = appCarOrderMapper.selectById(id);
+
+        //设置金额
+        CarChargeQO chargeQO = new CarChargeQO();
+        chargeQO.setCarColor(carOrderEntity.getPlateColor());
+        chargeQO.setCommunityId(String.valueOf(carOrderEntity.getCommunityId()));
+        chargeQO.setInTime(carOrderEntity.getBeginTime());
+        chargeQO.setReTime(LocalDateTime.now());
+        carOrderEntity.setMoney(carChargeService.charge(chargeQO));
+
         CommunityEntity entity = communityMapper.selectById(carOrderEntity.getCommunityId());
         carOrderEntity.setCarPositionText(entity.getName());
         Integer integer = carOrderEntity.getPlateColor()=="黄色"?0:1;
@@ -260,7 +270,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         if (basicsEntity != null) {
             carOrderEntity.setRetentionMinute(basicsEntity.getDwellTime());
         }
-        carOrderEntity.setMinute(ChronoUnit.MINUTES.between(carOrderEntity.getBeginTime(), carOrderEntity.getOverTime()));
+        carOrderEntity.setMinute(ChronoUnit.MINUTES.between(carOrderEntity.getBeginTime(), LocalDateTime.now()));
         carOrderEntity.setRetentionHour(24);
         carOrderEntity.setCarTypeText("临时车");
         return carOrderEntity;

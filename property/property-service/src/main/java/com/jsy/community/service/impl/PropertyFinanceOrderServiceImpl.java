@@ -1841,7 +1841,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      */
     @Override
     public List<PropertyFinanceOrderEntity> FeeOrderList(Long communityId, String uid) {
-        return propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>().eq("uid", uid).eq("community_id", communityId));
+        return propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>().eq("uid", uid).eq("community_id", communityId).eq("order_status",0));
     }
 
     /**
