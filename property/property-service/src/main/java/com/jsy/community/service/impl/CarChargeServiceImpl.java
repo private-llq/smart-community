@@ -445,6 +445,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
      * @return
      */
     @Override
+    @Transactional
     public orderChargeDto orderCharge(Long adminCommunityId, String carNumber) {
 
         orderChargeDto orderChargeDto = new orderChargeDto();
@@ -457,7 +458,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
                 .eq("type", 1)
                 .eq("order_status", 0)
                 .eq("community_id", adminCommunityId));
-        if (list.size()==0){//没有有最近生成的未支付的临时车订单，为包月逾期没有出去的车辆
+        if (list.size()==0){//没有最近生成的未支付的临时车订单，为包月逾期没有出去的车辆
 
             //查询是否是包月逾期的车辆，如果是在这里直接插入一条订单（开始时间为上次包月的结速时间，结束时间为订单支付时间）
             //查询已逾期的车辆（出口方向），逾期按临时停车规则收费
