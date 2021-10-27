@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.qo.proprietor.CarQO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -39,4 +40,13 @@ public interface CarMapper extends BaseMapper<CarEntity> {
      * @param uid           用户id
      */
     void update(CarQO c, String uid);
+
+    /**
+     * @Description: 查询临时账单
+     * @author: Hu
+     * @since: 2021/10/26 15:53
+     * @Param:
+     * @return:
+     */
+    List<CarOrderEntity> getTemporaryOrder(@Param("communityId") Long communityId, @Param("uid") String userId);
 }

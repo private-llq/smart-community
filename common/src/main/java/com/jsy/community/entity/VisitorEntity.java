@@ -118,7 +118,7 @@ public class VisitorEntity extends BaseEntity {
     // 人脸图片地址
     private String faceUrl;
 
-    // 临时通行码有效时间
+    // 临时通行码有效时间分钟数
     @NotNull(groups = {addTempCodeValidate.class}, message = "临时通行码有效时间不能为空")
     private Integer effectiveTime;
 
@@ -173,6 +173,7 @@ public class VisitorEntity extends BaseEntity {
     private String checkStatusStr;
 
     // 邀请过期状态;0:未过期;1已过期;
+    @TableField(exist = false)
     private Integer expireStatus;
 
     public interface addVisitorValidate{}

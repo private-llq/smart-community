@@ -5,6 +5,7 @@ import com.jsy.community.api.PropertyException;
 import javax.management.JMException;
 import java.awt.*;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 /**
@@ -145,7 +146,75 @@ public class Crc16Util {
         } catch (UnsupportedEncodingException e) {
             throw  new PropertyException(500,"机器码异常");
         }
-        String value1 = Crc16Util.getValue("0064FFFF621B001500000015000300FF000000000000000800" + value);
+
+        String value1 = Crc16Util.getValue("0064FFFF6221000100000001000300FF000000000000000E00" + value);
+        return value1;
+    }
+    //文字显示
+    public static String getUltimatelyValue2(String str,String line,String type)  {
+        String value = null;
+        String color = null;
+        int i;
+        try {
+            i= str.getBytes("GBK").length;
+            value = UtilStringTo16GB2312.enUnicode(str);
+        } catch (UnsupportedEncodingException e) {
+            throw  new PropertyException(500,"机器码异常");
+        }
+        System.out.println(i+"i");
+        if (type.equals("online")){
+            color="0100000501000301FF00000000000000";
+        }else {
+            color="0100000001000300FF00000000000000";
+        }
+        //固定参数
+        String head="0064FFFF62";
+        //19+文字长度  16进制
+        String valueLength = Integer.toHexString(i+19);
+        String textLength = Integer.toHexString(i);
+        System.out.println(textLength);
+        System.out.println(valueLength);
+
+        if(i<10){
+            textLength="0"+textLength+"00";
+        }else {
+            textLength=textLength+"00";
+        }
+        String result=head+valueLength+line+color+textLength;
+        // 00控制卡 64固定 FFFFpn包 62cmd命令号 1F长度  01twid窗口身份 15etm进入方式 02ets 05dm慢闪烁 03dt停留时间 15退场方式 00exs扫码周期
+        // 0064FFFF621F011502050315000300FF000000000000000800
+        //03宋体16 00drs无限循环 ff000000tc4  00000000bc4 0800txt长度
+        String value1 = Crc16Util.getValue(result + value);
+        return value1;
+    }
+
+    //语音播放
+    public static String getUltimatelyVoice(String str,String type)  {
+        String value = null;
+        String color = null;
+        int i;
+        try {
+            i= str.getBytes("GBK").length;
+            value = UtilStringTo16GB2312.enUnicode(str);
+        } catch (UnsupportedEncodingException e) {
+            throw  new PropertyException(500,"机器码异常");
+        }
+        if (type.equals("online")){
+            color="01";
+        }else {
+            color="01";
+        }
+        //固定参数
+        String head="0064FFFF30";
+        //1+文字长度  16进制
+        String valueLength = Integer.toHexString(i+1);
+        if(Integer.parseInt(valueLength)<10){
+            valueLength="0"+valueLength;
+        }else {
+            valueLength=valueLength;
+        }
+        String result=head+valueLength+color;
+        String value1 = Crc16Util.getValue(result + value);
         return value1;
     }
 
@@ -165,6 +234,15 @@ public class Crc16Util {
         return  s;
     }
 
+    public static void main(String[] args) {
+//0064FFFF62 1F 000100000001000300FF000000000000000C00CAA3D3E0CCECCAFD303033304B49
+//0064FFFF62 1F 030100000001000300FF00000000000000C00CAA3D3E0CCECCAFD30303335259
+        System.out.println(Crc16Util.getUltimatelyValue2("剩余天数"+"0030", "03","heartb"));
+        //:0064FFFF30 09 01 D3E5413435425237 9073 语音
+        //0064FFFF301101B4CBB3B5CEAABADAC3FBB5A5B3B5C1BE7E9D
+
+//        System.out.println(Crc16Util.getUltimatelyVoice("此车为黑名单车辆", "online"));
+    }
 
 
 

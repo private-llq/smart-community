@@ -7,18 +7,23 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.config.ProprietorTopicNameEntity;
-import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceVisitorEditPersonDTO;
-import com.jsy.community.entity.*;
+import com.jsy.community.entity.VisitingCarRecordEntity;
+import com.jsy.community.entity.VisitorEntity;
+import com.jsy.community.entity.VisitorPersonRecordEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.JSYException;
-import com.jsy.community.mapper.*;
+import com.jsy.community.mapper.CommunityHardWareMapper;
+import com.jsy.community.mapper.VisitingCarRecordMapper;
+import com.jsy.community.mapper.VisitorMapper;
+import com.jsy.community.mapper.VisitorPersonRecordMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.utils.*;
 import com.jsy.community.qo.proprietor.VisitorQO;
+import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.VisitorEntryVO;
 import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +33,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -121,18 +127,38 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
      * @date: 2021/10/26 11:41
      **/
     @Override
-    public List<VisitorEntity> queryVisitorCar(VisitorEntity visitorEntity) {
+    public Set<String> queryVisitorCar(VisitorEntity visitorEntity) {
         QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("car_plate, car_alternative_payment_status");
+        queryWrapper.select("car_plate");
         queryWrapper.eq("community_id", visitorEntity.getCommunityId());
         queryWrapper.eq("uid", visitorEntity.getUid());
+        queryWrapper.isNotNull("car_plate");
+        Set<String> visitorEntitySet = new HashSet<>();
         if (!StringUtil.isNullOrEmpty(visitorEntity.getCarPlate())) {
             queryWrapper.like("car_plate", visitorEntity.getCarPlate());
-            queryWrapper.last("order by create_time desc limit 5");
+            queryWrapper.last("order by create_time");
         } else {
-            queryWrapper.last("order by create_time desc limit 3");
+            queryWrapper.last("order by create_time");
         }
-        return visitorMapper.selectList(queryWrapper);
+        List<VisitorEntity> visitorEntities = visitorMapper.selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(visitorEntities)){
+            if (!StringUtil.isNullOrEmpty(visitorEntity.getCarPlate())) {
+                // 取5条
+                for (VisitorEntity entity : visitorEntities) {
+                    if (visitorEntitySet.size() < 5) {
+                        visitorEntitySet.add(entity.getCarPlate());
+                    }
+                }
+            } else {
+                // 取3条
+                for (VisitorEntity entity : visitorEntities) {
+                    if (visitorEntitySet.size() < 3) {
+                        visitorEntitySet.add(entity.getCarPlate());
+                    }
+                }
+            }
+        }
+        return visitorEntitySet;
     }
 
     /**
@@ -216,18 +242,9 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         xuFaceEditPersonDTO.setVisitorEntity(visitorEntity);
         rabbitTemplate.convertAndSend(ProprietorTopicNameEntity.exFaceXu,ProprietorTopicNameEntity.topicFaceXuServer,JSON.toJSONString(xuFaceEditPersonDTO));
 
-        if(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCommunityAccess())
-            || BusinessEnum.BuildingAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCarBanAccess())){
-            //小区是否有二维码设备(目前只用炫优一体机判断)
-            Integer count = communityHardWareMapper.countCommunityHardWare(visitorEntity.getCommunityId(), BusinessConst.HARDWARE_TYPE_XU_FACE);
-            if(count < 1){
-                return null;
-            }
-            VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
-            visitorEntryVO.setId(visitorEntity.getId());
-            return visitorEntryVO;
-        }
-        return null;
+        VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
+        visitorEntryVO.setId(visitorEntity.getId());
+        return visitorEntryVO;
     }
     
 //    /**

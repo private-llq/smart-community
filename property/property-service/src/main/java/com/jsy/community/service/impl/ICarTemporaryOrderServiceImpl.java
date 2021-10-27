@@ -76,11 +76,10 @@ public class ICarTemporaryOrderServiceImpl extends ServiceImpl<CarOrderMapper, C
            }
        }
 
-        //支付类型 1已支付  2未支付
+        //支付类型 1已支付  0未支付
         if (query.getOrderStatus()!=null){
             queryWrapper.eq("order_status",query.getOrderStatus());
         }
-
         //时间段
         if (query.getBeginTime()!=null  && query.getOverTime()!=null){
             queryWrapper.ge("order_time",query.getBeginTime())
