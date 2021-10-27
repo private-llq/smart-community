@@ -749,8 +749,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      */
 
     public Integer MonthlyOverdue(String carNumber,Long adminCommunityId){
-
-
         //没有未支付的临时车订单，为包月逾期没有出去的车辆
         List<CarOrderEntity> list = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>()
                 .eq("car_plate",carNumber)
