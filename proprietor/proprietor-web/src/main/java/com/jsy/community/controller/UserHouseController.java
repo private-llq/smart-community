@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import cn.hutool.core.util.IdUtil;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IUserHouseService;
@@ -82,6 +83,10 @@ public class UserHouseController {
              }
         }
         return CommonResult.error(1,"房间不存在");
+    }
+
+    public static void main(String[] args) {
+        System.out.println( "0x" + IdUtil.fastSimpleUUID() + IdUtil.fastSimpleUUID());
     }
 
     /**

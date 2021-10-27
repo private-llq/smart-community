@@ -95,7 +95,7 @@ public class CarController {
 	@Login
 	@ApiOperation("查询临时车辆一条账单详情")
 	@GetMapping("getTemporaryOrderById")
-	public CommonResult getTemporaryOrderById(@RequestBody Long id) {
+	public CommonResult getTemporaryOrderById(@RequestParam Long id) {
 		CarOrderEntity carOrderEntity = carService.getTemporaryOrderById(id,UserUtils.getUserId());
 		return CommonResult.ok(carOrderEntity);
 	}

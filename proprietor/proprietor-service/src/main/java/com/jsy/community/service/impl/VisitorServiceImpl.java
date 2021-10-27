@@ -127,7 +127,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
      * @date: 2021/10/26 11:41
      **/
     @Override
-    public Set<String> queryVisitorCar(VisitorEntity visitorEntity) {
+    public List<VisitorEntity> queryVisitorCar(VisitorEntity visitorEntity) {
         QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("car_plate");
         queryWrapper.eq("community_id", visitorEntity.getCommunityId());
@@ -141,6 +141,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
             queryWrapper.last("order by create_time");
         }
         List<VisitorEntity> visitorEntities = visitorMapper.selectList(queryWrapper);
+        List<VisitorEntity> visitorEntityList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(visitorEntities)){
             if (!StringUtil.isNullOrEmpty(visitorEntity.getCarPlate())) {
                 // 取5条
@@ -157,8 +158,14 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
                     }
                 }
             }
+
+            for (String carPlate : visitorEntitySet) {
+                VisitorEntity entity = new VisitorEntity();
+                entity.setCarPlate(carPlate);
+                visitorEntityList.add(entity);
+            }
         }
-        return visitorEntitySet;
+        return visitorEntityList;
     }
 
     /**
@@ -480,7 +487,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         BeanUtils.copyProperties(resultPage,pageInfo);
         return pageInfo;
     }
-    
+
     /**
     * @Description: 根据ID单查访客
      * @Param: [id]

@@ -322,7 +322,7 @@
             </if>
             <!-- 如果查询筛选增加了房源类型条件  精装修、邻地铁之类 使用或运算 判断 存储的进制位是否包含 这个标签code -->
             <if test="query.houseAdvantageId != null">
-                and #{query.houseAdvantageId} | house_advantage_id = house_advantage_id
+                and #{query.houseAdvantageId} = house_advantage_id &amp; 1 &lt;&lt; log(#{query.houseAdvantageId})/log(2)
             </if>
             and ((house_leasemode_id = 2 and lease_status = 0) or house_leasemode_id != 2 )
             and deleted = 0

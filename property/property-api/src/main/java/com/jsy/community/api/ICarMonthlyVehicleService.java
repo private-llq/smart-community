@@ -49,6 +49,8 @@ public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
 
     void issue(String uid, Long adminCommunityId);
 
+    Integer MonthlyOverdue(String carNumber,Long adminCommunityId);
+
     Map selectByStatus(String carNumber, String carColor, Long community_id);
 
     /**

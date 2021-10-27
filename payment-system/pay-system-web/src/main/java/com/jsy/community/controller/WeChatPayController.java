@@ -309,7 +309,7 @@ public class WeChatPayController {
                 //车辆临时缴费
                 if (split[0].equals("10")){
                     //修改车辆临时缴费订单状态
-                    carService.updateByOrder(split[1]);
+                    carService.updateByOrder(split[1],new BigDecimal(map.get("amount")),map.get("out_trade_no"));
                     log.info("车辆临时处理完成！");
                 }
         }
