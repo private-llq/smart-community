@@ -458,7 +458,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
                 .eq("type", 1)
                 .eq("order_status", 0)
                 .eq("community_id", adminCommunityId));
-        if (list.size()==0){//没有最近生成的未支付的临时车订单，为包月逾期没有出去的车辆
+        if (list.size()==0){//没有未支付的临时车订单，为包月逾期没有出去的车辆
 
             //查询是否是包月逾期的车辆，如果是在这里直接插入一条订单（开始时间为上次包月的结速时间，结束时间为订单支付时间）
             //查询已逾期的车辆（出口方向），逾期按临时停车规则收费
@@ -489,12 +489,18 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
             }
         }
         //有最近生成的未支付的临时车订单，就是临时车
-            //再次查询出来
-            List<CarOrderEntity> carOrderEntityList = list.stream().sorted(Comparator.comparing(x -> {
+            //再次查询出来就有之前插入订单
+        List<CarOrderEntity> list2 = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>()
+                .eq("car_plate",carNumber)
+                .eq("type", 1)
+                //.eq("order_status", 0)
+                .eq("community_id", adminCommunityId));
+
+            List<CarOrderEntity> carOrderEntityList = list2.stream().sorted(Comparator.comparing(x -> {
                 return x.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
             })).collect(Collectors.toList());
 
-            if (list.size()!=0){
+            if (list2.size()!=0){
             CarOrderEntity carOrderEntity = carOrderEntityList.get(carOrderEntityList.size() - 1);
 
             LocalDateTime openTime = carOrderEntity.getBeginTime();//进闸时间
