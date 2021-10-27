@@ -174,7 +174,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         //查询该车辆是否是已经进场的临时车，在场的临时车无法包月，进入之后无法包月，出场之后才能包月
         CarCutOffEntity carCutOffEntity = carCutOffMapper.selectOne(new QueryWrapper<CarCutOffEntity>().eq("community_id", communityId).eq("belong", 1).eq("state", 0));
         if (Objects.nonNull(carCutOffEntity)){
-            throw new PropertyException("该车辆为在场的临时车，请立场之后再包月！");
+            throw new PropertyException("该车辆为在场的临时车，请离场之后再包月！");
         }
 
         //查询基础设置里面的最大续费月数
@@ -747,7 +747,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      *
      * 1:逾期 0：未逾期
      */
-
     public Integer MonthlyOverdue(String carNumber,Long adminCommunityId){
         //没有未支付的临时车订单，为包月逾期没有出去的车辆
         List<CarOrderEntity> list = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>()
