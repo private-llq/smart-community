@@ -11,14 +11,18 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.property.CarChargeEntity;
+import com.jsy.community.entity.property.CarCutOffEntity;
+import com.jsy.community.entity.property.CarMonthlyVehicle;
 import com.jsy.community.mapper.CarChargeMapper;
 import com.jsy.community.mapper.CarCutOffMapper;
+import com.jsy.community.mapper.CarMonthlyVehicleMapper;
 import com.jsy.community.mapper.CarOrderMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarChargeQO;
 import com.jsy.community.qo.property.orderChargeDto;
 import com.jsy.community.util.TimeUtils;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -29,10 +33,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @DubboService(version = Const.version, group = Const.group_property)
@@ -46,6 +47,10 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
 
     @Autowired
     public CarOrderMapper carOrderMapper;
+
+    @Autowired
+    public CarMonthlyVehicleMapper carMonthlyVehicleMapper;
+
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
@@ -333,7 +338,6 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
     }
 
 
-
     /**
      * 查询所有包月车辆所有收费设置标准
      * @param adminCommunityId
@@ -443,7 +447,13 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
     @Override
     public orderChargeDto orderCharge(Long adminCommunityId, String carNumber) {
 
+
+
+
+
+
         orderChargeDto orderChargeDto = new orderChargeDto();
+
         /**
          * 查询该车辆出闸最新生成的订单
          */
@@ -452,12 +462,44 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
                 .eq("type", 1)
                 .eq("order_status", 0)
                 .eq("community_id", adminCommunityId));
-        if (list.size()!=0){
-        List<CarOrderEntity> carOrderEntityList = list.stream().sorted(Comparator.comparing(x -> {
-            return x.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
-        })).collect(Collectors.toList());
+        if (list.size()==0){//没有有最近生成的未支付的临时车订单，为包月逾期没有出去的车辆
 
-        CarOrderEntity carOrderEntity = carOrderEntityList.get(carOrderEntityList.size() - 1);
+            //查询是否是包月逾期的车辆，如果是在这里直接插入一条订单（开始时间为上次包月的结速时间，结束时间为订单支付时间）
+            //查询已逾期的车辆（出口方向），逾期按临时停车规则收费
+            var monthlyVehicleList = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id", adminCommunityId).eq("distribution_status",1).lt("end_time", LocalDateTime.now()));
+            if (monthlyVehicleList.size()!=0){
+                CarMonthlyVehicle monthlyVehicle = monthlyVehicleList.stream().max(Comparator.comparing(x -> {
+                    return x.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+                })).get();
+                CarOrderEntity carOrderEntity = new CarOrderEntity();
+                carOrderEntity.setCarPlate(monthlyVehicle.getCarNumber());//车牌号
+                CarCutOffEntity carCutOffEntity = carCutOffMapper.selectOne(new QueryWrapper<CarCutOffEntity>().eq("community_id", monthlyVehicle.getCommunityId()).eq("car_number", monthlyVehicle.getCarNumber()));
+                if (Objects.nonNull(carCutOffEntity)){
+                    carOrderEntity.setPlateColor(carCutOffEntity.getPlateColor());//车牌颜色
+                }
+                carOrderEntity.setType(1);//临时车收费
+                carOrderEntity.setOrderNum(String.valueOf(SnowFlake.nextId()));//订单编号
+                carOrderEntity.setOrderTime(LocalDateTime.now());//支付时间
+                carOrderEntity.setBeginTime(monthlyVehicle.getStartTime());//周期开始时间
+                carOrderEntity.setOverTime(LocalDateTime.now());//周期结束时间
+                carOrderEntity.setOrderStatus(0);//未支付
+                carOrderEntity.setCommunityId(adminCommunityId);//社区id
+                carOrderEntity.setIsRetention(0);//是否为滞留订单
+                carOrderEntity.setRise("无");
+                var calendar = Calendar.getInstance();
+                int month = calendar.get(Calendar.MONTH) + 1;
+                carOrderEntity.setMonth(month);
+                carOrderMapper.insert(carOrderEntity);
+            }
+        }
+        //有最近生成的未支付的临时车订单，就是临时车
+            //再次查询出来
+            List<CarOrderEntity> carOrderEntityList = list.stream().sorted(Comparator.comparing(x -> {
+                return x.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+            })).collect(Collectors.toList());
+
+            if (list.size()!=0){
+            CarOrderEntity carOrderEntity = carOrderEntityList.get(carOrderEntityList.size() - 1);
 
             LocalDateTime openTime = carOrderEntity.getBeginTime();//进闸时间
             String orderNum = carOrderEntity.getOrderNum();//订单号
@@ -511,6 +553,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
             orderChargeDto.setTime(time);//停车时长
             orderChargeDto.setMoney(money);//金额
             orderChargeDto.setId(carOrderEntity.getId());//id
+            orderChargeDto.setOrderStatus(carOrderEntity.getOrderStatus());//订单状态
             return orderChargeDto;
         }
         return null;
