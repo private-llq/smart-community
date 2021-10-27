@@ -173,6 +173,7 @@ public class VisitorEntity extends BaseEntity {
     private String checkStatusStr;
 
     // 邀请过期状态;0:未过期;1已过期;
+    @TableField(exist = false)
     private Integer expireStatus;
 
     public interface addVisitorValidate{}

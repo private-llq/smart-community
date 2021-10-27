@@ -369,4 +369,6 @@ public class HouseLeaseController {
         }
         return CommonResult.ok(assetLeaseRecordService.signatureOperation(assetLeaseRecordEntity));
     }
+
+
 }
