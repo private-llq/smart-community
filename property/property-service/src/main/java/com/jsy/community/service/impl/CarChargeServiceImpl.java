@@ -1226,6 +1226,18 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         return freeTime;
     }
 
+
+    /**
+     * @Description: 查询临时收费规则
+     * @author: Hu
+     * @since: 2021/10/27 11:03
+     * @Param: [communityId, integer]
+     * @return: com.jsy.community.entity.property.CarChargeEntity
+     */
+    @Override
+    public CarChargeEntity selectTemporary(Long communityId, Integer type) {
+        return carChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>().eq("type",1).eq("community_id",communityId).eq("plate_type",type).eq("open",1));
+    }
 }
 
 

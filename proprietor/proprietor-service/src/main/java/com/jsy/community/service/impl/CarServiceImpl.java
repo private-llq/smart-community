@@ -188,10 +188,12 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     public List<CarOrderEntity> getTemporaryOrder(Long communityId, String userId) {
         List<CarOrderEntity> entities = carMapper.getTemporaryOrder(communityId,userId);
+        CommunityEntity communityEntity = communityMapper.selectById(communityId);
         if (entities.size()!=0) {
             for (CarOrderEntity entity : entities) {
-                entity.setMinute(ChronoUnit.MINUTES.between(entity.getBeginTime(), entity.getOrderTime()));
+                entity.setMinute(ChronoUnit.MINUTES.between(entity.getBeginTime(), entity.getOverTime()));
                 entity.setCarTypeText("临时车");
+                entity.setCarPositionText(communityEntity.getName());
             }
         }
         return entities;
@@ -247,7 +249,19 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     public CarOrderEntity getTemporaryOrderById(Long id, String userId) {
         CarOrderEntity carOrderEntity = appCarOrderMapper.selectById(id);
-        carOrderEntity.setMinute(ChronoUnit.MINUTES.between(carOrderEntity.getBeginTime(), carOrderEntity.getOrderTime()));
+        CommunityEntity entity = communityMapper.selectById(carOrderEntity.getCommunityId());
+        carOrderEntity.setCarPositionText(entity.getName());
+        Integer integer = carOrderEntity.getPlateColor()=="黄色"?0:1;
+        CarChargeEntity carChargeEntity = carChargeService.selectTemporary(carOrderEntity.getCommunityId(),integer);
+        if (carChargeEntity != null) {
+            carOrderEntity.setExpenseRule(carChargeEntity.getChargePrice());
+        }
+        CarBasicsEntity basicsEntity = carBasicsService.findOne(carOrderEntity.getCommunityId());
+        if (basicsEntity != null) {
+            carOrderEntity.setRetentionMinute(basicsEntity.getDwellTime());
+        }
+        carOrderEntity.setMinute(ChronoUnit.MINUTES.between(carOrderEntity.getBeginTime(), carOrderEntity.getOverTime()));
+        carOrderEntity.setRetentionHour(24);
         carOrderEntity.setCarTypeText("临时车");
         return carOrderEntity;
     }
