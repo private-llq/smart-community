@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.MembersQO;
 import com.jsy.community.qo.UserHouseQO;
@@ -217,4 +218,13 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @return:
 	 */
 	void updateMobile(Set<Long> ids, String uuid);
+
+	/**
+	 * @Description: 查询房屋用户信息
+	 * @author: Hu
+	 * @since: 2021/10/26 17:46
+	 * @Param:
+	 * @return:
+	 */
+    HouseMemberEntity selectByUser(Long communityId, Long houseId, String userId);
 }

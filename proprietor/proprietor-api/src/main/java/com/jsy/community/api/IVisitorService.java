@@ -10,6 +10,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.VisitorEntryVO;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -111,4 +112,13 @@ public interface IVisitorService extends IService<VisitorEntity> {
      * @return:
      */
     VisitorEntity selectOneByIdv2(Long id);
+
+    /**
+     * @author: Pipi
+     * @description: 查询邀请过的车辆列表
+     * @param visitorEntity:
+     * @return: java.util.List<com.jsy.community.entity.VisitorEntity>
+     * @date: 2021/10/26 11:41
+     **/
+    Set<String> queryVisitorCar(VisitorEntity visitorEntity);
 }

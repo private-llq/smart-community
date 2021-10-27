@@ -35,7 +35,7 @@ public class VisitorEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "社区ID")
-    @NotNull(message = "缺少社区ID")
+    @NotNull(groups = {queryVisitorCarValidate.class, addVisitorValidate.class, addTempCodeValidate.class}, message = "缺少社区ID")
     private Long communityId;
 
     @ApiModelProperty(value = "楼栋ID")
@@ -93,6 +93,9 @@ public class VisitorEntity extends BaseEntity {
     @ApiModelProperty(value = "来访车辆车牌", hidden = true)
     private String carPlate;
 
+    // 车费代缴状态;0:不代缴;1:代缴
+    private Integer carAlternativePaymentStatus;
+
     @ApiModelProperty(value = "来访车辆类型 1.微型车 2.小型车 3.紧凑型车 4.中型车 5.中大型车 6.其他车型", hidden = true)
     private Integer carType;
 
@@ -114,6 +117,13 @@ public class VisitorEntity extends BaseEntity {
 
     // 人脸图片地址
     private String faceUrl;
+
+    // 临时通行码有效时间分钟数
+    @NotNull(groups = {addTempCodeValidate.class}, message = "临时通行码有效时间不能为空")
+    private Integer effectiveTime;
+
+    // 是否是临时通行码;0:不是;1是;
+    private Integer tempCodeStatus;
 
     @ApiModelProperty(value = "来访事由名")
     @TableField(exist = false)
@@ -162,6 +172,16 @@ public class VisitorEntity extends BaseEntity {
     @TableField(exist = false)
     private String checkStatusStr;
 
+    // 邀请过期状态;0:未过期;1已过期;
+    @TableField(exist = false)
+    private Integer expireStatus;
+
     public interface addVisitorValidate{}
+
+    // 查询邀请过的车俩验证组
+    public interface queryVisitorCarValidate{}
+
+    // 生成临时通行二维码验证组
+    public interface addTempCodeValidate{}
 
 }

@@ -119,6 +119,18 @@ public class CarEntity extends BaseEntity {
     @TableField(exist = false)
     @Range(groups = {BindingMonthCarValidated.class,RenewMonthCarValidated.class}, min = 1, message = "支付金额不能为0！")
     private BigDecimal money;
+    
+    @ApiModelProperty(value = "物业公司名称")
+    @TableField(exist = false)
+    private String companyName;
+    
+    @ApiModelProperty(value = "社区名称")
+    @TableField(exist = false)
+    private String communityName;
+    
+    @ApiModelProperty(value = "房屋信息")
+    @TableField(exist = false)
+    private String houseAddress;
 
 
     public static CarEntity getInstance() {

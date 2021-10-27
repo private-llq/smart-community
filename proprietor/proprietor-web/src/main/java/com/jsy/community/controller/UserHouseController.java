@@ -5,6 +5,7 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.api.ProprietorUserService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.MembersQO;
 import com.jsy.community.qo.UserHouseQO;
 import com.jsy.community.utils.UserUtils;
@@ -63,26 +64,22 @@ public class UserHouseController {
             }
         }
         //查询所有权限
-        ControlVO controlVO = UserUtils.getPermissions(UserUtils.getUserId(), redisTemplate);
-
-        for (ControlVO permission : controlVO.getPermissions()) {
-            //找到当前房间权限
-            if (userHouseQO.getHouseId().equals(permission.getHouseId())){
-                //如果等于1代表业主
-                if (permission.getAccessLevel()==1){
-                    return CommonResult.ok(userHouseService.userHouseDetails(userHouseQO, UserUtils.getUserId()));
-                } else {
-                    //如果等于2代表家属
-                    if (permission.getAccessLevel()==2){
-                        return CommonResult.ok(userHouseService.memberHouseDetails(userHouseQO, UserUtils.getUserId()));
-                    } else {
-                        //如果等于3代表租户
-                        if (permission.getAccessLevel()==3){
-                            return CommonResult.ok(userHouseService.lesseeHouseDetails(userHouseQO, UserUtils.getUserId()));
-                        }
-                    }
-                }
-            }
+        HouseMemberEntity houseMemberEntity = userHouseService.selectByUser(userHouseQO.getCommunityId(),userHouseQO.getHouseId(),UserUtils.getUserId());
+        if (houseMemberEntity != null) {
+             //如果等于1代表业主
+             if (houseMemberEntity.getRelation()==1){
+                 return CommonResult.ok(userHouseService.userHouseDetails(userHouseQO, UserUtils.getUserId()));
+             } else {
+                 //如果等于2代表家属
+                 if (houseMemberEntity.getRelation()==6){
+                     return CommonResult.ok(userHouseService.memberHouseDetails(userHouseQO, UserUtils.getUserId()));
+                 } else {
+                     //如果等于3代表租户
+                     if (houseMemberEntity.getRelation()==7){
+                         return CommonResult.ok(userHouseService.lesseeHouseDetails(userHouseQO, UserUtils.getUserId()));
+                     }
+                 }
+             }
         }
         return CommonResult.error(1,"房间不存在");
     }

@@ -106,6 +106,11 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		return userHouseMapper.queryUserHousesOfCommunityIds(uid);
 	}
 
+	@Override
+	public HouseMemberEntity selectByUser(Long communityId, Long houseId, String userId) {
+		return houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("community_id",communityId).eq("house_id",houseId).eq("uid",userId));
+	}
+
 	/**
 	 * @Description: 修改房屋认证表数据
 	 * @author: Hu

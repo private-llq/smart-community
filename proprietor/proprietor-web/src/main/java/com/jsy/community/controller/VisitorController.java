@@ -6,6 +6,7 @@ import com.jsy.community.api.IVisitingCarService;
 import com.jsy.community.api.IVisitorPersonService;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.constant.BusinessConst;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.VisitingCarEntity;
 import com.jsy.community.entity.VisitorEntity;
@@ -66,14 +67,13 @@ public class VisitorController {
 //		return visitorService.verifyQRCode(jsonObject,jsonObject.getInteger("hardwareType"));
 //	}
 	
-//	/**
-//	 * @Description: 访客登记 新增
-//	 * @Param: [visitorEntity]
-//	 * @Return: com.jsy.community.vo.CommonResult
-//	 * @Author: chq459799974
-//	 * @Date: 2020/11/11
-//	 **/
-	//TODO 权限和一次访客登记对应还是和每个随行人员一一对应？
+	/**
+	 * @Description: 访客登记 新增
+	 * @Param: [visitorEntity]
+	 * @Return: com.jsy.community.vo.CommonResult
+	 * @Author: chq459799974
+	 * @Date: 2020/11/11
+	 **/
 	@ApiOperation("【访客】新增")
 	@PostMapping("")
 	public CommonResult<VisitorEntryVO> save(@RequestBody VisitorEntity visitorEntity) {
@@ -86,12 +86,17 @@ public class VisitorController {
 				throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "车牌号不合法");
 			}
 		}
+		// 有来访车辆,如果没有选择代缴状态,默认为不代缴
+		if (!StringUtils.isEmpty(visitorEntity.getCarPlate()) && visitorEntity.getCarAlternativePaymentStatus() == null) {
+			visitorEntity.setCarAlternativePaymentStatus(0);
+		}
 		visitorEntity.setUid(UserUtils.getUserId());
+		visitorEntity.setTempCodeStatus(0);
 		return CommonResult.ok(visitorService.appAddVisitor(visitorEntity),"操作成功");
 	}
 
-	//TODO 权限和一次访客登记对应还是和每个随行人员一一对应？
-	@ApiOperation("【访客】新增")
+
+	/*@ApiOperation("【访客】新增")
 	@PostMapping("v2")
 	public CommonResult<VisitorEntryVO> saveV2(@RequestBody VisitorEntity visitorEntity) {
 		ValidatorUtils.validateEntity(visitorEntity);
@@ -105,7 +110,7 @@ public class VisitorController {
 		}
 		visitorEntity.setUid(UserUtils.getUserId());
 		return CommonResult.ok(visitorService.addVisitorV2(visitorEntity),"操作成功");
-	}
+	}*/
 
 	/**
 	 * @Description: 根据ID单查
@@ -309,6 +314,36 @@ public class VisitorController {
 	public CommonResult<PageInfo<VisitingCarEntity>> queryCarPage(@RequestBody BaseQO<String> baseQO){
 		baseQO.setQuery(UserUtils.getUserId());
 		return CommonResult.ok(visitingCarService.queryVisitingCarPage(baseQO));
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 查询邀请过的车辆列表
+	 * @param visitorEntity: 查询条件
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/10/26 11:33
+	 **/
+	@PostMapping("/v2/visitorCarHistory")
+	public CommonResult queryVisitorCar(@RequestBody VisitorEntity visitorEntity) {
+		ValidatorUtils.validateEntity(visitorEntity, VisitorEntity.queryVisitorCarValidate.class);
+		visitorEntity.setUid(UserUtils.getUserId());
+		return CommonResult.ok(visitorService.queryVisitorCar(visitorEntity));
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 生成临时通行二维码
+	 * @param visitorEntity:
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/10/26 16:19
+	 **/
+	@PostMapping("/v2/addTempCode")
+	public CommonResult addTempCode(@RequestBody VisitorEntity visitorEntity) {
+		ValidatorUtils.validateEntity(visitorEntity, VisitorEntity.addTempCodeValidate.class);
+		visitorEntity.setUid(UserUtils.getUserId());
+		visitorEntity.setTempCodeStatus(1);
+		visitorEntity.setIsCommunityAccess(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode());
+		return CommonResult.ok(visitorService.appAddVisitor(visitorEntity),"操作成功");
 	}
 
 }

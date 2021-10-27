@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.entity.CarOrderRecordEntity;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.CarQO;
@@ -216,4 +217,39 @@ public interface ICarService extends IService<CarEntity> {
      * @return:
      */
     CarOrderEntity getOrder(Long id);
+
+    /**
+     * @Description: 查询小区名称
+     * @author: Hu
+     * @since: 2021/10/26 14:40
+     * @Param:
+     * @return:
+     */
+    CommunityEntity selectCommunityName(Long communityId);
+
+    /**
+     * @Description: 查询临时车账单
+     * @author: Hu
+     * @since: 2021/10/26 15:33
+     * @Param:
+     * @return:
+     */
+    List<CarOrderEntity> getTemporaryOrder(Long communityId, String userId);
+    /**
+     * @Description: 查询临时车账单详情
+     * @author: Hu
+     * @since: 2021/10/26 15:33
+     * @Param:
+     * @return:
+     */
+    CarOrderEntity getTemporaryOrderById(Long id, String userId);
+
+    /**
+     * @Description: 修改临时车辆订单状态
+     * @author: Hu
+     * @since: 2021/10/26 16:43
+     * @Param: 
+     * @return: 
+     */
+    void updateByOrder(String id);
 }

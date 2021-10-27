@@ -24,4 +24,21 @@
             uid = #{uid} and id = #{c.id} and deleted = 0
         </where>
     </update>
+    <select id="getTemporaryOrder" resultType="com.jsy.community.entity.CarOrderEntity">
+        SELECT
+          co.*
+        FROM
+          t_car_order co
+          RIGHT JOIN t_visitor tv ON tv.car_plate = co.car_plate
+        WHERE
+          tv.community_id = #{communityId}
+          AND tv.uid = #{uid}
+          AND tv.car_plate IS NOT NULL
+          AND tv.car_alternative_payment_status = 1
+          AND co.community_id = 1
+          AND co.begin_time BETWEEN tv.start_time
+          AND tv.end_time
+          AND co.order_status = 0
+          AND co.type = 1
+    </select>
 </mapper>
