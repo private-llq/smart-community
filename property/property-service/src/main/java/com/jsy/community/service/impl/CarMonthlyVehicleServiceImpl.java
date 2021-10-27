@@ -10,6 +10,7 @@ import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.*;
@@ -22,7 +23,6 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.ibatis.logging.jdbc.BaseJdbcLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
@@ -66,6 +66,12 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
     @Autowired
     private PropertyFinanceOrderMapper propertyFinanceOrderMapper;
+
+    @Autowired
+    private CarCutOffMapper carCutOffMapper;
+
+    @Autowired
+    private CarOrderMapper carOrderMapper;
 
 
 
@@ -165,6 +171,13 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         if (Objects.nonNull(vehicle)){
             throw new PropertyException("该车辆已进行包月,还未到期，如果需要延期，请查询记录执行时间延期操作！");
         }
+
+        //查询该车辆是否是已经进场的临时车，在场的临时车无法包月，进入之后无法包月，出场之后才能包月
+        CarCutOffEntity carCutOffEntity = carCutOffMapper.selectOne(new QueryWrapper<CarCutOffEntity>().eq("community_id", communityId).eq("belong", 1).eq("state", 0));
+        if (Objects.nonNull(carCutOffEntity)){
+            throw new PropertyException("该车辆为在场的临时车，请立场之后再包月！");
+        }
+
 
         //查询基础设置里面的最大续费月数
         CarBasicsEntity carBasicsEntity = carBasicsMapper.selectOne(new QueryWrapper<CarBasicsEntity>().eq("community_id", communityId));
@@ -302,6 +315,47 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         carPositionEntity.setEndTime(carMonthlyVehicle.getEndTime());//结束时间
         carPositionEntity.setUserName(carMonthlyVehicle.getOwnerName());//租户姓名
         carPositionMapper.update(carPositionEntity,new UpdateWrapper<CarPositionEntity>().eq("car_position",carMonthlyVehicle.getCarPosition()).eq("community_id",carMonthlyVehicle.getCommunityId()));
+
+
+        //生成月租账单
+        PropertyFinanceOrderEntity orderEntity = new PropertyFinanceOrderEntity();
+        orderEntity.setId(SnowFlake.nextId());//生成主键
+        orderEntity.setCommunityId(carMonthlyVehicle.getCommunityId());//社区id
+        orderEntity.setPropertyFee(carMonthlyVehicle.getMonthlyFee());//包月费用
+        orderEntity.setOrderStatus(1);//已收款
+        orderEntity.setCreateTime(LocalDateTime.now());//创建时间
+        orderEntity.setPayType(2);//线下物业支付
+        orderEntity.setPayTime(LocalDateTime.now());//支付时间
+        orderEntity.setBeginTime(carMonthlyVehicle.getStartTime().toLocalDate());//账单开始时间
+        orderEntity.setOverTime(carMonthlyVehicle.getEndTime().toLocalDate());//账单结束时间
+        orderEntity.setBuildType(1);//系统生成
+
+        CommunityEntity communityEntity = communityMapper.selectById(carMonthlyVehicle.getCommunityId());
+        String communityName= communityEntity.getName();
+        String chargeName = carChargeEntity.getName();
+        orderEntity.setRise(communityName+"-"+chargeName);//账单抬头
+
+        PropertyFeeRuleEntity propertyFeeRuleEntity = propertyFeeRuleMapper.selectOne(new QueryWrapper<PropertyFeeRuleEntity>()
+                .eq("status", 1)
+                .eq("community_id", carMonthlyVehicle.getCommunityId())
+                .eq("type", 12)
+                .eq("disposable", 2)
+        );
+
+        if (Objects.nonNull(propertyFeeRuleEntity)){
+            orderEntity.setFeeRuleId(propertyFeeRuleEntity.getId());//缴费项目id
+            orderEntity.setType(propertyFeeRuleEntity.getType());//账单类型
+            orderEntity.setAssociatedType(2);//关联类型车位
+            orderEntity.setOrderTime(LocalDate.now());//账单月份
+            String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(carMonthlyVehicle.getId()));
+            orderEntity.setOrderNum(orderNum);//账单号
+            //查车位id
+            CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carMonthlyVehicle.getCarPosition()));
+            orderEntity.setTargetId(car_position.getId());//车位id
+
+        }
+        propertyFinanceOrderMapper.insert(orderEntity);
+
         return update;
     }
 
@@ -695,7 +749,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
 
     /**
-     * 1临时，2月租，3业主
+     * 1临时，2月租，3业主 4 月租逾期
      * @param carNumber 车牌号
      * @param carColor 车牌颜色
      * @param community_id 社区id
@@ -703,16 +757,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      */
     @Override
     public Map selectByStatus(String carNumber, String carColor, Long community_id) {
-
-        //查询未到期的、已下发的包月车辆
-        CarMonthlyVehicle carMonthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id", community_id).eq("distribution_status",1).ge("end_time", LocalDateTime.now()));
-        if (Objects.nonNull(carMonthlyVehicle)){
-            HashMap<Integer, CarMonthlyVehicle> hashMap = new HashMap<>();
-            CarMonthlyVehicle vehicle = new CarMonthlyVehicle();
-            BeanUtil.copyProperties(carMonthlyVehicle,vehicle);
-            hashMap.put(2,vehicle);
-            return hashMap;//月租车辆
-        }
 
         CarProprietorEntity carProprietorEntity = carProprietorMapper.selectOne(new QueryWrapper<CarProprietorEntity>().eq("car_number", carNumber).eq("community_id", community_id).eq("deleted", 0));
         if (Objects.nonNull(carProprietorEntity)){
@@ -724,32 +768,67 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         }
 
 
-        //临时车 黄牌
-        if ( StringUtils.containsAny(carColor,"黄色","黄牌","黄")){
-            CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>()
-                    .eq("community_id", community_id)
-                    .eq("type", 1)
-                    .eq(StringUtils.isNotBlank(carColor),"plate_type", 0)
-                    .eq("open",1)
-            );
-            HashMap<Integer, CarChargeEntity> HashMap = new HashMap<>();
-            CarChargeEntity chargeEntity = new CarChargeEntity();
-            BeanUtil.copyProperties(carChargeEntity,chargeEntity);
-            HashMap.put(1,chargeEntity);
-            return HashMap;
+        //查询未到期的、已下发的包月车辆
+        CarMonthlyVehicle carMonthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id", community_id).eq("distribution_status",1).ge("end_time", LocalDateTime.now()));
+        if (Objects.nonNull(carMonthlyVehicle)){
+            HashMap<Integer, CarMonthlyVehicle> hashMap = new HashMap<>();
+            CarMonthlyVehicle vehicle = new CarMonthlyVehicle();
+            BeanUtil.copyProperties(carMonthlyVehicle,vehicle);
+            hashMap.put(2,vehicle);
+            return hashMap;//月租车辆
         }
-        //临时车 其他牌照
-        CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>()
-                .eq("community_id", community_id)
+
+
+        //包月逾期车辆
+        List<CarOrderEntity> list = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>()//查询是否有临时车订单
+                .eq("car_plate",carNumber)
                 .eq("type", 1)
-                .eq(StringUtils.isNotBlank(carColor),"plate_type", 1)
-                .eq("open",1)
-        );
-        HashMap<Integer, CarChargeEntity> HashMap = new HashMap<>();
-        CarChargeEntity chargeEntity = new CarChargeEntity();
-        BeanUtil.copyProperties(carChargeEntity,chargeEntity);
-        HashMap.put(1,chargeEntity);
-        return HashMap;
+                .eq("order_status", 0)
+                .eq("community_id", community_id));
+        if (list.size()==0){//没有最近生成的(未支付)的临时车订单，为包月逾期没有出去的车辆
+            //查询所有包月记录
+            var monthlyVehicleList = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id", community_id).eq("distribution_status",1).lt("end_time", LocalDateTime.now()));
+            //取最近一条包月记录
+            List<CarMonthlyVehicle> carOrderEntityList = monthlyVehicleList.stream().sorted(Comparator.comparing(x -> {
+                return x.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+            })).collect(Collectors.toList());
+            CarMonthlyVehicle monthlyVehicle= carOrderEntityList.get(carOrderEntityList.size() - 1);
+
+            HashMap<Integer, CarMonthlyVehicle> hashMap = new HashMap<>();
+            hashMap.put(4,monthlyVehicle);//包月逾期车辆,不让出去
+            return hashMap;
+        }
+
+        if (list.size()!=0){//有最近生成的未支付的临时车订单，就是临时车
+            //临时车 黄牌
+            if ( StringUtils.containsAny(carColor,"黄色","黄牌","黄")){
+                CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>()
+                        .eq("community_id", community_id)
+                        .eq("type", 1)
+                        .eq(StringUtils.isNotBlank(carColor),"plate_type", 0)
+                        .eq("open",1)
+                );
+                HashMap<Integer, CarChargeEntity> HashMap = new HashMap<>();
+                CarChargeEntity chargeEntity = new CarChargeEntity();
+                BeanUtil.copyProperties(carChargeEntity,chargeEntity);
+                HashMap.put(1,chargeEntity);
+                return HashMap;
+            }else {
+                //临时车 其他牌照
+                CarChargeEntity carChargeEntity = CarChargeMapper.selectOne(new QueryWrapper<CarChargeEntity>()
+                        .eq("community_id", community_id)
+                        .eq("type", 1)
+                        .eq(StringUtils.isNotBlank(carColor),"plate_type", 1)
+                        .eq("open",1)
+                );
+                HashMap<Integer, CarChargeEntity> HashMap = new HashMap<>();
+                CarChargeEntity chargeEntity = new CarChargeEntity();
+                BeanUtil.copyProperties(carChargeEntity,chargeEntity);
+                HashMap.put(1,chargeEntity);
+                return HashMap;
+            }
+        }
+        return null;
     }
 
     /***********************************************************************包月车位***********************************************************************************************/

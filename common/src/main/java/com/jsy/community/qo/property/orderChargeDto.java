@@ -51,4 +51,10 @@ public class orderChargeDto implements Serializable {
      * 订单编号
      */
     private String orderNum;
+
+
+    /**
+     * 是否支付 0 未支付 1 已支付
+     */
+    private Integer orderStatus;
 }
