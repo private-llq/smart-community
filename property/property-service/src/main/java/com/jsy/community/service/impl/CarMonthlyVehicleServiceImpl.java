@@ -75,7 +75,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
 
 
-
     /**
      * @Description: app修改月租车辆到期时间
      * @author: Hu
@@ -178,7 +177,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             throw new PropertyException("该车辆为在场的临时车，请立场之后再包月！");
         }
 
-
         //查询基础设置里面的最大续费月数
         CarBasicsEntity carBasicsEntity = carBasicsMapper.selectOne(new QueryWrapper<CarBasicsEntity>().eq("community_id", communityId));
         if (Objects.nonNull(carBasicsEntity)){
@@ -215,9 +213,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         entity.setCarNumber(carMonthlyVehicle.getCarNumber());//车牌号
         entity.setPositionId(carMonthlyVehicle.getCarPosition());//车位号
         bindingPositionMapper.insert(entity);
-
-
-
 
         //修改车位的信息：为已绑定 开始结束时间变更
         CarPositionEntity carPositionEntity = new CarPositionEntity();
