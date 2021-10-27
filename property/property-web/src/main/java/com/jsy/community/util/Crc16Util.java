@@ -150,6 +150,7 @@ public class Crc16Util {
         String value1 = Crc16Util.getValue("0064FFFF6221000100000001000300FF000000000000000E00" + value);
         return value1;
     }
+    //文字显示
     public static String getUltimatelyValue2(String str,String line,String type)  {
         String value = null;
         String color = null;
@@ -184,6 +185,36 @@ public class Crc16Util {
         return value1;
     }
 
+    //语音播放
+    public static String getUltimatelyVoice(String str,String type)  {
+        String value = null;
+        String color = null;
+        int i;
+        try {
+            i= str.getBytes("GBK").length;
+            value = UtilStringTo16GB2312.enUnicode(str);
+        } catch (UnsupportedEncodingException e) {
+            throw  new PropertyException(500,"机器码异常");
+        }
+        if (type.equals("online")){
+            color="01";
+        }else {
+            color="01";
+        }
+        //固定参数
+        String head="0064FFFF30";
+        //1+文字长度  16进制
+        String valueLength = Integer.toHexString(i+1);
+        if(Integer.parseInt(valueLength)<10){
+            valueLength="0"+valueLength;
+        }else {
+            valueLength=valueLength;
+        }
+        String result=head+valueLength+color;
+        String value1 = Crc16Util.getValue(result + value);
+        return value1;
+    }
+
     /*数字换行成0000模式*/
     public static String getStandard(Integer value){
         String s = value.toString();
@@ -203,7 +234,10 @@ public class Crc16Util {
     public static void main(String[] args) {
         //0064FFFF622B010100000001000300FF000000000000001800C4FABBB9CEB4BDC9B7D1A3ACC7EBBDC9B7D1D4DACDA8D0D0A56A
         //0064FFFF622B030100000001000300FF0000000000000018C4FABBB9CEB4BDC9B7D1A3ACC7EBBDC9B7D1D4DACDA8D0D088A4
-        System.out.println(Crc16Util.getUltimatelyValue2("您还未缴费，请缴费在通行", "03","heartb"));
+//        System.out.println(Crc16Util.getUltimatelyValue2("您还未缴费，请缴费在通行", "03","heartb"));
+        //:0064FFFF30 09 01 D3E5413435425237 9073 语音
+        //0064FFFF301101B4CBB3B5CEAABADAC3FBB5A5B3B5C1BE7E9D
+        System.out.println(Crc16Util.getUltimatelyVoice("此车为黑名单车辆", "online"));
     }
 
 

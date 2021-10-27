@@ -899,11 +899,13 @@ public class CarPositionController {
         //推送例子为识别结果
         if (type.equals("online")){
             e2.setEncodetype("hex2string");
+            //识别结果的显示数据   type=0nline
             e2.setData( Crc16Util.getUltimatelyValue2("渝A5486C","00",type));//一路顺风  语音0064FFFF300901D2BBC2B7CBB3B7E79F40
             list.add(e2);
 
         }else {
             e2.setEncodetype("hex2string");
+            //心跳结果的显示数据   type=heartbeat
             e2.setData( Crc16Util.getUltimatelyValue2("余位999个","00",type));//一路顺风  语音0064FFFF300901D2BBC2B7CBB3B7E79F40
             list.add(e2);
 
