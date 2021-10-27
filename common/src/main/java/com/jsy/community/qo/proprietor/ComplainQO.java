@@ -23,4 +23,7 @@ public class ComplainQO implements Serializable {
 
     @ApiModelProperty(value = "用户id")
     private String uid;
+    
+    @ApiModelProperty(value = "1,投诉，2建议")
+    private Integer type;
 }
