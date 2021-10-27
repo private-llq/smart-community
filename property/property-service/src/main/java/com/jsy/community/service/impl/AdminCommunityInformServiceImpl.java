@@ -1,15 +1,14 @@
 package com.jsy.community.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAdminCommunityInformService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
-import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.entity.InformAcctEntity;
+import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.mapper.AdminCommunityInformMapper;
 import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.mapper.InformAcctMapper;
@@ -31,7 +30,10 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -316,6 +318,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
                 informAcctEntity.setAcctId(String.valueOf(communityEntity.getId()));
                 informAcctEntity.setAcctName(communityEntity.getName());
                 informAcctEntity.setAcctAvatar(communityEntity.getIconUrl());
+                informAcctEntity.setPushObject(2);
                 informAcctEntities.add(informAcctEntity);
                 //当某个推送号有新消息发布时：用户之前已经删除的 推送号 又会被拉取出来 同时通知有未读消息
                 //清除推送消息屏蔽表

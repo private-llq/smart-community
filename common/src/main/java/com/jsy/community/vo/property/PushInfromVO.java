@@ -31,6 +31,9 @@ public class PushInfromVO implements Serializable {
 
     // 推送者名称
     private List<String> acctName;
+    
+    // 推送对象
+    private List<String> pushObjectName;
 
     // 创建时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")

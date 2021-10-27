@@ -161,6 +161,7 @@ public class Crc16Util {
         } catch (UnsupportedEncodingException e) {
             throw  new PropertyException(500,"机器码异常");
         }
+        System.out.println(i+"i");
         if (type.equals("online")){
             color="0100000501000301FF00000000000000";
         }else {
@@ -171,12 +172,14 @@ public class Crc16Util {
         //19+文字长度  16进制
         String valueLength = Integer.toHexString(i+19);
         String textLength = Integer.toHexString(i);
-        if(Integer.parseInt(textLength)<10){
+        System.out.println(textLength);
+        System.out.println(valueLength);
+
+        if(i<10){
             textLength="0"+textLength+"00";
         }else {
             textLength=textLength+"00";
         }
-        System.out.println(textLength);
         String result=head+valueLength+line+color+textLength;
         // 00控制卡 64固定 FFFFpn包 62cmd命令号 1F长度  01twid窗口身份 15etm进入方式 02ets 05dm慢闪烁 03dt停留时间 15退场方式 00exs扫码周期
         // 0064FFFF621F011502050315000300FF000000000000000800
@@ -232,12 +235,13 @@ public class Crc16Util {
     }
 
     public static void main(String[] args) {
-        //0064FFFF622B010100000001000300FF000000000000001800C4FABBB9CEB4BDC9B7D1A3ACC7EBBDC9B7D1D4DACDA8D0D0A56A
-        //0064FFFF622B030100000001000300FF0000000000000018C4FABBB9CEB4BDC9B7D1A3ACC7EBBDC9B7D1D4DACDA8D0D088A4
-//        System.out.println(Crc16Util.getUltimatelyValue2("您还未缴费，请缴费在通行", "03","heartb"));
+//0064FFFF62 1F 000100000001000300FF000000000000000C00CAA3D3E0CCECCAFD303033304B49
+//0064FFFF62 1F 030100000001000300FF00000000000000C00CAA3D3E0CCECCAFD30303335259
+        System.out.println(Crc16Util.getUltimatelyValue2("剩余天数"+"0030", "03","heartb"));
         //:0064FFFF30 09 01 D3E5413435425237 9073 语音
         //0064FFFF301101B4CBB3B5CEAABADAC3FBB5A5B3B5C1BE7E9D
-        System.out.println(Crc16Util.getUltimatelyVoice("此车为黑名单车辆", "online"));
+
+//        System.out.println(Crc16Util.getUltimatelyVoice("此车为黑名单车辆", "online"));
     }
 
 

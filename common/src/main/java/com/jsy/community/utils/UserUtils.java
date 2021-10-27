@@ -150,8 +150,8 @@ public class UserUtils {
 	 * @Description: 获取request域中用户id(登录用户自己的uid)
 	 * @Param: []
 	 * @Return: java.lang.String
-	 * @Author: chq459799974
-	 * @Date: 2020/12/3
+	 * @Author: DKS
+	 * @Date: 2021/10/14
 	 **/
 	public static String getId() {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))

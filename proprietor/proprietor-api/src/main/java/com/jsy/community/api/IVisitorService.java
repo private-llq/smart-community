@@ -120,5 +120,5 @@ public interface IVisitorService extends IService<VisitorEntity> {
      * @return: java.util.List<com.jsy.community.entity.VisitorEntity>
      * @date: 2021/10/26 11:41
      **/
-    Set<String> queryVisitorCar(VisitorEntity visitorEntity);
+    List<VisitorEntity> queryVisitorCar(VisitorEntity visitorEntity);
 }

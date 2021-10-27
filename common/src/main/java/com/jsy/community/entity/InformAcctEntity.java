@@ -1,6 +1,7 @@
 package com.jsy.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 
@@ -27,6 +28,9 @@ public class InformAcctEntity implements Serializable {
 
     // 推送消息号头像
     private String acctAvatar;
+    
+    @ApiModelProperty(value = "推送对象：1.物业 2.小区 4.商家")
+    private Integer pushObject;
 
     public String getId() {
         return id;
@@ -67,15 +71,24 @@ public class InformAcctEntity implements Serializable {
     public void setAcctAvatar(String acctAvatar) {
         this.acctAvatar = acctAvatar;
     }
-
+    
+    public Integer getPushObject() {
+        return pushObject;
+    }
+    
+    public void setPushObject(Integer pushObject) {
+        this.pushObject = pushObject;
+    }
+    
     public InformAcctEntity() {
     }
-
-    public InformAcctEntity(String id, String informId, String acctId, String acctName, String acctAvatar) {
+    
+    public InformAcctEntity(String id, String informId, String acctId, String acctName, String acctAvatar, Integer pushObject) {
         this.id = id;
         this.informId = informId;
         this.acctId = acctId;
         this.acctName = acctName;
         this.acctAvatar = acctAvatar;
+        this.pushObject = pushObject;
     }
 }

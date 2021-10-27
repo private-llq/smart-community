@@ -1,5 +1,6 @@
 package com.jsy.community.qo.proprietor;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -36,6 +37,9 @@ public class PushInformQO implements Serializable {
     // 需要推送的社区id列表
     @NotEmpty(groups = {AddPushInformValidateGroup.class, UpdateDetailValidate.class}, message = "请选择推送社区")
     private List<Long> communityIds;
+    
+    @ApiModelProperty(value = "推送对象：1.物业 2.小区 4.商家")
+    private Integer pushObject;
 
     // 推送开关,0关闭推送,1开启推送
     private Integer pushTag;

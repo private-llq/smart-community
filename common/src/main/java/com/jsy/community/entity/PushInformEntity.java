@@ -74,6 +74,9 @@ public class PushInformEntity extends BaseEntity {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private LocalDateTime publishTime;
+    
+    @ApiModelProperty(value = "推送对象：1.物业 2.小区 4.商家")
+    private Integer pushObject;
 
     // 推送开关,0关闭推送,1开启推送
     private Integer pushTag;
