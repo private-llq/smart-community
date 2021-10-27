@@ -28,6 +28,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -121,18 +122,38 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
      * @date: 2021/10/26 11:41
      **/
     @Override
-    public List<VisitorEntity> queryVisitorCar(VisitorEntity visitorEntity) {
+    public Set<String> queryVisitorCar(VisitorEntity visitorEntity) {
         QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("car_plate, car_alternative_payment_status");
+        queryWrapper.select("car_plate");
         queryWrapper.eq("community_id", visitorEntity.getCommunityId());
         queryWrapper.eq("uid", visitorEntity.getUid());
+        queryWrapper.isNotNull("car_plate");
+        Set<String> visitorEntitySet = new HashSet<>();
         if (!StringUtil.isNullOrEmpty(visitorEntity.getCarPlate())) {
             queryWrapper.like("car_plate", visitorEntity.getCarPlate());
-            queryWrapper.last("order by create_time desc limit 5");
+            queryWrapper.last("order by create_time");
         } else {
-            queryWrapper.last("order by create_time desc limit 3");
+            queryWrapper.last("order by create_time");
         }
-        return visitorMapper.selectList(queryWrapper);
+        List<VisitorEntity> visitorEntities = visitorMapper.selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(visitorEntitySet)){
+            if (!StringUtil.isNullOrEmpty(visitorEntity.getCarPlate())) {
+                // 取5条
+                for (VisitorEntity entity : visitorEntities) {
+                    if (visitorEntitySet.size() < 5) {
+                        visitorEntitySet.add(entity.getCarPlate());
+                    }
+                }
+            } else {
+                // 取3条
+                for (VisitorEntity entity : visitorEntities) {
+                    if (visitorEntitySet.size() < 3) {
+                        visitorEntitySet.add(entity.getCarPlate());
+                    }
+                }
+            }
+        }
+        return visitorEntitySet;
     }
 
     /**
@@ -216,18 +237,9 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         xuFaceEditPersonDTO.setVisitorEntity(visitorEntity);
         rabbitTemplate.convertAndSend(ProprietorTopicNameEntity.exFaceXu,ProprietorTopicNameEntity.topicFaceXuServer,JSON.toJSONString(xuFaceEditPersonDTO));
 
-        if(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCommunityAccess())
-            || BusinessEnum.BuildingAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCarBanAccess())){
-            //小区是否有二维码设备(目前只用炫优一体机判断)
-            Integer count = communityHardWareMapper.countCommunityHardWare(visitorEntity.getCommunityId(), BusinessConst.HARDWARE_TYPE_XU_FACE);
-            if(count < 1){
-                return null;
-            }
-            VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
-            visitorEntryVO.setId(visitorEntity.getId());
-            return visitorEntryVO;
-        }
-        return null;
+        VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
+        visitorEntryVO.setId(visitorEntity.getId());
+        return visitorEntryVO;
     }
     
 //    /**

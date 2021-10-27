@@ -118,7 +118,7 @@ public class VisitorEntity extends BaseEntity {
     // 人脸图片地址
     private String faceUrl;
 
-    // 临时通行码有效时间
+    // 临时通行码有效时间分钟数
     @NotNull(groups = {addTempCodeValidate.class}, message = "临时通行码有效时间不能为空")
     private Integer effectiveTime;
 
