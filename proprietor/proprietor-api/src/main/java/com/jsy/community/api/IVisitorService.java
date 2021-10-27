@@ -10,6 +10,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.VisitorEntryVO;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -119,5 +120,5 @@ public interface IVisitorService extends IService<VisitorEntity> {
      * @return: java.util.List<com.jsy.community.entity.VisitorEntity>
      * @date: 2021/10/26 11:41
      **/
-    List<VisitorEntity> queryVisitorCar(VisitorEntity visitorEntity);
+    Set<String> queryVisitorCar(VisitorEntity visitorEntity);
 }
