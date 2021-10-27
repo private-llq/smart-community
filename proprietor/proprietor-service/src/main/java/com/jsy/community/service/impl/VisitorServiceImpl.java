@@ -141,7 +141,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
             queryWrapper.last("order by create_time");
         }
         List<VisitorEntity> visitorEntities = visitorMapper.selectList(queryWrapper);
-        if (!CollectionUtils.isEmpty(visitorEntitySet)){
+        if (!CollectionUtils.isEmpty(visitorEntities)){
             if (!StringUtil.isNullOrEmpty(visitorEntity.getCarPlate())) {
                 // 取5条
                 for (VisitorEntity entity : visitorEntities) {
