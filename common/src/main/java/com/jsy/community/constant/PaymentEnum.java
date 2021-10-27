@@ -81,7 +81,8 @@ public interface PaymentEnum {
 		TRADE_FROM_REDBAG_BACK("红包退回", 7),
 		TRADE_FROM_PARKING_PAYMENT("停车缴费", 8),
 		HOUSE_RENT_PAYMENT("房屋租赁", 9),
-		OTHER("其他缴费",10);
+		TEMPORARY_CAR_PAYMENT("临时车辆缴费", 10),
+		OTHER("其他缴费",11);
 		private String name;
 		private Integer index;
 		TradeFromEnum(String name, Integer index) {
