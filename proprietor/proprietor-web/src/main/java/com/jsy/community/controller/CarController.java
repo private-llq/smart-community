@@ -7,6 +7,8 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.DrivingLicense;
 import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.CarOrderEntity;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
@@ -84,6 +86,21 @@ public class CarController {
 	}
 
 	@Login
+	@ApiOperation("查询临时车辆账单")
+	@GetMapping("getTemporaryOrder")
+	public CommonResult getTemporaryOrder(@RequestParam Long communityId) {
+		List<CarOrderEntity> list = carService.getTemporaryOrder(communityId,UserUtils.getUserId());
+		return CommonResult.ok(list);
+	}
+	@Login
+	@ApiOperation("查询临时车辆一条账单详情")
+	@GetMapping("getTemporaryOrderById")
+	public CommonResult getTemporaryOrderById(@RequestBody Long id) {
+		CarOrderEntity carOrderEntity = carService.getTemporaryOrderById(id,UserUtils.getUserId());
+		return CommonResult.ok(carOrderEntity);
+	}
+
+	@Login
 	@ApiOperation("查询缴费详情")
 	@GetMapping("getOrder")
 	public CommonResult getOrder(@RequestParam Long id) {
@@ -138,10 +155,11 @@ public class CarController {
 	@GetMapping("getPosition")
 	public CommonResult getPosition(@RequestParam Long communityId) {
 //		List<CarPositionEntity> list = carService.getPosition(communityId);
+		CommunityEntity communityEntity = carService.selectCommunityName(communityId);
 		LinkedList<Object> list = new LinkedList<>();
 		CarPositionEntity entity = new CarPositionEntity();
-		entity.setId(999999999999999L);
-		entity.setCarPosition("地上");
+		entity.setId(communityEntity.getId());
+		entity.setCarPosition(communityEntity.getName());
 		list.add(entity);
 		return CommonResult.ok(list);
 	}

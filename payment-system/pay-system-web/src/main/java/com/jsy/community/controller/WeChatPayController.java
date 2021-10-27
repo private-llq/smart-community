@@ -185,6 +185,12 @@ public class WeChatPayController {
 //                hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
                 map.put("attach",9+","+weChatPayQO.getServiceOrderNo());
             }
+        } else
+        //车辆临时缴费
+        if (weChatPayQO.getTradeFrom()==10){
+//            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
+              map.put("attach",10+","+weChatPayQO.getServiceOrderNo());
+
         }
         //新增数据库订单记录
         WeChatOrderEntity msg = new WeChatOrderEntity();
@@ -299,7 +305,13 @@ public class WeChatPayController {
                 redisTemplate.delete(SIGNATURE+split[1]);
                 log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + map.get("out_trade_no"));
                 log.info("租赁处理完成！");
-            }
+            } else
+                //车辆临时缴费
+                if (split[0].equals("10")){
+                    //修改车辆临时缴费订单状态
+                    carService.updateByOrder(split[1]);
+                    log.info("车辆临时处理完成！");
+                }
         }
     }
 

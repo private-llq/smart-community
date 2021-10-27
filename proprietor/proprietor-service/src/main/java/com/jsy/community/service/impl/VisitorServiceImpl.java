@@ -7,18 +7,23 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.config.ProprietorTopicNameEntity;
-import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceVisitorEditPersonDTO;
-import com.jsy.community.entity.*;
+import com.jsy.community.entity.VisitingCarRecordEntity;
+import com.jsy.community.entity.VisitorEntity;
+import com.jsy.community.entity.VisitorPersonRecordEntity;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.JSYException;
-import com.jsy.community.mapper.*;
+import com.jsy.community.mapper.CommunityHardWareMapper;
+import com.jsy.community.mapper.VisitingCarRecordMapper;
+import com.jsy.community.mapper.VisitorMapper;
+import com.jsy.community.mapper.VisitorPersonRecordMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.utils.*;
 import com.jsy.community.qo.proprietor.VisitorQO;
+import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.VisitorEntryVO;
 import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -126,6 +133,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         queryWrapper.select("car_plate, car_alternative_payment_status");
         queryWrapper.eq("community_id", visitorEntity.getCommunityId());
         queryWrapper.eq("uid", visitorEntity.getUid());
+        queryWrapper.isNotNull("car_plate");
         if (!StringUtil.isNullOrEmpty(visitorEntity.getCarPlate())) {
             queryWrapper.like("car_plate", visitorEntity.getCarPlate());
             queryWrapper.last("order by create_time desc limit 5");

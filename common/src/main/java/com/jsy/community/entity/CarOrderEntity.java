@@ -2,7 +2,6 @@ package com.jsy.community.entity;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -132,4 +131,30 @@ public class CarOrderEntity extends BaseEntity {
      */
     @TableField(exist = false)
     private String stopCarTime;
+
+    /**
+     * 分钟
+     */
+    @TableField(exist = false)
+    private Long minute;
+
+    /**
+     * 收费标准
+     */
+    @TableField(exist = false)
+    private Long expenseRule;
+
+    /**
+     * 收费标准
+     */
+//    @TableField(exist = false)
+//    private Long expenseRule;
+
+
+
+    /**
+     * 车辆类型
+     */
+    @TableField(exist = false)
+    private String carTypeText;
 }

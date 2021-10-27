@@ -52,6 +52,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     private CommunityMapper communityMapper;
 
     @Autowired
+    private VisitorMapper visitorMapper;
+
+    @Autowired
     private AppCarOrderMapper appCarOrderMapper;
 
     @Autowired
@@ -175,6 +178,79 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     }
 
 
+    /**
+     * @Description: 查询所有临时车记录
+     * @author: Hu
+     * @since: 2021/10/26 15:33
+     * @Param: [communityId, userId]
+     * @return: java.util.List<com.jsy.community.entity.CarOrderEntity>
+     */
+    @Override
+    public List<CarOrderEntity> getTemporaryOrder(Long communityId, String userId) {
+        List<CarOrderEntity> entities = carMapper.getTemporaryOrder(communityId,userId);
+        if (entities.size()!=0) {
+            for (CarOrderEntity entity : entities) {
+                entity.setHour(ChronoUnit.HOURS.between(entity.getBeginTime(), entity.getOrderTime()));
+                entity.setCarTypeText("临时车");
+            }
+        }
+        return entities;
+    }
+
+
+
+    /**
+     * @Description: 修改临时车辆订单状态
+     * @author: Hu
+     * @since: 2021/10/26 16:46
+     * @Param: [s]
+     * @return: void
+     */
+    @Override
+    public void updateByOrder(String id) {
+        CarOrderEntity carOrderEntity = appCarOrderMapper.selectById(id);
+        if (carOrderEntity != null) {
+            carOrderEntity.setPayType(1);
+            carOrderEntity.setOrderStatus(1);
+            appCarOrderMapper.updateById(carOrderEntity);
+
+            //向账单表添加数据
+            CommunityEntity communityEntity = communityMapper.selectById(carOrderEntity.getCommunityId());
+            CarChargeEntity carChargeEntity = carChargeService.selectOne(carOrderEntity.getCommunityId());
+            PropertyFinanceOrderEntity orderEntity = new PropertyFinanceOrderEntity();
+            orderEntity.setAssociatedType(2);
+            orderEntity.setBuildType(4);
+            orderEntity.setRise(communityEntity.getName()+"-"+carChargeEntity.getName());
+            orderEntity.setCommunityId(carOrderEntity.getCommunityId());
+            orderEntity.setOrderTime(LocalDate.now());
+            orderEntity.setUid(carOrderEntity.getUid());
+            orderEntity.setPropertyFee(carOrderEntity.getMoney());
+            orderEntity.setOrderNum(getOrderNum(carOrderEntity.getCommunityId().toString()));
+            orderEntity.setOrderStatus(1);
+            orderEntity.setPayType(2);
+            orderEntity.setPayTime(LocalDateTime.now());
+            orderEntity.setBeginTime(carOrderEntity.getBeginTime().toLocalDate());
+            orderEntity.setOverTime(carOrderEntity.getOverTime().toLocalDate());
+            orderEntity.setId(SnowFlake.nextId());
+            propertyFinanceOrderService.insert(orderEntity);
+
+        }
+    }
+
+    /**
+     * @Description: 查询一条临时账单详情
+     * @author: Hu
+     * @since: 2021/10/26 15:34
+     * @Param: [id, userId]
+     * @return: com.jsy.community.entity.CarOrderEntity
+     */
+    @Override
+    public CarOrderEntity getTemporaryOrderById(Long id, String userId) {
+        CarOrderEntity carOrderEntity = appCarOrderMapper.selectById(id);
+        carOrderEntity.setHour(ChronoUnit.HOURS.between(carOrderEntity.getBeginTime(), carOrderEntity.getOrderTime()));
+        carOrderEntity.setCarTypeText("临时车");
+        return carOrderEntity;
+    }
 
     /**
      * @Description: 查询月租缴费订单
@@ -188,11 +264,16 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         LinkedList<Long> ids = new LinkedList<>();
         Map<Long,String> positionMap = new HashMap<>();
         Map<String, Object> map = new HashMap<>();
-        Page<CarOrderEntity> page = appCarOrderMapper.selectPage(new Page<CarOrderEntity>(baseQO.getPage(), baseQO.getSize()), new QueryWrapper<CarOrderEntity>()
+        CommunityEntity communityEntity = communityMapper.selectById(baseQO.getQuery().getCommunityId());
+        QueryWrapper<CarOrderEntity> wrapper = new QueryWrapper<CarOrderEntity>()
                 .select("id,order_num,month,order_time,over_time,money,car_plate,car_position_id,type")
                 .eq("community_id", baseQO.getQuery().getCommunityId())
                 .eq("uid", userId)
-                .eq("type", 2));
+                .eq("type", 2);
+        if (!"".equals(baseQO.getQuery().getMonth())&&baseQO.getQuery().getMonth()!=null&&baseQO.getQuery().getMonth()!=0){
+            wrapper.eq("month",baseQO.getQuery().getMonth());
+        }
+        Page<CarOrderEntity> page = appCarOrderMapper.selectPage(new Page<CarOrderEntity>(baseQO.getPage(), baseQO.getSize()), wrapper);
         List<CarOrderEntity> records = page.getRecords();
         if (records.size()!=0){
             for (CarOrderEntity record : records) {
@@ -203,9 +284,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 //                positionMap.put(entity.getId(),entity.getCarPosition());
 //            }
             for (CarOrderEntity record : records) {
-                record.setCarPositionId(999999999999999L);
+                record.setCarPositionId(communityEntity.getId());
 //                record.setCarPositionText(positionMap.get(record.getCarPositionId()));
-                record.setCarPositionText("地上");
+                record.setCarPositionText(communityEntity.getName());
                 record.setTypeText("月租车");
             }
             map.put("total",page.getTotal());
@@ -241,6 +322,18 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         CarEntity carEntity = carMapper.selectById(id);
         carMapper.deleteById(id);
 //        carPositionService.updateByPosition(carEntity.getCarPositionId());
+    }
+
+    /**
+     * @Description: 查询小区名称
+     * @author: Hu
+     * @since: 2021/10/26 14:40
+     * @Param:
+     * @return:
+     */
+    @Override
+    public CommunityEntity selectCommunityName(Long communityId) {
+        return communityMapper.selectById(communityId);
     }
 
     @Override
@@ -412,7 +505,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             carOrderEntity.setBeginTime(carEntity.getBeginTime());
             carOrderEntity.setOverTime(carEntity.getOverTime());
             carOrderEntity.setMoney(entity.getMoney());
-            carOrderEntity.setMonth(entity.getMonth());
+            carOrderEntity.setMonth(LocalDateTime.now().getMonthValue());
             carOrderEntity.setOrderNum(entity.getOrderNum());
             carOrderEntity.setOrderStatus(0);
             carOrderEntity.setCarPlate(carEntity.getCarPlate());
@@ -545,7 +638,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carOrderEntity.setBeginTime(carEntity.getBeginTime());
                 carOrderEntity.setOverTime(carEntity.getOverTime());
                 carOrderEntity.setMoney(carEntity.getMoney());
-                carOrderEntity.setMonth(entity.getMonth());
+                carOrderEntity.setMonth(LocalDateTime.now().getMonthValue());
                 carOrderEntity.setOrderNum(carEntity.getOrderNum());
                 carOrderEntity.setOrderStatus(0);
                 carOrderEntity.setCarPlate(carEntity.getCarPlate());
@@ -608,8 +701,20 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     public void delete(Long id, String userId) {
+        CarEntity carEntity = carMapper.selectById(id);
+        if (carEntity != null) {
+            CarEntity entity = carMapper.selectOne(new QueryWrapper<CarEntity>().eq("car_plate", carEntity.getCarPlate()).eq("type", 2));
+            if (entity != null) {
+                if (entity.getOverTime().isBefore(LocalDateTime.now())){
+                    throw new ProprietorException("该车辆存在逾期未付款，请先缴清费用！");
+                }
+                throw new ProprietorException("该车辆为月租产权车辆请先解除该车辆！");
+            }
+        }
         carMapper.delete(new QueryWrapper<CarEntity>().eq("uid",userId).eq("id",id));
     }
+
+
 
 
     /**
@@ -639,6 +744,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                         .eq("type",carEntity.getType());
             }
         }
+        CommunityEntity communityEntity = communityMapper.selectById(carEntity.getCommunityId());
         //如果查询的是月租车则要查询车位编号
         List<CarEntity> list = carMapper.selectList(wrapper);
         if (carEntity.getType()==2){
@@ -658,7 +764,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                     for (CarEntity entity : list) {
 //                        entity.setCarPositionText(map.get(entity.getCarPositionId()));
                         entity.setCarPositionId(999999999999999L);
-                        entity.setCarPositionText("地上");
+                        entity.setCarPositionText(communityEntity.getName());
                         entity.setTypeText("月租车");
                         //计算当前月租车所剩天数
                         long until = LocalDate.now().until(entity.getOverTime(), ChronoUnit.DAYS);
