@@ -447,11 +447,6 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
     @Override
     public orderChargeDto orderCharge(Long adminCommunityId, String carNumber) {
 
-
-
-
-
-
         orderChargeDto orderChargeDto = new orderChargeDto();
 
         /**
