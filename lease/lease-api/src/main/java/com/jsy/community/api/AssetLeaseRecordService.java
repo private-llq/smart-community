@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.lease.HouseLeaseContractVO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -101,4 +102,6 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
      * @date: 2021/9/16 17:26
      **/
     AssetLeaseRecordEntity queryRecordByConId(String conId);
+
+    HouseLeaseContractVO queryContractPreFillInfo(AssetLeaseRecordEntity assetLeaseRecordEntity);
 }
