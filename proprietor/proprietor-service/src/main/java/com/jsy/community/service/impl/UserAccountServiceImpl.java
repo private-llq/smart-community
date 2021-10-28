@@ -404,7 +404,7 @@ public class UserAccountServiceImpl implements IUserAccountService {
         } else {
             UserThirdPlatformEntity userThirdPlatform = new UserThirdPlatformEntity();
             userThirdPlatform.setId(SnowFlake.nextId());
-            userThirdPlatform.setDeleted(0);
+            userThirdPlatform.setDeleted(0L);
             userThirdPlatform.setUid(uid);
             userThirdPlatform.setThirdPlatformId(account);
             userThirdPlatform.setThirdPlatformType(5);
@@ -457,7 +457,7 @@ public class UserAccountServiceImpl implements IUserAccountService {
             ucoinRecordEntity.setTradeAmount(amount);
             ucoinRecordEntity.setBalance(userAccountEntity.getBalance().add(amount));//交易后余额
             ucoinRecordEntity.setComment("租金入账");
-            ucoinRecordEntity.setDeleted(0);
+            ucoinRecordEntity.setDeleted(0L);
             ucoinRecordEntity.setSerialNumber(Long.toString(ucoinRecordEntity.getId()));
             userAccountRecordMapper.insert(ucoinRecordEntity);
         }
@@ -499,7 +499,7 @@ public class UserAccountServiceImpl implements IUserAccountService {
         ucoinRecordEntity.setTradeAmount(amount);
         ucoinRecordEntity.setBalance(subtract);//交易后余额
         ucoinRecordEntity.setComment(typeStr + "提现");
-        ucoinRecordEntity.setDeleted(0);
+        ucoinRecordEntity.setDeleted(0L);
         ucoinRecordEntity.setSerialNumber(Long.toString(serialNumber));
         userAccountRecordService.addAccountRecord(ucoinRecordEntity);
         return result;

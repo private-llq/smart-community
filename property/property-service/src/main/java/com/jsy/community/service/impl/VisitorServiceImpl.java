@@ -314,7 +314,7 @@ public class VisitorServiceImpl implements IVisitorService {
 						visitorFaceSyncRecordEntity.setFaceUrl(visitorEntity.getFaceUrl());
 						visitorFaceSyncRecordEntity.setFacilityId(communityHardWareEntity.getHardwareId());
 						visitorFaceSyncRecordEntity.setId(SnowFlake.nextId());
-						visitorFaceSyncRecordEntity.setDeleted(0);
+						visitorFaceSyncRecordEntity.setDeleted(0L);
 						visitorFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
 						visitorFaceSyncRecordEntities.add(visitorFaceSyncRecordEntity);
 					}
@@ -347,7 +347,7 @@ public class VisitorServiceImpl implements IVisitorService {
 					visitorFaceSyncRecordEntity.setFaceUrl(visitorEntity.getFaceUrl());
 					visitorFaceSyncRecordEntity.setFacilityId(communityHardWareEntity.getHardwareId());
 					visitorFaceSyncRecordEntity.setId(SnowFlake.nextId());
-					visitorFaceSyncRecordEntity.setDeleted(0);
+					visitorFaceSyncRecordEntity.setDeleted(0L);
 					visitorFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
 					visitorFaceSyncRecordEntities.add(visitorFaceSyncRecordEntity);
 					facilityIds.add(communityHardWareEntity.getHardwareId());

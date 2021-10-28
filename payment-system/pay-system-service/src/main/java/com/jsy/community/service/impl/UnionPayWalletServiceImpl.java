@@ -107,7 +107,7 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
         unionPayWalletEntity.setUserUuid(openAccountForCVO.getUserUuid());
         unionPayWalletEntity.setWalletId(openAccountForCVO.getWalletId());
         unionPayWalletEntity.setBankAcctNo(openAccountForCQO.getBankAcctNo());
-        unionPayWalletEntity.setDeleted(0);
+        unionPayWalletEntity.setDeleted(0L);
         unionPayWalletEntity.setCreateTime(new Date());
         unionPayWalletEntity.setUpdateTime(new Date());
         baseMapper.insert(unionPayWalletEntity);
@@ -180,7 +180,7 @@ public class UnionPayWalletServiceImpl extends ServiceImpl<UnionPayWalletMapper,
             } else {
                 unionPayWalletBankEntity.setIsDefault(0);
             }
-            unionPayWalletBankEntity.setDeleted(0);
+            unionPayWalletBankEntity.setDeleted(0L);
             unionPayWalletBankEntity.setCreateTime(new Date());
             unionPayWalletBankEntity.setUpdateTime(new Date());
             unionPayWalletBankMapper.insert(unionPayWalletBankEntity);

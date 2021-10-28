@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 public class UserAccountEntity extends BaseEntity{
 	
 	@TableField(exist = false)
-	private Integer deleted;
+	private Long deleted;
 	
 	@TableField(exist = false)
 	private Long id;
