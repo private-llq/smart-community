@@ -56,10 +56,17 @@ public class ChineseYuanUtil {
 
     // 将金额小数部分转换为中文大写
     private static String fraction2rmb(String fraction) {
-        char jiao = fraction.charAt(0); // 角
-        char fen = fraction.charAt(1); // 分
-        return (RMB_NUMS[jiao - '0'] + (jiao > '0' ? UNITS[1] : ""))
-                + (fen > '0' ? RMB_NUMS[fen - '0'] + UNITS[2] : "");
+        if(fraction.length()==2){
+            char jiao = fraction.charAt(0); // 角
+            char fen = fraction.charAt(1); // 分
+            return (RMB_NUMS[jiao - '0'] + (jiao > '0' ? UNITS[1] : ""))
+                    + (fen > '0' ? RMB_NUMS[fen - '0'] + UNITS[2] : "");
+        }else if(fraction.length()==1){
+            char jiao = fraction.charAt(0); // 角
+            return (RMB_NUMS[jiao - '0'] + (jiao > '0' ? UNITS[1] : ""));
+        }else{
+            return fraction;
+        }
     }
 
     // 将金额整数部分转换为中文大写
