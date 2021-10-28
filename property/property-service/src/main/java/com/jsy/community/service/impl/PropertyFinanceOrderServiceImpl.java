@@ -7,9 +7,7 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
-import com.jsy.community.entity.CommunityEntity;
-import com.jsy.community.entity.HouseEntity;
-import com.jsy.community.entity.UserIMEntity;
+import com.jsy.community.entity.*;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
@@ -53,6 +51,9 @@ import java.util.*;
 public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinanceOrderMapper, PropertyFinanceOrderEntity> implements IPropertyFinanceOrderService {
     @Autowired
     private PropertyFinanceOrderMapper propertyFinanceOrderMapper;
+
+    @Autowired
+    private PropertyCompanyMapper propertyCompanyMapper;
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IHouseService houseService;
@@ -685,8 +686,18 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (rows != ids.length) {
             log.info("物业账单支付后处理失败，单号：" + tripartiteOrder + " 账单ID：" + Arrays.toString(ids));
         }
+//        StringBuilder detailedList = new StringBuilder();
         PropertyFinanceOrderEntity orderEntity = propertyFinanceOrderMapper.selectById(ids[0]);
         UserIMEntity userIMEntity = userImService.selectUid(orderEntity.getUid());
+        UserEntity userEntity = userService.getUser(orderEntity.getUid());
+        CommunityEntity communityEntity = communityMapper.selectById(orderEntity.getCommunityId());
+        PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(communityEntity.getPropertyId());
+
+        List<PropertyFinanceOrderEntity> list = propertyFinanceOrderMapper.selectByIdsList(ids);
+//        for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : list) {
+//            detailedList.append(propertyFinanceOrderEntity.getBeginTime()).append()
+//        }
+//        OrderCochainUtil.orderCochain("物业费","人民币",payType==1?"微信支付":"支付宝支付",total,tripartiteOrder,userEntity.getIdCard(),companyEntity.getUnifiedSocialCreditCode(),);
         if (userIMEntity != null) {
             Map<Object, Object> map = new HashMap<>();
             map.put("type", 3);

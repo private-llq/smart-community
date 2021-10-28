@@ -28,7 +28,7 @@ public class BaseEntity implements Serializable {
 	}
 	
 	@TableLogic
-	private Integer deleted;
+	private Long deleted;
 
 	@TableField(fill = FieldFill.INSERT)
 	@JsonDeserialize(using = LocalDateTimeDeserializer.class)

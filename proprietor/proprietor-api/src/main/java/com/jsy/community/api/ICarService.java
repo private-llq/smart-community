@@ -251,5 +251,5 @@ public interface ICarService extends IService<CarEntity> {
      * @Param: 
      * @return: 
      */
-    void updateByOrder(String id,BigDecimal total,String outTradeNo);
+    void updateByOrder(String id,BigDecimal total,String outTradeNo,Integer payType);
 }
