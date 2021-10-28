@@ -73,8 +73,6 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     @Autowired
     private CarOrderMapper carOrderMapper;
 
-
-
     /**
      * @Description: app修改月租车辆到期时间
      * @author: Hu
@@ -752,7 +750,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         List<CarOrderEntity> list = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>()
                 .eq("car_plate",carNumber)
                 .eq("type", 1)
-                .eq("order_status", 0)
+                .eq("order_status", 0)//未支付
+                .eq("overdue_state",1)//逾期
                 .eq("community_id", adminCommunityId));
         if (list.size()==0){
             return 1;//逾期车辆
