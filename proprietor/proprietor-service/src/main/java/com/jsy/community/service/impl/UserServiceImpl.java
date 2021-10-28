@@ -181,7 +181,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     /**
      * 查询用户信息
      */
-    private UserInfoVo queryUserInfo(String uid) {
+    @Override
+    public UserInfoVo queryUserInfo(String uid) {
         UserEntity user = baseMapper.queryUserInfoByUid(uid);
         if (user == null || user.getDeleted() == 1) {
             throw new ProprietorException("账号不存在");

@@ -31,6 +31,15 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @Date: 2020/12/3
 	**/
 	UserAuthVo createAuthVoWithToken(UserInfoVo userInfoVo);
+
+	/**
+	 * @author: Pipi
+	 * @description: 查询用户信息
+	 * @param uid: 
+	 * @return: com.jsy.community.vo.UserAuthVo
+	 * @date: 2021/10/28 11:26
+	 **/
+	UserInfoVo queryUserInfo(String uid);
 	
 	/**
 	* @Description: 更新用户极光ID

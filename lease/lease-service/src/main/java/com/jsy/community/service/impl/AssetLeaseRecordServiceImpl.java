@@ -1,4 +1,5 @@
 package com.jsy.community.service.impl;
+import java.math.BigDecimal;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -1615,6 +1616,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     @Override
     public HouseLeaseContractVO queryContractPreFillInfo(AssetLeaseRecordEntity assetLeaseRecordEntity) {
         HouseLeaseContractVO houseLeaseContractVO = new HouseLeaseContractVO();
+
         QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", assetLeaseRecordEntity.getId());
         AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
@@ -1703,7 +1705,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 }
                 List<Long> houseLeasedepositIds = MyMathUtils.analysisTypeCode(houseLeaseEntity.getHouseLeasedepositId());
                 if (!CollectionUtils.isEmpty(houseLeasedepositIds)) {
-                    Map<String, Long> constByTypeCodeForList = houseConstService.getConstByTypeCodeForList(houseFurnitureIds, 4L);
+                    Map<String, Long> constByTypeCodeForList = houseConstService.getConstByTypeCodeForList(houseFurnitureIds, 18L);
                     for (String key : constByTypeCodeForList.keySet()) {
                         switch (key) {
                             case "押1付1":
@@ -1724,6 +1726,12 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     }
                 }
             }
+        }
+        UserInfoVo userInfoVo = userService.queryUserInfo(leaseRecordEntity.getTenantUid());
+        if (userInfoVo != null) {
+            houseLeaseContractVO.setPartyB(userInfoVo.getRealName());
+            houseLeaseContractVO.setTelB(userInfoVo.getMobile());
+            houseLeaseContractVO.setIdCardB(userInfoVo.getIdCard());
         }
         return houseLeaseContractVO;
     }
