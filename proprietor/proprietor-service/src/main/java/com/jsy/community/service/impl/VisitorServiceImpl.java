@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.config.ProprietorTopicNameEntity;
@@ -11,6 +12,7 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceVisitorEditPersonDTO;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.VisitingCarRecordEntity;
 import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorPersonRecordEntity;
@@ -27,6 +29,7 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.VisitorEntryVO;
 import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
@@ -65,6 +68,9 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @DubboReference(version = Const.version, group = Const.group, check = false)
+    private ICommunityService communityService;
     
     @Autowired
     private CommunityHardWareMapper communityHardWareMapper;
@@ -183,6 +189,10 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         if (visitorEntity.getTempCodeStatus() == 1) {
             visitorEntity.setStartTime(LocalDateTime.now());
             visitorEntity.setEndTime(LocalDateTime.now().plusMinutes(visitorEntity.getEffectiveTime()));
+            CommunityEntity communityInfo = communityService.getCommunityNameById(visitorEntity.getCommunityId());
+            if (communityInfo != null) {
+                visitorEntity.setAddress(communityInfo.getName());
+            }
         }
         int insert = visitorMapper.insert(visitorEntity);
         if(1 != insert){
@@ -240,7 +250,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
 //           || (visitorEntity.getIsBuildingAccess() != null && visitorEntity.getIsBuildingAccess() != 0)){
 //           return getVisitorEntry(visitorEntity);// 返回门禁权限VO
 //        }
-        
+
         // 把访客登记数据推送给小区
         log.info("发送消息到队列{}", ProprietorTopicNameEntity.topicFaceXuServer);
         XUFaceVisitorEditPersonDTO xuFaceEditPersonDTO = new XUFaceVisitorEditPersonDTO();
@@ -253,7 +263,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         visitorEntryVO.setId(visitorEntity.getId());
         return visitorEntryVO;
     }
-    
+
 //    /**
 //     * @Description: 验证二维码
 //     * @Param: [jsonObject, hardwareType]
@@ -354,7 +364,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
 //        }
 //        return visitorEntryVO;
 //    }
-    
+
 //    /**
 //     * @Description: 访客门禁验证
 //     * @Param: [token, type]
@@ -399,7 +409,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
 //        }
 //        return false;
 //    }
-    
+
     /**
      * @Description: 批量添加随行人员
      * @Param: [personRecordList]
@@ -413,7 +423,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
             throw new ProprietorException(JSYError.INTERNAL.getCode(),"添加随行人员失败");
         }
     }
-    
+
     /**
      * @Description: 批量添加随行车辆
      * @Param: [carList]
@@ -427,7 +437,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
             throw new ProprietorException(JSYError.INTERNAL.getCode(),"添加随行车辆失败");
         }
     }
-    
+
 	/**
 	 * @Description: 根据ID 删除访客登记申请
 	 * @Param: [id]
@@ -445,7 +455,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
 	    }
 	    return false;
     }
-    
+
     /**
      * @Description: 关联删除 访客关联数据(随行人员记录、随行车辆记录)
      * @Param: [visitorId]
@@ -459,7 +469,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
         visitorPersonRecordMapper.deleteByMap(opMap);
         visitingCarRecordMapper.deleteByMap(opMap);
     }
-    
+
     /**
      * @Description: 分页查询
      * @Param: [baseQO, uid]

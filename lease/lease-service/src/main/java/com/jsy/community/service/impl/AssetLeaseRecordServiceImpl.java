@@ -1,4 +1,5 @@
 package com.jsy.community.service.impl;
+import java.math.BigDecimal;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -26,12 +27,10 @@ import com.jsy.community.mapper.*;
 import com.jsy.community.untils.wechat.PublicConfig;
 import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.util.HouseHelper;
-import com.jsy.community.utils.MyHttpUtils;
-import com.jsy.community.utils.MyMathUtils;
-import com.jsy.community.utils.PushInfoUtil;
-import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.*;
 import com.jsy.community.utils.signature.ZhsjUtil;
 import com.jsy.community.vo.UserInfoVo;
+import com.jsy.community.vo.lease.HouseLeaseContractVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -1612,5 +1611,128 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("con_id", conId);
         return assetLeaseRecordMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public HouseLeaseContractVO queryContractPreFillInfo(AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        HouseLeaseContractVO houseLeaseContractVO = new HouseLeaseContractVO();
+
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", assetLeaseRecordEntity.getId());
+        AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
+        if (leaseRecordEntity == null) {
+            return houseLeaseContractVO;
+        }
+        if (leaseRecordEntity.getAssetId() != null) {
+            if (leaseRecordEntity.getAssetType() == BusinessEnum.HouseTypeEnum.SHOP.getCode()) {
+                // 商铺
+                QueryWrapper<ShopLeaseEntity> shopLeaseEntityQueryWrapper = new QueryWrapper<>();
+                shopLeaseEntityQueryWrapper.eq("id", leaseRecordEntity.getAssetId());
+                ShopLeaseEntity shopLeaseEntity = shopLeaseMapper.selectOne(shopLeaseEntityQueryWrapper);
+                String city = StringUtils.isBlank(shopLeaseEntity.getCity()) ? "" : shopLeaseEntity.getCity();
+                String area = StringUtils.isBlank(shopLeaseEntity.getArea()) ? "" : shopLeaseEntity.getArea();
+                houseLeaseContractVO.setAddress(city + area);
+                houseLeaseContractVO.setBuiltupArea(shopLeaseEntity.getShopAcreage());
+                List<Long> faciltyList = MyMathUtils.analysisTypeCode(shopLeaseEntity.getShopFacility());
+                if (!CollectionUtils.isEmpty(faciltyList)) {
+                    Map<String, Long> constByTypeCodeForList = houseConstService.getConstByTypeCodeForList(faciltyList, 16L);
+                    String facilities = constByTypeCodeForList.keySet().toString();
+                    facilities = StringUtils.isBlank(facilities) ? "" : facilities;
+                    houseLeaseContractVO.setFacilities(facilities.replaceAll("\\[", "").replaceAll("\\]", ""));
+                }
+                houseLeaseContractVO.setMonthlyRent(shopLeaseEntity.getMonthMoney());
+                if (shopLeaseEntity.getMonthMoney() != null) {
+                    houseLeaseContractVO.setMonthlyRentInWords(ChineseYuanUtil.convert(shopLeaseEntity.getMonthMoney().toString()));
+                }
+                if (StringUtils.isNotBlank(shopLeaseEntity.getDefrayType())) {
+                    switch (shopLeaseEntity.getDefrayType()) {
+                        case "押一付一":
+                            houseLeaseContractVO.setPaymentOptions("A");
+                            break;
+                        case "押1付3":
+                            houseLeaseContractVO.setPaymentOptions("B");
+                            break;
+                        case "押1付6":
+                            houseLeaseContractVO.setPaymentOptions("C");
+                            break;
+                        case "年付":
+                            houseLeaseContractVO.setPaymentOptions("D");
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            } else {
+                // 房屋
+                QueryWrapper<HouseLeaseEntity> houseLeaseEntityQueryWrapper = new QueryWrapper<>();
+                houseLeaseEntityQueryWrapper.eq("id", leaseRecordEntity.getAssetId());
+                HouseLeaseEntity houseLeaseEntity = houseLeaseMapper.selectOne(houseLeaseEntityQueryWrapper);
+                String city = redisTemplate.opsForValue().get("RegionSingle:" + houseLeaseEntity.getHouseCityId());
+                String area = redisTemplate.opsForValue().get("RegionSingle:" + houseLeaseEntity.getHouseAreaId());
+                String address = houseLeaseEntity.getHouseAddress() == null ? "" : houseLeaseEntity.getHouseAddress();
+                houseLeaseContractVO.setAddress(city == null ? "" : city + area == null ? "" : area + address);
+                houseLeaseContractVO.setBuiltupArea(houseLeaseEntity.getHouseSquareMeter().doubleValue());
+                List<Long> decorationTypeIds = MyMathUtils.analysisTypeCode(houseLeaseEntity.getDecorationTypeId());
+                if (!CollectionUtils.isEmpty(decorationTypeIds)) {
+                    Map<String, Long> constByTypeCodeForList = houseConstService.getConstByTypeCodeForList(decorationTypeIds, 18L);
+                    houseLeaseContractVO.setDecorationLevel(constByTypeCodeForList.keySet().toString().replaceAll("\\[", "").replaceAll("\\]", ""));
+                }
+                // 房屋家具
+                List<Long> houseFurnitureIds = MyMathUtils.analysisTypeCode(houseLeaseEntity.getHouseFurnitureId());
+                Map<String, Long> facilitiesMap = new HashMap<>();
+                if (!CollectionUtils.isEmpty(houseFurnitureIds)) {
+                    Map<String, Long> constByTypeCodeForList = houseConstService.getConstByTypeCodeForList(houseFurnitureIds, 13L);
+                    facilitiesMap.putAll(constByTypeCodeForList);
+                }
+                // 房间设施
+                List<Long> roomFacilitiesIds = MyMathUtils.analysisTypeCode(houseLeaseEntity.getRoomFacilitiesId());
+                if (!CollectionUtils.isEmpty(roomFacilitiesIds)) {
+                    Map<String, Long> constByTypeCodeForList = houseConstService.getConstByTypeCodeForList(houseFurnitureIds, 24L);
+                    facilitiesMap.putAll(constByTypeCodeForList);
+                }
+                // 公共配置
+                List<Long> commonFacilitiesIds = MyMathUtils.analysisTypeCode(houseLeaseEntity.getCommonFacilitiesId());
+                if (!CollectionUtils.isEmpty(houseFurnitureIds)) {
+                    Map<String, Long> constByTypeCodeForList = houseConstService.getConstByTypeCodeForList(houseFurnitureIds, 23L);
+                    facilitiesMap.putAll(constByTypeCodeForList);
+                }
+                String facilities = facilitiesMap.keySet().toString();
+                facilities = StringUtils.isBlank(facilities) ? "" : facilities;
+                houseLeaseContractVO.setFacilities(facilities.replaceAll("\\[", "").replaceAll("\\]", ""));
+                houseLeaseContractVO.setMonthlyRent(houseLeaseEntity.getHousePrice());
+                if (houseLeaseEntity.getHousePrice() != null) {
+                    houseLeaseContractVO.setMonthlyRentInWords(ChineseYuanUtil.convert(houseLeaseEntity.getHousePrice().toString()));
+                }
+                List<Long> houseLeasedepositIds = MyMathUtils.analysisTypeCode(houseLeaseEntity.getHouseLeasedepositId());
+                if (!CollectionUtils.isEmpty(houseLeasedepositIds)) {
+                    Map<String, Long> constByTypeCodeForList = houseConstService.getConstByTypeCodeForList(houseFurnitureIds, 18L);
+                    for (String key : constByTypeCodeForList.keySet()) {
+                        switch (key) {
+                            case "押1付1":
+                                houseLeaseContractVO.setPaymentOptions("A");
+                                break;
+                            case "押1付3":
+                                houseLeaseContractVO.setPaymentOptions("B");
+                                break;
+                            case "半年付":
+                                houseLeaseContractVO.setPaymentOptions("C");
+                                break;
+                            case "年付":
+                                houseLeaseContractVO.setPaymentOptions("D");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        UserInfoVo userInfoVo = userService.queryUserInfo(leaseRecordEntity.getTenantUid());
+        if (userInfoVo != null) {
+            houseLeaseContractVO.setPartyB(userInfoVo.getRealName());
+            houseLeaseContractVO.setTelB(userInfoVo.getMobile());
+            houseLeaseContractVO.setIdCardB(userInfoVo.getIdCard());
+        }
+        return houseLeaseContractVO;
     }
 }

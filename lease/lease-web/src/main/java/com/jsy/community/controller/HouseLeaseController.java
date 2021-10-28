@@ -22,6 +22,7 @@ import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.HouseVo;
+import com.jsy.community.vo.lease.HouseLeaseContractVO;
 import com.jsy.community.vo.lease.HouseLeaseSimpleVO;
 import com.jsy.community.vo.lease.HouseLeaseVO;
 import io.swagger.annotations.Api;
@@ -370,5 +371,19 @@ public class HouseLeaseController {
         return CommonResult.ok(assetLeaseRecordService.signatureOperation(assetLeaseRecordEntity));
     }
 
-
+    /**
+     * @author: Pipi
+     * @description: 查询拟定合同需要的预填参数
+     * @param assetLeaseRecordEntity:
+     * @return: com.jsy.community.vo.CommonResult
+     * @date: 2021/10/27 16:23
+     **/
+    @Login
+    @PostMapping("/v2/queryContractPreFillInfo")
+    public CommonResult queryContractPreFillInfo(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
+        if (assetLeaseRecordEntity.getId() == null) {
+            throw new JSYException(400, "签约ID不能为空");
+        }
+        return CommonResult.ok(assetLeaseRecordService.queryContractPreFillInfo(assetLeaseRecordEntity));
+    }
 }
