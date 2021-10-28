@@ -80,7 +80,7 @@ public class CarPositionEntity implements Serializable {
      */
     @ExcelIgnore
     @TableLogic
-    private Integer deleted;
+    private Long deleted;
 
     /**
      * 创建时间

@@ -41,7 +41,7 @@ public class CarLocationEntity extends BaseQO {
     private Long communityId;
 
     @TableLogic
-    private Integer deleted;
+    private Long deleted;
 
     @TableField(fill = FieldFill.INSERT)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)

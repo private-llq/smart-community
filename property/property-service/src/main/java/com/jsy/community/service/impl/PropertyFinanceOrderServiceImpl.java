@@ -2073,7 +2073,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             entity.setType(propertyFeeRuleEntity.getType());
             entity.setFeeRuleId(propertyFeeRuleEntity.getId());
             entity.setOrderNum(FinanceBillServiceImpl.getOrderNum(String.valueOf(propertyFeeRuleEntity.getCommunityId())));
-            entity.setDeleted(0);
+            entity.setDeleted(0L);
             entity.setCreateTime(LocalDateTime.now());
             addPropertyFinanceOrderEntityList.add(entity);
         }

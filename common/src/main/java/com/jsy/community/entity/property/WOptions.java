@@ -73,7 +73,7 @@ public class WOptions implements Serializable {
      * 逻辑删除
      */
     @TableLogic
-    private Integer deleted;
+    private Long deleted;
 
     /**
      * 乐观锁

@@ -129,7 +129,7 @@ public class CommunityHardWareServiceImpl extends ServiceImpl<CommunityHardWareM
                 visitorFaceSyncRecordEntity.setFaceUrl(visitorEntity.getFaceUrl());
                 visitorFaceSyncRecordEntity.setFacilityId(facilityId);
                 visitorFaceSyncRecordEntity.setId(SnowFlake.nextId());
-                visitorFaceSyncRecordEntity.setDeleted(0);
+                visitorFaceSyncRecordEntity.setDeleted(0L);
                 visitorFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
                 visitorFaceSyncRecordEntities.add(visitorFaceSyncRecordEntity);
 

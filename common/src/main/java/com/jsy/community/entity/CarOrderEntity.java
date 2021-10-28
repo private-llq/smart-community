@@ -122,9 +122,17 @@ public class CarOrderEntity extends BaseEntity {
     @ExcelIgnore
     private Integer goStatus;
 
-    //是否为滞留订单0正常,1滞留订单
+    /**
+     * 是否为滞留订单0正常,1滞留订单
+     */
     @ExcelIgnore
     private  Integer isRetention;
+
+    /**
+     * 是否为包月逾期订单 0 正常 1逾期
+     */
+    @ExcelIgnore
+    private Integer overdueState;
 
     /**
      * 停车时长

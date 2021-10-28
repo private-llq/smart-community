@@ -34,5 +34,5 @@ public class CarOperationLog implements Serializable {
     private LocalDateTime updateTime;
 
     @TableLogic
-    private Integer deleted;
+    private Long deleted;
 }

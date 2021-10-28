@@ -16,6 +16,7 @@
     <name>物业端服务提供模块</name>
 
     <dependencies>
+
         <dependency>
             <groupId>com.jsy</groupId>
             <artifactId>property-api</artifactId>
@@ -44,19 +45,19 @@
         </dependency>
 
         <!-- nacos 服务发现 -->
-<!--        <dependency>-->
-<!--            <groupId>com.alibaba.cloud</groupId>-->
-<!--            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.alibaba.cloud</groupId>-->
+        <!--            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-dubbo</artifactId>
         </dependency>
         <!-- 配置中心 -->
-<!--        <dependency>-->
-<!--            <groupId>com.alibaba.cloud</groupId>-->
-<!--            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.alibaba.cloud</groupId>-->
+        <!--            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>-->
+        <!--        </dependency>-->
         <!-- 数据持久化 -->
         <dependency>
             <groupId>mysql</groupId>
@@ -183,6 +184,7 @@
             <artifactId>easyexcel</artifactId>
             <version>2.2.0-beta2</version>
         </dependency>
+
     </dependencies>
 
     <build>

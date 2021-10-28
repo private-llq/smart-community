@@ -42,7 +42,7 @@ public class PropertyFinanceTicketTemplateController {
     @businessLog(operation = "新增",content = "新增了【票据打印模板】")
     public CommonResult addTicketTemplate(@RequestBody FinanceTicketTemplateEntity templateEntity) {
         ValidatorUtils.validateEntity(templateEntity, FinanceTicketTemplateEntity.AddTicketTemplateValidate.class);
-        templateEntity.setDeleted(0);
+        templateEntity.setDeleted(0L);
         templateEntity.setCommunityId(String.valueOf(UserUtils.getAdminCommunityId()));
         String id = ticketTemplateService.insertTicketTemplate(templateEntity);
         return StringUtils.isNotBlank(id) ? CommonResult.ok(id, "添加成功!") : CommonResult.error("添加失败了!");

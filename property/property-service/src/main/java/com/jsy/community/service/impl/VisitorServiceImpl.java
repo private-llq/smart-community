@@ -19,6 +19,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.elasticsearch.search.sort.MinAndMax;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
 public class VisitorServiceImpl implements IVisitorService {
 	
 	@Autowired
-	private VisitorMapper visitorMapper;
+	private  VisitorMapper visitorMapper;
 	
 	@Autowired
 	private VisitorPersonRecordMapper visitorPersonRecordMapper;
@@ -314,7 +315,7 @@ public class VisitorServiceImpl implements IVisitorService {
 						visitorFaceSyncRecordEntity.setFaceUrl(visitorEntity.getFaceUrl());
 						visitorFaceSyncRecordEntity.setFacilityId(communityHardWareEntity.getHardwareId());
 						visitorFaceSyncRecordEntity.setId(SnowFlake.nextId());
-						visitorFaceSyncRecordEntity.setDeleted(0);
+						visitorFaceSyncRecordEntity.setDeleted(0L);
 						visitorFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
 						visitorFaceSyncRecordEntities.add(visitorFaceSyncRecordEntity);
 					}
@@ -347,7 +348,7 @@ public class VisitorServiceImpl implements IVisitorService {
 					visitorFaceSyncRecordEntity.setFaceUrl(visitorEntity.getFaceUrl());
 					visitorFaceSyncRecordEntity.setFacilityId(communityHardWareEntity.getHardwareId());
 					visitorFaceSyncRecordEntity.setId(SnowFlake.nextId());
-					visitorFaceSyncRecordEntity.setDeleted(0);
+					visitorFaceSyncRecordEntity.setDeleted(0L);
 					visitorFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
 					visitorFaceSyncRecordEntities.add(visitorFaceSyncRecordEntity);
 					facilityIds.add(communityHardWareEntity.getHardwareId());
@@ -420,15 +421,28 @@ public class VisitorServiceImpl implements IVisitorService {
 	public boolean selectCarNumberIsNoInvite(String carNumber, Long communityId,Integer status) {
 		QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<VisitorEntity>()
 				.eq("community_id", communityId)//社区id
-				.eq("status",status)//状态 1.待入园 2.已入园 3.已出园 4.已失效
-				//.eq("check_status",1)//通过审核
+				//.eq("status",status)//状态 1.待入园 2.已入园 3.已出园 4.已失效
+				//.eq("check_status",1)//(预留)通过审核
 				.eq("car_plate",carNumber);
+		       //if(status==1){//状态 1.待入园 2.已入园 3.已出园 4.已失效
+				  LocalDateTime now = LocalDateTime.now();
+				  queryWrapper.ge("start_time",now);//当前时间大于等于开始时间
+				  queryWrapper.le("end_time",now);//结束时间小于等于当前时间
+			  //}
 		List<VisitorEntity> visitorEntities = visitorMapper.selectList(queryWrapper);
 		if (visitorEntities.size()>0) {
 			return true;
 		}
 		return false;
 	}
+
+
+
+
+
+
+
+
 
 	@Override
 	public boolean updateCarStatus(String carNumber, Long communityId, Integer status) {

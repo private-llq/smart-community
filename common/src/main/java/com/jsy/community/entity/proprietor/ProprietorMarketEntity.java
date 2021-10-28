@@ -94,7 +94,7 @@ public class ProprietorMarketEntity extends BaseEntity {
     private  String communityName;
 
     @ApiModelProperty(value = "前端删除")
-    private Integer deleted;
+    private Long deleted;
 
 
     @ApiModelProperty(value = "后端删除")

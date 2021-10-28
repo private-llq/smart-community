@@ -18,7 +18,7 @@ public class UserUroraTagsEntity extends BaseEntity{
 	private Long id;
 	
 	@TableField(exist = false)
-	private Integer deleted;
+	private Long deleted;
 	
 	@ApiModelProperty(value = "用户id")
 	private String uid;

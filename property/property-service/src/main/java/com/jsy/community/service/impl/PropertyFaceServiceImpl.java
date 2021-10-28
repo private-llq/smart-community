@@ -101,7 +101,7 @@ public class PropertyFaceServiceImpl extends ServiceImpl<PropertyFaceMapper, Pro
                     propertyFaceSyncRecordEntity.setFaceUrl(faceEntity.getFaceUrl());
                     propertyFaceSyncRecordEntity.setFacilityId(hardwareId);
                     propertyFaceSyncRecordEntity.setId(SnowFlake.nextId());
-                    propertyFaceSyncRecordEntity.setDeleted(0);
+                    propertyFaceSyncRecordEntity.setDeleted(0L);
                     propertyFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
                     faceSyncRecordEntities.add(propertyFaceSyncRecordEntity);
                 }
@@ -188,7 +188,7 @@ public class PropertyFaceServiceImpl extends ServiceImpl<PropertyFaceMapper, Pro
             faceEntity.setFaceUrl(propertyFaceEntity.getFaceUrl());
             faceEntity.setFaceEnableStatus(propertyFaceEntity.getFaceEnableStatus());
             faceEntity.setFaceDeleted(0);
-            faceEntity.setDeleted(0);
+            faceEntity.setDeleted(0L);
             faceEntity.setId(SnowFlake.nextId());
             faceEntity.setCreateTime(LocalDateTime.now());
             result = propertyFaceMapper.insert(faceEntity);
@@ -197,7 +197,7 @@ public class PropertyFaceServiceImpl extends ServiceImpl<PropertyFaceMapper, Pro
             faceEntity.setFaceUrl(propertyFaceEntity.getFaceUrl());
             faceEntity.setFaceEnableStatus(propertyFaceEntity.getFaceEnableStatus());
             faceEntity.setFaceDeleted(0);
-            faceEntity.setDeleted(0);
+            faceEntity.setDeleted(0L);
             result = propertyFaceMapper.updateById(faceEntity);
             // 删除原有的同步记录
             QueryWrapper<PropertyFaceSyncRecordEntity> recordEntityQueryWrapper = new QueryWrapper<>();
@@ -219,7 +219,7 @@ public class PropertyFaceServiceImpl extends ServiceImpl<PropertyFaceMapper, Pro
                     propertyFaceSyncRecordEntity.setFaceUrl(faceEntity.getFaceUrl());
                     propertyFaceSyncRecordEntity.setFacilityId(hardwareId);
                     propertyFaceSyncRecordEntity.setId(SnowFlake.nextId());
-                    propertyFaceSyncRecordEntity.setDeleted(0);
+                    propertyFaceSyncRecordEntity.setDeleted(0L);
                     propertyFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
                     faceSyncRecordEntities.add(propertyFaceSyncRecordEntity);
                 }

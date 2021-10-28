@@ -482,6 +482,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
                 carOrderEntity.setCommunityId(adminCommunityId);//社区id
                 carOrderEntity.setIsRetention(0);//是否为滞留订单
                 carOrderEntity.setRise("无");
+                carOrderEntity.setOverdueState(1);//逾期订单
                 var calendar = Calendar.getInstance();
                 int month = calendar.get(Calendar.MONTH) + 1;
                 carOrderEntity.setMonth(month);
