@@ -20,6 +20,9 @@ public class PropertyCompanyEntity extends BaseEntity {
     
     @ApiModelProperty(value = "公司名称")
     private String name;
+
+    @ApiModelProperty(value = "统一社会信用代码")
+    private String unifiedSocialCreditCode;
     
     @ApiModelProperty(value = "联系人")
     private String contacts;

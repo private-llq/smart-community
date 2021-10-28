@@ -87,6 +87,7 @@ public class ChineseYuanUtil {
                             || i > 2 && integer.charAt(i - 3) != '0') {
                         buffer.append(U2[j / 4]);
                     }
+
                 }
             } else {
                 if (j % 4 == 0) {
