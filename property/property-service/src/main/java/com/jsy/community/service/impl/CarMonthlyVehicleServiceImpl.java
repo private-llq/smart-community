@@ -387,7 +387,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         String carNumber = vehicle.getCarNumber();
         Long communityId = vehicle.getCommunityId();
         CarEntity carEntity = new CarEntity();
-        carEntity.setDeleted(1);
+        carEntity.setDeleted(1L);
         carMapper.update(carEntity,new UpdateWrapper<CarEntity>().eq("car_plate",carNumber).eq("community_id",communityId).set("deleted",1));
 
 

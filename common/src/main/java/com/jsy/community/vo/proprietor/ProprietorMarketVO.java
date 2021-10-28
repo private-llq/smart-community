@@ -67,7 +67,7 @@ public class ProprietorMarketVO extends BaseVO {
     private Integer click;
 
     @ApiModelProperty(value = "前端删除")
-    private Integer deleted;
+    private Long deleted;
 
 
     @ApiModelProperty(value = "后端删除")

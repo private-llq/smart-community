@@ -78,7 +78,7 @@ public class UnionPayBApplyRecordServiceImpl extends ServiceImpl<UnionPayBApplyR
             bApplyRecordEntity.setOperationType(0);
             bApplyRecordEntity.setRegStatus("00");
             bApplyRecordEntity.setId(SnowFlake.nextId());
-            bApplyRecordEntity.setDeleted(0);
+            bApplyRecordEntity.setDeleted(0L);
             bApplyRecordMapper.insert(bApplyRecordEntity);
         }
         return credentialResponseVO.getResponse();
@@ -119,7 +119,7 @@ public class UnionPayBApplyRecordServiceImpl extends ServiceImpl<UnionPayBApplyR
                 bUnionPayWalletEntity.setLegalName(credentialNotifyQO.getLegalName());
                 bUnionPayWalletEntity.setBankAcctType(Integer.valueOf(credentialNotifyQO.getBankAcctType()));
                 bUnionPayWalletEntity.setId(SnowFlake.nextId());
-                bUnionPayWalletEntity.setDeleted(0);
+                bUnionPayWalletEntity.setDeleted(0L);
                 bUnionPayWalletMapper.insert(bUnionPayWalletEntity);
             }
         }

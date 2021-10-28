@@ -38,7 +38,7 @@ public class SelectCarPositionPagingVO {
      * 逻辑删除
      */
     @TableLogic
-    private Integer deleted;
+    private Long deleted;
 
 
 

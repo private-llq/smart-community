@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 public class RedbagEntity extends BaseEntity{
 	
 	@TableField(exist = false)
-	private Integer deleted;
+	private Long deleted;
 	
 	@ApiModelProperty(value = "发送人ID")
 	private String userUuid;

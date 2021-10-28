@@ -928,7 +928,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 //                buildingHouseEntity.setPropertyType(houseEntity.getPropertyType());
                 buildingHouseEntity.setCreateBy(uid);
                 buildingHouseEntity.setId(SnowFlake.nextId());
-                buildingHouseEntity.setDeleted(0);
+                buildingHouseEntity.setDeleted(0L);
                 buildingHouseEntity.setCreateTime(LocalDateTime.now());
                 buildingHouseEntity.setUpdateTime(LocalDateTime.now());
                 buildingNumMap.put(houseEntity.getBuilding(), buildingHouseEntity);
@@ -946,7 +946,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
                 unitHouseEntity.setCreateBy(uid);
 //                unitHouseEntity.setBuildingNumber(houseEntity.getBuildingNumber());
                 unitHouseEntity.setId(SnowFlake.nextId());
-                unitHouseEntity.setDeleted(0);
+                unitHouseEntity.setDeleted(0L);
                 unitHouseEntity.setCreateTime(LocalDateTime.now());
                 unitHouseEntity.setUpdateTime(LocalDateTime.now());
                 unitNumMap.put(houseEntity.getBuilding() + houseEntity.getUnit(), unitHouseEntity);
@@ -970,7 +970,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
             addHouseEntity.setComment(houseEntity.getComment());
             addHouseEntity.setCreateBy(uid);
             addHouseEntity.setId(SnowFlake.nextId());
-            addHouseEntity.setDeleted(0);
+            addHouseEntity.setDeleted(0L);
             addHouseEntity.setCreateTime(LocalDateTime.now());
             addHouseEntity.setUpdateTime(LocalDateTime.now());
             addHouseEntityList.add(addHouseEntity);
@@ -1055,7 +1055,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
                 buildingHouseEntity.setBuildingType(houseEntity.getBuildingType());
                 buildingHouseEntity.setCreateBy(uid);
                 buildingHouseEntity.setId(SnowFlake.nextId());
-                buildingHouseEntity.setDeleted(0);
+                buildingHouseEntity.setDeleted(0L);
                 buildingHouseEntity.setCreateTime(LocalDateTime.now());
                 buildingHouseEntity.setUpdateTime(LocalDateTime.now());
                 buildingNumMap.put(houseEntity.getBuilding(), buildingHouseEntity);

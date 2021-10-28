@@ -58,7 +58,7 @@ public class ComplainEntity implements Serializable {
 
     @ApiModelProperty(hidden = true)
     @TableLogic
-    private Integer deleted;
+    private Long deleted;
     @ApiModelProperty(hidden = true)
     private LocalDateTime createTime;
     @ApiModelProperty(hidden = true)

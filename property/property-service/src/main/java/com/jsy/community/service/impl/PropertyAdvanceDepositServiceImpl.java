@@ -229,7 +229,7 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
                 addPropertyAdvanceDepositEntity.setHouseId(propertyAdvanceDepositEntity.getHouseId());
                 addPropertyAdvanceDepositEntity.setBalance(propertyAdvanceDepositEntity.getReceivedAmount());
                 addPropertyAdvanceDepositEntity.setComment(propertyAdvanceDepositEntity.getComment());
-                addPropertyAdvanceDepositEntity.setDeleted(0);
+                addPropertyAdvanceDepositEntity.setDeleted(0L);
                 addPropertyAdvanceDepositEntity.setCreateBy(uid);
                 addPropertyAdvanceDepositEntity.setCreateTime(LocalDateTime.now());
                 addPropertyAdvanceDepositEntityList.add(addPropertyAdvanceDepositEntity);
@@ -243,7 +243,7 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
                 propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositEntity.getReceivedAmount());
                 propertyAdvanceDepositRecordEntity.setAdvanceDepositId(addPropertyAdvanceDepositEntity.getId());
                 propertyAdvanceDepositRecordEntity.setComment(propertyAdvanceDepositEntity.getComment());
-                propertyAdvanceDepositRecordEntity.setDeleted(0);
+                propertyAdvanceDepositRecordEntity.setDeleted(0L);
                 propertyAdvanceDepositRecordEntity.setCreateBy(uid);
                 propertyAdvanceDepositRecordEntity.setCreateTime(LocalDateTime.now());
                 addPropertyAdvanceDepositRecordEntityList.add(propertyAdvanceDepositRecordEntity);
@@ -277,7 +277,7 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
                 propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositRecordEntity1.getBalanceRecord().add(propertyAdvanceDepositEntity.getReceivedAmount()));
                 propertyAdvanceDepositRecordEntity.setAdvanceDepositId(propertyAdvanceDepositRecordEntity1.getAdvanceDepositId());
                 propertyAdvanceDepositRecordEntity.setComment(updatePropertyAdvanceDepositEntity.getComment());
-                propertyAdvanceDepositRecordEntity.setDeleted(0);
+                propertyAdvanceDepositRecordEntity.setDeleted(0L);
                 propertyAdvanceDepositRecordEntity.setUpdateBy(uid);
                 propertyAdvanceDepositRecordEntity.setUpdateTime(LocalDateTime.now());
                 addPropertyAdvanceDepositRecordEntityList.add(propertyAdvanceDepositRecordEntity);

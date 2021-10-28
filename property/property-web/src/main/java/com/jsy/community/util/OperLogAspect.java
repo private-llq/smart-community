@@ -90,7 +90,7 @@ public class OperLogAspect {
                 carOperationLog.setStatus(0); // 状态
 
                 carOperationLog.setOperationTime(LocalDateTime.now());
-                carOperationLog.setDeleted(0);
+                carOperationLog.setDeleted(0L);
                 System.out.println("对象结束赋值");
             }
 
