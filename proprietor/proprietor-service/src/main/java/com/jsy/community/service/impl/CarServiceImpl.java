@@ -13,6 +13,7 @@ import com.jsy.community.entity.*;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.property.CarChargeQO;
 import com.jsy.community.qo.proprietor.CarQO;
 import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
@@ -188,10 +189,12 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     public List<CarOrderEntity> getTemporaryOrder(Long communityId, String userId) {
         List<CarOrderEntity> entities = carMapper.getTemporaryOrder(communityId,userId);
+        CommunityEntity communityEntity = communityMapper.selectById(communityId);
         if (entities.size()!=0) {
             for (CarOrderEntity entity : entities) {
-                entity.setMinute(ChronoUnit.MINUTES.between(entity.getBeginTime(), entity.getOrderTime()));
+//                entity.setMinute(ChronoUnit.MINUTES.between(entity.getBeginTime(), LocalDateTime.now()));
                 entity.setCarTypeText("临时车");
+                entity.setCarPositionText(communityEntity.getName());
             }
         }
         return entities;
@@ -207,11 +210,16 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      * @return: void
      */
     @Override
-    public void updateByOrder(String id) {
+    @TxcTransaction
+    public void updateByOrder(String id,BigDecimal total,String outTradeNo) {
         CarOrderEntity carOrderEntity = appCarOrderMapper.selectById(id);
+        String orderNum = getOrderNum(carOrderEntity.getCommunityId().toString());
         if (carOrderEntity != null) {
             carOrderEntity.setPayType(1);
             carOrderEntity.setOrderStatus(1);
+            carOrderEntity.setMoney(total);
+            carOrderEntity.setOverTime(LocalDateTime.now());
+            carOrderEntity.setBillNum(orderNum);
             appCarOrderMapper.updateById(carOrderEntity);
 
             //向账单表添加数据
@@ -224,10 +232,11 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             orderEntity.setCommunityId(carOrderEntity.getCommunityId());
             orderEntity.setOrderTime(LocalDate.now());
             orderEntity.setUid(carOrderEntity.getUid());
-            orderEntity.setPropertyFee(carOrderEntity.getMoney());
-            orderEntity.setOrderNum(getOrderNum(carOrderEntity.getCommunityId().toString()));
+            orderEntity.setPropertyFee(total);
+            orderEntity.setOrderNum(orderNum);
             orderEntity.setOrderStatus(1);
             orderEntity.setPayType(2);
+            orderEntity.setTripartiteOrder(outTradeNo);
             orderEntity.setPayTime(LocalDateTime.now());
             orderEntity.setBeginTime(carOrderEntity.getBeginTime().toLocalDate());
             orderEntity.setOverTime(carOrderEntity.getOverTime().toLocalDate());
@@ -247,7 +256,28 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     public CarOrderEntity getTemporaryOrderById(Long id, String userId) {
         CarOrderEntity carOrderEntity = appCarOrderMapper.selectById(id);
-        carOrderEntity.setMinute(ChronoUnit.MINUTES.between(carOrderEntity.getBeginTime(), carOrderEntity.getOrderTime()));
+
+        //设置金额
+        CarChargeQO chargeQO = new CarChargeQO();
+        chargeQO.setCarColor(carOrderEntity.getPlateColor());
+        chargeQO.setCommunityId(String.valueOf(carOrderEntity.getCommunityId()));
+        chargeQO.setInTime(carOrderEntity.getBeginTime());
+        chargeQO.setReTime(LocalDateTime.now());
+        carOrderEntity.setMoney(carChargeService.charge(chargeQO));
+
+        CommunityEntity entity = communityMapper.selectById(carOrderEntity.getCommunityId());
+        carOrderEntity.setCarPositionText(entity.getName());
+        Integer integer = carOrderEntity.getPlateColor()=="黄色"?0:1;
+        CarChargeEntity carChargeEntity = carChargeService.selectTemporary(carOrderEntity.getCommunityId(),integer);
+        if (carChargeEntity != null) {
+            carOrderEntity.setExpenseRule(carChargeEntity.getChargePrice());
+        }
+        CarBasicsEntity basicsEntity = carBasicsService.findOne(carOrderEntity.getCommunityId());
+        if (basicsEntity != null) {
+            carOrderEntity.setRetentionMinute(basicsEntity.getDwellTime());
+        }
+        carOrderEntity.setMinute(ChronoUnit.MINUTES.between(carOrderEntity.getBeginTime(), LocalDateTime.now()));
+        carOrderEntity.setRetentionHour(24);
         carOrderEntity.setCarTypeText("临时车");
         return carOrderEntity;
     }

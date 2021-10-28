@@ -1,5 +1,7 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -40,6 +42,10 @@ public class ComplainEntity implements Serializable {
     //@NotNull(message = "类型不能为空")
     @ApiModelProperty(value = "类型，1投诉，2建议")
     private Integer type;
+    
+    @ApiModelProperty(value = "类型名称，1投诉，2建议")
+    @TableField(exist = false)
+    private String typeName;
 
     @NotNull(message = "类容不能为空")
     @ApiModelProperty(value = "内容")
@@ -51,6 +57,7 @@ public class ComplainEntity implements Serializable {
 
 
     @ApiModelProperty(hidden = true)
+    @TableLogic
     private Integer deleted;
     @ApiModelProperty(hidden = true)
     private LocalDateTime createTime;

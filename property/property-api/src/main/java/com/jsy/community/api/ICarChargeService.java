@@ -82,4 +82,13 @@ public interface ICarChargeService {
 
      //查询临时车免费停车时长
     public Integer selectTemporaryFreTime(Long CommunityId,Integer plateType);
+
+    /**
+     * @Description: 查询临时收费规则
+     * @author: Hu
+     * @since: 2021/10/27 11:02
+     * @Param:
+     * @return:
+     */
+    CarChargeEntity selectTemporary(Long communityId, Integer integer);
 }

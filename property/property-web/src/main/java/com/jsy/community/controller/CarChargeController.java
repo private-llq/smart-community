@@ -116,6 +116,7 @@ public class CarChargeController {
      * 订单支付返回收费详情
      */
     @PostMapping("/orderCharge")
+    @CrossOrigin
     public CommonResult orderCharge(@RequestParam Long adminCommunityId,@RequestParam String carNumber){
         orderChargeDto orderCharge =carChargeService.orderCharge(adminCommunityId,carNumber);
 
