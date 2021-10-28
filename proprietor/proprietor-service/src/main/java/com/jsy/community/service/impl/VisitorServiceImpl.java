@@ -186,14 +186,13 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     public VisitorEntryVO appAddVisitor(VisitorEntity visitorEntity){
         long visitorId = SnowFlake.nextId();
         visitorEntity.setId(visitorId);
-        CommunityEntity communityInfo = communityService.getCommunityNameById(visitorEntity.getCommunityId());
-        if (communityInfo != null) {
-            String address = StringUtils.isEmpty(communityInfo.getAddress()) ? "" : communityInfo.getAddress();
-            visitorEntity.setAddress(communityInfo.getName() + address);
-        }
         if (visitorEntity.getTempCodeStatus() == 1) {
             visitorEntity.setStartTime(LocalDateTime.now());
             visitorEntity.setEndTime(LocalDateTime.now().plusMinutes(visitorEntity.getEffectiveTime()));
+            CommunityEntity communityInfo = communityService.getCommunityNameById(visitorEntity.getCommunityId());
+            if (communityInfo != null) {
+                visitorEntity.setAddress(communityInfo.getName());
+            }
         }
         int insert = visitorMapper.insert(visitorEntity);
         if(1 != insert){
