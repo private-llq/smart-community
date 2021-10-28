@@ -279,7 +279,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         UserEntity user = new UserEntity();
         user.setUid(uuid);
         user.setAvatarUrl("https://i.postimg.cc/1XgLJbXJ/home.jpg");
-        user.setNickname("E-home@" + qo.getAccount());
+//        user.setNickname("E-home@" + qo.getAccount());
+        user.setNickname(qo.getAccount());
         user.setId(SnowFlake.nextId());
 
         // 账户数据(user_auth表)
@@ -404,7 +405,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         user.setId(SnowFlake.nextId());
         user.setUid(uuid);
         user.setAvatarUrl("https://i.postimg.cc/1XgLJbXJ/home.jpg");
-        user.setNickname("E-home@" + qo.getAccount());
+//        user.setNickname("E-home@" + qo.getAccount());
+        user.setNickname(qo.getAccount());
         user.setRealName(qo.getName());
 
         // 账户数据(user_auth表)
