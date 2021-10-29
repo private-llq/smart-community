@@ -780,6 +780,29 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         return overdueVo;//正常
     }
 
+    /**
+     * 根据车牌号和社区id修改包月记录最后一条数据的  isOverdueFee 为已交
+     */
+    public Integer UpdateoVerduefee(String carNumber,Long communityId){
+        List<CarMonthlyVehicle> monthlyVehicleList = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>()
+                .eq("car_number", carNumber)
+                .eq("community_id", communityId)
+        );
+        Optional<CarMonthlyVehicle> max = monthlyVehicleList.stream().max(Comparator.comparing(x -> {
+            return x.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+        }));
+        if (max.isPresent()){
+            CarMonthlyVehicle monthlyVehicle = new CarMonthlyVehicle();
+            monthlyVehicle.setIsOverdueFee(1);
+            int update = carMonthlyVehicleMapper.update(monthlyVehicle, new QueryWrapper<CarMonthlyVehicle>()
+                    .eq("car_number", carNumber)
+                    .eq("community_id", communityId)
+            );
+            return update;
+        }
+        return null;
+    }
+
 
 
     /**
