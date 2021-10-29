@@ -35,7 +35,7 @@
           AND tv.uid = #{uid}
           AND tv.car_plate IS NOT NULL
           AND tv.car_alternative_payment_status = 1
-          AND co.community_id = 1
+          AND co.community_id = #{communityId}
           AND co.begin_time BETWEEN tv.start_time
           AND tv.end_time
           AND co.order_status = 0
