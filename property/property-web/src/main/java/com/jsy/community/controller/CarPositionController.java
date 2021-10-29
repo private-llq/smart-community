@@ -24,6 +24,7 @@ import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.car.CarVO;
 import com.jsy.community.vo.car.GpioData;
 import com.jsy.community.vo.car.Rs485Data;
+import com.jsy.community.vo.property.OverdueVo;
 import com.jsy.community.vo.property.PageVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -717,9 +718,9 @@ public class CarPositionController {
 
         } else if (vdcType.equals("out")) {//出口
 
-            Integer status = iCarMonthlyVehicleService.MonthlyOverdue(plateNum, communityId);//1包月逾期0临时车
-            System.out.println("1包月逾期0临时车" + status);
-            if (status == 1) {//包月逾期车辆
+            OverdueVo overdueVo = iCarMonthlyVehicleService.MonthlyOverdue(plateNum, communityId);//1包月逾期0临时车
+            System.out.println("1包月逾期0临时车" + overdueVo.getState());
+            if (overdueVo.getState() == 1) {//包月逾期车辆
                 //语音播报内容
                 Rs485Data e2 = new Rs485Data();
                 e2.setEncodetype("hex2string");
