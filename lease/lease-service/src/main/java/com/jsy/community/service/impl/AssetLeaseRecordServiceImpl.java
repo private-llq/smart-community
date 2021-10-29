@@ -1709,26 +1709,22 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 if (houseLeaseEntity.getHousePrice() != null) {
                     houseLeaseContractVO.setMonthlyRentInWords(ChineseYuanUtil.convert(houseLeaseEntity.getHousePrice().toString()));
                 }
-                List<Long> houseLeasedepositIds = MyMathUtils.analysisTypeCode(houseLeaseEntity.getHouseLeasedepositId());
-                if (!CollectionUtils.isEmpty(houseLeasedepositIds)) {
-                    Map<String, Long> constByTypeCodeForList = houseConstService.getConstByTypeCodeForList(houseFurnitureIds, 18L);
-                    for (String key : constByTypeCodeForList.keySet()) {
-                        switch (key) {
-                            case "押1付1":
-                                houseLeaseContractVO.setPaymentOptions("A");
-                                break;
-                            case "押1付3":
-                                houseLeaseContractVO.setPaymentOptions("B");
-                                break;
-                            case "半年付":
-                                houseLeaseContractVO.setPaymentOptions("C");
-                                break;
-                            case "年付":
-                                houseLeaseContractVO.setPaymentOptions("D");
-                                break;
-                            default:
-                                break;
-                        }
+                if (houseLeaseEntity.getHouseLeasedepositId() != null) {
+                    switch (houseLeaseEntity.getHouseLeasedepositId()) {
+                        case 1:
+                            houseLeaseContractVO.setPaymentOptions("A");
+                            break;
+                        case 2:
+                            houseLeaseContractVO.setPaymentOptions("B");
+                            break;
+                        case 4:
+                            houseLeaseContractVO.setPaymentOptions("C");
+                            break;
+                        case 8:
+                            houseLeaseContractVO.setPaymentOptions("D");
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
