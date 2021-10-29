@@ -211,7 +211,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     @TxcTransaction
-    public void updateByOrder(String id,BigDecimal total,String outTradeNo) {
+    public void updateByOrder(String id,BigDecimal total,String outTradeNo,Integer payType) {
         CarOrderEntity carOrderEntity = appCarOrderMapper.selectById(id);
         String orderNum = getOrderNum(carOrderEntity.getCommunityId().toString());
         if (carOrderEntity != null) {
@@ -243,6 +243,19 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             orderEntity.setId(SnowFlake.nextId());
             propertyFinanceOrderService.insert(orderEntity);
 
+
+            //推送消息
+            UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", carOrderEntity.getUid()));
+            HashMap<Object, Object> map = new HashMap<>();
+            map.put("type",1);
+            map.put("dataId",carOrderEntity.getId());
+            PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+                    payType,
+                    total.toString(),
+                    null,
+                    "临时缴费",
+                    map,
+                    BusinessEnum.PushInfromEnum.MONTHLYRENTPAYMENT.getName());
         }
     }
 
@@ -298,8 +311,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         QueryWrapper<CarOrderEntity> wrapper = new QueryWrapper<CarOrderEntity>()
                 .select("id,order_num,month,order_time,over_time,money,car_plate,car_position_id,type")
                 .eq("community_id", baseQO.getQuery().getCommunityId())
-                .eq("uid", userId)
-                .eq("type", 2);
+                .eq("uid", userId);
         if (!"".equals(baseQO.getQuery().getMonth())&&baseQO.getQuery().getMonth()!=null&&baseQO.getQuery().getMonth()!=0){
             wrapper.eq("month",baseQO.getQuery().getMonth());
         }
@@ -317,7 +329,11 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 record.setCarPositionId(communityEntity.getId());
 //                record.setCarPositionText(positionMap.get(record.getCarPositionId()));
                 record.setCarPositionText(communityEntity.getName());
-                record.setTypeText("月租车");
+                if (record.getType()==1){
+                    record.setTypeText("临时车");
+                }else {
+                    record.setTypeText("月租车");
+                }
             }
             map.put("total",page.getTotal());
             map.put("list",records);
@@ -423,7 +439,8 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 entity.setMoney(carEntity.getMoney());
                 entity.setUid(carEntity.getUid());
                 carOrderRecordMapper.insert(entity);
-
+//                entity.setPayType(1);
+//                entity.setOrderNum("4654132516843135");
                 //支付成功后回调     测试阶段直接回调
 //                bindingMonthCar(entity);
                 return entity.getId();

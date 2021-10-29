@@ -236,7 +236,7 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 					userFaceSyncRecordEntity.setFaceUrl(userEntityResult.getFaceUrl());
 					userFaceSyncRecordEntity.setFacilityId(hardwareId);
 					userFaceSyncRecordEntity.setId(SnowFlake.nextId());
-					userFaceSyncRecordEntity.setDeleted(0);
+					userFaceSyncRecordEntity.setDeleted(0L);
 					userFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
 					userFaceSyncRecordEntities.add(userFaceSyncRecordEntity);
 				}
@@ -340,7 +340,7 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 					userFaceSyncRecordEntity.setFaceUrl(userEntityResult.getFaceUrl());
 					userFaceSyncRecordEntity.setFacilityId(hardwareId);
 					userFaceSyncRecordEntity.setId(SnowFlake.nextId());
-					userFaceSyncRecordEntity.setDeleted(0);
+					userFaceSyncRecordEntity.setDeleted(0L);
 					userFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
 					recordEntities.add(userFaceSyncRecordEntity);
 				}
@@ -399,7 +399,7 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 					userFaceSyncRecordEntity.setFaceUrl(userEntity.getFaceUrl());
 					userFaceSyncRecordEntity.setFacilityId(hardwareId);
 					userFaceSyncRecordEntity.setId(SnowFlake.nextId());
-					userFaceSyncRecordEntity.setDeleted(0);
+					userFaceSyncRecordEntity.setDeleted(0L);
 					userFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
 					recordEntities.add(userFaceSyncRecordEntity);
 				}

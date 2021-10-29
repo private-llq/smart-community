@@ -161,6 +161,7 @@ public class Crc16Util {
         } catch (UnsupportedEncodingException e) {
             throw  new PropertyException(500,"机器码异常");
         }
+        System.out.println(i+"i");
         if (type.equals("online")){
             color="0100000501000301FF00000000000000";
         }else {

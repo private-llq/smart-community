@@ -40,7 +40,7 @@ public class UnionPayWalletBankEntity {
     private Integer isDefault;
 
     @ApiModelProperty(value = "删除标记,0:未删除,1:已删除")
-    private Integer deleted;
+    private Long deleted;
 
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")

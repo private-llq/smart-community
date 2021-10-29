@@ -29,5 +29,5 @@ public class CarOperationLogVO implements Serializable {
     private LocalDateTime updateTime;
 
     @TableLogic
-    private Integer deleted;
+    private Long deleted;
 }

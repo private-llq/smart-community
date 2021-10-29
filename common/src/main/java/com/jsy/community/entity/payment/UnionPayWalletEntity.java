@@ -64,7 +64,7 @@ public class UnionPayWalletEntity implements Serializable {
     private String remark;
 
     @ApiModelProperty(value = "删除标记,可用于注销,0:未删除,1:已删除")
-    private Integer deleted;
+    private Long deleted;
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;

@@ -283,7 +283,7 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 		houseMemberEntity.setIdCard(userEntity.getIdCard());
 		houseMemberEntity.setRemark("");
 		houseMemberEntity.setValidTime(validTime);
-		houseMemberEntity.setDeleted(0);
+		houseMemberEntity.setDeleted(0L);
 		houseMemberEntity.setCreateTime(LocalDateTime.now());
 		return houseMemberMapper.insert(houseMemberEntity);
 	}

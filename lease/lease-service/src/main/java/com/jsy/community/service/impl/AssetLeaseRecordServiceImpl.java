@@ -149,7 +149,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             throw new LeaseException("签约申请已经存在,请不要重复发起");
         }
         assetLeaseRecordEntity.setId(SnowFlake.nextId());
-        assetLeaseRecordEntity.setDeleted(0);
+        assetLeaseRecordEntity.setDeleted(0L);
         assetLeaseRecordEntity.setReadMark(1);
         assetLeaseRecordEntity.setCreateTime(LocalDateTime.now());
         assetLeaseRecordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.INITIATE_CONTRACT.getCode());
@@ -184,7 +184,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         leaseOperationRecordEntity.setAssetLeaseRecordId(assetLeaseRecordEntity.getId());
         leaseOperationRecordEntity.setOperation(assetLeaseRecordEntity.getOperation());
         leaseOperationRecordEntity.setId(SnowFlake.nextId());
-        leaseOperationRecordEntity.setDeleted(0);
+        leaseOperationRecordEntity.setDeleted(0L);
         leaseOperationRecordEntity.setCreateTime(LocalDateTime.now());
         leaseOperationRecordMapper.insert(leaseOperationRecordEntity);
         // 记录倒计时
@@ -518,7 +518,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         leaseOperationRecordEntity.setAssetLeaseRecordId(assetLeaseRecordEntity.getId());
         leaseOperationRecordEntity.setOperation(assetLeaseRecordEntity.getOperation());
         leaseOperationRecordEntity.setId(SnowFlake.nextId());
-        leaseOperationRecordEntity.setDeleted(0);
+        leaseOperationRecordEntity.setDeleted(0L);
         leaseOperationRecordEntity.setCreateTime(LocalDateTime.now());
         leaseOperationRecordMapper.insert(leaseOperationRecordEntity);
     }
