@@ -750,7 +750,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         List<CarOrderEntity> list = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>()
                 .eq("car_plate",carNumber)
                 .eq("type", 1)
-                .eq("order_status", 0)//未支付
+                .eq("order_status", 1)//未支付
                 .eq("overdue_state",1)//逾期
                 .eq("community_id", adminCommunityId));
         if (list.size()==0){
