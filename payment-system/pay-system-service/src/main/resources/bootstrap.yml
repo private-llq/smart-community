@@ -37,7 +37,7 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:1010/eureka/ #注册中心地址
+      defaultZone: http://localhost:2010/eureka/ #注册中心地址
   instance:
     prefer-ip-address: true #使用ip地址注册
     instance-id: payment-service:9952  #指定服务的id

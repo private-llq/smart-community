@@ -106,11 +106,6 @@ public class CarCutOffEntity  extends BaseEntity {
             timezone = "GMT+8")
     private LocalDateTime updateTime;
 
-
-    @ApiModelProperty(value = "逻辑删除")
-    @TableLogic(value = "0",delval = "1")
-    private  Long deleted;
-
     /**
      * 停车时长
      */

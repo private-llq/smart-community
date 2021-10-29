@@ -55,8 +55,8 @@ public class CarProprietorEntity implements Serializable{
     private LocalDateTime updateTime;
 
     @ApiModelProperty(value = "逻辑删除")
-    @TableLogic(value = "0",delval = "1")
-    private  Integer deleted;
+    @TableLogic
+    private  Long deleted;
 
 //    @ApiModelProperty("分页查询当前页")
 //	@TableField(exist = false)
