@@ -781,7 +781,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     }
 
     /**
-     * 根据车牌号和社区id修改包月记录最后一条数据的  isOverdueFee 为已交
+     * 根据车牌号和社区id修改包月记录最后一条数据的  isOverdueFee 为1:已交
      */
     public Integer UpdateoVerduefee(String carNumber,Long communityId){
         List<CarMonthlyVehicle> monthlyVehicleList = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>()
