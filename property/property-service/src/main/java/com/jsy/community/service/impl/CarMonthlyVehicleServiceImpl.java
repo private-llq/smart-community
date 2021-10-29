@@ -21,6 +21,7 @@ import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.vo.property.OverdueVo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -743,22 +744,73 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     /**
      * 包月逾期---------------出口方向
      *
-     * 1:逾期 0：未逾期
+     *  0：车牌识别错误 1:逾期 2：正常
      */
-    public Integer MonthlyOverdue(String carNumber,Long adminCommunityId){
-        //没有未支付的临时车订单，为包月逾期没有出去的车辆
-        List<CarOrderEntity> list = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>()
-                .eq("car_plate",carNumber)
-                .eq("type", 1)
-                .eq("order_status", 0)//未支付
-                .eq("overdue_state",1)//逾期
-                .eq("community_id", adminCommunityId));
-        if (list.size()==0){
-            return 1;//逾期车辆
-        }else {
-            return 0;//临时车辆
+    public OverdueVo MonthlyOverdue(String carNumber, Long adminCommunityId){
+        //最后一条包月记录为已过期、并且还在场，没有出去过的车辆为包月逾期车辆
+
+        long now = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+
+        List<CarCutOffEntity> carCutOffEntities = carCutOffMapper.selectList(new QueryWrapper<CarCutOffEntity>().eq("community_id", adminCommunityId).eq("car_number", carNumber));
+        Optional<CarCutOffEntity> maxCarCutOffEntity = carCutOffEntities.stream().max(Comparator.comparing(x -> {
+            return x.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+        }));
+        if (!maxCarCutOffEntity.isPresent()){
+           OverdueVo overdueVo = new OverdueVo();
+           overdueVo.setState(0);
+           return overdueVo;//没有进场记录的车（可能是车牌识别错误）
         }
 
+
+        List<CarMonthlyVehicle> monthlyVehicleList = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>()
+                .eq("car_number", carNumber)
+                .eq("community_id", adminCommunityId)
+        );
+        Optional<CarMonthlyVehicle> max = monthlyVehicleList.stream().max(Comparator.comparing(x -> {
+            return x.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+        }));
+        if (max.isPresent()){
+            CarMonthlyVehicle monthlyVehicle = max.get();
+            if (monthlyVehicle.getIsOverdueFee()==1){//已交费，包月记录为1的 返回正常通行
+                OverdueVo overdueVo = new OverdueVo();
+                overdueVo.setState(2);//正常
+                return overdueVo;
+            }
+
+            if (maxCarCutOffEntity.get().getState()==0 && now > monthlyVehicle.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli()){
+                OverdueVo overdueVo = new OverdueVo();
+                overdueVo.setState(1);
+                overdueVo.setCarMonthlyVehicle(monthlyVehicle);
+                return overdueVo; //包月逾期
+            }
+
+        }
+        OverdueVo overdueVo = new OverdueVo();
+        overdueVo.setState(2);//正常
+        return overdueVo;
+    }
+
+    /**
+     * 根据车牌号和社区id修改包月记录最后一条数据的  isOverdueFee 为1:已交
+     */
+    public Integer UpdateoVerduefee(String carNumber,Long communityId){
+        List<CarMonthlyVehicle> monthlyVehicleList = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>()
+                .eq("car_number", carNumber)
+                .eq("community_id", communityId)
+        );
+        Optional<CarMonthlyVehicle> max = monthlyVehicleList.stream().max(Comparator.comparing(x -> {
+            return x.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+        }));
+        if (max.isPresent()){
+            CarMonthlyVehicle monthlyVehicle = new CarMonthlyVehicle();
+            monthlyVehicle.setIsOverdueFee(1);
+            int update = carMonthlyVehicleMapper.update(monthlyVehicle, new QueryWrapper<CarMonthlyVehicle>()
+                    .eq("car_number", carNumber)
+                    .eq("community_id", communityId)
+            );
+            return update;
+        }
+        return null;
     }
 
 

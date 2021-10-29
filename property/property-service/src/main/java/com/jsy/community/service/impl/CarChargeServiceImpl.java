@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarChargeService;
+import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
@@ -24,6 +25,7 @@ import com.jsy.community.util.TimeUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.vo.property.OverdueVo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -54,6 +56,9 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
+
+    @Autowired
+    private ICarMonthlyVehicleService iCarMonthlyVehicleService;
 
 
     @Override
@@ -448,49 +453,35 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
     @Transactional
     public orderChargeDto orderCharge(Long adminCommunityId, String carNumber) {
 
-        orderChargeDto orderChargeDto = new orderChargeDto();
-
-        /**
-         * 查询该车辆出闸最新生成的订单
-         */
-        List<CarOrderEntity> list = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>()
-                .eq("car_plate",carNumber)
-                .eq("type", 1)
-                .eq("order_status", 0)
-                .eq("community_id", adminCommunityId));
-        if (list.size()==0){//没有未支付的临时车订单，为包月逾期没有出去的车辆
-
-            //查询是否是包月逾期的车辆，如果是在这里直接插入一条订单（开始时间为上次包月的结速时间，结束时间为订单支付时间）
-            //查询已逾期的车辆（出口方向），逾期按临时停车规则收费
-            var monthlyVehicleList = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>().eq("car_number", carNumber).eq("community_id", adminCommunityId).eq("distribution_status",1).lt("end_time", LocalDateTime.now()));
-            if (monthlyVehicleList.size()!=0){
-                CarMonthlyVehicle monthlyVehicle = monthlyVehicleList.stream().max(Comparator.comparing(x -> {
-                    return x.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
-                })).get();
-                CarOrderEntity carOrderEntity = new CarOrderEntity();
-                carOrderEntity.setCarPlate(monthlyVehicle.getCarNumber());//车牌号
-                CarCutOffEntity carCutOffEntity = carCutOffMapper.selectOne(new QueryWrapper<CarCutOffEntity>().eq("community_id", monthlyVehicle.getCommunityId()).eq("car_number", monthlyVehicle.getCarNumber()));
-                if (Objects.nonNull(carCutOffEntity)){
-                    carOrderEntity.setPlateColor(carCutOffEntity.getPlateColor());//车牌颜色
-                }
-                carOrderEntity.setType(1);//临时车收费
-                carOrderEntity.setOrderNum(String.valueOf(SnowFlake.nextId()));//订单编号
-                carOrderEntity.setOrderTime(LocalDateTime.now());//支付时间
-                carOrderEntity.setBeginTime(monthlyVehicle.getStartTime());//周期开始时间
-                carOrderEntity.setOverTime(LocalDateTime.now());//周期结束时间
-                carOrderEntity.setOrderStatus(0);//未支付
-                carOrderEntity.setCommunityId(adminCommunityId);//社区id
-                carOrderEntity.setIsRetention(0);//是否为滞留订单
-                carOrderEntity.setRise("无");
-                carOrderEntity.setOverdueState(1);//逾期订单
-                var calendar = Calendar.getInstance();
-                int month = calendar.get(Calendar.MONTH) + 1;
-                carOrderEntity.setMonth(month);
-                carOrderMapper.insert(carOrderEntity);
+        //逾期插入订单
+        OverdueVo overdueVo = iCarMonthlyVehicleService.MonthlyOverdue(carNumber, adminCommunityId);
+        if (overdueVo.getState()==1){//判断是否是逾期
+            CarMonthlyVehicle monthlyVehicle = overdueVo.getCarMonthlyVehicle();
+            CarOrderEntity carOrderEntity = new CarOrderEntity();
+            carOrderEntity.setCarPlate(monthlyVehicle.getCarNumber());//车牌号
+            CarCutOffEntity carCutOffEntity = carCutOffMapper.selectOne(new QueryWrapper<CarCutOffEntity>().eq("community_id", monthlyVehicle.getCommunityId()).eq("car_number", monthlyVehicle.getCarNumber()));
+            if (Objects.nonNull(carCutOffEntity)){
+                carOrderEntity.setPlateColor(carCutOffEntity.getPlateColor());//车牌颜色
             }
+            carOrderEntity.setType(1);//临时车收费
+            carOrderEntity.setOrderNum(String.valueOf(SnowFlake.nextId()));//订单编号
+            carOrderEntity.setOrderTime(LocalDateTime.now());//支付时间
+            carOrderEntity.setBeginTime(monthlyVehicle.getStartTime());//周期开始时间
+            carOrderEntity.setOverTime(LocalDateTime.now());//周期结束时间
+            carOrderEntity.setOrderStatus(0);//未支付
+            carOrderEntity.setCommunityId(adminCommunityId);//社区id
+            carOrderEntity.setIsRetention(0);//是否为滞留订单
+            carOrderEntity.setRise("无");
+            carOrderEntity.setOverdueState(1);//逾期订单
+            var calendar = Calendar.getInstance();
+            int month = calendar.get(Calendar.MONTH) + 1;
+            carOrderEntity.setMonth(month);
+            carOrderMapper.insert(carOrderEntity);
+
         }
-        //有最近生成的未支付的临时车订单，就是临时车
-            //再次查询出来就有之前插入订单
+
+        //查询订单计算价格
+        orderChargeDto orderChargeDto = new orderChargeDto();
         List<CarOrderEntity> list2 = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>()
                 .eq("car_plate",carNumber)
                 .eq("type", 1)

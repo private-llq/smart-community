@@ -84,6 +84,11 @@ public class WeChatH5PayController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarOrderService carOrderService;
 
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICarMonthlyVehicleService carMonthlyVehicleService;
+
+
     //    @Login
     @PostMapping("/wxH5Pay")
     public CommonResult<Map<String, Object>> wxH5Pay(@RequestBody AliOrderContentQO qo) throws Exception {
@@ -168,6 +173,9 @@ public class WeChatH5PayController {
         CarOrderEntity entity;
         //订单号
         entity = carOrderService.selectId(Long.parseLong(split[1]));
+        if (entity.getOverdueState()==1){
+            carMonthlyVehicleService.UpdateoVerduefee(entity.getCarPlate(),entity.getCommunityId());
+        }
         System.out.println("\n\n"+entity);
         //付款金额 单位是分 需要除 100在存入数据库
         String total = params.get("amount");

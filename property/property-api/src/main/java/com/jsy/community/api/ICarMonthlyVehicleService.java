@@ -6,6 +6,7 @@ import com.jsy.community.entity.property.CarMonthlyVehicle;
 import com.jsy.community.qo.CarMonthlyDelayQO;
 import com.jsy.community.qo.CarMonthlyVehicleQO;
 import com.jsy.community.utils.PageInfo;
+import com.jsy.community.vo.property.OverdueVo;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -49,7 +50,9 @@ public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
 
     void issue(String uid, Long adminCommunityId);
 
-    Integer MonthlyOverdue(String carNumber,Long adminCommunityId);
+    OverdueVo MonthlyOverdue(String carNumber, Long adminCommunityId);
+
+    Integer UpdateoVerduefee(String carNumber,Long communityId);
 
     Map selectByStatus(String carNumber, String carColor, Long community_id);
 
