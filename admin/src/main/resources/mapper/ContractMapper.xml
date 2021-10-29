@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.jsy.community.mapper.ContractMapper">
+	<select id="selectContractPage" resultType="com.jsy.community.entity.proprietor.AssetLeaseRecordEntity">
+		SELECT
+		id,
+		asset_id,
+		asset_type,
+		home_owner_uid,
+		tenant_uid,
+		image_url,
+		title,
+		advantage_id,
+		summarize,
+		type_code,
+		direction_id,
+		community_id,
+		price,
+		con_id,
+		con_name,
+		start_date,
+		end_date,
+		block_status,
+		initiator,
+		signatory,
+		operation,
+		province_id,
+		city_id,
+		area_id,
+		address,
+		floor,
+		read_mark,
+		deleted,
+		create_time,
+		update_time
+		FROM
+			t_asset_lease_record
+		WHERE
+			deleted = 0
+			<if test="contractQO.query.contractType != null and contractQO.query.contractType == 2">
+				and asset_type = 3
+			</if>
+			<if test="contractQO.query.date != null">
+				and start_date <![CDATA[ <= ]]> #{contractQO.query.date}
+				and end_date <![CDATA[ >= ]]> #{contractQO.query.date}
+			</if>
+			<if test='contractQO.query.name != null and contractQO.query.name != ""'>
+				and (initiator like concat('%',#{contractQO.query.name},'%')
+				or signatory like concat('%',#{contractQO.query.name},'%'))
+			</if>
+			<if test="contractQO.query.contractStatus == 1">
+				and operation in (1, 9)
+			</if>
+			<if test="contractQO.query.contractStatus == 2">
+				and operation in (2, 3, 4, 5, 31, 32)
+			</if>
+			<if test="contractQO.query.contractStatus == 3">
+				and operation = 6
+			</if>
+			<if test="contractQO.query.contractStatus == 4">
+				and operation = 10
+			</if>
+			UNION ALL
+		SELECT
+		id,
+		asset_id,
+		asset_type,
+		home_owner_uid,
+		tenant_uid,
+		image_url,
+		title,
+		advantage_id,
+		summarize,
+		type_code,
+		direction_id,
+		community_id,
+		price,
+		con_id,
+		con_name,
+		start_date,
+		end_date,
+		block_status,
+		initiator,
+		signatory,
+		operation,
+		province_id,
+		city_id,
+		area_id,
+		address,
+		floor,
+		read_mark,
+		deleted,
+		create_time,
+		update_time
+		FROM
+			t_asset_lease_record
+		WHERE
+			asset_type = 3
+		ORDER BY
+		create_time
+		LIMIT #{contractQO.page},#{contractQO.size}
+	</select>
+
+	<select id="getContractPageCount" resultType="java.lang.Long">
+		select count(0) from (SELECT
+		id,
+		asset_id,
+		asset_type,
+		home_owner_uid,
+		tenant_uid,
+		image_url,
+		title,
+		advantage_id,
+		summarize,
+		type_code,
+		direction_id,
+		community_id,
+		price,
+		con_id,
+		con_name,
+		start_date,
+		end_date,
+		block_status,
+		initiator,
+		signatory,
+		operation,
+		province_id,
+		city_id,
+		area_id,
+		address,
+		floor,
+		read_mark,
+		deleted,
+		create_time,
+		update_time
+		FROM
+		t_asset_lease_record
+		WHERE
+		deleted = 0
+		<if test="contractQO.query.contractType != null and contractQO.query.contractType == 2">
+			and asset_type = 3
+		</if>
+		<if test="contractQO.query.date != null">
+			and start_date <![CDATA[ <= ]]> #{contractQO.query.date}
+			and end_date <![CDATA[ >= ]]> #{contractQO.query.date}
+		</if>
+		<if test='contractQO.query.name != null and contractQO.query.name != ""'>
+			and (initiator like concat('%',#{contractQO.query.name},'%')
+			or signatory like concat('%',#{contractQO.query.name},'%'))
+		</if>
+		<if test="contractQO.query.contractStatus == 1">
+			and operation in (1, 9)
+		</if>
+		<if test="contractQO.query.contractStatus == 2">
+			and operation in (2, 3, 4, 5, 31, 32)
+		</if>
+		<if test="contractQO.query.contractStatus == 3">
+			and operation = 6
+		</if>
+		<if test="contractQO.query.contractStatus == 4">
+			and operation = 10
+		</if>
+		UNION ALL
+		SELECT
+		id,
+		asset_id,
+		asset_type,
+		home_owner_uid,
+		tenant_uid,
+		image_url,
+		title,
+		advantage_id,
+		summarize,
+		type_code,
+		direction_id,
+		community_id,
+		price,
+		con_id,
+		con_name,
+		start_date,
+		end_date,
+		block_status,
+		initiator,
+		signatory,
+		operation,
+		province_id,
+		city_id,
+		area_id,
+		address,
+		floor,
+		read_mark,
+		deleted,
+		create_time,
+		update_time
+		FROM
+		t_asset_lease_record
+		WHERE
+		asset_type = 3) a
+	</select>
+</mapper>

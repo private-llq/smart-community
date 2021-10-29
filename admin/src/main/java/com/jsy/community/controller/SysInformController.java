@@ -95,7 +95,7 @@ public class SysInformController {
     }
     
     /**
-     * (物业端)新增推送通知消息
+     * 新增推送通知消息
      * @param qo 新增推送消息
      * @return 返回是否新增成功
      */
