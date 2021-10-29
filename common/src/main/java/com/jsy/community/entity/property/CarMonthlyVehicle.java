@@ -98,5 +98,9 @@ public class CarMonthlyVehicle implements Serializable {
     @TableField(exist = false)
     private String belongHouse;
 
+    /**
+     * 逾期费是否缴纳 1：已交 0：未交
+     */
+    private Integer isOverdueFee;
 
 }
