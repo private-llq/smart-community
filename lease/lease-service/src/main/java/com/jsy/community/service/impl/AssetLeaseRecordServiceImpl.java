@@ -1682,19 +1682,25 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 Map<String, Long> facilitiesMap = new HashMap<>();
                 if (!CollectionUtils.isEmpty(houseFurnitureIds)) {
                     Map<String, Long> constByTypeCodeForList = houseConstService.getConstByTypeCodeForList(houseFurnitureIds, 13L);
-                    facilitiesMap.putAll(constByTypeCodeForList);
+                    if (!CollectionUtils.isEmpty(constByTypeCodeForList)) {
+                        facilitiesMap.putAll(constByTypeCodeForList);
+                    }
                 }
                 // 房间设施
                 List<Long> roomFacilitiesIds = MyMathUtils.analysisTypeCode(houseLeaseEntity.getRoomFacilitiesId());
                 if (!CollectionUtils.isEmpty(roomFacilitiesIds)) {
                     Map<String, Long> constByTypeCodeForList = houseConstService.getConstByTypeCodeForList(houseFurnitureIds, 24L);
-                    facilitiesMap.putAll(constByTypeCodeForList);
+                    if (!CollectionUtils.isEmpty(constByTypeCodeForList)) {
+                        facilitiesMap.putAll(constByTypeCodeForList);
+                    }
                 }
                 // 公共配置
                 List<Long> commonFacilitiesIds = MyMathUtils.analysisTypeCode(houseLeaseEntity.getCommonFacilitiesId());
                 if (!CollectionUtils.isEmpty(houseFurnitureIds)) {
                     Map<String, Long> constByTypeCodeForList = houseConstService.getConstByTypeCodeForList(houseFurnitureIds, 23L);
-                    facilitiesMap.putAll(constByTypeCodeForList);
+                    if (!CollectionUtils.isEmpty(constByTypeCodeForList)) {
+                        facilitiesMap.putAll(constByTypeCodeForList);
+                    }
                 }
                 String facilities = facilitiesMap.keySet().toString();
                 facilities = StringUtils.isBlank(facilities) ? "" : facilities;
