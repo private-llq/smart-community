@@ -109,7 +109,7 @@ public class CarCutOffEntity  extends BaseEntity {
 
     @ApiModelProperty(value = "逻辑删除")
     @TableLogic(value = "0",delval = "1")
-    private  Integer deleted;
+    private  Long deleted;
 
     /**
      * 停车时长
