@@ -751,12 +751,16 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
         long now = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
 
-        CarCutOffEntity carCutOffEntity = carCutOffMapper.selectOne(new QueryWrapper<CarCutOffEntity>().eq("community_id", adminCommunityId).eq("car_number", carNumber));
-        if (Objects.isNull(carCutOffEntity)){
-            OverdueVo overdueVo = new OverdueVo();
-            overdueVo.setState(0);
-            return overdueVo;//没有进场记录的车（可能是车牌识别错误）
+        List<CarCutOffEntity> carCutOffEntities = carCutOffMapper.selectList(new QueryWrapper<CarCutOffEntity>().eq("community_id", adminCommunityId).eq("car_number", carNumber));
+        Optional<CarCutOffEntity> maxCarCutOffEntity = carCutOffEntities.stream().max(Comparator.comparing(x -> {
+            return x.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+        }));
+        if (!maxCarCutOffEntity.isPresent()){
+           OverdueVo overdueVo = new OverdueVo();
+           overdueVo.setState(0);
+           return overdueVo;//没有进场记录的车（可能是车牌识别错误）
         }
+
 
         List<CarMonthlyVehicle> monthlyVehicleList = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>()
                 .eq("car_number", carNumber)
@@ -767,7 +771,13 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         }));
         if (max.isPresent()){
             CarMonthlyVehicle monthlyVehicle = max.get();
-            if (carCutOffEntity.getState()==0 && now > monthlyVehicle.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli()){
+            if (monthlyVehicle.getIsOverdueFee()==1){//已交费，包月记录为1的 返回正常通行
+                OverdueVo overdueVo = new OverdueVo();
+                overdueVo.setState(2);//正常
+                return overdueVo;
+            }
+
+            if (maxCarCutOffEntity.get().getState()==0 && now > monthlyVehicle.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli()){
                 OverdueVo overdueVo = new OverdueVo();
                 overdueVo.setState(1);
                 overdueVo.setCarMonthlyVehicle(monthlyVehicle);
@@ -776,8 +786,8 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
         }
         OverdueVo overdueVo = new OverdueVo();
-        overdueVo.setState(2);
-        return overdueVo;//正常
+        overdueVo.setState(2);//正常
+        return overdueVo;
     }
 
     /**
