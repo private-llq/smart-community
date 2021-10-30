@@ -17,6 +17,7 @@ import com.jsy.community.qo.property.FinanceOrderOperationQO;
 import com.jsy.community.qo.property.FinanceOrderQO;
 import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.utils.*;
+import com.jsy.community.utils.imutils.entity.ImResponseEntity;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import com.jsy.community.vo.property.FinanceOrderAndCarOrHouseInfoVO;
@@ -682,6 +683,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      **/
     @Override
     public void updateOrderStatusBatch(Integer payType, String tripartiteOrder, String[] ids, BigDecimal total) {
+        log.info("开始修改账单状态！");
         int rows = propertyFinanceOrderMapper.updateOrderBatch(payType, tripartiteOrder, ids);
         if (rows != ids.length) {
             log.info("物业账单支付后处理失败，单号：" + tripartiteOrder + " 账单ID：" + Arrays.toString(ids));
@@ -701,7 +703,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             }
         }
         //支付上链
-        OrderCochainUtil.orderCochain("物业费",
+        CochainResponseEntity responseEntity = OrderCochainUtil.orderCochain("物业费",
                 1,
                 payType,
                 total,
@@ -710,19 +712,20 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 companyEntity.getUnifiedSocialCreditCode(),
                 detailedList.toString(),
                 null);
-        if (userIMEntity != null) {
-            Map<Object, Object> map = new HashMap<>();
-            map.put("type", 3);
-            map.put("dataId", tripartiteOrder);
-            map.put("orderNum", tripartiteOrder);
-            PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
-                    payType,
-                    total.toString(),
-                    null,
-                    "物业缴费",
-                    map,
-                    BusinessEnum.PushInfromEnum.PROPERTYPAYMENT.getName());
-        }
+        log.info("支付上链："+responseEntity);
+        Map<Object, Object> map = new HashMap<>();
+        map.put("type", 3);
+        map.put("dataId", tripartiteOrder);
+        map.put("orderNum", tripartiteOrder);
+        ImResponseEntity imResponseEntity = PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+                payType,
+                total.toString(),
+                null,
+                "物业缴费",
+                map,
+                BusinessEnum.PushInfromEnum.PROPERTYPAYMENT.getName());
+        log.info("支付助手："+imResponseEntity);
+
     }
 
     /**

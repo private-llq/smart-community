@@ -23,6 +23,7 @@ import com.jsy.community.untils.wechat.PublicConfig;
 import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.util.HouseHelper;
 import com.jsy.community.utils.*;
+import com.jsy.community.utils.imutils.entity.ImResponseEntity;
 import com.jsy.community.utils.signature.ZhsjUtil;
 import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.lease.HouseLeaseContractVO;
@@ -1513,7 +1514,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(assetLeaseRecordEntity.getCommunityId());
             UserEntity userEntity = userService.getUser(assetLeaseRecordEntity.getTenantUid());
             //支付上链
-            OrderCochainUtil.orderCochain("停车费",
+            CochainResponseEntity cochainResponseEntity = OrderCochainUtil.orderCochain("停车费",
                     1,
                     payType,
                     total,
@@ -1522,20 +1523,21 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     companyEntity.getUnifiedSocialCreditCode(),
                     "房屋租金支付",
                     null);
+            log.info("支付上链："+cochainResponseEntity);
 
             //消息推送
             Map<Object, Object> map = new HashMap<>();
             map.put("type", 3);
             map.put("dataId", conId);
             map.put("orderNum", orderNum);
-            PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+            ImResponseEntity imResponseEntity = PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
                     payType,
                     total.toString(),
                     null,
                     "租赁缴费",
                     map,
                     BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
-
+            log.info("支付助手："+imResponseEntity);
         } else {
             log.info("没有找到合同:{}相关的签约ID", conId);
         }
