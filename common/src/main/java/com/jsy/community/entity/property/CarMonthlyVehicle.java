@@ -103,4 +103,9 @@ public class CarMonthlyVehicle implements Serializable {
      */
     private Integer isOverdueFee;
 
+    /**
+     * 逻辑删除 1：已删 0：未删
+     */
+
+    private Integer deleted;
 }

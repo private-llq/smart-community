@@ -392,8 +392,10 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         carMapper.update(carEntity,new UpdateWrapper<CarEntity>().eq("car_plate",carNumber).eq("community_id",communityId).set("deleted",1));
 
 
-        int delete = carMonthlyVehicleMapper.delete(new QueryWrapper<CarMonthlyVehicle>().eq("uid", uid));
-        return delete;
+        CarMonthlyVehicle monthlyVehicle = new CarMonthlyVehicle();
+        monthlyVehicle.setDeleted(1);//删除
+        int update = carMonthlyVehicleMapper.update(monthlyVehicle, new QueryWrapper<CarMonthlyVehicle>().eq("uid", uid));
+        return update;
     }
     /**
      * 多条件查询+分页
