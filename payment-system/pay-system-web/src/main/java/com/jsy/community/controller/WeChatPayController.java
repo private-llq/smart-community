@@ -298,7 +298,7 @@ public class WeChatPayController {
                 // 修改签章合同支付状态
                 Map<String, Object> houseMap = housingRentalOrderService.completeLeasingOrder(map.get("out_trade_no"), split[1]);
                 // 修改租房签约支付状态
-                assetLeaseRecordService.updateOperationPayStatus( split[1]);
+                assetLeaseRecordService.updateOperationPayStatus( split[1],1,new BigDecimal(map.get("amount")),map.get("out_trade_no"));
                 if(0 != (int)houseMap.get("code")){
                     throw new PaymentException((int)houseMap.get("code"),String.valueOf(map.get("msg")));
                 }

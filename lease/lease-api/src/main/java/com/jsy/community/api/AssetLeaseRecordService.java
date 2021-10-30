@@ -2,10 +2,9 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
-import com.jsy.community.qo.BaseQO;
-import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.lease.HouseLeaseContractVO;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -82,7 +81,7 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
      * @return: void
      * @date: 2021/9/9 18:24
      **/
-    void updateOperationPayStatus(String conId);
+    void updateOperationPayStatus(String conId, Integer payType, BigDecimal total,String orderNum);
 
     /**
      * @author: Pipi

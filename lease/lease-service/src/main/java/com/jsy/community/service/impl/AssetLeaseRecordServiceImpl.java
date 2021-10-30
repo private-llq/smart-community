@@ -1,6 +1,4 @@
 package com.jsy.community.service.impl;
-import java.math.BigDecimal;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -11,10 +9,7 @@ import com.jsy.community.config.LeaseTopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.CommunityEntity;
-import com.jsy.community.entity.CompanyPayConfigEntity;
-import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.UserIMEntity;
+import com.jsy.community.entity.*;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
@@ -47,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -87,6 +83,10 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
+
+    @DubboReference(version = Const.version,  group = Const.group_property, check = false)
+    private IPropertyCompanyService propertyCompanyService;
+
 
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private IHouseConstService houseConstService;
@@ -1497,7 +1497,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
      * @date: 2021/9/9 18:24
      **/
     @Override
-    public void updateOperationPayStatus(String conId) {
+    public void updateOperationPayStatus(String conId, Integer payType, BigDecimal total,String orderNum) {
         QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("con_id", conId);
         AssetLeaseRecordEntity assetLeaseRecordEntity = assetLeaseRecordMapper.selectOne(queryWrapper);
@@ -1507,6 +1507,21 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             assetLeaseRecordEntity.setOperation(BusinessEnum.ContractingProcessStatusEnum.PAYMENT_COMPLETED.getCode());
             addLeaseOperationRecord(assetLeaseRecordEntity);
             assetLeaseRecordMapper.updateById(assetLeaseRecordEntity);
+
+
+            PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(assetLeaseRecordEntity.getCommunityId());
+            UserEntity userEntity = userService.getUser(assetLeaseRecordEntity.getTenantUid());
+//            //支付上链
+//            OrderCochainUtil.orderCochain("停车费",
+//                    1,
+//                    payType,
+//                    total,
+//                    orderNum,
+//                    userEntity.getUid(),
+//                    companyEntity.getUnifiedSocialCreditCode(),
+//                    entity.getMonth()+"月车位租金费",
+//                    null);
+
         } else {
             log.info("没有找到合同:{}相关的签约ID", conId);
         }

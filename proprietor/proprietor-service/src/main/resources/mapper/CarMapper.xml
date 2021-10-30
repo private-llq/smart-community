@@ -32,6 +32,7 @@
           RIGHT JOIN t_visitor tv ON tv.car_plate = co.car_plate
         WHERE
           tv.community_id = #{communityId}
+          AND co.is_pay_another=1
           AND tv.uid = #{uid}
           AND tv.car_plate IS NOT NULL
           AND tv.car_alternative_payment_status = 1

@@ -410,6 +410,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     public CarOrderEntity getOrder(Long id) {
         CarOrderEntity entity = appCarOrderMapper.selectById(id);
+        entity.setMonth((int)ChronoUnit.MONTHS.between( entity.getOrderTime(),entity.getOverTime()));
         return entity;
     }
 
