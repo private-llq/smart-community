@@ -24,12 +24,7 @@
 #        extension-configs[2]:
 #          data-id: common.yaml
 #          refresh: true
-server:
-  ssl:
-    enabled: true
-    key-store-password: H1w5C1hj
-    key-store: classpath:6363490_api.sq.wy.zhsj.co.pfx
-    key-store-type: PKCS12
+
 #配置中心的地址
 spring:
   main:
@@ -37,10 +32,6 @@ spring:
   application:
     name: gateway-service
   cloud:
-    gateway:
-      httpclient:
-        ssl:
-          useInsecureTrustManager: true
     config:
       uri: http://localhost:2020 #zuul要从配置中心拉取文件
       #你要拉取具体的哪个配置文件
