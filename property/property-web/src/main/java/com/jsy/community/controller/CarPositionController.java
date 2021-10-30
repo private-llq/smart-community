@@ -12,6 +12,7 @@ import com.jsy.community.config.ExcelListener;
 import com.jsy.community.config.ExcelUtils;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderEntity;
+import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.qo.property.*;
 import com.jsy.community.util.CarOperation;
@@ -286,6 +287,9 @@ public class CarPositionController {
     }
 
 
+
+
+
     @ApiOperation("过车记录")
     @RequestMapping(value = "/test", method = RequestMethod.POST)
     public void carBeforeRecord(@RequestParam Map<String, Object> body,
@@ -327,11 +331,6 @@ public class CarPositionController {
 //        whitelistData.setStart("2021/08/31 11:00:00");
 //        whitelistData.setEnd("2022/12/31 23:59:59");
 //        carVO.getWhitelist_data().add(whitelistData);
-
-
-
-
-
 
         } else {
             System.out.println("正常" + entity.getType());
@@ -529,10 +528,19 @@ public class CarPositionController {
                                 boolean statusInvite = false;
                                 if (entity.getVdcType().equals("in")) {//进口
                                     //查询车牌是否是业主邀请and状态为没有进入
-                                    statusInvite = visitorService.selectCarNumberIsNoInvite(entity.getPlateNum(), communityId, 1);//状态 1.待入园 2.已入园 3.已出园 4.已失效
+                                    VisitorEntity visitorEntity = visitorService.selectCarNumberIsNoInvite(entity.getPlateNum(), communityId, 1);//状态 1.待入园 2.已入园 3.已出园 4.已失效
+                                    if (visitorEntity != null) {
+                                        long StartTime = visitorEntity.getStartTime().toEpochSecond(ZoneOffset.of("+8"));//开始时间
+                                        long EndTime = visitorEntity.getEndTime().toEpochSecond(ZoneOffset.of("+8"));//结束时间
+                                        long now = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));//当前时间
+                                        if(StartTime<now && EndTime>now){
+                                            statusInvite=true;
+                                        }
+                                    }
+
                                 } else if (entity.getVdcType().equals("out")) {//出口
                                     //查询车牌是否是业主邀请and状态为进入状态
-                                    statusInvite=true;
+                                    statusInvite = true;
                                 }
                                 //查询车牌号是否收到邀请
                                 if (statusInvite) {//收到邀请可以开闸
@@ -648,8 +656,6 @@ public class CarPositionController {
             }
 
 
-
-
         }
 
         response.setStatus(200);
@@ -715,18 +721,18 @@ public class CarPositionController {
             //新增订单
             insterCarOrder(plateNum, communityId, LocalDateTime.now(), plateColor, 0);
             //如果是收到邀请的车辆状态改变为已经进园，查询车辆现在时间是在业主邀请名单中and时间范围之内
-            boolean statusInvite = visitorService.selectCarNumberIsNoInvite(plateNum, communityId, 1);
-            if (statusInvite) {
-                visitorService.updateCarStatus(plateNum, communityId, 2);
-            }
+//            boolean statusInvite = visitorService.selectCarNumberIsNoInvite(plateNum, communityId, 1);
+//            if (statusInvite) {
+//                visitorService.updateCarStatus(plateNum, communityId, 2);
+//            }
 
         } else if (vdcType.equals("out")) {//出口
 
             CarOrderEntity entity = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
-            if (entity!=null && entity.getOverdueState()==0) {//正常订单
+            if (entity != null && entity.getOverdueState() == 0) {//正常订单
                 extracted(plateNum, plateColor, carSubLogo, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carVO, communityId);
 
-            }else{//不是正常订单
+            } else {//不是正常订单
                 //0：车牌识别错误 1:逾期 2：正常
                 OverdueVo overdueVo = iCarMonthlyVehicleService.MonthlyOverdue(plateNum, communityId);//1包月逾期0临时车
                 if (overdueVo.getState() == 1) {//包月逾期车辆
@@ -740,10 +746,10 @@ public class CarPositionController {
                     e3.setEncodetype("hex2string");
                     e3.setData(Crc16Util.getUltimatelyValue2(plateNum, "01", "online"));//车牌号
                     carVO.getRs485_data().add(e3);
-                } else if(overdueVo.getState() == 2) {//临时车,逾期车辆正常缴费后变为的临时车
+                } else if (overdueVo.getState() == 2) {//临时车,逾期车辆正常缴费后变为的临时车
                     //临时车走的接口
                     extracted(plateNum, plateColor, carSubLogo, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carVO, communityId);
-                }else if(overdueVo.getState() == 0){
+                } else if (overdueVo.getState() == 0) {
                     //语音播报内容
                     Rs485Data e2 = new Rs485Data();
                     e2.setEncodetype("hex2string");
@@ -756,7 +762,7 @@ public class CarPositionController {
                     carVO.getRs485_data().add(e3);
                 }
             }
-            
+
 
         }
 
@@ -896,10 +902,10 @@ public class CarPositionController {
                 e3.setData(Crc16Util.getUltimatelyValue2(plateNum, "01", "online"));//车牌号
                 carVO.getRs485_data().add(e3);
                 //如果是收到邀请的车辆状态改变为已经出园
-                boolean statusInvite = visitorService.selectCarNumberIsNoInvite(plateNum, communityId, 2);
-                if (statusInvite) {
-                    visitorService.updateCarStatus(plateNum, communityId, 3);
-                }
+//                boolean statusInvite = visitorService.selectCarNumberIsNoInvite(plateNum, communityId, 2);
+//                if (statusInvite) {
+//                    visitorService.updateCarStatus(plateNum, communityId, 3);
+//                }
             }
 
         }
@@ -918,6 +924,20 @@ public class CarPositionController {
 
     //新增一个车辆订单对象
     private void insterCarOrder(String plateNum, Long communityId, LocalDateTime beginTime, String plateColor, Integer isRetention) {
+        boolean  statusInvite=false;
+        VisitorEntity visitorEntity=null;
+        if(isRetention!=1){//不能为滞留订单的时候进入
+            //查询车牌是否是业主邀请切在时间之内
+             visitorEntity = visitorService.selectCarNumberIsNoInvite(plateNum, communityId, 1);//状态 1.待入园 2.已入园 3.已出园 4.已失效
+            if (visitorEntity != null) {
+                long StartTime = visitorEntity.getStartTime().toEpochSecond(ZoneOffset.of("+8"));//开始时间
+                long EndTime = visitorEntity.getEndTime().toEpochSecond(ZoneOffset.of("+8"));//结束时间
+                long now = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));//当前时间
+                if(StartTime<now && EndTime>now){
+                    statusInvite=true;
+                }
+            }
+        }
         CarOrderEntity entity = new CarOrderEntity();//新增一个车辆订单对象
         entity.setType(1);//临时车
         entity.setPlateColor(plateColor);//颜色
@@ -926,6 +946,9 @@ public class CarPositionController {
         entity.setBeginTime(beginTime);//进入的时间
         entity.setOrderStatus(0);//未支付
         entity.setRise("无");
+        if(statusInvite){//有邀请记录就讲uid设置进去
+            entity.setUid(visitorEntity.getUid());//邀请的uid
+        }
         entity.setCarPlate(plateNum);//车牌号
         entity.setCommunityId(communityId);//社区id
         Calendar calendar = Calendar.getInstance();
