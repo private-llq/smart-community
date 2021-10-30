@@ -223,6 +223,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             carOrderEntity.setOrderStatus(1);
             carOrderEntity.setIsPayAnother(1);
             carOrderEntity.setMoney(total);
+            carOrderEntity.setOrderTime(LocalDateTime.now());
             carOrderEntity.setOverTime(LocalDateTime.now());
             carOrderEntity.setBillNum(orderNum);
             appCarOrderMapper.updateById(carOrderEntity);
