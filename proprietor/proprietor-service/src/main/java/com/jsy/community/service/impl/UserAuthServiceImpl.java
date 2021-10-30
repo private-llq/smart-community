@@ -192,6 +192,9 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
             return false;
         }
         if (!StringUtils.isEmpty(userAuthEntity.getPayPassword())) {
+            if (StringUtils.isEmpty(qo.getOldPayPassword())) {
+                throw new ProprietorException("原支付密码不能为空");
+            }
             if (!userAccountService.checkPayPassword(uid, qo.getOldPayPassword())) {
                 throw new ProprietorException("原支付密码错误");
             }
