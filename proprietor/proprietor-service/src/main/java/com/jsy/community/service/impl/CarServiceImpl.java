@@ -223,6 +223,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             carOrderEntity.setOrderStatus(1);
             carOrderEntity.setIsPayAnother(1);
             carOrderEntity.setMoney(total);
+            carOrderEntity.setOrderTime(LocalDateTime.now());
             carOrderEntity.setOverTime(LocalDateTime.now());
             carOrderEntity.setBillNum(orderNum);
             appCarOrderMapper.updateById(carOrderEntity);
@@ -335,7 +336,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         Map<String, Object> map = new HashMap<>();
         CommunityEntity communityEntity = communityMapper.selectById(baseQO.getQuery().getCommunityId());
         QueryWrapper<CarOrderEntity> wrapper = new QueryWrapper<CarOrderEntity>()
-                .select("id,order_num,month,order_time,begin_time,over_time,money,car_plate,car_position_id,type")
+                .select("id,order_num,month,order_time,begin_time,over_time,money,car_plate,car_position_id,type,renewal_in")
                 .eq("community_id", baseQO.getQuery().getCommunityId())
                 .eq("uid", userId)
                 .eq("order_status",1);
@@ -360,6 +361,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                     record.setTypeText("临时车");
                 }else {
                     record.setTypeText("月租车");
+                    record.setMonth(record.getRenewalIn());
                 }
             }
             map.put("total",page.getTotal());
@@ -446,7 +448,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             //查询数据库是否正在包月中
             CarEntity plate = carMapper.selectOne(new QueryWrapper<CarEntity>().eq("car_plate", carEntity.getCarPlate()).eq("type",2));
             if (Objects.nonNull(plate)){
-                throw new PropertyException("当前车辆已进行包月，如果需要延期，请查询记录执行时间延期操作！");
+                throw new ProprietorException("当前车辆已进行包月，如果需要延期，请查询记录执行时间延期操作！");
             }
             if (basicsEntity.getWhetherAllowMonth()==0){
                 //查询车主在当前小区是否存在未交的物业费账单
