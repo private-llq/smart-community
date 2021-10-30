@@ -104,7 +104,7 @@ public interface IVisitorService {
 	 * @description: 根据车牌查询车辆是否被邀请
 	 **/
 
-	boolean selectCarNumberIsNoInvite(String carNumber,Long communityId,Integer status);
+	VisitorEntity selectCarNumberIsNoInvite(String carNumber,Long communityId,Integer status);
 
 	/**
 	 * @author: arli
