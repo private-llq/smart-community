@@ -319,6 +319,20 @@ public class CarPositionController {
             e2.setEncodetype("hex2string");
             e2.setData(Crc16Util.getUltimatelyValue2("余位" + standard, "00", entity.getType()));
             carVO.getRs485_data().add(e2);
+            ////黑白名单的注册
+//        WhitelistData whitelistData = new WhitelistData();
+//        whitelistData.setAction("delete");
+//        whitelistData.setPlateNumber("沪A99999");
+//        whitelistData.setType("W");
+//        whitelistData.setStart("2021/08/31 11:00:00");
+//        whitelistData.setEnd("2022/12/31 23:59:59");
+//        carVO.getWhitelist_data().add(whitelistData);
+
+
+
+
+
+
         } else {
             System.out.println("正常" + entity.getType());
             //全景图
@@ -327,8 +341,6 @@ public class CarPositionController {
             String carInAndOutPicture1 = base64GetString(entity.getPlateNum(), entity.getStartTime(), entity.getCloseupPic(), "車牌");
             System.out.println("全景图" + carInAndOutPicture);
             System.out.println("车位号图" + carInAndOutPicture1);
-//            String carInAndOutPicture = "全景";
-//            String carInAndOutPicture1 = "車牌";
 
 
             //在小区是否是黑名单车辆
@@ -520,7 +532,7 @@ public class CarPositionController {
                                     statusInvite = visitorService.selectCarNumberIsNoInvite(entity.getPlateNum(), communityId, 1);//状态 1.待入园 2.已入园 3.已出园 4.已失效
                                 } else if (entity.getVdcType().equals("out")) {//出口
                                     //查询车牌是否是业主邀请and状态为进入状态
-                                    statusInvite = visitorService.selectCarNumberIsNoInvite(entity.getPlateNum(), communityId, 2);
+                                    statusInvite=true;
                                 }
                                 //查询车牌号是否收到邀请
                                 if (statusInvite) {//收到邀请可以开闸
@@ -589,7 +601,6 @@ public class CarPositionController {
 
                             if (locationPattern.equals("收费模式")) {
 
-
                                 chargingMode(entity.getPlateNum(), entity.getPlateColor(), entity.getCarSubLogo(), entity.getVehicleType(), entity.getStartTime(), entity.getCamId(), entity.getVdcType(), entity.getTrigerType(), carInAndOutPicture, carInAndOutPicture1, carVO, communityId);
                             }
                         } else {//車位不足的情況
@@ -636,14 +647,7 @@ public class CarPositionController {
                 carVO.getRs485_data().add(e3);
             }
 
-////黑白名单的注册
-//        WhitelistData whitelistData = new WhitelistData();
-//        whitelistData.setAction("delete");
-//        whitelistData.setPlateNumber("沪A99999");
-//        whitelistData.setType("W");
-//        whitelistData.setStart("2021/08/31 11:00:00");
-//        whitelistData.setEnd("2022/12/31 23:59:59");
-//        carVO.getWhitelist_data().add(whitelistData);
+
 
 
         }
@@ -739,7 +743,6 @@ public class CarPositionController {
                 } else if(overdueVo.getState() == 2) {//临时车,逾期车辆正常缴费后变为的临时车
                     //临时车走的接口
                     extracted(plateNum, plateColor, carSubLogo, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carVO, communityId);
-
                 }else if(overdueVo.getState() == 0){
                     //语音播报内容
                     Rs485Data e2 = new Rs485Data();
@@ -765,7 +768,6 @@ public class CarPositionController {
         Integer orderStatus = 0;
         //查询临时车最后订单
         CarOrderEntity carOrderEntity = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
-        System.out.println(carOrderEntity);
         if (carOrderEntity != null) {
             orderStatus = carOrderEntity.getOrderStatus();//获取订单的状态
         }
