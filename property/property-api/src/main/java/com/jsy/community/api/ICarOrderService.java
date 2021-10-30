@@ -10,6 +10,8 @@ public interface ICarOrderService extends IService<CarOrderEntity> {
 
     //根据条件查询车辆最后订单的状态
     CarOrderEntity selectCarOrderStatus(Long communityId, String plateNum,Integer type);
+    //根据条件查询车辆最后没有支付的订单的
+    CarOrderEntity selectCarOrderStatusNO(Long communityId, String plateNum,Integer type);
    //删除未支付的订单
     void deletedNOpayOrder(String plateNum, Long communityId, LocalDateTime beginTime);
     //根据订单号查询订单记录
