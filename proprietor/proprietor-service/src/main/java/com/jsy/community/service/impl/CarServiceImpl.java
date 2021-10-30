@@ -221,6 +221,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         if (carOrderEntity != null) {
             carOrderEntity.setPayType(1);
             carOrderEntity.setOrderStatus(1);
+            carOrderEntity.setIsPayAnother(1);
             carOrderEntity.setMoney(total);
             carOrderEntity.setOverTime(LocalDateTime.now());
             carOrderEntity.setBillNum(orderNum);
@@ -337,7 +338,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 .select("id,order_num,month,order_time,over_time,money,car_plate,car_position_id,type")
                 .eq("community_id", baseQO.getQuery().getCommunityId())
                 .eq("uid", userId)
-                .eq("order_status",0);
+                .eq("order_status",1);
         if (!"".equals(baseQO.getQuery().getMonth())&&baseQO.getQuery().getMonth()!=null&&baseQO.getQuery().getMonth()!=0){
             wrapper.eq("month",baseQO.getQuery().getMonth());
         }
@@ -582,7 +583,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             carOrderEntity.setMoney(entity.getMoney());
             carOrderEntity.setMonth(LocalDateTime.now().getMonthValue());
             carOrderEntity.setOrderNum(entity.getOrderNum());
-            carOrderEntity.setOrderStatus(0);
+            carOrderEntity.setOrderStatus(1);
             carOrderEntity.setCarPlate(carEntity.getCarPlate());
             carOrderEntity.setId(SnowFlake.nextId());
             appCarOrderMapper.insert(carOrderEntity);
@@ -728,7 +729,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carOrderEntity.setMoney(carEntity.getMoney());
                 carOrderEntity.setMonth(LocalDateTime.now().getMonthValue());
                 carOrderEntity.setOrderNum(carEntity.getOrderNum());
-                carOrderEntity.setOrderStatus(0);
+                carOrderEntity.setOrderStatus(1);
                 carOrderEntity.setCarPlate(carEntity.getCarPlate());
                 carOrderEntity.setId(SnowFlake.nextId());
                 appCarOrderMapper.insert(carOrderEntity);
