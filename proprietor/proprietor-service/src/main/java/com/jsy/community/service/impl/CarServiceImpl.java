@@ -340,7 +340,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 .eq("uid", userId)
                 .eq("order_status",1);
         if (!"".equals(baseQO.getQuery().getMonth())&&baseQO.getQuery().getMonth()!=null&&baseQO.getQuery().getMonth()!=0){
-            wrapper.eq("month",baseQO.getQuery().getMonth());
+            wrapper.eq("renewal_in",baseQO.getQuery().getMonth());
         }
         Page<CarOrderEntity> page = appCarOrderMapper.selectPage(new Page<CarOrderEntity>(baseQO.getPage(), baseQO.getSize()), wrapper);
         List<CarOrderEntity> records = page.getRecords();
