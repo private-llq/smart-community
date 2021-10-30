@@ -287,14 +287,7 @@ public class CarPositionController {
     }
 
 
-//    @CarOperation(operation = "查询邀请记录")
-//    @ApiOperation("查询邀请记录")
-//    @RequestMapping(value = "/selectCarNumberIsNoInvite", method = RequestMethod.POST)
-//    public boolean selectCarNumberIsNoInvite(String carNumber, Long communityId, Integer status) {
-//        //boolean b = visitorService.selectCarNumberIsNoInvite("沪A9999", 1L, status);
-//        System.out.println(b);
-//        return b;
-//    }
+
 
 
     @ApiOperation("过车记录")
@@ -932,17 +925,19 @@ public class CarPositionController {
     //新增一个车辆订单对象
     private void insterCarOrder(String plateNum, Long communityId, LocalDateTime beginTime, String plateColor, Integer isRetention) {
         boolean  statusInvite=false;
-        //查询车牌是否是业主邀请切在时间之内
-        VisitorEntity visitorEntity = visitorService.selectCarNumberIsNoInvite(plateNum, communityId, 1);//状态 1.待入园 2.已入园 3.已出园 4.已失效
-        if (visitorEntity != null) {
-            long StartTime = visitorEntity.getStartTime().toEpochSecond(ZoneOffset.of("+8"));//开始时间
-            long EndTime = visitorEntity.getEndTime().toEpochSecond(ZoneOffset.of("+8"));//结束时间
-            long now = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));//当前时间
-            if(StartTime<now && EndTime>now){
-                statusInvite=true;
+        VisitorEntity visitorEntity=null;
+        if(isRetention!=1){//不能为滞留订单的时候进入
+            //查询车牌是否是业主邀请切在时间之内
+             visitorEntity = visitorService.selectCarNumberIsNoInvite(plateNum, communityId, 1);//状态 1.待入园 2.已入园 3.已出园 4.已失效
+            if (visitorEntity != null) {
+                long StartTime = visitorEntity.getStartTime().toEpochSecond(ZoneOffset.of("+8"));//开始时间
+                long EndTime = visitorEntity.getEndTime().toEpochSecond(ZoneOffset.of("+8"));//结束时间
+                long now = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));//当前时间
+                if(StartTime<now && EndTime>now){
+                    statusInvite=true;
+                }
             }
         }
-
         CarOrderEntity entity = new CarOrderEntity();//新增一个车辆订单对象
         entity.setType(1);//临时车
         entity.setPlateColor(plateColor);//颜色
