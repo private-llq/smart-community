@@ -34,6 +34,24 @@ public class CarOrderServiceImpl extends ServiceImpl<CarOrderMapper, CarOrderEnt
 
         return carOrderEntity;
     }
+
+    //根据条件查询车辆最后没有支付的订单的
+    @Override
+    public CarOrderEntity selectCarOrderStatusNO(Long communityId, String plateNum,Integer type) {
+        //查询订单状态状态0未缴费1缴费
+        QueryWrapper<CarOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("community_id",communityId);//社区id
+        queryWrapper.eq("type",type);//临时车
+        queryWrapper.eq("car_plate",plateNum);//车牌号
+        queryWrapper.eq("order_status",0);//订单没有支付
+        queryWrapper.orderByDesc("create_time");
+        queryWrapper.last("LIMIT 1");
+        CarOrderEntity carOrderEntity = carOrderMapper.selectOne(queryWrapper);
+
+        return carOrderEntity;
+    }
+
+
     //删除未支付的订单
     @Override
     public void deletedNOpayOrder(String plateNum, Long communityId, LocalDateTime beginTime) {
