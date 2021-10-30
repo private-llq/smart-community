@@ -335,7 +335,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         Map<String, Object> map = new HashMap<>();
         CommunityEntity communityEntity = communityMapper.selectById(baseQO.getQuery().getCommunityId());
         QueryWrapper<CarOrderEntity> wrapper = new QueryWrapper<CarOrderEntity>()
-                .select("id,order_num,month,order_time,over_time,money,car_plate,car_position_id,type")
+                .select("id,order_num,month,order_time,begin_time,over_time,money,car_plate,car_position_id,type")
                 .eq("community_id", baseQO.getQuery().getCommunityId())
                 .eq("uid", userId)
                 .eq("order_status",1);
