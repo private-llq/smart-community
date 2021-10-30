@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
  * @author chq459799974
  * @since 2020-12-03 10:29
  **/
+@Component
 public class UserUtils {
 	
 	public static final String USER_TOKEN = "token";
@@ -35,11 +36,19 @@ public class UserUtils {
 	public static final String USER_COMPANY_ID = "companyId";
 	public static final String USER_ROLE_ID = "roleId";
 
-	@Autowired
 	private static StringRedisTemplate stringRedisTemplate;
-	
-	@Autowired
+
 	private static RedisTemplate redisTemplate;
+
+	@Autowired
+	public void setStringRedisTemplate(StringRedisTemplate stringRedisTemplate) {
+		UserUtils.stringRedisTemplate = stringRedisTemplate;
+	}
+
+	@Autowired
+	public void setRedisTemplate(RedisTemplate redisTemplate) {
+		UserUtils.redisTemplate = redisTemplate;
+	}
 	
 	/**
 	* @Description: 通过token获取用户信息(业主端)

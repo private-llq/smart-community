@@ -1647,7 +1647,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 String city = StringUtils.isBlank(shopLeaseEntity.getCity()) ? "" : shopLeaseEntity.getCity();
                 String area = StringUtils.isBlank(shopLeaseEntity.getArea()) ? "" : shopLeaseEntity.getArea();
                 houseLeaseContractVO.setAddress(city + area);
-                houseLeaseContractVO.setBuiltupArea(shopLeaseEntity.getShopAcreage());
+                houseLeaseContractVO.setBuiltupArea(String.valueOf(shopLeaseEntity.getShopAcreage()));
                 List<Long> faciltyList = MyMathUtils.analysisTypeCode(shopLeaseEntity.getShopFacility());
                 if (!CollectionUtils.isEmpty(faciltyList)) {
                     Map<String, Long> constByTypeCodeForList = houseConstService.getConstByTypeCodeForList(faciltyList, 16L);
@@ -1686,7 +1686,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 String area = redisTemplate.opsForValue().get("RegionSingle:" + houseLeaseEntity.getHouseAreaId());
                 String address = houseLeaseEntity.getHouseAddress() == null ? "" : houseLeaseEntity.getHouseAddress();
                 houseLeaseContractVO.setAddress(city == null ? "" : city + area == null ? "" : area + address);
-                houseLeaseContractVO.setBuiltupArea(houseLeaseEntity.getHouseSquareMeter().doubleValue());
+                houseLeaseContractVO.setBuiltupArea(String.valueOf(houseLeaseEntity.getHouseSquareMeter()));
                 List<Long> decorationTypeIds = MyMathUtils.analysisTypeCode(houseLeaseEntity.getDecorationTypeId());
                 if (!CollectionUtils.isEmpty(decorationTypeIds)) {
                     Map<String, Long> constByTypeCodeForList = houseConstService.getConstByTypeCodeForList(decorationTypeIds, 18L);
