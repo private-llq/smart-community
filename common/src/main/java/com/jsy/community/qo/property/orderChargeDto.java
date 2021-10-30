@@ -1,6 +1,7 @@
 package com.jsy.community.qo.property;
 
 
+import com.alibaba.excel.annotation.ExcelIgnore;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -57,4 +58,9 @@ public class orderChargeDto implements Serializable {
      * 是否支付 0 未支付 1 已支付
      */
     private Integer orderStatus;
+
+    /**
+     * 是否为房主代付订单  1 ：是 0：否
+     */
+    private Integer isPayAnother;
 }

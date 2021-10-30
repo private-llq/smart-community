@@ -548,6 +548,7 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
             orderChargeDto.setMoney(money);//金额
             orderChargeDto.setId(carOrderEntity.getId());//id
             orderChargeDto.setOrderStatus(carOrderEntity.getOrderStatus());//订单状态
+            orderChargeDto.setIsPayAnother(carOrderEntity.getIsPayAnother());//代付状态
             return orderChargeDto;
         }
         return null;
