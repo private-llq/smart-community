@@ -135,6 +135,12 @@ public class CarOrderEntity extends BaseEntity {
     private Integer overdueState;
 
     /**
+     * 是否为房主代付订单  1 ：是 0：否
+     */
+    @ExcelIgnore
+    private Integer isPayAnother;
+
+    /**
      * 停车时长
      */
     @TableField(exist = false)

@@ -335,7 +335,8 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         QueryWrapper<CarOrderEntity> wrapper = new QueryWrapper<CarOrderEntity>()
                 .select("id,order_num,month,order_time,over_time,money,car_plate,car_position_id,type")
                 .eq("community_id", baseQO.getQuery().getCommunityId())
-                .eq("uid", userId);
+                .eq("uid", userId)
+                .eq("order_status",0);
         if (!"".equals(baseQO.getQuery().getMonth())&&baseQO.getQuery().getMonth()!=null&&baseQO.getQuery().getMonth()!=0){
             wrapper.eq("month",baseQO.getQuery().getMonth());
         }
