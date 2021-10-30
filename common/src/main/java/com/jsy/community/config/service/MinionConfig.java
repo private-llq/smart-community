@@ -1,6 +1,7 @@
 package com.jsy.community.config.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @Author: Pipi
@@ -8,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
  * @Date: 2021/10/21 10:06
  * @Version: 1.0
  **/
-//@Configuration
+@Configuration
 public class MinionConfig {
     // ip
     public static String endPoint;
