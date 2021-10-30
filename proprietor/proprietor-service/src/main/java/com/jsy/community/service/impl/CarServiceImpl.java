@@ -259,11 +259,11 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carOrderEntity.getUid()));
             //支付上链
             OrderCochainUtil.orderCochain("停车费",
-                    "人民币",
-                    payType==1?"微信支付":"支付宝支付",
+                    1,
+                    payType,
                     total,
                     outTradeNo,
-                    userEntity.getIdCard(),
+                    carOrderEntity.getUid(),
                     companyEntity.getUnifiedSocialCreditCode(),
                     hours+"小时"+minutes+"分钟"+"停车位",
                     null);
@@ -594,11 +594,11 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carEntity.getUid()));
             //支付上链
             OrderCochainUtil.orderCochain("停车费",
-                    "人民币",
-                    entity.getPayType()==1?"微信支付":"支付宝支付",
+                    1,
+                    entity.getPayType(),
                     entity.getMoney(),
                     entity.getOrderNum(),
-                    userEntity.getIdCard(),
+                    entity.getUid(),
                     companyEntity.getUnifiedSocialCreditCode(),
                     entity.getMonth()+"月车位租金费",
                     null);
@@ -750,11 +750,11 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(communityEntity.getPropertyId());
                 //支付上链
                 OrderCochainUtil.orderCochain("停车费",
-                        "人民币",
-                        entity.getPayType()==1?"微信支付":"支付宝支付",
+                        1,
+                        entity.getPayType(),
                         entity.getMoney(),
                         entity.getOrderNum(),
-                        userEntity.getIdCard(),
+                        entity.getUid(),
                         companyEntity.getUnifiedSocialCreditCode(),
                         entity.getMonth()+"月车位租金费",
                         null);

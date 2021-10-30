@@ -689,7 +689,6 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         StringBuilder detailedList = new StringBuilder();
         PropertyFinanceOrderEntity orderEntity = propertyFinanceOrderMapper.selectById(ids[0]);
         UserIMEntity userIMEntity = userImService.selectUid(orderEntity.getUid());
-        UserEntity userEntity = userService.getUser(orderEntity.getUid());
         CommunityEntity communityEntity = communityMapper.selectById(orderEntity.getCommunityId());
         PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(communityEntity.getPropertyId());
 
@@ -703,11 +702,11 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         //支付上链
         OrderCochainUtil.orderCochain("物业费",
-                "人民币",
-                payType==1?"微信支付":"支付宝支付",
+                1,
+                payType,
                 total,
                 tripartiteOrder,
-                userEntity.getIdCard(),
+                orderEntity.getUid(),
                 companyEntity.getUnifiedSocialCreditCode(),
                 detailedList.toString(),
                 null);

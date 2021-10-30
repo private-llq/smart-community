@@ -41,7 +41,7 @@ public class OrderCochainUtil {
      * remarks:备注
      * @return: [com.jsy.community.utils.CochainResponseEntity]
      */
-    public static CochainResponseEntity orderCochain(String transactionName, String currency, String payType, BigDecimal totalAmount,String orderNum,String payElectronicIdentity,String payeeElectronicIdentity,String detailedList,String remarks){
+    public static CochainResponseEntity orderCochain(String transactionName, Integer currency, Integer payType, BigDecimal totalAmount,String orderNum,String payElectronicIdentity,String payeeElectronicIdentity,String detailedList,String remarks){
         HashMap<String, Object> map = new HashMap<>();
         map.put("transactionName",transactionName);
         map.put("currency",currency);
