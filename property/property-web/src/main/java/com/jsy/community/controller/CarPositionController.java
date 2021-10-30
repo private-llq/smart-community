@@ -728,7 +728,7 @@ public class CarPositionController {
 
         } else if (vdcType.equals("out")) {//出口
             //查询最后没有支付的订单
-            CarOrderEntity entity = iCarOrderService.selectCarOrderStatusNO(communityId, plateNum, 1);
+            CarOrderEntity entity = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
             if (entity != null && entity.getOverdueState() == 0) {//正常订单
                 extracted(plateNum, plateColor, carSubLogo, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carVO, communityId);
 
