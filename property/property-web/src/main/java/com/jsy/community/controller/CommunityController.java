@@ -55,9 +55,6 @@ public class CommunityController {
     @Autowired
     private RedisTemplate redisTemplate;
 
-    @Autowired
-    private UserUtils userUtils;
-
     @Value("${propertyLoginExpireHour}")
     private long loginExpireHour = 12;
 
@@ -118,7 +115,7 @@ public class CommunityController {
         adminUserInfo.getCommunityIdList().add(String.valueOf(communityId));
         String token = UserUtils.getUserToken();
         // 根据token,更新Redis数据
-        userUtils.updateRedisByToken("Admin:Login", JSON.toJSONString(adminUserInfo), token, loginExpireHour);
+        UserUtils.updateRedisByToken("Admin:Login", JSON.toJSONString(adminUserInfo), token, loginExpireHour);
         return CommonResult.ok("添加成功!");
     }
 

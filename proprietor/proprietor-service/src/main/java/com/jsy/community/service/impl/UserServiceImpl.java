@@ -65,9 +65,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Resource
     private RedisTemplate<String, String> redisTemplate;
 
-    @Autowired
-    private UserUtils userUtils;
-
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserAuthService userAuthService;
 
@@ -172,7 +169,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userAuthVo.setExpiredTime(LocalDateTimeUtil.of(expireDate));
         userInfoVo.setIsBindMobile(1);
         userAuthVo.setUserInfo(userInfoVo);
-        String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(userInfoVo), expire, TimeUnit.SECONDS);
+        String token = UserUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(userInfoVo), expire, TimeUnit.SECONDS);
         userAuthVo.setToken(token);
 
         return userAuthVo;
@@ -623,7 +620,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         vo.setThirdPlatformId(id);
         vo.setIsBindMobile(0);
         userAuthVo.setUserInfo(vo);
-//        String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(vo), expire, TimeUnit.SECONDS);
+//        String token = UserUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(vo), expire, TimeUnit.SECONDS);
         userAuthVo.setToken(null);
         return userAuthVo;
     }

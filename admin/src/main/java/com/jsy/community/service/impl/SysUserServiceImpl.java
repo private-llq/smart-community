@@ -68,9 +68,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	@Resource
 	private SysRoleMapper sysRoleMapper;
 	
-	@Autowired
-	private UserUtils userUtils;
-	
 	/**
 	* @Description: 设置用户角色
 	 * @Param: [roleIds, userId]
@@ -503,8 +500,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 			boolean b = changeMobile(sysUserEntity.getMobile(), user.getMobile());
 			if(b){
 				//旧手机账号退出登录
-				userUtils.destroyToken("Sys:Login",String.valueOf(redisTemplate.opsForValue().get("Sys:LoginAccount:" + user.getMobile())));
-				userUtils.destroyToken("Sys:LoginAccount",user.getMobile());
+				UserUtils.destroyToken("Sys:Login",String.valueOf(redisTemplate.opsForValue().get("Sys:LoginAccount:" + user.getMobile())));
+				UserUtils.destroyToken("Sys:LoginAccount",user.getMobile());
 			}
 		}
 		//更新菜单权限
