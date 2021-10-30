@@ -10,4 +10,12 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface UserMapper extends BaseMapper<UserEntity> {
+	/**
+	 * @Description: 根据uid查询用户
+	 * @author: DKS
+	 * @since: 2021/10/29 16:05
+	 * @Param: uid
+	 * @return: com.jsy.community.entity.UserEntity
+	 */
+	UserEntity getUserMobileByUid(String uid);
 }

@@ -686,18 +686,30 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (rows != ids.length) {
             log.info("物业账单支付后处理失败，单号：" + tripartiteOrder + " 账单ID：" + Arrays.toString(ids));
         }
-//        StringBuilder detailedList = new StringBuilder();
+        StringBuilder detailedList = new StringBuilder();
         PropertyFinanceOrderEntity orderEntity = propertyFinanceOrderMapper.selectById(ids[0]);
         UserIMEntity userIMEntity = userImService.selectUid(orderEntity.getUid());
-        UserEntity userEntity = userService.getUser(orderEntity.getUid());
         CommunityEntity communityEntity = communityMapper.selectById(orderEntity.getCommunityId());
         PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(communityEntity.getPropertyId());
 
         List<PropertyFinanceOrderEntity> list = propertyFinanceOrderMapper.selectByIdsList(ids);
-//        for (PropertyFinanceOrderEntity propertyFinanceOrderEntity : list) {
-//            detailedList.append(propertyFinanceOrderEntity.getBeginTime()).append()
-//        }
-//        OrderCochainUtil.orderCochain("物业费","人民币",payType==1?"微信支付":"支付宝支付",total,tripartiteOrder,userEntity.getIdCard(),companyEntity.getUnifiedSocialCreditCode(),);
+        for (int i = 0; i < list.size(); i++) {
+            detailedList.append(list.get(i).getBeginTime().getMonthValue()+"月");
+            detailedList.append(BusinessEnum.FeeRuleNameEnum.getName(list.get(i).getType()));
+            if (i!=list.size()-1){
+                detailedList.append("\n");
+            }
+        }
+        //支付上链
+        OrderCochainUtil.orderCochain("物业费",
+                1,
+                payType,
+                total,
+                tripartiteOrder,
+                orderEntity.getUid(),
+                companyEntity.getUnifiedSocialCreditCode(),
+                detailedList.toString(),
+                null);
         if (userIMEntity != null) {
             Map<Object, Object> map = new HashMap<>();
             map.put("type", 3);

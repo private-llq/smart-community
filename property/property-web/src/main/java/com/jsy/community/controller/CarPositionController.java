@@ -321,14 +321,14 @@ public class CarPositionController {
             carVO.getRs485_data().add(e2);
         } else {
             System.out.println("正常" + entity.getType());
-//            //全景图
-//            String carInAndOutPicture = base64GetString(entity.getPlateNum(), entity.getStartTime(), entity.getPicture(), "全景");
-//            //车位号
-//            String carInAndOutPicture1 = base64GetString(entity.getPlateNum(), entity.getStartTime(), entity.getCloseupPic(), "車牌");
-//            System.out.println("全景图" + carInAndOutPicture);
-//            System.out.println("车位号图" + carInAndOutPicture1);
-            String carInAndOutPicture = "全景";
-            String carInAndOutPicture1 = "車牌";
+            //全景图
+            String carInAndOutPicture = base64GetString(entity.getPlateNum(), entity.getStartTime(), entity.getPicture(), "全景");
+            //车位号
+            String carInAndOutPicture1 = base64GetString(entity.getPlateNum(), entity.getStartTime(), entity.getCloseupPic(), "車牌");
+            System.out.println("全景图" + carInAndOutPicture);
+            System.out.println("车位号图" + carInAndOutPicture1);
+//            String carInAndOutPicture = "全景";
+//            String carInAndOutPicture1 = "車牌";
 
 
             //在小区是否是黑名单车辆
@@ -718,13 +718,87 @@ public class CarPositionController {
 
         } else if (vdcType.equals("out")) {//出口
 
-            OverdueVo overdueVo = iCarMonthlyVehicleService.MonthlyOverdue(plateNum, communityId);//1包月逾期0临时车
-            System.out.println("1包月逾期0临时车" + overdueVo.getState());
-            if (overdueVo.getState() == 1) {//包月逾期车辆
+            CarOrderEntity entity = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
+            if (entity!=null && entity.getOverdueState()==0) {//正常订单
+                extracted(plateNum, plateColor, carSubLogo, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carVO, communityId);
+
+            }else{//不是正常订单
+                //0：车牌识别错误 1:逾期 2：正常
+                OverdueVo overdueVo = iCarMonthlyVehicleService.MonthlyOverdue(plateNum, communityId);//1包月逾期0临时车
+                if (overdueVo.getState() == 1) {//包月逾期车辆
+                    //语音播报内容
+                    Rs485Data e2 = new Rs485Data();
+                    e2.setEncodetype("hex2string");
+                    e2.setData(Crc16Util.getUltimatelyVoice("月租车到期请重新补交停车费", "online"));
+                    carVO.getRs485_data().add(e2);
+                    //led
+                    Rs485Data e3 = new Rs485Data();
+                    e3.setEncodetype("hex2string");
+                    e3.setData(Crc16Util.getUltimatelyValue2(plateNum, "01", "online"));//车牌号
+                    carVO.getRs485_data().add(e3);
+                } else if(overdueVo.getState() == 2) {//临时车,逾期车辆正常缴费后变为的临时车
+                    //临时车走的接口
+                    extracted(plateNum, plateColor, carSubLogo, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carVO, communityId);
+
+                }else if(overdueVo.getState() == 0){
+                    //语音播报内容
+                    Rs485Data e2 = new Rs485Data();
+                    e2.setEncodetype("hex2string");
+                    e2.setData(Crc16Util.getUltimatelyVoice("请重新进入识别区", "online"));
+                    carVO.getRs485_data().add(e2);
+                    //led
+                    Rs485Data e3 = new Rs485Data();
+                    e3.setEncodetype("hex2string");
+                    e3.setData(Crc16Util.getUltimatelyValue2(plateNum, "01", "online"));//车牌号
+                    carVO.getRs485_data().add(e3);
+                }
+            }
+            
+
+        }
+
+
+    }
+
+    //如果是临时车走的接口
+    private void extracted(String plateNum, String plateColor, String carSubLogo, String vehicleType, Long startTime, String camId, String vdcType, String trigerType, String carInAndOutPicture, String carInAndOutPicture1, CarVO carVO, Long communityId) {
+        Integer orderStatus = 0;
+        //查询临时车最后订单
+        CarOrderEntity carOrderEntity = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
+        System.out.println(carOrderEntity);
+        if (carOrderEntity != null) {
+            orderStatus = carOrderEntity.getOrderStatus();//获取订单的状态
+        }
+        System.out.println("支付状态" + orderStatus);
+        if (orderStatus == 0) {//未支付
+
+            Integer plateType = 1;
+            if (plateColor.equals("黄色")) {
+                plateType = 0;
+            }
+            LocalDateTime beginTime = carOrderEntity.getBeginTime();//进入时间
+            LocalDateTime now = LocalDateTime.now();//当前时间
+            Integer difference = (int) Duration.between(beginTime, now).toMinutes();//时间差
+            System.out.println("时间差" + difference);
+            //查询临时车的免费分钟数difference
+            Integer temporaryFreTime = carChargeService.selectTemporaryFreTime(communityId, plateType);
+
+            System.out.println("免费分钟数" + temporaryFreTime);
+            if (difference < temporaryFreTime) {//在免费时间内
+                //是否开闸
+                GpioData gpioData = new GpioData();
+                gpioData.setIonum("io1");
+                gpioData.setAction("on");
+                carVO.getGpio_data().add(gpioData);
+                //开闸记录
+                extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
+                //将免费时间内的订单删除
+                iCarOrderService.deletedNOpayOrder(plateNum, communityId, beginTime);
+
                 //语音播报内容
                 Rs485Data e2 = new Rs485Data();
                 e2.setEncodetype("hex2string");
-                e2.setData(Crc16Util.getUltimatelyVoice("月租车到期请重新补交停车费", "online"));
+                e2.setData(Crc16Util.getUltimatelyVoice("一路平安", "online"));//特殊车辆放行
                 carVO.getRs485_data().add(e2);
                 //led
                 Rs485Data e3 = new Rs485Data();
@@ -732,151 +806,101 @@ public class CarPositionController {
                 e3.setData(Crc16Util.getUltimatelyValue2(plateNum, "01", "online"));//车牌号
                 carVO.getRs485_data().add(e3);
             } else {
-                Integer orderStatus = 0;
-                //查询临时车最后订单
-                CarOrderEntity carOrderEntity = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
-                System.out.println(carOrderEntity);
-                if (carOrderEntity != null) {
-                    orderStatus = carOrderEntity.getOrderStatus();//获取订单的状态
-                }
-                System.out.println("支付状态" + orderStatus);
-                if (orderStatus == 0) {//未支付
-
-                    Integer plateType = 1;
-                    if (plateColor.equals("黄色")) {
-                        plateType = 0;
-                    }
-                    LocalDateTime beginTime = carOrderEntity.getBeginTime();//进入时间
-                    LocalDateTime now = LocalDateTime.now();//当前时间
-                    Integer difference = (int) Duration.between(beginTime, now).toMinutes();//时间差
-                    System.out.println("时间差" + difference);
-                    //查询临时车的免费分钟数difference
-                    Integer temporaryFreTime = carChargeService.selectTemporaryFreTime(communityId, plateType);
-
-                    System.out.println("免费分钟数" + temporaryFreTime);
-                    if (difference < temporaryFreTime) {//在免费时间内
-                        //是否开闸
-                        GpioData gpioData = new GpioData();
-                        gpioData.setIonum("io1");
-                        gpioData.setAction("on");
-                        carVO.getGpio_data().add(gpioData);
-                        //开闸记录
-                        extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
-                        //将免费时间内的订单删除
-                        iCarOrderService.deletedNOpayOrder(plateNum, communityId, beginTime);
-
-                        //语音播报内容
-                        Rs485Data e2 = new Rs485Data();
-                        e2.setEncodetype("hex2string");
-                        e2.setData(Crc16Util.getUltimatelyVoice("一路平安", "online"));//特殊车辆放行
-                        carVO.getRs485_data().add(e2);
-                        //led
-                        Rs485Data e3 = new Rs485Data();
-                        e3.setEncodetype("hex2string");
-                        e3.setData(Crc16Util.getUltimatelyValue2(plateNum, "01", "online"));//车牌号
-                        carVO.getRs485_data().add(e3);
-                    } else {
 
 
-                        //语音播报内容
-                        Rs485Data e2 = new Rs485Data();
-                        e2.setEncodetype("hex2string");
-                        e2.setData(Crc16Util.getUltimatelyVoice("请缴费", "online"));//请缴费
-                        carVO.getRs485_data().add(e2);
-                        //led
-                        Rs485Data e3 = new Rs485Data();
-                        e3.setEncodetype("hex2string");
-                        e3.setData(Crc16Util.getUltimatelyValue2(plateNum, "01", "online"));//车牌号
-                        carVO.getRs485_data().add(e3);
-                        //计算临时车，停车金额
-                        BigDecimal charge = getBigDecimal(plateColor, communityId, carOrderEntity.getBeginTime());
-                        //led
-                        Rs485Data e4 = new Rs485Data();
-                        e4.setEncodetype("hex2string");
-                        e4.setData(Crc16Util.getUltimatelyValue2(charge + "元", "02", "online"));//计算临时车
-                        carVO.getRs485_data().add(e4);
-
-
-                    }
-
-                }
-                if (orderStatus == 1) {//已经支付
-
-                    //缴费获取缴费时间和允许出入的时间是多久
-                    CarBasicsEntity one1 = iCarBasicsService.findOne(communityId);
-                    LocalDateTime now = LocalDateTime.now();//当前时间
-                    LocalDateTime orderTime = carOrderEntity.getOrderTime();//支付时间
-                    Integer dwellTime = one1.getDwellTime();//允许滞留时间
-                    Duration duration = Duration.between(orderTime, now);//支付时间和当前时间差
-                    long l = duration.toMinutes();//分钟
-                    System.out.println("当前时间" + now);
-                    System.out.println("支付时间" + orderTime);
-                    System.out.println("允许滞留时间" + dwellTime + "分钟");
-                    System.out.println("时间差" + l + "分钟");
-
-                    if (l > dwellTime) {//超过了滞留时间
-                        //是否开闸
-                        GpioData gpioData = new GpioData();
-                        gpioData.setIonum("io1");
-                        carVO.getGpio_data().add(gpioData);
-                        //语音播报内容
-                        Rs485Data e2 = new Rs485Data();
-                        e2.setEncodetype("hex2string");
-                        e2.setData(Crc16Util.getUltimatelyVoice("此车已超时请重新补交停车费", "online"));//此车已超时
-                        carVO.getRs485_data().add(e2);
-                        //led
-                        Rs485Data e3 = new Rs485Data();
-                        e3.setEncodetype("hex2string");
-                        e3.setData(Crc16Util.getUltimatelyValue2(plateNum, "01", "online"));//车牌号
-                        carVO.getRs485_data().add(e3);
-                        //新增订单
-                        insterCarOrder(plateNum, communityId, orderTime, plateColor, 1);
-
-                        //查询临时车最后订单
-                        CarOrderEntity carOrder1 = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
-                        //查询临时车费用
-                        BigDecimal charge = getBigDecimal(plateColor, communityId, carOrder1.getBeginTime());
-                        //led
-                        Rs485Data e4 = new Rs485Data();
-                        e4.setEncodetype("hex2string");
-                        e4.setData(Crc16Util.getUltimatelyValue2(charge + "元", "02", "online"));//需要支付的金额
-                        carVO.getRs485_data().add(e4);
-
-
-                    }
-                    if (l < dwellTime) {//没有超过滞留时间
-                        //是否开闸
-                        GpioData gpioData = new GpioData();
-                        gpioData.setIonum("io1");
-                        gpioData.setAction("on");
-                        carVO.getGpio_data().add(gpioData);
-                        //开闸记录
-                        extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
-
-                        //语音播报内容
-                        Rs485Data e2 = new Rs485Data();
-                        e2.setEncodetype("hex2string");
-                        e2.setData(Crc16Util.getUltimatelyVoice("一路平安", "online"));//一路平安
-                        carVO.getRs485_data().add(e2);
-                        //led
-                        Rs485Data e3 = new Rs485Data();
-                        e3.setEncodetype("hex2string");
-                        e3.setData(Crc16Util.getUltimatelyValue2(plateNum, "01", "online"));//车牌号
-                        carVO.getRs485_data().add(e3);
-                        //如果是收到邀请的车辆状态改变为已经出园
-                        boolean statusInvite = visitorService.selectCarNumberIsNoInvite(plateNum, communityId, 2);
-                        if (statusInvite) {
-                            visitorService.updateCarStatus(plateNum, communityId, 3);
-                        }
-                    }
-
-                }
+                //语音播报内容
+                Rs485Data e2 = new Rs485Data();
+                e2.setEncodetype("hex2string");
+                e2.setData(Crc16Util.getUltimatelyVoice("请缴费", "online"));//请缴费
+                carVO.getRs485_data().add(e2);
+                //led
+                Rs485Data e3 = new Rs485Data();
+                e3.setEncodetype("hex2string");
+                e3.setData(Crc16Util.getUltimatelyValue2(plateNum, "01", "online"));//车牌号
+                carVO.getRs485_data().add(e3);
+                //计算临时车，停车金额
+                BigDecimal charge = getBigDecimal(plateColor, communityId, carOrderEntity.getBeginTime());
+                //led
+                Rs485Data e4 = new Rs485Data();
+                e4.setEncodetype("hex2string");
+                e4.setData(Crc16Util.getUltimatelyValue2(charge + "元", "02", "online"));//计算临时车
+                carVO.getRs485_data().add(e4);
 
 
             }
+
         }
+        if (orderStatus == 1) {//已经支付
+
+            //缴费获取缴费时间和允许出入的时间是多久
+            CarBasicsEntity one1 = iCarBasicsService.findOne(communityId);
+            LocalDateTime now = LocalDateTime.now();//当前时间
+            LocalDateTime orderTime = carOrderEntity.getOrderTime();//支付时间
+            Integer dwellTime = one1.getDwellTime();//允许滞留时间
+            Duration duration = Duration.between(orderTime, now);//支付时间和当前时间差
+            long l = duration.toMinutes();//分钟
+            System.out.println("当前时间" + now);
+            System.out.println("支付时间" + orderTime);
+            System.out.println("允许滞留时间" + dwellTime + "分钟");
+            System.out.println("时间差" + l + "分钟");
+
+            if (l > dwellTime) {//超过了滞留时间
+                //是否开闸
+                GpioData gpioData = new GpioData();
+                gpioData.setIonum("io1");
+                carVO.getGpio_data().add(gpioData);
+                //语音播报内容
+                Rs485Data e2 = new Rs485Data();
+                e2.setEncodetype("hex2string");
+                e2.setData(Crc16Util.getUltimatelyVoice("此车已超时请重新补交停车费", "online"));//此车已超时
+                carVO.getRs485_data().add(e2);
+                //led
+                Rs485Data e3 = new Rs485Data();
+                e3.setEncodetype("hex2string");
+                e3.setData(Crc16Util.getUltimatelyValue2(plateNum, "01", "online"));//车牌号
+                carVO.getRs485_data().add(e3);
+                //新增订单
+                insterCarOrder(plateNum, communityId, orderTime, plateColor, 1);
+
+                //查询临时车最后订单
+                CarOrderEntity carOrder1 = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
+                //查询临时车费用
+                BigDecimal charge = getBigDecimal(plateColor, communityId, carOrder1.getBeginTime());
+                //led
+                Rs485Data e4 = new Rs485Data();
+                e4.setEncodetype("hex2string");
+                e4.setData(Crc16Util.getUltimatelyValue2(charge + "元", "02", "online"));//需要支付的金额
+                carVO.getRs485_data().add(e4);
 
 
+            }
+            if (l < dwellTime) {//没有超过滞留时间
+                //是否开闸
+                GpioData gpioData = new GpioData();
+                gpioData.setIonum("io1");
+                gpioData.setAction("on");
+                carVO.getGpio_data().add(gpioData);
+                //开闸记录
+                extracted(plateNum, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carSubLogo, plateColor);
+
+                //语音播报内容
+                Rs485Data e2 = new Rs485Data();
+                e2.setEncodetype("hex2string");
+                e2.setData(Crc16Util.getUltimatelyVoice("一路平安", "online"));//一路平安
+                carVO.getRs485_data().add(e2);
+                //led
+                Rs485Data e3 = new Rs485Data();
+                e3.setEncodetype("hex2string");
+                e3.setData(Crc16Util.getUltimatelyValue2(plateNum, "01", "online"));//车牌号
+                carVO.getRs485_data().add(e3);
+                //如果是收到邀请的车辆状态改变为已经出园
+                boolean statusInvite = visitorService.selectCarNumberIsNoInvite(plateNum, communityId, 2);
+                if (statusInvite) {
+                    visitorService.updateCarStatus(plateNum, communityId, 3);
+                }
+            }
+
+        }
     }
 
     //查询需要支付的额金额{"社区id,车牌颜色,入场时间,结算时间"}
