@@ -188,7 +188,8 @@ public class WeChatH5PayController {
         entity.setPayType(4);//1app支付 2物业后台 3支付宝手机H5 4微信公众号
 
         entity.setRise(params.get("attach"));//商品订单抬头
-
+        //设置支付方式  0扫码  1APP
+        entity.setIsPayAnother(0);
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Date date = null;
