@@ -27,7 +27,7 @@ public class HouseLeaseContractVO implements Serializable {
     private String address;
 
     // 房屋建筑面积
-    private Double builtupArea;
+    private String builtupArea;
 
     // 房屋装修情况
     private String decorationLevel;
