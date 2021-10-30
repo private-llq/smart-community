@@ -38,9 +38,10 @@ public class OrderCochainUtil {
      * payElectronicIdentity:支付方电子身份证
      * payeeElectronicIdentity:收款方电子身份证
      * detailedList:交易详单
+     * remarks:备注
      * @return: [com.jsy.community.utils.CochainResponseEntity]
      */
-    public static CochainResponseEntity orderCochain(String transactionName, String currency, String payType, BigDecimal totalAmount,String orderNum,String payElectronicIdentity,String payeeElectronicIdentity,String detailedList){
+    public static CochainResponseEntity orderCochain(String transactionName, Integer currency, Integer payType, BigDecimal totalAmount,String orderNum,String payElectronicIdentity,String payeeElectronicIdentity,String detailedList,String remarks){
         HashMap<String, Object> map = new HashMap<>();
         map.put("transactionName",transactionName);
         map.put("currency",currency);
@@ -50,6 +51,7 @@ public class OrderCochainUtil {
         map.put("payElectronicIdentity",payElectronicIdentity);
         map.put("payeeElectronicIdentity",payeeElectronicIdentity);
         map.put("detailedList",detailedList);
+        map.put("remarks",remarks);
         //内容加密
         String encrypt = ZhsjUtil.postEncrypt(JSONUtil.toJsonStr(map));
         //创建httpclient对象
@@ -73,10 +75,6 @@ public class OrderCochainUtil {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(orderCochain(null, null, null, null, null, null, null, null));
     }
 
 }

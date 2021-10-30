@@ -15,6 +15,7 @@ import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarChargeQO;
 import com.jsy.community.qo.proprietor.CarQO;
+import com.jsy.community.utils.OrderCochainUtil;
 import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
@@ -57,6 +58,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
     @Autowired
     private AppCarOrderMapper appCarOrderMapper;
+
+    @DubboReference(version = Const.version,  group = Const.group_property, check = false)
+    private IPropertyCompanyService propertyCompanyService;
 
     @Autowired
     private CarOrderRecordMapper carOrderRecordMapper;
@@ -244,6 +248,26 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             propertyFinanceOrderService.insert(orderEntity);
 
 
+            LocalDateTime fromDateTime = carOrderEntity.getBeginTime();
+            LocalDateTime toDateTime = carOrderEntity.getOverTime();
+            LocalDateTime tempDateTime = LocalDateTime.from( fromDateTime );
+
+            long hours = tempDateTime.until( toDateTime, ChronoUnit.HOURS);
+            tempDateTime = tempDateTime.plusHours( hours );
+            long minutes = tempDateTime.until( toDateTime, ChronoUnit.MINUTES);
+            PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(communityEntity.getPropertyId());
+            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carOrderEntity.getUid()));
+            //支付上链
+            OrderCochainUtil.orderCochain("停车费",
+                    1,
+                    payType,
+                    total,
+                    outTradeNo,
+                    carOrderEntity.getUid(),
+                    companyEntity.getUnifiedSocialCreditCode(),
+                    hours+"小时"+minutes+"分钟"+"停车位",
+                    null);
+
             //推送消息
             UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", carOrderEntity.getUid()));
             HashMap<Object, Object> map = new HashMap<>();
@@ -311,7 +335,8 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         QueryWrapper<CarOrderEntity> wrapper = new QueryWrapper<CarOrderEntity>()
                 .select("id,order_num,month,order_time,over_time,money,car_plate,car_position_id,type")
                 .eq("community_id", baseQO.getQuery().getCommunityId())
-                .eq("uid", userId);
+                .eq("uid", userId)
+                .eq("order_status",0);
         if (!"".equals(baseQO.getQuery().getMonth())&&baseQO.getQuery().getMonth()!=null&&baseQO.getQuery().getMonth()!=0){
             wrapper.eq("month",baseQO.getQuery().getMonth());
         }
@@ -566,7 +591,18 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             entity.setStatus(1);
             carOrderRecordMapper.updateById(entity);
 
-
+            PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(communityEntity.getPropertyId());
+            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carEntity.getUid()));
+            //支付上链
+            OrderCochainUtil.orderCochain("停车费",
+                    1,
+                    entity.getPayType(),
+                    entity.getMoney(),
+                    entity.getOrderNum(),
+                    entity.getUid(),
+                    companyEntity.getUnifiedSocialCreditCode(),
+                    entity.getMonth()+"月车位租金费",
+                    null);
             //推送消息
             UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", entity.getUid()));
             HashMap<Object, Object> map = new HashMap<>();
@@ -712,6 +748,17 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carOrderRecordMapper.updateById(entity);
 
 
+                PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(communityEntity.getPropertyId());
+                //支付上链
+                OrderCochainUtil.orderCochain("停车费",
+                        1,
+                        entity.getPayType(),
+                        entity.getMoney(),
+                        entity.getOrderNum(),
+                        entity.getUid(),
+                        companyEntity.getUnifiedSocialCreditCode(),
+                        entity.getMonth()+"月车位租金费",
+                        null);
                 //推送消息
                 UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", entity.getUid()));
                 HashMap<Object, Object> map = new HashMap<>();

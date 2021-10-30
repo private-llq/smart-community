@@ -56,8 +56,6 @@ public class SysLoginController {
 	private ICaptchaService captchaService;
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
-	@Resource
-	private UserUtils userUtils;
 	
 //	/**
 //	 * 验证码
@@ -234,7 +232,7 @@ public class SysLoginController {
 	@GetMapping("/check/code")
 	public CommonResult<Map<String,Object>> checkCode(@RequestParam String account, @RequestParam String code) {
 		checkVerifyCode(account, code);
-		String token = userUtils.setRedisTokenWithTime("Sys:Auth", account,1, TimeUnit.HOURS);
+		String token = UserUtils.setRedisTokenWithTime("Sys:Auth", account,1, TimeUnit.HOURS);
 		Map<String, Object> map = new HashMap<>();
 		map.put("authToken",token);
 		map.put("msg","验证通过，请在1小时内完成操作");
@@ -252,7 +250,7 @@ public class SysLoginController {
 		if (StrUtil.isBlank(token)) {
 			token = request.getParameter("token");
 		}
-		userUtils.destroyToken("Sys:Login",token);
+		UserUtils.destroyToken("Sys:Login",token);
 		return CommonResult.ok();
 	}
 	

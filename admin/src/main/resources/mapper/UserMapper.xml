@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.jsy.community.mapper.UserMapper">
+
+	<select id="getUserMobileByUid" resultType="com.jsy.community.entity.UserEntity">
+		select
+		id,uid,householder_id,mobile,nickname,avatar_url,sex,real_name,id_card,is_real_auth,id_card_pic_face,
+		id_card_pic_back,face_url,face_enable_status,face_deleted,identification_type,country_id,province_id,
+		city_id,area_id,detail_address,reg_id,wechat,qq,email,deleted,create_time,update_time,birthday_time
+		from t_user where uid = #{uid} and deleted = 0
+	</select>
+</mapper>

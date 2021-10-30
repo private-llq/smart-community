@@ -10,6 +10,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.jsy.community.entity.BaseEntity;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Range;
@@ -190,6 +191,22 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @TableField(exist = false)
     private LocalDateTime countdownFinish;
+    
+    @ApiModelProperty(value = "合同类型名称")
+    @TableField(exist = false)
+    private String contractTypeName;
+    
+    @ApiModelProperty(value = "发起方电话")
+    @TableField(exist = false)
+    private String initiatorMobile;
+    
+    @ApiModelProperty(value = "签约方电话")
+    @TableField(exist = false)
+    private String signatoryMobile;
+    
+    @ApiModelProperty(value = "合同签约状态名称:1:未签约;2:签约中;3已签约;4已过期")
+    @TableField(exist = false)
+    private String contractStatusName;
 
     /**
      * 发起签约验证组

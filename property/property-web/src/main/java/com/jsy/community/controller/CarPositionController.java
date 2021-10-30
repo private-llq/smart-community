@@ -321,14 +321,14 @@ public class CarPositionController {
             carVO.getRs485_data().add(e2);
         } else {
             System.out.println("正常" + entity.getType());
-//            //全景图
-//            String carInAndOutPicture = base64GetString(entity.getPlateNum(), entity.getStartTime(), entity.getPicture(), "全景");
-//            //车位号
-//            String carInAndOutPicture1 = base64GetString(entity.getPlateNum(), entity.getStartTime(), entity.getCloseupPic(), "車牌");
-//            System.out.println("全景图" + carInAndOutPicture);
-//            System.out.println("车位号图" + carInAndOutPicture1);
-            String carInAndOutPicture = "全景";
-            String carInAndOutPicture1 = "車牌";
+            //全景图
+            String carInAndOutPicture = base64GetString(entity.getPlateNum(), entity.getStartTime(), entity.getPicture(), "全景");
+            //车位号
+            String carInAndOutPicture1 = base64GetString(entity.getPlateNum(), entity.getStartTime(), entity.getCloseupPic(), "車牌");
+            System.out.println("全景图" + carInAndOutPicture);
+            System.out.println("车位号图" + carInAndOutPicture1);
+//            String carInAndOutPicture = "全景";
+//            String carInAndOutPicture1 = "車牌";
 
 
             //在小区是否是黑名单车辆
@@ -722,7 +722,7 @@ public class CarPositionController {
             if (entity!=null && entity.getOverdueState()==0) {//正常订单
                 extracted(plateNum, plateColor, carSubLogo, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carVO, communityId);
 
-            }else {//不是正常订单
+            }else{//不是正常订单
                 //0：车牌识别错误 1:逾期 2：正常
                 OverdueVo overdueVo = iCarMonthlyVehicleService.MonthlyOverdue(plateNum, communityId);//1包月逾期0临时车
                 if (overdueVo.getState() == 1) {//包月逾期车辆
@@ -744,7 +744,7 @@ public class CarPositionController {
                     //语音播报内容
                     Rs485Data e2 = new Rs485Data();
                     e2.setEncodetype("hex2string");
-                    e2.setData(Crc16Util.getUltimatelyVoice("车牌识别错误", "online"));
+                    e2.setData(Crc16Util.getUltimatelyVoice("请重新进入识别区", "online"));
                     carVO.getRs485_data().add(e2);
                     //led
                     Rs485Data e3 = new Rs485Data();

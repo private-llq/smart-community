@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
  * @author chq459799974
  * @since 2020-12-03 10:29
  **/
-@Component
 public class UserUtils {
 	
 	public static final String USER_TOKEN = "token";
@@ -37,10 +36,10 @@ public class UserUtils {
 	public static final String USER_ROLE_ID = "roleId";
 
 	@Autowired
-	private StringRedisTemplate stringRedisTemplate;
+	private static StringRedisTemplate stringRedisTemplate;
 	
 	@Autowired
-	private RedisTemplate redisTemplate;
+	private static RedisTemplate redisTemplate;
 	
 	/**
 	* @Description: 通过token获取用户信息(业主端)
@@ -49,7 +48,7 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/3
 	**/
-	public UserInfoVo getUserInfo(String loginToken) {
+	public static UserInfoVo getUserInfo(String loginToken) {
 		if(StringUtils.isEmpty(loginToken)){
 			return null;
 		}
@@ -70,7 +69,7 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/21
 	**/
-	public AdminInfoVo getAdminInfo(String loginToken) {
+	public static AdminInfoVo getAdminInfo(String loginToken) {
 		if(StringUtils.isEmpty(loginToken)){
 			return null;
 		}
@@ -91,7 +90,7 @@ public class UserUtils {
 	 * @Author: DKS
 	 * @Date: 2021/10/14
 	 **/
-	public SysInfoVo getSysInfo(String loginToken) {
+	public static SysInfoVo getSysInfo(String loginToken) {
 		if(StringUtils.isEmpty(loginToken)){
 			return null;
 		}
@@ -273,7 +272,7 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/4
 	**/
-	public String setRedisToken(String typeName,Object o){
+	public static String setRedisToken(String typeName,Object o){
 		String userToken = randomUUID();
 		redisTemplate.opsForValue().set(typeName + ":" + userToken,o);
 		return userToken;
@@ -287,7 +286,7 @@ public class UserUtils {
 	 * @return: void
 	 * @date: 2021/7/22 15:04
 	 **/
-	public void updateRedisByToken(String typeName, Object o, String token, Long expireTime) {
+	public static void updateRedisByToken(String typeName, Object o, String token, Long expireTime) {
 		redisTemplate.opsForValue().set(typeName + ":" + token, o, expireTime ,TimeUnit.HOURS);
 	}
 
@@ -298,7 +297,7 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/4
 	**/
-	public String setRedisTokenWithTime(String typeName,Object o,long time,TimeUnit timeUnit){
+	public static String setRedisTokenWithTime(String typeName,Object o,long time,TimeUnit timeUnit){
 		String userToken = randomUUID();
 		redisTemplate.opsForValue().set(typeName + ":" + userToken,o,time,timeUnit);
 		return userToken;
@@ -311,7 +310,7 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/4
 	**/
-	public Object getRedisToken(String typeName,String token){
+	public static Object getRedisToken(String typeName,String token){
 		return redisTemplate.opsForValue().get(typeName + ":" + token);
 	}
 	
@@ -322,7 +321,7 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/4
 	**/
-	public boolean destroyToken(String typeName,String token){
+	public static boolean destroyToken(String typeName,String token){
 		Boolean result1 = redisTemplate.delete(typeName + ":" + token);
 		Boolean result2 = stringRedisTemplate.delete(typeName + ":" + token);
         return result1 || result2;

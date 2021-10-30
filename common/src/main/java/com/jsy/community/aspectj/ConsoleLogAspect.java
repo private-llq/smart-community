@@ -35,9 +35,6 @@ import java.util.Calendar;
 public class ConsoleLogAspect {
 	private final Logger logger = LoggerFactory.getLogger(ConsoleLogAspect.class);
 	
-	@Autowired
-	private UserUtils userUtils;
-	
 	private static final ThreadLocal<Double> mark = new ThreadLocal<>();
 	
 	/**
@@ -125,7 +122,7 @@ public class ConsoleLogAspect {
 					HttpServletRequest servletRequest = attributes.getRequest();
 					String token = servletRequest.getHeader("token");
 					if (!StrUtil.isBlank(token)) {
-						UserInfoVo userInfo = userUtils.getUserInfo(token);
+						UserInfoVo userInfo = UserUtils.getUserInfo(token);
 						if (userInfo != null) {
 							logger.info("访问用户："+userInfo.getRealName()+"     用户id："+userInfo.getUid());
 						}

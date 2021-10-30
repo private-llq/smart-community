@@ -57,9 +57,6 @@ public class AdminUserController {
 	private IAdminUserService adminUserService;
 	
 	@Autowired
-	private UserUtils userUtils;
-	
-	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
 	
 	@Resource
@@ -117,7 +114,7 @@ public class AdminUserController {
 //		if (StrUtil.isBlank(token)) {
 //			token = request.getParameter("token");
 //		}
-//		AdminInfoVo adminInfo = userUtils.getAdminInfo(token);
+//		AdminInfoVo adminInfo = UserUtils.getAdminInfo(token);
 //		sysUserEntity.setCreateUserName(adminInfo.getRealName());//邀请者姓名
 //		sysUserEntity.setCreateUserId(UserUtils.getUserId());//邀请者uid
 //		Map<String, String> resultMap = adminUserService.invitation(sysUserEntity);
@@ -370,7 +367,7 @@ public class AdminUserController {
 				authToken = request.getParameter("authToken");
 			}
 			//销毁Auth token
-			userUtils.destroyToken("Auth",authToken);
+			UserUtils.destroyToken("Auth",authToken);
 		}
 		return b ? CommonResult.ok() : CommonResult.error("操作失败");
 	}
@@ -429,7 +426,7 @@ public class AdminUserController {
 			if (StrUtil.isBlank(token)) {
 				token = request.getParameter("token");
 			}
-			userUtils.destroyToken("Admin:Login", token);
+			UserUtils.destroyToken("Admin:Login", token);
 		}
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
 	}

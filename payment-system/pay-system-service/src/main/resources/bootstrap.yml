@@ -30,14 +30,14 @@ spring:
     config:
       uri: http://localhost:2020 #zuul要从配置中心拉取文件
       #你要拉取具体的哪个配置文件
-      name: payment-service,common,common-service  #配置文件名字   dev是环境
+      name: payment-service,common,common-service,common-web  #配置文件名字   dev是环境
       profile: dev #环境  组成完整的文件名：gateway-service-dev.yml
       label: master #主分支
 #服务发现
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:1010/eureka/ #注册中心地址
+      defaultZone: http://localhost:2010/eureka/ #注册中心地址
   instance:
     prefer-ip-address: true #使用ip地址注册
     instance-id: payment-service:9952  #指定服务的id

@@ -174,8 +174,8 @@
 //			boolean b = changeMobile(adminUserEntity.getMobile(), user.getMobile());
 //			if(b){
 //				//旧手机账号退出登录
-//				userUtils.destroyToken("Admin:Login",String.valueOf(redisTemplate.opsForValue().get("Admin:LoginAccount:" + user.getMobile())));
-//				userUtils.destroyToken("Admin:LoginAccount",user.getMobile());
+//				UserUtils.destroyToken("Admin:Login",String.valueOf(redisTemplate.opsForValue().get("Admin:LoginAccount:" + user.getMobile())));
+//				UserUtils.destroyToken("Admin:LoginAccount",user.getMobile());
 //			}
 //		}
 //		//更新菜单权限

@@ -53,9 +53,6 @@ public class SysUserController {
 	
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
-	
-	@Autowired
-	private UserUtils userUtils;
 
 	/**
 	* @Description: 设置用户角色
@@ -243,7 +240,7 @@ public class SysUserController {
 				authToken = request.getParameter("authToken");
 			}
 			//销毁Auth token
-			userUtils.destroyToken("Auth",authToken);
+			UserUtils.destroyToken("Auth",authToken);
 		}
 		return b ? CommonResult.ok() : CommonResult.error("操作失败");
 	}
@@ -301,7 +298,7 @@ public class SysUserController {
 //			if (StrUtil.isBlank(token)) {
 //				token = request.getParameter("token");
 //			}
-//			userUtils.destroyToken("Sys:Login", token);
+//			UserUtils.destroyToken("Sys:Login", token);
 //		}
 //		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
 //	}

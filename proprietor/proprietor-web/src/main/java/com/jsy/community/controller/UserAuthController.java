@@ -46,9 +46,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class UserAuthController {
 
-    @Autowired
-    private UserUtils userUtils;
-
     @DubboReference(version = Const.version, group = Const.group, check = false)
     @SuppressWarnings("unused")
     private ICaptchaService captchaService;
@@ -216,7 +213,7 @@ public class UserAuthController {
     @GetMapping("/check/code")
     public CommonResult<Map<String, Object>> checkCode(@RequestParam String account, @RequestParam String code) {
         commonService.checkVerifyCode(account, code);
-        String token = userUtils.setRedisTokenWithTime("Auth", account, 1, TimeUnit.HOURS);
+        String token = UserUtils.setRedisTokenWithTime("Auth", account, 1, TimeUnit.HOURS);
         Map<String, Object> map = new HashMap<>();
         map.put("authToken", token);
         map.put("msg", "验证通过，请在1小时内完成操作");
@@ -240,7 +237,7 @@ public class UserAuthController {
                 authToken = request.getParameter("authToken");
             }
             //销毁Auth token
-            userUtils.destroyToken("Auth", authToken);
+            UserUtils.destroyToken("Auth", authToken);
         }
         return b ? CommonResult.ok() : CommonResult.error("重置失败");
     }
@@ -283,7 +280,7 @@ public class UserAuthController {
 //		if (StrUtil.isBlank(authToken)) {
 //			authToken = request.getParameter("authToken");
 //		}
-//		Object authTokenContent = userUtils.getRedisToken("Auth", authToken);
+//		Object authTokenContent = UserUtils.getRedisToken("Auth", authToken);
 //		if(authTokenContent == null){
 //			throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "操作未被授权");
 //		}
@@ -301,13 +298,13 @@ public class UserAuthController {
 //		boolean b = userAuthService.changeMobile(newMobile, uid);
 //		if(b){
 //			//销毁Auth token
-//			userUtils.destroyToken("Auth", authToken);
+//			UserUtils.destroyToken("Auth", authToken);
 //			//销毁token
 //			String token = request.getHeader("token");
 //			if (StrUtil.isBlank(token)) {
 //				token = request.getParameter("token");
 //			}
-//			userUtils.destroyToken("Login", token);
+//			UserUtils.destroyToken("Login", token);
 //		}
 //		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL);
 //	}
@@ -345,7 +342,7 @@ public class UserAuthController {
         if (StrUtil.isBlank(token)) {
             token = request.getParameter("token");
         }
-        userUtils.destroyToken("Login", token);
+        UserUtils.destroyToken("Login", token);
         return CommonResult.ok("操作成功");
     }
 

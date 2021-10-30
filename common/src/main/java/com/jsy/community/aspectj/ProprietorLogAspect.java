@@ -43,9 +43,6 @@ import java.lang.reflect.Method;
 @Component
 public class ProprietorLogAspect {
 
-	@Autowired
-	private UserUtils userUtils;
-
 	private static final Logger log = LoggerFactory.getLogger(ProprietorLogAspect.class);
 
 	/**
@@ -150,7 +147,7 @@ public class ProprietorLogAspect {
 					HttpServletRequest request = attributes.getRequest();
 					String token = request.getHeader("token");
 					if (!StrUtil.isBlank(token)) {
-						UserInfoVo userInfo = userUtils.getUserInfo(token);
+						UserInfoVo userInfo = UserUtils.getUserInfo(token);
 						if (userInfo != null) {
 							proprietorLog.setName(userInfo.getRealName());
 							proprietorLog.setCity(userInfo.getCity());

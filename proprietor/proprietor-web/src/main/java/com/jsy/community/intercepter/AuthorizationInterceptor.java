@@ -26,9 +26,6 @@ import java.io.IOException;
 @Component
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 	
-	@Autowired
-	private UserUtils userUtils;
-	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		//===================================== 需要授权的敏感操作 ========================================
@@ -40,7 +37,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 				if (StrUtil.isBlank(token)) {
 					token = request.getParameter("authToken");
 				}
-				Object authTokenContent = userUtils.getRedisToken("Auth", token);
+				Object authTokenContent = UserUtils.getRedisToken("Auth", token);
 				if(authTokenContent == null){
 					throw new JSYException(JSYError.UNAUTHORIZED.getCode(), "操作未被授权");
 				}
@@ -67,7 +64,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 			token = request.getParameter("token");
 		}
 		if(!StringUtils.isEmpty(token)){
-			UserInfoVo userInfo = userUtils.getUserInfo(token);
+			UserInfoVo userInfo = UserUtils.getUserInfo(token);
 			if(userInfo != null){
 				request.setAttribute(UserUtils.USER_KEY, userInfo.getUid());
 				request.setAttribute(UserUtils.USER_INFO, userInfo);

@@ -45,9 +45,6 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
     private ICommonService commonService;
 
     @Autowired
-    private UserUtils userUtils;
-
-    @Autowired
     private UserIMMapper userIMMapper;
 
     @Resource
@@ -202,7 +199,7 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         userAuthVo.setExpiredTime(LocalDateTimeUtil.of(expireDate));
         userInfoVo.setIsBindMobile(1);
         userAuthVo.setUserInfo(userInfoVo);
-        String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(userInfoVo), expire, TimeUnit.SECONDS);
+        String token = UserUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(userInfoVo), expire, TimeUnit.SECONDS);
         userAuthVo.setToken(token);
         return userAuthVo;
     }
@@ -221,7 +218,7 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         vo.setThirdPlatformId(id);
         vo.setIsBindMobile(0);
         userAuthVo.setUserInfo(vo);
-        String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(vo), expire, TimeUnit.SECONDS);
+        String token = UserUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(vo), expire, TimeUnit.SECONDS);
         userAuthVo.setToken(token);
         return userAuthVo;
     }
@@ -240,7 +237,7 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         vo.setThirdPlatformId(id);
         vo.setIsBindMobile(0);
         userAuthVo.setUserInfo(vo);
-//        String token = userUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(vo), expire, TimeUnit.SECONDS);
+//        String token = UserUtils.setRedisTokenWithTime("Login", JSONObject.toJSONString(vo), expire, TimeUnit.SECONDS);
         userAuthVo.setToken(null);
         return userAuthVo;
     }
