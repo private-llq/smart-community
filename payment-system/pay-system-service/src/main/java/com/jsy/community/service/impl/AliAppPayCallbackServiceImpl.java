@@ -191,7 +191,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 					Map<String, Object> map = housingRentalOrderService.completeLeasingOrder(orderNo, serviceOrderNo);
 					// 修改租房签约支付状态
 					log.info("开始修改租房签约支付状态");
-					assetLeaseRecordService.updateOperationPayStatus(serviceOrderNo);
+					assetLeaseRecordService.updateOperationPayStatus(serviceOrderNo,2,tradeAmount,orderNo);
 					if(0 != (int)map.get("code")){
 						log.info("修改签章合同支付状态失败");
 						throw new PaymentException((int)map.get("code"),String.valueOf(map.get("msg")));

@@ -1509,18 +1509,32 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             assetLeaseRecordMapper.updateById(assetLeaseRecordEntity);
 
 
+            UserIMEntity userIMEntity = userImService.selectUid(assetLeaseRecordEntity.getTenantUid());
             PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(assetLeaseRecordEntity.getCommunityId());
             UserEntity userEntity = userService.getUser(assetLeaseRecordEntity.getTenantUid());
-//            //支付上链
-//            OrderCochainUtil.orderCochain("停车费",
-//                    1,
-//                    payType,
-//                    total,
-//                    orderNum,
-//                    userEntity.getUid(),
-//                    companyEntity.getUnifiedSocialCreditCode(),
-//                    entity.getMonth()+"月车位租金费",
-//                    null);
+            //支付上链
+            OrderCochainUtil.orderCochain("停车费",
+                    1,
+                    payType,
+                    total,
+                    orderNum,
+                    userEntity.getUid(),
+                    companyEntity.getUnifiedSocialCreditCode(),
+                    "房屋租金支付",
+                    null);
+
+            //消息推送
+            Map<Object, Object> map = new HashMap<>();
+            map.put("type", 3);
+            map.put("dataId", conId);
+            map.put("orderNum", orderNum);
+            PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+                    payType,
+                    total.toString(),
+                    null,
+                    "租赁缴费",
+                    map,
+                    BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
 
         } else {
             log.info("没有找到合同:{}相关的签约ID", conId);

@@ -111,6 +111,11 @@ public class CarOrderEntity extends BaseEntity {
      *  车牌号
      */
     private String carPlate;
+
+    /**
+     *  车牌号
+     */
+    private Integer renewalIn;
     /**
      * 扫码时间
      */

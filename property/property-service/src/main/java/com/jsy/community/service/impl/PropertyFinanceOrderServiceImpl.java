@@ -714,6 +714,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             Map<Object, Object> map = new HashMap<>();
             map.put("type", 3);
             map.put("dataId", tripartiteOrder);
+            map.put("orderNum", tripartiteOrder);
             PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
                     payType,
                     total.toString(),

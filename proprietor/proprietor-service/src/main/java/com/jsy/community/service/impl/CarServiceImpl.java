@@ -273,6 +273,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             HashMap<Object, Object> map = new HashMap<>();
             map.put("type",1);
             map.put("dataId",carOrderEntity.getId());
+            map.put("orderNum",outTradeNo);
             PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
                     payType,
                     total.toString(),
@@ -410,7 +411,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     public CarOrderEntity getOrder(Long id) {
         CarOrderEntity entity = appCarOrderMapper.selectById(id);
-        entity.setMonth((int)ChronoUnit.MONTHS.between( entity.getOrderTime(),entity.getOverTime()));
+        entity.setMonth(entity.getRenewalIn());
         return entity;
     }
 
@@ -572,6 +573,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             carOrderEntity.setType(2);
             carOrderEntity.setUid(carEntity.getUid());
             carOrderEntity.setPayType(1);
+            carOrderEntity.setRenewalIn(entity.getMonth());
             carOrderEntity.setBillNum(orderEntity.getOrderNum());
             carOrderEntity.setRise("月租车-"+carEntity.getCarPlate());
             carOrderEntity.setOrderTime(LocalDateTime.now());
@@ -609,6 +611,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             HashMap<Object, Object> map = new HashMap<>();
             map.put("type",2);
             map.put("dataId",carOrderEntity.getId());
+            map.put("orderNum",entity.getOrderNum());
             PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
                     entity.getPayType(),
                     entity.getMoney().toString(),
@@ -718,6 +721,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 carOrderEntity.setRise("月租车-"+carEntity.getCarPlate());
                 carOrderEntity.setUid(carEntity.getUid());
                 carOrderEntity.setPayType(1);
+                carOrderEntity.setRenewalIn(entity.getMonth());
                 carOrderEntity.setOrderTime(LocalDateTime.now());
                 carOrderEntity.setBeginTime(carEntity.getBeginTime());
                 carOrderEntity.setOverTime(carEntity.getOverTime());
@@ -765,6 +769,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 HashMap<Object, Object> map = new HashMap<>();
                 map.put("type",2);
                 map.put("dataId",carOrderEntity.getId());
+                map.put("orderNum",entity.getOrderNum());
                 PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
                         entity.getPayType(),
                         entity.getMoney().toString(),
