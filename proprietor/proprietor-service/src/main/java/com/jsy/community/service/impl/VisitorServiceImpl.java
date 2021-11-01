@@ -79,36 +79,6 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
     private long visitorTimeLimit = 60*24*60; //单位 秒
 
     /**
-     * @Description: 访客登记 新增V2
-     * @Param: [visitorEntity]
-     * @Return: void
-     * @Author: chq459799974
-     * @Date: 2020/11/12
-     **/
-    @Override
-    public VisitorEntryVO addVisitorV2(VisitorEntity visitorEntity) {
-        long visitorId = SnowFlake.nextId();
-        visitorEntity.setId(visitorId);
-        int insert = visitorMapper.insert(visitorEntity);
-
-        //把访客登记数据推送给小区
-        rabbitTemplate.convertAndSend(ProprietorTopicNameEntity.exTopicVisitorToCommunity,ProprietorTopicNameEntity.queueVisitorToCommunity,JSON.toJSONString(visitorEntity));
-
-        //社区二维码权限，需要生成二维码 (演示版本，只有一个机器，分小区没分机器)
-        if(BusinessEnum.CommunityAccessEnum.QR_CODE.getCode().equals(visitorEntity.getIsCommunityAccess())){
-            //小区是否有二维码设备(目前只用炫优一体机判断)
-            Integer count = communityHardWareMapper.countCommunityHardWare(visitorEntity.getCommunityId(), BusinessConst.HARDWARE_TYPE_XU_FACE);
-            if(count < 1){
-                return null;
-            }
-            VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
-            visitorEntryVO.setId(visitorEntity.getId());
-            return visitorEntryVO;
-        }
-        return null;
-    }
-
-    /**
      * @Description: 查询一条详情
      * @author: Hu
      * @since: 2021/9/16 15:04

@@ -31,6 +31,7 @@
         <if test="query.expirationStatus =='1'.toString() ">
             AND cm.end_time &gt; now()
         </if>
+        AND cm.deleted=0
 
     </where>
 </select>
@@ -58,6 +59,7 @@
             <if test="query.expirationStatus =='1'.toString() ">
                 AND cm.end_time &gt; now()
             </if>
+            AND cm.deleted=0
         </where>
     </select>
 
