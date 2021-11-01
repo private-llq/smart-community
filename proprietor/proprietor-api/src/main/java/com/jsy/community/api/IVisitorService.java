@@ -96,15 +96,6 @@ public interface IVisitorService extends IService<VisitorEntity> {
     List<VisitingCarRecordEntity> queryCarRecordList(Long visitorid);
 
     /**
-     * @Description: 访客登记 新增V2
-     * @Param: [visitorEntity]
-     * @Return: void
-     * @Author: chq45799974
-     * @Date: 2020/11/12
-     **/
-    VisitorEntryVO addVisitorV2(VisitorEntity visitorEntity);
-
-    /**
      * @Description: 查询一条详情
      * @author: Hu
      * @since: 2021/9/16 15:04

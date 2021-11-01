@@ -50,13 +50,13 @@ dubbo:
   protocol:
     name: dubbo
     port: -1
-    threadname: property-service,proprietor-service,lease-service
+    threadname: property-service
     dispatcher: message
     threads: 50
   application:
     name: ${spring.application.name}
   cloud:
-    subscribed-services: property-web
+    subscribed-services: property-service,proprietor-service,lease-service
   consumer:
     retries: 0
     timeout: 99999

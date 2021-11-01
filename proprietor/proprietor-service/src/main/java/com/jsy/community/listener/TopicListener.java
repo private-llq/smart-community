@@ -2,6 +2,7 @@ package com.jsy.community.listener;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.IVisitorService;
+import com.jsy.community.config.ProprietorTopicNameEntity;
 import com.jsy.community.config.TopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.rabbitmq.client.Channel;
@@ -23,21 +24,21 @@ import java.util.Map;
 @Component
 public class TopicListener {
 	
-//	@RabbitListener(queues = TopicNameEntity.queueVisitorHisFromCommunity)
-//	public void syncVisitorHistory(String msg, Message message, Channel channel) throws IOException {
-//		log.info("监听到访客进出记录定时同步消息: " + msg);
-//		try {
-//			JSONObject jsonObject = JSONObject.parseObject(msg);
-//			log.info("解析成功：" + jsonObject);
-//			System.out.println(jsonObject);
-//		}catch(Exception e){
-//			e.printStackTrace();
-//			log.error("访客进出记录定时同步消息 监听发生异常：\n" + msg);
-//			//手动确认
-//			channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
-//		}
-//		//手动确认
-//		channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
-//	}
+	@RabbitListener(queues = "${rabbit-mq-name.queueVisitorHisFromCommunity}")
+	public void syncVisitorHistory(String msg, Message message, Channel channel) throws IOException {
+		log.info("监听到访客进出记录定时同步消息: " + msg);
+		try {
+			JSONObject jsonObject = JSONObject.parseObject(msg);
+			log.info("解析成功：" + jsonObject);
+			System.out.println(jsonObject);
+		}catch(Exception e){
+			e.printStackTrace();
+			log.error("访客进出记录定时同步消息 监听发生异常：\n" + msg);
+			//手动确认
+			channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+		}
+		//手动确认
+		channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+	}
 	
 }
