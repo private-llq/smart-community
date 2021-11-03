@@ -7,7 +7,6 @@ import com.alibaba.fastjson.JSON;
 import com.jsy.community.utils.imutils.entity.*;
 import com.jsy.community.utils.imutils.open.EncryptHelper;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
@@ -166,16 +165,7 @@ public class PushInfoUtil {
             }
         }
         payAppMsg.setTemplateId("");
-        payAppMsg.setLinks(Collections.singletonList(new Links(detailUrl, "查看账单详情")));
-
-        payAppMsg.setLinks(Arrays.asList(
-                new Links("www.baidu.com","查看百度")
-                ,new Links("www.baidu.com","查看百度")
-                ,new Links("www.baidu.com","查看百度")
-                ,new Links("www.baidu.com","查看百度")
-                ,new Links("www.baidu.com","查看百度")
-                ,new Links("www.baidu.com","查看百度")
-        ));
+        payAppMsg.setLinks(Collections.singletonList(new Links(detailUrl, "查看详情")));
         payAppMsg.setExtraDta(map);
 
         pushAppMsg.setAppMsg(JSON.toJSONString(payAppMsg));
