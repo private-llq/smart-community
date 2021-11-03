@@ -29,7 +29,7 @@ spring:
     name: facility-web
   cloud:
     config:
-      uri: http://localhost:2020 #zuul要从配置中心拉取文件
+      uri: http://127.0.0.1:2020 #zuul要从配置中心拉取文件
       #你要拉取具体的哪个配置文件
       name: facility-web,common,common-web  #配置文件名字   dev是环境
       profile: dev #环境  组成完整的文件名：gateway-service-dev.yml
@@ -39,14 +39,14 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:2010/eureka/ #注册中心地址
+      defaultZone: http://127.0.0.1:2010/eureka/ #注册中心地址
   instance:
     prefer-ip-address: true #使用ip地址注册
     instance-id: facility-web:9001  #指定服务的id
 #服务调用
 dubbo:
   registry:
-    address: spring-cloud://localhost
+    address: spring-cloud://127.0.0.1
     use-as-metadata-center: false
   protocol:
     name: dubbo

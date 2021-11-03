@@ -2,7 +2,6 @@ package com.jsy.community.vo.proprietor;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -14,7 +13,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -42,6 +40,10 @@ public class ProprietorMarketVO extends BaseVO {
 
     @ApiModelProperty(value = "上下架（0下架  1上架）")
     private Integer state;
+    
+    @ApiModelProperty(value = "上下架（0下架  1上架）")
+    @TableField(exist = false)
+    private String stateName;
 
     @ApiModelProperty(value = "手机号")
     private String phone;
@@ -104,4 +106,8 @@ public class ProprietorMarketVO extends BaseVO {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private LocalDateTime updateTime;
+    
+    @TableField(exist = false)
+    @ApiModelProperty(value = "标价")
+    private  String priceName;
 }

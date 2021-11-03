@@ -23,7 +23,7 @@ import java.util.HashMap;
  **/
 public class OrderCochainUtil {
 
-    private static final String url = "http://222.178.212.29:13000/zh-sign/contract-server/community/sign/communityOrderUpLink";
+    private static final String url = "https://signature.zhsj.co:13000/zh-sign/contract-server/community/sign/communityOrderUpLink";
 
     /**
      * @Description: 支付上链
