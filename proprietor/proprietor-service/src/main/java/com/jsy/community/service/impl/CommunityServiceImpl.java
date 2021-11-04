@@ -9,9 +9,11 @@ import com.jsy.community.api.IPropertyCompanyService;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.mapper.CommunityMapper;
+import com.jsy.community.mapper.HouseMemberMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.DistanceUtil;
@@ -41,6 +43,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 	
 	@Autowired
 	private IUserHouseService userHouseService;
+
+	@Autowired
+	private HouseMemberMapper houseMemberMapper;
 
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IPropertyCompanyService propertyCompanyService;
@@ -161,6 +166,70 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		communityEntity = communityMapper.locateCommunity(communityIds, location);
 		communityEntity.setHouseId(communityHouseMap.get(communityEntity.getId())); //家属界面默认房屋用
 		return communityEntity;
+	}
+
+
+	/**
+	 * @Description:
+	 * @author: Hu
+	 * @since: 2021/11/3 15:56
+	 * @Param: [uid, location]
+	 */
+	@Override
+	public CommunityEntity locateCommunityV2(String uid, Map<String,Double> location){
+
+		List<Long> communityIds = new LinkedList<>();
+		List<Long> userCommunityIds = new LinkedList<>();
+		Map<Long, Long> communityHouseMap = new HashMap<>();
+		CommunityEntity communityEntity;
+		// 查业主房屋id和所属社区id
+		List<HouseMemberEntity> userHouseList = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("uid",uid));
+
+		if (userHouseList.size()!=0){
+			for (HouseMemberEntity entity : userHouseList) {
+				//身份是业主的小区
+				if (entity.getRelation()==1){
+					userCommunityIds.add(entity.getCommunityId());
+				}
+				if(communityHouseMap.get(entity.getCommunityId()) == null){
+					communityHouseMap.put(entity.getCommunityId(),entity.getHouseId());
+				}
+				//所有身份的小区
+				communityIds.add(entity.getCommunityId());
+			}
+		} else {
+			//定位
+			communityEntity = communityMapper.locateCommunity(communityIds, location);
+			return communityEntity;
+		}
+
+		//如果身份是业主的小区只有一个那么直接返回
+		if (userCommunityIds.size()==1){
+			CommunityEntity communityEntity1 = communityMapper.selectById(userHouseList.get(0));
+			communityEntity1.setHouseId(communityHouseMap.get(communityEntity1.getId()));
+			return communityEntity1;
+		}
+		//那个大于1代表有多个，通过金纬度获取最近的小区
+		else  if (userCommunityIds.size()>1) {
+			//定位
+			communityEntity = communityMapper.locateCommunity(userCommunityIds, location);
+			communityEntity.setHouseId(communityHouseMap.get(communityEntity.getId())); //家属界面默认房屋用
+			return communityEntity;
+		}
+		//如果身份不是业主且数据只有一条直接返回
+		else  if (communityIds.size()==1) {
+			CommunityEntity communityEntity1 = communityMapper.selectById(userHouseList.get(0));
+			communityEntity1.setHouseId(communityHouseMap.get(communityEntity1.getId()));
+			return communityEntity1;
+		}
+		//如果身份不是业主且数据不只一条直接返回那么久获取最近的小区
+		else if (communityIds.size()>1) {
+			//定位
+			communityEntity = communityMapper.locateCommunity(communityIds, location);
+			communityEntity.setHouseId(communityHouseMap.get(communityEntity.getId()));
+			return communityEntity;
+		}
+		return null;
 	}
 
 

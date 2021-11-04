@@ -1527,7 +1527,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
             //消息推送
             Map<Object, Object> map = new HashMap<>();
-            map.put("type", 3);
+            map.put("type", 10);
             map.put("dataId", conId);
             map.put("orderNum", orderNum);
             ImResponseEntity imResponseEntity = PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
@@ -1537,7 +1537,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     "租赁缴费",
                     map,
                     BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
-            log.info("支付助手："+imResponseEntity);
+            log.info("支付上链："+imResponseEntity);
         } else {
             log.info("没有找到合同:{}相关的签约ID", conId);
         }
