@@ -21,7 +21,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableDiscoveryClient
 @MapperScan("com.jsy.community.mapper")
 @PropertySource(value = "classpath:common-service.properties")
-@EnableDistributedTransaction
+// @EnableDistributedTransaction
 public class ProprietorServiceApp {
 	public static void main(String[] args) {
 		SpringApplication.run(ProprietorServiceApp.class, args);
