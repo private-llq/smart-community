@@ -57,8 +57,6 @@ public class AdminLoginController {
 	private IAdminConfigService adminConfigService;
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private ICaptchaService captchaService;
-	@DubboReference(version = Const.version, group = Const.group, check = false)
-	private ProprietorCommunityService communityService;
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IPropertyCompanyService iPropertyCompanyService;
 	

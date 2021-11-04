@@ -28,7 +28,10 @@ spring:
     name: rabbitmq-server
   cloud:
     config:
-      uri: http://127.0.0.1:2020 #zuul要从配置中心拉取文件
+      #uri: http://127.0.0.1:2020 #zuul要从配置中心拉取文件
+      discovery:
+        enabled: true #开启springcloudconfig服务端的服务发现
+        service-id: base-config-server #config-server服务的名称
       #你要拉取具体的哪个配置文件
       name: rabbitmq-server,common,common-service  #配置文件名字   dev是环境
       profile: dev #环境  组成完整的文件名：gateway-service-dev.yml
@@ -38,7 +41,7 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://127.0.0.1:2010/eureka/ #注册中心地址
+      defaultZone: http://192.168.12.49:36366/eureka/ #注册中心地址
   instance:
     prefer-ip-address: true #使用ip地址注册
     instance-id: rabbitmq-server:6541  #指定服务的id

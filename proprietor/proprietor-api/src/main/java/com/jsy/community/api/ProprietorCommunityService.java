@@ -44,6 +44,15 @@ public interface ProprietorCommunityService extends IService<CommunityEntity> {
      * @Date: 2020/11/25
     **/
     CommunityEntity locateCommunity(String uid,Map<String,Double> location);
+
+
+    /**
+     * @Description: 小区定位
+     * @author: Hu
+     * @since: 2021/11/3 15:56
+     * @Param:
+	 */
+	CommunityEntity locateCommunityV2(String uid, Map<String,Double> location);
 	
 	/**
 	 * @Description: 根据社区id批量查询社区名

@@ -165,7 +165,7 @@ public class PushInfoUtil {
             }
         }
         payAppMsg.setTemplateId("");
-        payAppMsg.setLinks(Collections.singletonList(new Links(detailUrl, "查看账单详情")));
+        payAppMsg.setLinks(Collections.singletonList(new Links(detailUrl, "查看详情")));
         payAppMsg.setExtraDta(map);
 
         pushAppMsg.setAppMsg(JSON.toJSONString(payAppMsg));
