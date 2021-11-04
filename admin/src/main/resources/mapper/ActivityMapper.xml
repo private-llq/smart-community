@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.jsy.community.mapper.ActivityMapper">
+
+	<!-- 批量添加活动 -->
+	<insert id="addActivityEntities">
+		insert into t_activity(id,community_id,theme,content,begin_activity_time,over_activity_time,begin_apply_time,over_apply_time,count,picture,deleted,create_time,activity_status)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{id},#{communityId},#{theme},#{content},#{beginActivityTime},#{overActivityTime},#{beginApplyTime},#{overApplyTime},#{count},#{picture},#{deleted},#{createTime},#{activityStatus})
+		</foreach>
+	</insert>
+</mapper>

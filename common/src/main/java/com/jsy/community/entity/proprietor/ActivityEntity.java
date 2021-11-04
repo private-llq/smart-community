@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jsy.community.entity.BaseEntity;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -57,6 +58,9 @@ public class ActivityEntity extends BaseEntity {
      * 活动总人数
      */
     private Integer count;
+    
+    @ApiModelProperty(value = "1.由小区发布 2.由大后台发布")
+    private Integer type;
 
     /**
      * 活动已报名总人数
@@ -84,5 +88,10 @@ public class ActivityEntity extends BaseEntity {
      */
     @TableField(exist = false)
     private String name;
-
+    
+    /**
+     * 1预发布，2报名进行中，3报名已结束，4活动进行中，5活动已结束
+     */
+    @TableField(exist = false)
+    private String activityStatusName;
 }
