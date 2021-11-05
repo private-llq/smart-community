@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 import cn.hutool.core.bean.BeanUtil;
+import com.alipay.api.domain.Car;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,6 +25,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.property.OverdueVo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
@@ -284,7 +286,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     }
 
     /**
-     * 修改 TODO的延期没有进入账单
+     * 修改
      * @param carMonthlyVehicle
      * @return
      */
@@ -309,6 +311,17 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         carPositionEntity.setEndTime(carMonthlyVehicle.getEndTime());//结束时间
         carPositionEntity.setUserName(carMonthlyVehicle.getOwnerName());//租户姓名
         carPositionMapper.update(carPositionEntity,new UpdateWrapper<CarPositionEntity>().eq("car_position",carMonthlyVehicle.getCarPosition()).eq("community_id",carMonthlyVehicle.getCommunityId()));
+
+        //修改app的包月车辆表
+        //根据id查询修改之前的车牌号
+        CarMonthlyVehicle monthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("uid", carMonthlyVehicle.getUid()));
+        if(monthlyVehicle!=null){
+
+            CarEntity carEntity = new CarEntity();
+            carEntity.setCarPlate(carMonthlyVehicle.getCarNumber());
+            carEntity.setOverTime(carMonthlyVehicle.getEndTime());
+            carMapper.update(carEntity,new QueryWrapper<CarEntity>().eq("community_id",carMonthlyVehicle.getCommunityId()).eq("type",2).eq("car_plate",monthlyVehicle.getCarNumber()));
+        }
 
 
         //生成月租账单
@@ -482,6 +495,17 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         carPositionEntity.setUserName(reCarMonthlyVehicle.getOwnerName());//租户姓名
         carPositionMapper.update(carPositionEntity,new UpdateWrapper<CarPositionEntity>().eq("car_position",carMonthlyVehicle.getCarPosition()).eq("community_id",carMonthlyVehicle.getCommunityId()));
 
+
+        //修改app的包月车辆表
+        //根据id查询修改之前的车牌号
+        CarMonthlyVehicle monthlyVehicle = carMonthlyVehicleMapper.selectOne(new QueryWrapper<CarMonthlyVehicle>().eq("uid", carMonthlyVehicle.getUid()));
+        if(monthlyVehicle!=null){
+
+            CarEntity carEntity = new CarEntity();
+            carEntity.setCarPlate(carMonthlyVehicle.getCarNumber());
+            carEntity.setOverTime(carMonthlyVehicle.getEndTime());
+            carMapper.update(carEntity,new QueryWrapper<CarEntity>().eq("community_id",carMonthlyVehicle.getCommunityId()).eq("type",2).eq("car_plate",monthlyVehicle.getCarNumber()));
+        }
 
 
         CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carMonthlyVehicle.getCarPosition()));
