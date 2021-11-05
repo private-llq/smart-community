@@ -279,7 +279,7 @@ public interface IPropertyFinanceOrderService extends IService<PropertyFinanceOr
      * @Author: DKS
      * @Date: 2021/08/26 09:35
      **/
-    boolean addTemporaryCharges(PropertyFinanceOrderEntity propertyFinanceOrderEntity);
+    PropertyFinanceOrderEntity addTemporaryCharges(PropertyFinanceOrderEntity propertyFinanceOrderEntity);
 
     /**
      * @Description: 批量修改账单状态
