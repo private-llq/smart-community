@@ -38,7 +38,7 @@ public class AddPasswordQO implements Serializable {
 	private String confirmPayPassword;
 
 	@ApiModelProperty("原支付密码")
-	@Length(groups = payPasswordVGroup.class,min = 6, max = 6, message = "原支付密码长度为6位")
+	// @Length(groups = payPasswordVGroup.class,min = 6, max = 6, message = "原支付密码长度为6位")
 	private String oldPayPassword;
 	/**
 	 * 密码操作

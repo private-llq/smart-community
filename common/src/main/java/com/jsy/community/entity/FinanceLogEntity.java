@@ -40,6 +40,9 @@ public class FinanceLogEntity extends BaseEntity {
 	@ApiModelProperty(value = "ip地址")
 	private String ip;
 	
+	@ApiModelProperty(value = "编辑目标")
+	private String edit;
+	
 	@ApiModelProperty(value = "创建人")
 	private String createBy;
 	

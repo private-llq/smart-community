@@ -1825,8 +1825,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
      * @Author: DKS
      * @Date: 2021/08/26 09:35
      **/
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean addTemporaryCharges(PropertyFinanceOrderEntity propertyFinanceOrderEntity) {
+    public PropertyFinanceOrderEntity addTemporaryCharges(PropertyFinanceOrderEntity propertyFinanceOrderEntity) {
         // 设置id
         propertyFinanceOrderEntity.setId(SnowFlake.nextId());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -1842,8 +1843,8 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         propertyFinanceOrderEntity.setTotalMoney(propertyFinanceOrderEntity.getPropertyFee());
         // 设置临时收费类型
         propertyFinanceOrderEntity.setBuildType(2);
-        int row = propertyFinanceOrderMapper.insert(propertyFinanceOrderEntity);
-        return row == 1;
+        propertyFinanceOrderMapper.insert(propertyFinanceOrderEntity);
+	    return propertyFinanceOrderEntity;
     }
 
     /**

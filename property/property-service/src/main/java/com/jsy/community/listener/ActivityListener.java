@@ -84,6 +84,9 @@ public class ActivityListener {
                 }
             }
         }
+//        else if (map.get("type").equals(4)) {
+//            propertyActivityMapper.updateByDataId((Set<Long>) map.get("dataId"), Integer.parseInt(String.valueOf(map.get("status"))));
+//        }
         //手动确认
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
 

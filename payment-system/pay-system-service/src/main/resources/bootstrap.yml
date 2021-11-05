@@ -28,23 +28,34 @@ spring:
     name: payment-service
   cloud:
     config:
-      uri: http://localhost:2020 #zuul要从配置中心拉取文件
+      #uri: http://127.0.0.1:2020 #zuul要从配置中心拉取文件
+      discovery:
+        enabled: true #开启springcloudconfig服务端的服务发现
+        service-id: base-config-server #config-server服务的名称
       #你要拉取具体的哪个配置文件
       name: payment-service,common,common-service,common-web  #配置文件名字   dev是环境
       profile: dev #环境  组成完整的文件名：gateway-service-dev.yml
       label: master #主分支
 #服务发现
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://192.168.12.49:36366/eureka/ #注册中心地址
+#  instance:
+#    prefer-ip-address: true #使用ip地址注册
+#    instance-id: payment-service:9952  #指定服务的id
 eureka:
   client:
-    serviceUrl:
-      defaultZone: http://localhost:2010/eureka/ #注册中心地址
+    service-url:
+      defaultZone: http://192.168.12.49:36366/eureka
   instance:
-    prefer-ip-address: true #使用ip地址注册
-    instance-id: payment-service:9952  #指定服务的id
+    hostname: ${spring.cloud.client.ip-address}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}
 #服务调用
 dubbo:
   registry:
-    address: spring-cloud://localhost
+    address: spring-cloud://127.0.0.1
     use-as-metadata-center: false
   protocol:
     name: dubbo
@@ -55,7 +66,7 @@ dubbo:
   application:
     name: ${spring.application.name}
   cloud:
-    subscribed-services: proprietor-service,property-service
+    subscribed-services: proprietor-service,property-service,lease-service
   consumer:
     retries: 0
     timeout: 99999

@@ -3,18 +3,12 @@ package com.jsy.community.entity.proprietor;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
-import com.jsy.community.entity.CarEntity;
-import com.jsy.community.qo.BaseQO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
 @ApiModel("社区集市实体类")
@@ -99,7 +93,8 @@ public class ProprietorMarketEntity extends BaseEntity {
 
     @ApiModelProperty(value = "后端删除")
     private Integer remove;
-
-
-
+    
+    @TableField(exist = false)
+    @ApiModelProperty(value = "标价")
+    private  String priceName;
 }

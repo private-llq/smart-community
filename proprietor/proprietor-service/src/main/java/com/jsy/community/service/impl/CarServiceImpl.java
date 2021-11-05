@@ -414,7 +414,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     public CarOrderEntity getOrder(Long id) {
         CarOrderEntity entity = appCarOrderMapper.selectById(id);
+        CommunityEntity communityEntity = communityMapper.selectById(entity.getCommunityId());
         entity.setMonth(entity.getRenewalIn());
+        entity.setCarPositionText(communityEntity.getName());
         return entity;
     }
 

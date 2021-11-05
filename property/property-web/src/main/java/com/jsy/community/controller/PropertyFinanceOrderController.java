@@ -20,8 +20,8 @@ import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.FinanceImportErrorVO;
-import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import com.jsy.community.vo.property.FinanceOrderAndCarOrHouseInfoVO;
+import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.FilenameUtils;
@@ -588,7 +588,7 @@ public class PropertyFinanceOrderController {
     @ApiOperation("新增物业账单临时收费")
     @PostMapping("/temporary/charges")
     @businessLog(operation = "新增", content = "新增了【物业账单临时收费】")
-    @PropertyFinanceLog(operation = "创建了一个临时账单")
+    @PropertyFinanceLog(operation = "临时账单", type = 2)
     public CommonResult addTemporaryCharges(@RequestBody PropertyFinanceOrderEntity propertyFinanceOrderEntity) {
         if (propertyFinanceOrderEntity.getAssociatedType() == null || propertyFinanceOrderEntity.getTargetId() == null || propertyFinanceOrderEntity.getFeeRuleName() == null
                 || propertyFinanceOrderEntity.getPropertyFee() == null || propertyFinanceOrderEntity.getBeginTime() == null || propertyFinanceOrderEntity.getOverTime() == null) {
@@ -597,8 +597,8 @@ public class PropertyFinanceOrderController {
         ValidatorUtils.validateEntity(propertyFinanceOrderEntity);
         AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
         propertyFinanceOrderEntity.setCommunityId(loginUser.getCommunityId());
-        return propertyFinanceOrderService.addTemporaryCharges(propertyFinanceOrderEntity)
-                ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "新增物业账单临时收费失败");
+        PropertyFinanceOrderEntity entity = propertyFinanceOrderService.addTemporaryCharges(propertyFinanceOrderEntity);
+        return entity != null ? CommonResult.ok(entity) : CommonResult.error(JSYError.INTERNAL.getCode(), "新增物业账单临时收费失败");
     }
 
     /**

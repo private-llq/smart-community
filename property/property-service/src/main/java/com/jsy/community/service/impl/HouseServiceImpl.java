@@ -353,15 +353,21 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
                     throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "房屋已添加，请勿重复添加");
                 }
             }
-            //查询父级楼栋总层数更新到房屋
+            //查询父级楼栋总层数更新到房屋 并 判断所属层数是否超过楼宇层数
             HouseEntity bHouseEntity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("id", houseEntity.getPid()).eq("community_id", houseEntity.getCommunityId()));
             //pid是楼栋
             if (bHouseEntity.getPid() == 0){
                 houseEntity.setTotalFloor(bHouseEntity.getTotalFloor());
+                if (houseEntity.getFloor() > bHouseEntity.getTotalFloor()) {
+                    throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "房屋楼层不能高于楼栋总楼层");
+                }
             } else {
                 //pid是单元
                 HouseEntity uHouseEntity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("id", bHouseEntity.getPid()).eq("community_id", houseEntity.getCommunityId()));
                 houseEntity.setTotalFloor(uHouseEntity.getTotalFloor());
+                if (houseEntity.getFloor() > uHouseEntity.getTotalFloor()) {
+                    throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "房屋楼层不能高于楼栋总楼层");
+                }
             }
 //            houseEntity.setDoor(houseEntity.getNumber()); //TODO 后期可删除，但需要先修改依赖了t_house表door字段的代码
             houseEntity.setDoor(houseEntity.getName());
@@ -451,6 +457,9 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
                 //查新所属单元信息,楼栋信息
                 HouseEntity unitEntity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("id", houseEntity.getPid()).eq("community_id", houseEntity.getCommunityId()));
                 HouseEntity buildingEntity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("id", unitEntity.getPid()).eq("community_id", houseEntity.getCommunityId()));
+                if (houseEntity.getFloor() > unitEntity.getTotalFloor() || houseEntity.getFloor() > buildingEntity.getTotalFloor()) {
+                    throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "房屋楼层不能高于楼栋总楼层");
+                }
                 //设置对应单元名称
                 houseEntity.setUnit(unitEntity.getUnit());
                 houseEntity.setBuilding(buildingEntity.getBuilding());
@@ -782,6 +791,10 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         HouseBuildingTypeEntity entity = houseBuildingTypeMapper.selectOne(new QueryWrapper<HouseBuildingTypeEntity>().eq("id", id).eq("community_id", communityId));
         if (entity == null) {
             throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "楼宇分类数据不存在");
+        }
+        List<HouseEntity> houseEntities = houseMapper.selectList(new QueryWrapper<HouseEntity>().eq("building_type", entity.getId()).eq("deleted", 0));
+        if (houseEntities.size() > 0) {
+            throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "该楼宇分类存在楼宇，请删除楼宇后再进行操作");
         }
         return houseBuildingTypeMapper.deleteById(id) == 1;
     }

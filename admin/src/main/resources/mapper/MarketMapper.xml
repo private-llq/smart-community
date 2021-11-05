@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jsy.community.mapper.MarketMapper">
+   <resultMap id="ProprietorMarketEntityMap" type="com.jsy.community.entity.proprietor.ProprietorMarketEntity">
+       <result column="id" property="id"/>
+       <result column="communityId" property="communityId"/>
+       <result column="uid" property="uid"></result>
+       <result column="createTime" property="createTime"></result>
+       <result column="updateTime" property="updateTime"></result>
+       <result column="deleted" property="deleted"></result>
+       <result column="state" property="state"></result>
+       <result column="goodsName" property="goodsName"></result>
+       <result column="price" property="price"></result>
+       <result column="goodsExplain" property="goodsExplain"></result>
+       <result column="negotiable" property="negotiable"></result>
+       <result column="labelId" property="labelId"></result>
+       <result column="categoryId" property="categoryId"></result>
+       <result column="click" property="click"></result>
+       <result column="phone" property="phone"></result>
+       <result column="images" property="images"></result>
+       <result column="shield" property="shield"></result>
+       <result column="remove" property="remove"></result>
+       <result column="deleted" property="deleted"></result>
+       <result column="labelName" property="labelName"></result>
+       <result column="categoryName" property="categoryName"></result>
+       <result column="realName" property="realName"></result>
+       <result column="communityName" property="communityName"></result>
+   </resultMap>
+
+    <update id="deleteBlacklist" >
+        update t_proprietor_market tm set tm.remove = 1 where tm.id = #{id}
+    </update>
+
+    <!--所有发布商品的条数-->
+    <select id="findTotals" resultType="java.lang.Long">
+        select count(*) from t_proprietor_market tm
+        left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
+        left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
+        left join t_user tu on tm.uid = tu.uid
+        left join t_community tc on tc.id = tm.community_id
+        where  tm.shield= 0
+        and tm.remove = 0
+        <if test="query.categoryId!=null and query.categoryId!=''">
+            and tm.category_id=#{query.categoryId}
+        </if>
+        <if test="query.communityId!=null and query.communityId!=''">
+            and tm.community_id=#{query.communityId}
+        </if>
+        <if test="query.realName !=null and query.realName!=''">
+            AND (tu.real_name LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%')
+            OR  tm.phone LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%'))
+        </if>
+        <if test="query.state !=null and query.state !='' or query.state==0">
+            AND state= #{query.state,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <!--所有发布商品-->
+    <select id="selectMarketAllPage" resultMap="ProprietorMarketEntityMap">
+        select tm.id,tm.community_id as communityId,tc.name as communityName, tm.uid as uid, tm.goods_name as goodsName, tm.price, tm.goods_explain as goodsExplain,
+               tm.negotiable,  tm.state, tm.category_id as categoryId,tm.label_id as labelId, tm.remove,
+               tm.click as click, tm.phone as phone,tm.images as images,tm.shield as shield,
+               tm.deleted as deleted, tm.create_time as createTime,tm.update_time as updateTime,
+               tpml.label as labelName,tpmc.category  as categoryName,tu.real_name as realName
+        from t_proprietor_market tm
+                 left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
+                 left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
+                 left join t_user tu on tm.uid = tu.uid
+                 left join t_community tc on tc.id = tm.community_id
+        where  tm.shield= 0
+        and tm.remove = 0
+        <if test="query.categoryId!=null and query.categoryId!=''">
+            and tm.category_id=#{query.categoryId}
+        </if>
+        <if test="query.communityId!=null and query.communityId!=''">
+            and tm.community_id=#{query.communityId}
+        </if>
+        <if test="query.realName !=null and query.realName!=''">
+            AND (tu.real_name LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%')
+            OR  tm.phone LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%'))
+        </if>
+        <if test="query.state !=null and query.state !='' or query.state==0">
+            AND state= #{query.state,jdbcType=INTEGER}
+        </if>
+        limit #{page},#{size}
+    </select>
+
+    <select id="findCount" resultType="java.lang.Long">
+        select count(*) from t_proprietor_market tm
+                         left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
+                         left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
+                         left join t_user tu on tm.uid = tu.uid
+                         left join t_community tc on tc.id = tm.community_id
+        where tm.remove = 0 and  tm.shield = 1
+    </select>
+
+    <select id="selectMarketBlacklist" resultMap="ProprietorMarketEntityMap">
+        select tm.id, tm.community_id , tm.uid as uid, tm.goods_name as goodsName, tm.price, tm.goods_explain as goodsExplain,
+        tm.negotiable,  tm.state, tm.category_id as categoryId,tm.label_id as labelId, tm.remove,
+        tm.click as click, tm.phone as phone,tm.images as images,tm.shield as shield,
+        tm.deleted as deleted, tm.create_time as createTime,tm.update_time as updateTime,
+        tpml.label as labelName,tpmc.category  as categoryName,tu.real_name as realName,tc.name as communityName
+        from t_proprietor_market tm
+        left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
+        left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
+        left join t_user tu on tm.uid = tu.uid
+        left join t_community tc on tc.id = tm.community_id
+        where tm.remove = 0 and tm.shield = 1
+        limit #{page},#{size}
+    </select>
+
+</mapper>

@@ -89,6 +89,7 @@
 			au.mobile,
 			au.create_time,
 			aur.role_id,
+			aur.role_id as roleIdStr,
 			ar.name as roleName
 		from t_admin_user au
 		left join t_admin_user_role aur on aur.uid = au.uid

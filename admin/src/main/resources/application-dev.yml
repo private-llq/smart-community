@@ -43,3 +43,9 @@ spring:
         wall:
           config:
             multi-statement-allow: true
+
+minio:
+  end-point: http://222.178.212.29
+  port: 9000
+  access-key: minio
+  secret-key: minimini
