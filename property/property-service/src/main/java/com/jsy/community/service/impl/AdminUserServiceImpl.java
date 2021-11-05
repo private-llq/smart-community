@@ -598,17 +598,17 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			throw new PropertyException("用户不存在！");
 		}
 		//更新密码
-		if(!StringUtils.isEmpty(adminUserEntity.getPassword())){
+		/*if(!StringUtils.isEmpty(adminUserEntity.getPassword())){
 			//生成盐值并对密码加密
 			String salt = RandomStringUtils.randomAlphanumeric(20);
 			String password = new Sha256Hash(RSAUtil.privateDecrypt(adminUserEntity.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), salt).toHex();
-//			String password = new Sha256Hash(adminUserEntity.getPassword(), salt).toHex();
+			// String password = new Sha256Hash(adminUserEntity.getPassword(), salt).toHex();
 			//更新
 			AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
 			adminUserAuthEntity.setPassword(password);
 			adminUserAuthEntity.setSalt(salt);
 			adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("mobile",user.getMobile()));
-		}
+		}*/
 		//更新社区权限
 		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
 			adminConfigService.updateAdminCommunityBatch(adminUserEntity.getCommunityIdList(),user.getUid());

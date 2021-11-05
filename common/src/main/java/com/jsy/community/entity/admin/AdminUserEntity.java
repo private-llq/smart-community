@@ -9,10 +9,7 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +35,7 @@ public class AdminUserEntity extends BaseEntity {
 	 * 有权限的社区ids(List)
 	 */
 	@TableField(exist = false)
+	@NotEmpty(groups = {addOperatorValidatedGroup.class}, message = "请选择授权社区")
 	private List<String> communityIdList;
 	
 	/**
