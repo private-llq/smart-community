@@ -16,6 +16,9 @@ public class AdminUserQO implements Serializable {
 	
 	@ApiModelProperty(value = "id")
 	private Long id;
+
+	// 用户uid
+	private String uid;
 	
 	@ApiModelProperty(value = "社区ID")
 	private Long communityId;

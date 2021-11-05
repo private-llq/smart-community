@@ -14,6 +14,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 物业端用户
@@ -214,6 +215,10 @@ public class AdminUserEntity extends BaseEntity {
 	@TableField(exist = false)
 	@NotNull(groups = {addOperatorValidatedGroup.class}, message = "角色Id不能为空")
 	private Long roleId;
+
+	// 角色Id
+	@TableField(exist = false)
+	private String roleIdStr;
 
 	// 角色名称
 	@TableField(exist = false)

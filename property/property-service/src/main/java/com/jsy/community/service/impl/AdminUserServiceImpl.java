@@ -14,10 +14,12 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.admin.AdminCommunityEntity;
 import com.jsy.community.entity.admin.AdminUserAuthEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.entity.admin.AdminUserRoleEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.mapper.AdminCommunityMapper;
 import com.jsy.community.mapper.AdminUserAuthMapper;
 import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.mapper.AdminUserRoleMapper;
@@ -47,6 +49,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 /**
@@ -79,6 +82,9 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 
 	@Autowired
 	private AdminUserRoleMapper adminUserRoleMapper;
+
+	@Autowired
+	private AdminCommunityMapper adminCommunityMapper;
 	
 	@Value("${propertyLoginExpireHour}")
 	private long loginExpireHour = 12;
@@ -505,6 +511,25 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		Integer integer = adminUserMapper.countPageUserEntity(query);
 		if (integer == null) {
 			integer = 0;
+		}
+		if (!CollectionUtils.isEmpty(adminUserEntities)) {
+			Set<String> uidList = adminUserEntities.stream().map(AdminUserEntity::getUid).collect(Collectors.toSet());
+			List<AdminCommunityEntity> adminCommunityEntities = adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("community_id, uid").in("uid", uidList));
+			if (!CollectionUtils.isEmpty(adminCommunityEntities)) {
+				HashMap<String, List<String>> userCommunityIdMap = new HashMap<>();
+				for (AdminCommunityEntity adminCommunityEntity : adminCommunityEntities) {
+					if (userCommunityIdMap.containsKey(adminCommunityEntity.getUid())) {
+						userCommunityIdMap.get(adminCommunityEntity.getUid()).add(String.valueOf(adminCommunityEntity.getCommunityId()));
+					} else {
+						List<String> communityIdSet = new ArrayList<>();
+						communityIdSet.add(String.valueOf(adminCommunityEntity.getCommunityId()));
+						userCommunityIdMap.put(adminCommunityEntity.getUid(), communityIdSet);
+					}
+				}
+				for (AdminUserEntity adminUserEntity : adminUserEntities) {
+					adminUserEntity.setCommunityIdList(userCommunityIdMap.get(adminUserEntity.getUid()));
+				}
+			}
 		}
 		PageInfo<AdminUserEntity> pageInfo = new PageInfo<>();
 		pageInfo.setRecords(adminUserEntities);
