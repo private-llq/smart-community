@@ -9,11 +9,9 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 物业端用户
@@ -37,6 +35,7 @@ public class AdminUserEntity extends BaseEntity {
 	 * 有权限的社区ids(List)
 	 */
 	@TableField(exist = false)
+	@NotEmpty(groups = {addOperatorValidatedGroup.class}, message = "请选择授权社区")
 	private List<String> communityIdList;
 	
 	/**
@@ -214,6 +213,10 @@ public class AdminUserEntity extends BaseEntity {
 	@TableField(exist = false)
 	@NotNull(groups = {addOperatorValidatedGroup.class}, message = "角色Id不能为空")
 	private Long roleId;
+
+	// 角色Id
+	@TableField(exist = false)
+	private String roleIdStr;
 
 	// 角色名称
 	@TableField(exist = false)
