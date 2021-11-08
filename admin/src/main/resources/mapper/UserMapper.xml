@@ -10,4 +10,11 @@
 		city_id,area_id,detail_address,reg_id,wechat,qq,email,deleted,create_time,update_time,birthday_time
 		from t_user where uid = #{uid} and deleted = 0
 	</select>
+
+	<select id="listAuthUserInfo" resultType="com.jsy.community.entity.UserEntity">
+		select * from t_user where uid in
+		<foreach collection="ids" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</select>
 </mapper>
