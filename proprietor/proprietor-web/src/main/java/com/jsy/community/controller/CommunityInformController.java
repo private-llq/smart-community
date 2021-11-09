@@ -5,7 +5,6 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommunityInformService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PushInformEntity;
-import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.OldPushInformQO;
 import com.jsy.community.utils.UserUtils;
@@ -93,7 +92,7 @@ public class CommunityInformController {
         }
         ValidatorUtils.validateEntity(qo.getQuery(), OldPushInformQO.CommunityPushInformValidate.class);
         qo.getQuery().setUid(UserUtils.getUserId());
-        return CommonResult.ok(communityInformService.queryCommunityInform(qo), "查询成功!");
+        return CommonResult.ok(communityInformService.queryCommunityInformV2(qo), "查询成功!");
     }
 
 

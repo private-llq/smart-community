@@ -34,6 +34,24 @@
 	    ) = 0
 	    AND i.deleted = 0 and i.acct_id = #{acctId}
     </select>
+	<!-- 分页查询推送号的推送消息 -->
+	<select id="selectInformPage" resultType="com.jsy.community.entity.PushInformEntity">
+		select
+			tpi.id,
+			tpi.acct_id,
+			tpi.create_time,
+			tpi.push_title,
+			tpi.push_sub_title,
+			tpi.publish_time
+		from t_push_inform tpi
+		left join t_push_inform_acct tpia on tpia.inform_id = tpi.id
+		where tpi.deleted = 0
+		and tpia.acct_id = #{acctId}
+		and tpi.push_object = 2
+		and tpi.push_state = 1
+		ORDER BY tpi.create_time desc
+		limit #{startNum}, #{pageSize}
+	</select>
 	<!-- 标记当前用户 已读消息列表 -->
 	<insert id="insertBatchReadInform">
 		insert into t_user_inform(id,acct_id,inform_id,uid,create_time)

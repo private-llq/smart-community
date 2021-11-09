@@ -22,6 +22,8 @@ public interface ICommunityInformService extends IService<PushInformEntity> {
      */
     List<PushInformEntity> queryCommunityInform(BaseQO<OldPushInformQO> qo);
 
+    List<PushInformEntity> queryCommunityInformV2(BaseQO<OldPushInformQO> qo);
+
 
 
 
