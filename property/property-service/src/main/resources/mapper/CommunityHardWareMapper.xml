@@ -13,4 +13,8 @@
             #{communityId}
         </foreach>
     </select>
+    <!-- 查询社区下的设备序列号列表 -->
+    <select id="selectListHardWareIdByCommunityId" resultType="java.lang.String">
+        select hardware_id from t_community_hardware where community_id = #{communityId} and deleted = 0
+    </select>
 </mapper>

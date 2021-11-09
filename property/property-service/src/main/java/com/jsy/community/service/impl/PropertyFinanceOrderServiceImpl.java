@@ -132,10 +132,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         //封装总金额、房间地址、车位编号
         for (PropertyFinanceOrderEntity entity : orderEntities) {
             //如果associatedType等于1表示关联房间   相反则是关联车位
-            if (entity.getAssociatedType() == 1) {
-                entity.setAddress(houseMap.get(entity.getTargetId()));
-            } else {
-                entity.setAddress(carPositionMap.get(entity.getTargetId()));
+            if (entity.getAssociatedType() != null) {
+                if (entity.getAssociatedType() == 1) {
+                    entity.setAddress(houseMap.get(entity.getTargetId()));
+                } else {
+                    entity.setAddress(carPositionMap.get(entity.getTargetId()));
+                }
             }
             //封装总金额  总金额=(propertyFee+penalSum)-coupon-deduction
             entity.setTotalMoney(entity.getPropertyFee().add(entity.getPenalSum()).subtract(entity.getCoupon()).subtract(entity.getDeduction()));

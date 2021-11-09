@@ -7,6 +7,7 @@ import com.jsy.community.api.CommunityRfSycRecordService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CommunityRfEntity;
 import com.jsy.community.entity.property.CommunityRfSycRecordEntity;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -46,6 +47,7 @@ public class CommunityRfController {
         if (rfEntity.getEnableStatus() == null) {
             rfEntity.setEnableStatus(1);
         }
-        return CommonResult.ok();
+        rfEntity.setCommunityId(UserUtils.getAdminCommunityId());
+        return rfService.addRf(rfEntity) == 1 ? CommonResult.ok() : CommonResult.error("添加失败!");
     }
 }
