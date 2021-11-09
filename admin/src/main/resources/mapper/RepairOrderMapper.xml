@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.RepairOrderMapper">
+
+    <select id="repairTurnover" resultType="java.math.BigDecimal">
+        select sum(money) AS totalMoney from t_repair_order
+        where success_time &lt;= #{endTime} and success_time &gt;= #{startTime} and status = 2 and deleted = 0
+    </select>
+</mapper>
