@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.CommunityHardWareEntity;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author: Pipi
@@ -29,4 +30,13 @@ public interface CommunityHardWareMapper extends BaseMapper<CommunityHardWareEnt
      * @date: 2021/10/8 18:00
      **/
     List<CommunityHardWareEntity> selectAllByCommunityIds(List<Long> communityIds);
+
+    /**
+     * @author: Pipi
+     * @description: 查询社区下的设备序列号列表
+     * @param communityId: 社区ID
+     * @return: java.util.List<java.lang.String>
+     * @date: 2021/11/8 10:33
+     **/
+    Set<String> selectListHardWareIdByCommunityId(Long communityId);
 }

@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.property.PropertyFaceSyncRecordEntity;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -21,4 +22,14 @@ public interface PropertyFaceSyncRecordMapper extends BaseMapper<PropertyFaceSyn
      * @date: 2021/9/24 11:52
      **/
     Integer batchInsertSyncRecord(List<PropertyFaceSyncRecordEntity> recordEntities);
+
+    /**
+     * @author: Pipi
+     * @description: 查询物业人脸信息
+     * @param mobile: 电话号码
+     * @param communityId: 社区ID
+     * @return: com.jsy.community.entity.property.PropertyFaceSyncRecordEntity
+     * @date: 2021/11/8 14:36
+     **/
+    PropertyFaceSyncRecordEntity queryByMobile(@Param("mobile") String mobile, @Param("communityId") Long communityId);
 }
