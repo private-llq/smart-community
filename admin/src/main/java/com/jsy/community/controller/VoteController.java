@@ -55,7 +55,7 @@ public class VoteController {
     @ApiOperation("上传图片")
     @PostMapping("/file")
     public CommonResult file(@RequestParam MultipartFile[] file){
-        String[] votes = MinioUtils.uploadForBatch(file, "admin-vote");
+        String[] votes = MinioUtils.uploadForBatch(file, "sys-vote");
         return CommonResult.ok(votes);
     }
     
