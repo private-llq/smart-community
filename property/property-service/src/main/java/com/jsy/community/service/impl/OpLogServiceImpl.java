@@ -70,7 +70,9 @@ public class OpLogServiceImpl extends ServiceImpl<OpLogMapper, OpLogEntity> impl
 		// 模糊查询用户名
 		if (StringUtils.isNotBlank(query.getUserName())) {
 			List<String> uidList = adminUserMapper.queryUidListByRealName(query.getUserName());
-			queryWrapper.in("user_id", uidList);
+			if (!CollectionUtils.isEmpty(uidList)) {
+				queryWrapper.in("user_id", uidList);
+			}
 		}
 		queryWrapper.orderByDesc("create_time");
 		Page<OpLogEntity> pageData = opLogMapper.selectPage(page, queryWrapper);
