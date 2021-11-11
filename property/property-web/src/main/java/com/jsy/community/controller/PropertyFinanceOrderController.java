@@ -24,6 +24,7 @@ import com.jsy.community.vo.property.FinanceOrderAndCarOrHouseInfoVO;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import jodd.util.StringUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -46,6 +47,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * @program: com.jsy.community
@@ -381,6 +383,50 @@ public class PropertyFinanceOrderController {
             if (propertyCollectionFormEntity.getMonth() != null) {
                 String firstMouthDateOfAmount = DateCalculateUtil.getFirstMouthDateOfAmount(propertyCollectionFormEntity.getMonth());
                 String lastMouthDateOfAmount = DateCalculateUtil.getLastMouthDateOfAmount(propertyCollectionFormEntity.getMonth());
+                propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+            if (propertyCollectionFormEntity.getDateTime() != null) {
+                ZoneId zone = ZoneId.systemDefault();
+                Instant instant = propertyCollectionFormEntity.getDateTime().atStartOfDay().atZone(zone).toInstant();
+                String firstDate = DateCalculateUtil.getFirstDate(Date.from(instant));
+                String lastDate = DateCalculateUtil.getLastDate(Date.from(instant));
+                propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ValidatorUtils.validateEntity(propertyCollectionFormEntity);
+//        if (propertyCollectionFormEntity.getStartTime() == null && propertyCollectionFormEntity.getEndTime() == null) {
+//            throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少查询类型");
+//        }
+//        propertyCollectionFormEntity.setCommunityId(UserUtils.getAdminCommunityId());
+        return CommonResult.ok(propertyFinanceOrderService.getCollectionFormCollection(propertyCollectionFormEntity, communityIdList), "查询成功");
+    }
+
+    /**
+     * @Author: DKS
+     * @Description: 获取收款报表-收款报表
+     * @Param:
+     * @Return: com.jsy.community.vo.CommonResult
+     * @Date: 2021/8/19 9:31
+     **/
+    @Login
+    @ApiOperation("获取收款报表-收款报表")
+    @PostMapping("/v2/getCollectionForm/collection")
+    public CommonResult getCollectionFormCollectionV2(@RequestBody PropertyCollectionFormEntity propertyCollectionFormEntity) {
+        List<String> communityIdList = UserUtils.getAdminCommunityIdList();
+        try {
+            if (propertyCollectionFormEntity.getYear() != null) {
+                String firstYearDateOfAmount = DateCalculateUtil.getFirstYearDateOfAmount(propertyCollectionFormEntity.getYear());
+                String lastYearDateOfAmount = DateCalculateUtil.getLastYearDateOfAmount(propertyCollectionFormEntity.getYear());
+                propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastYearDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+            if (StringUtil.isNotBlank(propertyCollectionFormEntity.getMonthStr())) {
+                String firstMouthDateOfAmount = DateCalculateUtil.getFirstMouthDateOfAmount(propertyCollectionFormEntity.getMonthStr() + "-01");
+                String lastMouthDateOfAmount = DateCalculateUtil.getLastMouthDateOfAmount(propertyCollectionFormEntity.getMonthStr() + "-01");
                 propertyCollectionFormEntity.setStartTime(LocalDate.parse(firstMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                 propertyCollectionFormEntity.setEndTime(LocalDate.parse(lastMouthDateOfAmount, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             }

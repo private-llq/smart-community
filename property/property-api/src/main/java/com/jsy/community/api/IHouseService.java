@@ -288,4 +288,15 @@ public interface IHouseService extends IService<HouseEntity> {
 	 * @return:
 	 */
 	List<HouseEntity> getHouse(Long adminCommunityId);
+
+	/**
+	 * @author: Pipi
+	 * @description: 通用房屋名称搜索
+	 * @param houseEntity: 查询条件-名称模糊查询
+	 * @return: java.util.List<com.jsy.community.entity.HouseEntity>
+	 * @date: 2021/11/11 9:42
+	 **/
+	List<HouseEntity> commonQueryHouse(HouseEntity houseEntity);
+
+
 }

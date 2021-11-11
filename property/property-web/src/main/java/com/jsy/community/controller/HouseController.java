@@ -629,6 +629,23 @@ public class HouseController {
 		return CommonResult.ok(returnMap);
 	}
 
+	/**
+	 * @author: Pipi
+	 * @description: 通用房屋名称搜索
+	 * @param houseEntity: 查询条件-名称模糊查询
+	 * @return: com.jsy.community.vo.CommonResult
+	 * @date: 2021/11/11 9:38
+	 **/
+	@Login
+	@ApiOperation("显示楼栋、单元、房屋树形结构")
+	@PostMapping("/v2/commonQueryHouse")
+	public CommonResult commonQueryHouse(@RequestBody HouseEntity houseEntity) {
+		if (houseEntity.getType() == null || houseEntity.getType() < 0 || houseEntity.getType() > 4) {
+			houseEntity.setType(4);
+		}
+		houseEntity.setCommunityId(UserUtils.getAdminCommunityId());
+		return CommonResult.ok(houseService.commonQueryHouse(houseEntity));
+	}
 
 
 

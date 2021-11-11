@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -108,6 +109,21 @@ public class DateCalculateUtil {
 		sdf = new SimpleDateFormat("yyyy-MM-dd");
 		return sdf.format(d);
 	}
+
+	// 通过月份获取月第一天
+	public static String getFirstMouthDateOfAmount(String amount) throws ParseException {
+		LocalDate parse = LocalDate.parse(amount, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		Date date = new Date();
+		date = DateUtils.setMonths(date, parse.getMonthValue() - 1);
+		date = DateUtils.setYears(date, parse.getYear());
+		Date firstSecondOfMonth = getFirstSecondOfMonth(date);
+		String dateStr = String.valueOf(firstSecondOfMonth);
+		SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
+		Date d = sdf.parse(dateStr);
+		sdf = new SimpleDateFormat("yyyy-MM-dd");
+		return sdf.format(d);
+	}
+
 	
 	/**
 	 * @author DKS
@@ -118,6 +134,20 @@ public class DateCalculateUtil {
 		Date date = new Date();
 		Date date1 = DateUtils.setMonths(date, amount - 1);
 		Date lastSecondOfMonth = getLastSecondOfMonth(date1);
+		String dateStr = String.valueOf(lastSecondOfMonth);
+		SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
+		Date d = sdf.parse(dateStr);
+		sdf = new SimpleDateFormat("yyyy-MM-dd");
+		return sdf.format(d);
+	}
+
+	// 通过月份获取月最后一天
+	public static String getLastMouthDateOfAmount(String amount) throws ParseException {
+		LocalDate parse = LocalDate.parse(amount, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		Date date = new Date();
+		date = DateUtils.setYears(date, parse.getYear());
+		date = DateUtils.setMonths(date, parse.getMonthValue() - 1);
+		Date lastSecondOfMonth = getLastSecondOfMonth(date);
 		String dateStr = String.valueOf(lastSecondOfMonth);
 		SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
 		Date d = sdf.parse(dateStr);

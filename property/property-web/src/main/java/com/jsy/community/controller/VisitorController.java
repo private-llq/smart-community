@@ -103,8 +103,8 @@ public class VisitorController {
 	@PostMapping("/addPropertyVisitor")
 	@businessLog(operation = "新增",content = "新增了【访客邀请】")
 	public CommonResult addVisitor(@RequestBody VisitorEntity visitorEntity) {
-		ValidatorUtils.validateEntity(visitorEntity, VisitorEntity.addVisitorValidate.class);
 		visitorEntity.setCommunityId(UserUtils.getAdminCommunityId());
+		ValidatorUtils.validateEntity(visitorEntity, VisitorEntity.addVisitorValidate.class);
 		// 如果上传了人脸,则是人脸识别通行
 		if (!StringUtils.isEmpty(visitorEntity.getFaceUrl())) {
 			// 人脸识别通行
