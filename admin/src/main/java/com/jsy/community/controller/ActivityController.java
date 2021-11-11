@@ -105,7 +105,7 @@ public class ActivityController {
     @ApiOperation("上传图片")
     @PostMapping("/file")
     public CommonResult file(@RequestParam MultipartFile[] file){
-        String[] votes = MinioUtils.uploadForBatch(file, "admin-activity");
+        String[] votes = MinioUtils.uploadForBatch(file, "sys-activity");
         return CommonResult.ok(votes);
     }
 }

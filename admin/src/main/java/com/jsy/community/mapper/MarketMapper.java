@@ -56,4 +56,13 @@ public interface MarketMapper extends BaseMapper<ProprietorMarketEntity> {
      * @Date: 2021/11/1-10:18
      **/
     Long deleteBlacklist(@Param("id") Long id);
+    
+    /**
+     * @Description: 根据分类id查询是否存在商品
+     * @author: DKS
+     * @since: 2021/11/10 10:06
+     * @Param: java.lang.String
+     * @return: com.jsy.community.entity.proprietor.ProprietorMarketEntity
+     */
+    Integer selectMarketByCategoryId(String categoryId);
 }
