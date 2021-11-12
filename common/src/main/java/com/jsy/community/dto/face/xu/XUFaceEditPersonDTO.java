@@ -50,4 +50,7 @@ public class XUFaceEditPersonDTO extends XUFaceBaseDTO {
 	// 社区ID
 	private String communityId;
 
+	// ID 卡(门禁卡)卡号
+	private String RFIDCard;
+
 }

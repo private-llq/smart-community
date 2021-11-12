@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.IHouseService;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -185,8 +187,10 @@ public class PatrolServiceImpl implements IPatrolService {
 		}
 		Map<Long, HouseEntity> idAndHouseMap = houseService.queryIdAndHouseMap(idSet);
 		for(PatrolPointEntity entity : pageData.getRecords()){
-			entity.setBuildingName(idAndHouseMap.get(entity.getBuildingId()).getBuilding());
-			entity.setUnitName(idAndHouseMap.get(entity.getUnitId()).getUnit());
+			HouseEntity building = JSON.parseObject(JSON.toJSONString(idAndHouseMap.get(BigInteger.valueOf(entity.getBuildingId()))), HouseEntity.class);
+			entity.setBuildingName(building.getBuilding());
+			HouseEntity unit = JSON.parseObject(JSON.toJSONString(idAndHouseMap.get(BigInteger.valueOf(entity.getUnitId()))), HouseEntity.class);
+			entity.setUnitName(unit.getUnit());
 		}
 		PageInfo<PatrolPointEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageData,pageInfo);

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jsy.community.entity.BaseEntity;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -25,8 +26,12 @@ public class VoteEntity extends BaseEntity {
      * 楼栋id
      */
     private String buildingId;
+    
+    @ApiModelProperty(value = "城市Id")
+    private String cityId;
+    
     /**
-     * 楼栋id
+     * 范围
      */
     @TableField(exist = false)
     private String scope;
@@ -85,5 +90,7 @@ public class VoteEntity extends BaseEntity {
     @TableField(exist = false)
     private VoteTopicEntity voteTopicEntity;
 
-
+    @ApiModelProperty(value = "1待发布，2进行中，3已结束")
+    @TableField(exist = false)
+    private String voteStatusName;
 }

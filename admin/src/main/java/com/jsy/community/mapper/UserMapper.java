@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.UserEntity;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * @author ling
  * @since 2020-11-19 16:50
@@ -18,4 +21,13 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * @return: com.jsy.community.entity.UserEntity
 	 */
 	UserEntity getUserMobileByUid(String uid);
+	
+	/**
+	 * @return java.util.List<com.jsy.community.entity.UserEntity>
+	 * @Author DKS
+	 * @Description 批量查询业主数据
+	 * @Date 2021/11/08 10:42
+	 * @Param [ids]
+	 **/
+	List<UserEntity> listAuthUserInfo(Collection<String> ids);
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsy.community.mapper.CommunityRfSycRecordMapper">
+    <!-- 批量新增门禁卡同步记录 -->
+    <insert id="batchInsertRecord">
+        insert into t_community_rf_syc_record (
+            id,
+            rf_num,
+            hardware_id,
+            community_id,
+            deleted,
+            create_time,
+            update_time
+        ) values
+        <foreach collection="list" separator="," item="rfSycRecordEntiy">
+            (#{rfSycRecordEntiy.id},
+            #{rfSycRecordEntiy.rfNum},
+            #{rfSycRecordEntiy.hardwareId},
+            #{rfSycRecordEntiy.communityId},
+            0,
+            now(),
+            now())
+        </foreach>
+    </insert>
+</mapper>

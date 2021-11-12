@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.entity.proprietor.ProprietorMarketCategoryEntity;
 import com.jsy.community.mapper.MarketCategoryMapper;
+import com.jsy.community.mapper.MarketMapper;
+import com.jsy.community.service.AdminException;
 import com.jsy.community.service.IMarketCategoryService;
 import com.jsy.community.utils.SnowFlake;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,9 @@ public class MarketCategoryServiceImpl extends ServiceImpl<MarketCategoryMapper,
     
     @Resource
     private MarketCategoryMapper categoryMapper;
+    
+    @Resource
+    private MarketMapper marketMapper;
 
     /**
      * @Description: 新增社区集市商品类别
@@ -53,7 +58,18 @@ public class MarketCategoryServiceImpl extends ServiceImpl<MarketCategoryMapper,
      */
     @Override
     public boolean deleteMarketCategory(Long id) {
-        return categoryMapper.delete(new QueryWrapper<ProprietorMarketCategoryEntity>().eq("id",id)) == 1;
+        ProprietorMarketCategoryEntity proprietorMarketCategoryEntity = categoryMapper.selectById(id);
+        // 根据分类id查询是否存在商品
+        if (proprietorMarketCategoryEntity != null) {
+            Integer integer = marketMapper.selectMarketByCategoryId(proprietorMarketCategoryEntity.getCategoryId());
+            if (integer > 0) {
+                throw new AdminException("存在商品的分类无法被删除");
+            } else {
+                return categoryMapper.delete(new QueryWrapper<ProprietorMarketCategoryEntity>().eq("id",id)) == 1;
+            }
+        } else {
+            throw new AdminException("不存在该集市商品分类");
+        }
     }
     
     /**

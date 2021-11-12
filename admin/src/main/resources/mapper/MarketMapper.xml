@@ -110,4 +110,8 @@
         limit #{page},#{size}
     </select>
 
+    <select id="selectMarketByCategoryId" resultType="java.lang.Integer">
+        select count(0) from t_proprietor_market where category_id = #{categoryId} and deleted = 0
+    </select>
+
 </mapper>

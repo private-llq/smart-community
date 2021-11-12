@@ -26,4 +26,15 @@
             )
         </foreach>
     </insert>
+    <!-- 查询物业人脸信息 -->
+    <select id="queryByMobile" resultType="com.jsy.community.entity.property.PropertyFaceSyncRecordEntity">
+        select tpf.face_url from t_property_face tpf
+        left join t_property_face_sync_record tpfsr on tpfsr.porperty_face_id = tpf.id and tpfsr.face_url = tpf.face_url
+        where tpfsr.face_url is not null
+        and tpfsr.deleted = 0
+        and tpf.deleted = 0
+        and tpf.mobile = #{mobile}
+        and tpf.community_id = #{communityId}
+        limit 1
+    </select>
 </mapper>
