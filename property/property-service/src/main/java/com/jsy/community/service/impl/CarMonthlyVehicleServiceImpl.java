@@ -147,7 +147,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         if (Objects.isNull(carMonthlyVehicle.getOwnerName())){
             throw new PropertyException("车主姓名不能为空！");
         }
-        /*if (Objects.isNull(carMonthlyVehicle.getCarPosition())){
+       /* if (Objects.isNull(carMonthlyVehicle.getCarPosition())){
             throw new PropertyException("车位号不能为空！");
         }*/
         if (Objects.isNull(carMonthlyVehicle.getMonthlyMethodId())){
@@ -278,7 +278,10 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             orderEntity.setOrderTime(LocalDate.now());//账单月份
             String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(communityId));
             orderEntity.setOrderNum(orderNum);//账单号
-            orderEntity.setTargetId(car_position.getId());//车位id
+            if (Objects.nonNull(car_position)) {
+                orderEntity.setTargetId(car_position.getId());//车位id
+            }
+
 
         }
         propertyFinanceOrderMapper.insert(orderEntity);
@@ -359,8 +362,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             orderEntity.setOrderNum(orderNum);//账单号
             //查车位id
             CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carMonthlyVehicle.getCarPosition()));
-            orderEntity.setTargetId(car_position.getId());//车位id
-
+            if (Objects.nonNull(car_position)) {
+                orderEntity.setTargetId(car_position.getId());//车位id
+            }
         }
         propertyFinanceOrderMapper.insert(orderEntity);
 
@@ -543,6 +547,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             if (Objects.nonNull(car_position)){
                 orderEntity.setTargetId(car_position.getId());//车位id
             }
+
 
         }
         propertyFinanceOrderMapper.insert(orderEntity);
@@ -742,7 +747,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             orderEntity.setOrderTime(LocalDate.now());//账单月份
             String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(communityId));
             orderEntity.setOrderNum(orderNum);//账单号
-            orderEntity.setTargetId(car_position.getId());//车位id
+            if (Objects.nonNull(car_position)) {
+                orderEntity.setTargetId(car_position.getId());//车位id
+            }
 
 
         }
@@ -1093,7 +1100,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             orderEntity.setOrderTime(LocalDate.now());//账单月份
             String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(communityId));
             orderEntity.setOrderNum(orderNum);//账单号
-            orderEntity.setTargetId(car_position.getId());//车位id
+            if (Objects.nonNull(car_position)) {
+                orderEntity.setTargetId(car_position.getId());//车位id
+            }
 
         }
         propertyFinanceOrderMapper.insert(orderEntity);
@@ -1280,7 +1289,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
                 orderEntity.setOrderTime(LocalDate.now());//账单月份
                 String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(communityId));
                 orderEntity.setOrderNum(orderNum);//账单号
-                orderEntity.setTargetId(car_position.getId());//车位id
+                if (Objects.nonNull(car_position)) {
+                    orderEntity.setTargetId(car_position.getId());//车位id
+                }
             }
         }
         resultMap.put("success", "成功" + success + "条");
