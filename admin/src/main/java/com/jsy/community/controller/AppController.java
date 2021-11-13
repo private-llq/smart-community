@@ -34,13 +34,27 @@ public class AppController {
 	@Resource
 	private IAppVersionService appVersionService;
 	
+	/**
+	 * @Description: ANDROID-APP上传到服务器
+	 * @author: DKS
+	 * @since: 2021/11/13 13:57
+	 * @Param: [file]
+	 * @return: com.jsy.community.vo.CommonResult
+	 */
 	@ApiOperation("ANDROID-APP上传到服务器")
 	@PostMapping("/uploadApp")
 	public CommonResult uploadApp(@RequestParam("file") MultipartFile file) {
 		String app = MinioUtils.upload(file, "sys-android");
 		return CommonResult.ok(app);
 	}
-
+	
+	/**
+	 * @Description: IOS-APP上传到服务器
+	 * @author: DKS
+	 * @since: 2021/11/13 13:58
+	 * @Param: [file]
+	 * @return: com.jsy.community.vo.CommonResult
+	 */
 	@ApiOperation("IOS-APP上传到服务器")
 	@PostMapping("/uploadIos")
 	public CommonResult uploadIos(@RequestParam("file") MultipartFile file) {
@@ -48,6 +62,13 @@ public class AppController {
 		return CommonResult.ok(app);
 	}
 	
+	/**
+	 * @Description: 查询APP版本列表
+	 * @author: DKS
+	 * @since: 2021/11/13 13:58
+	 * @Param: [sysType, sysVersion]
+	 * @return: com.jsy.community.vo.CommonResult
+	 */
 	@ApiOperation("查询APP版本列表")
 	@GetMapping("/list/version")
 	public CommonResult queryAppVersionList(Integer sysType, String sysVersion){
@@ -57,6 +78,13 @@ public class AppController {
 		return CommonResult.ok(appVersionService.queryAppVersionList(sysType,sysVersion),"查询成功");
 	}
 	
+	/**
+	 * @Description: 添加APP版本
+	 * @author: DKS
+	 * @since: 2021/11/13 13:58
+	 * @Param: [appVersionEntity]
+	 * @return: com.jsy.community.vo.CommonResult
+	 */
 	@ApiOperation("添加APP版本")
 	@PostMapping("/version/insert")
 	public CommonResult addAppVersion(@RequestBody AppVersionEntity appVersionEntity){
@@ -65,6 +93,13 @@ public class AppController {
 		return CommonResult.ok("操作成功");
 	}
 	
+	/**
+	 * @Description: 修改APP版本信息
+	 * @author: DKS
+	 * @since: 2021/11/13 13:58
+	 * @Param: [appVersionEntity]
+	 * @return: com.jsy.community.vo.CommonResult
+	 */
 	@ApiOperation("修改APP版本信息")
 	@PutMapping("/version/update")
 	public CommonResult updateAppVersion(@RequestBody AppVersionEntity appVersionEntity){
@@ -76,6 +111,13 @@ public class AppController {
 		return appVersionService.updateById(appVersionEntity) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
 	
+	/**
+	 * @Description: 删除APP版本
+	 * @author: DKS
+	 * @since: 2021/11/13 13:58
+	 * @Param: [id]
+	 * @return: com.jsy.community.vo.CommonResult
+	 */
 	@ApiOperation("删除APP版本")
 	@DeleteMapping("/version/delete")
 	public CommonResult delAppVersion(@RequestParam Long id){
