@@ -165,7 +165,12 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
 
     @Override
     public Boolean insterCarPosition(InsterCarPositionQO qo, Long adminCommunityId) {
-        List<CarPositionEntity> list = carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>().eq("car_position", qo.getCarPosition()));
+        QueryWrapper<CarPositionEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("community_id",adminCommunityId);
+        queryWrapper.eq("car_position", qo.getCarPosition());
+
+        List<CarPositionEntity> list = carPositionMapper.selectList(queryWrapper);
+
         if (list.size() > 0) {
             throw new PropertyException(500, "车位号已经存在");
         }
@@ -208,6 +213,15 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
             BeanUtils.copyProperties(qo, carPositionEntity);
             carPositionEntity.setCarPosition(s);
             carPositionEntity.setCommunityId(adminCommunityId);
+
+            String carPosition = carPositionEntity.getCarPosition();//车位号
+            QueryWrapper<CarPositionEntity> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("community_id",adminCommunityId);
+            queryWrapper.eq("car_position", carPosition);
+            List<CarPositionEntity> list = carPositionMapper.selectList(queryWrapper);
+            if (list.size() > 0) {
+                throw new PropertyException(500, carPosition+"车位号已经存在");
+            }
             int insert = carPositionMapper.insert(carPositionEntity);
             if (insert > 0) {
                 x++;
