@@ -96,6 +96,7 @@
 		left join t_admin_role ar on ar.id = aur.role_id
 		<where>
 			au.deleted = 0
+			and au.uid != #{qo.uid}
 			and ar.company_id = #{qo.companyId}
 			<if test="qo.name != null and qo.name !=''">
 				and (au.real_name like concat("%", #{qo.name}, "%")

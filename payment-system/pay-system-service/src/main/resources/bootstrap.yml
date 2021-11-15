@@ -22,6 +22,8 @@
 
 #配置中心的地址
 spring:
+  profiles:
+    active: dev
   main:
     allow-bean-definition-overriding: true
   application:
@@ -44,14 +46,6 @@ spring:
 #  instance:
 #    prefer-ip-address: true #使用ip地址注册
 #    instance-id: payment-service:9952  #指定服务的id
-eureka:
-  client:
-    service-url:
-      defaultZone: http://192.168.12.49:36366/eureka
-  instance:
-    hostname: ${spring.cloud.client.ip-address}
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}
 #服务调用
 dubbo:
   registry:
@@ -73,3 +67,41 @@ dubbo:
   provider:
     retries: 0
     timeout: 99999
+
+
+---
+spring:
+  profiles: dev
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://192.168.12.49:36366/eureka
+  instance:
+    hostname: ${spring.cloud.client.ip-address}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}
+
+---
+spring:
+  profiles: test
+eureka:
+  client:
+    service-url:
+      defaultZone: http://222.178.212.29:36366/eureka
+  instance:
+    hostname: ${spring.cloud.client.ip-address}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}
+
+---
+spring:
+  profiles: prod
+eureka:
+  client:
+    service-url:
+      defaultZone: ${server.eureka-service-address}
+  instance:
+    hostname: ${spring.cloud.client.ip-address}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}

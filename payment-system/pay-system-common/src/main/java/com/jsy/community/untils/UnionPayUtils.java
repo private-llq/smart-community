@@ -3,10 +3,10 @@ package com.jsy.community.untils;
 import com.alibaba.fastjson.JSONArray;
 import com.gnete.openapi.internal.DefaultOpenApiRequestClient;
 import com.jsy.community.config.UnionPayConfig;
-import com.jsy.community.qo.OpenApiRequestQO;
-import com.jsy.community.vo.OpenApiResponseVO;
+import com.jsy.community.qo.unionpay.OpenApiRequestQO;
+import com.jsy.community.vo.unionpay.OpenApiResponseVO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * @Author: Pipi
@@ -22,7 +22,7 @@ public class UnionPayUtils {
      *@Description: 交易业务的向银联接口发送请求并返回接收数据
      *@Param: jsonString: 发送的json字符串对象
      *@Param: apiName: 请求的api方法
-     *@Return: com.jsy.community.vo.OpenApiResponseVO
+     *@Return: com.jsy.community.vo.unionpay.OpenApiResponseVO
      *@Date: 2021/4/11 13:34
      **/
     public static OpenApiResponseVO transApi(String jsonString, String apiName) {
@@ -58,7 +58,7 @@ public class UnionPayUtils {
      *@Description: 交易业务的向银联接口发送请求并返回接收数据
      *@Param: jsonString: 发送的json字符串对象
      *@Param: apiName: 请求的api方法
-     *@Return: com.jsy.community.vo.OpenApiResponseVO
+     *@Return: com.jsy.community.vo.unionpay.OpenApiResponseVO
      *@Date: 2021/4/14 14:14
      **/
     public static OpenApiResponseVO queryApi(String jsonString, String apiName) {
@@ -80,7 +80,7 @@ public class UnionPayUtils {
      *@Description: 红包的向银联接口发送请求并返回接收数据
      *@Param: jsonString: 发送的json字符串对象
      *@Param: apiName: 请求的api方法
-     *@Return: com.jsy.community.vo.OpenApiResponseVO
+     *@Return: com.jsy.community.vo.unionpay.OpenApiResponseVO
      *@Date: 2021/4/11 13:34
      **/
     public static OpenApiResponseVO redPacketApi(String jsonString, String apiName) {

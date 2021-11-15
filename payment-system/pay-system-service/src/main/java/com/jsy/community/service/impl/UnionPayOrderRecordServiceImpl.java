@@ -14,16 +14,15 @@ import com.jsy.community.entity.payment.UnionPayWalletEntity;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.UnionPayOrderRecordMapper;
 import com.jsy.community.mapper.UnionPayWalletMapper;
-import com.jsy.community.qo.ConsumeApplyOrderNotifyQO;
-import com.jsy.community.qo.GenerateOrderQO;
-import com.jsy.community.qo.QueryBillInfoQO;
-import com.jsy.community.qo.QueryTransListQO;
-import com.jsy.community.untils.UnionPayUtils;
+import com.jsy.community.qo.unionpay.ConsumeApplyOrderNotifyQO;
+import com.jsy.community.qo.unionpay.GenerateOrderQO;
+import com.jsy.community.qo.unionpay.QueryBillInfoQO;
+import com.jsy.community.qo.unionpay.QueryTransListQO;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.vo.OpenApiResponseVO;
-import com.jsy.community.vo.QueryBillInfoListVO;
-import com.jsy.community.vo.UnionPayOrderVO;
-import com.jsy.community.vo.UnionPayTransListVO;
+import com.jsy.community.vo.unionpay.OpenApiResponseVO;
+import com.jsy.community.vo.unionpay.QueryBillInfoListVO;
+import com.jsy.community.vo.unionpay.UnionPayOrderVO;
+import com.jsy.community.vo.unionpay.UnionPayTransListVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -59,7 +58,7 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
      *@Author: Pipi
      *@Description: 银联消费下单
      *@Param: unionPayOrderRecordEntity:
-     *@Return: com.jsy.community.vo.UnionPayOrderVO
+     *@Return: com.jsy.community.vo.unionpay.UnionPayOrderVO
      *@Date: 2021/4/26 16:56
      **/
     @Override
@@ -156,7 +155,7 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
      * @Author: Pipi
      * @Description: 查询交易明细
      * @Param: queryTransListQO:
-     * @Return: com.jsy.community.vo.UnionPayTransListVO
+     * @Return: com.jsy.community.vo.unionpay.UnionPayTransListVO
      * @Date: 2021/5/12 10:08
      */
     @Override
@@ -175,7 +174,7 @@ public class UnionPayOrderRecordServiceImpl extends ServiceImpl<UnionPayOrderRec
      * @Author: Pipi
      * @Description: 账单查询
      * @Param: queryBillInfoQO:
-     * @Return: com.jsy.community.vo.QueryBillInfoListVO
+     * @Return: com.jsy.community.vo.unionpay.QueryBillInfoListVO
      * @Date: 2021/5/12 11:27
      */
     @Override

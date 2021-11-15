@@ -1451,6 +1451,10 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
                             .or().like("door", houseEntity.getName())
             );
         }
-        return houseMapper.selectList(queryWrapper);
+        if (houseEntity.getId() != null) {
+            queryWrapper.eq("pid", houseEntity.getId());
+        }
+        List<HouseEntity> houseEntities = houseMapper.selectList(queryWrapper);
+        return houseEntities;
     }
 }
