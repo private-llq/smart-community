@@ -1,14 +1,15 @@
 package com.jsy.community.untils.cebbank;
 
 import com.google.gson.Gson;
-import com.jsy.community.config.CebBankEntity;
-import com.jsy.community.qo.CebBankPostModel;
-import com.jsy.community.qo.HttpResonseModel;
+import com.jsy.community.config.service.CebBankEntity;
+import com.jsy.community.constant.CebBankConst;
+import com.jsy.community.qo.cebbank.*;
+import com.jsy.community.qo.unionpay.HttpResonseModel;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,10 +21,95 @@ import java.util.Map;
  **/
 public class CebBankContributionUtil {
 
-    public static String queryCity() {
-
-        return null;
+    /**
+     * @author: Pipi
+     * @description: 注册
+     * @param cebLoginQO: 
+     * @return: java.lang.String
+     * @date: 2021/11/12 10:18
+     **/
+    public static String login(CebLoginQO cebLoginQO) {
+        return sendRequest(cebLoginQO, cebLoginQO.getDeviceType(), CebBankConst.LOGIN);
     }
+
+    /**
+     * @author: Pipi
+     * @description: 查询城市
+     * @param : 
+     * @return: java.lang.String
+     * @date: 2021/11/12 10:19
+     **/
+    public static String queryCity(CebQueryCityQO cebQueryCityQO) {
+        return sendRequest(cebQueryCityQO, cebQueryCityQO.getDeviceType(), CebBankConst.QUERY_CITY);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 查询城市下缴费类别
+     * @param categoryQO:
+     * @return: java.lang.String
+     * @date: 2021/11/12 10:57
+     **/
+    public static String queryCityContributionCategory(CebQueryCityContributionCategoryQO categoryQO) {
+        return sendRequest(categoryQO, categoryQO.getDeviceType(), CebBankConst.QUERY_CITY_CONTRIBUTION_CATEGORY);
+    }
+    
+    /**
+     * @author: Pipi
+     * @description: 查询缴费类别下缴费项目
+     * @param projectQO: 
+     * @return: java.lang.String
+     * @date: 2021/11/12 11:08
+     **/
+    public static String queryContributionProject(CebQueryContributionProjectQO projectQO) {
+        return sendRequest(projectQO, projectQO.getDeviceType(), CebBankConst.QUERY_CONTRIBUTION_PROJECT);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 查询缴费账单信息
+     * @param billInfoQO:
+     * @return: java.lang.String
+     * @date: 2021/11/12 11:33
+     **/
+    public static String queryBillInfoQO(CebQueryBillInfoQO billInfoQO) {
+        return sendRequest(billInfoQO, billInfoQO.getDeviceType(), CebBankConst.QUERY_BILL_INFO);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 查询手机充值缴费账单
+     * @param billQO:
+     * @return: java.lang.String
+     * @date: 2021/11/12 11:46
+     **/
+    public static String queryMobileBill(CebQueryMobileBillQO billQO) {
+        return sendRequest(billQO, billQO.getDeviceType(), CebBankConst.QUERY_MOBILE_BILL);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 查询缴费记录
+     * @param recordQO:
+     * @return: java.lang.String
+     * @date: 2021/11/12 11:53
+     **/
+    public static String queryContributionRecord(CebQueryContributionRecordQO recordQO) {
+        return sendRequest(recordQO, recordQO.getDeviceType(), CebBankConst.QUERY_CONTRIBUTION_RECORD);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 查询缴费记录详情
+     * @param infoQO:
+     * @return: java.lang.String
+     * @date: 2021/11/12 14:51
+     **/
+    public static String queryContributionRecordInfo(CebQueryContributionRecordInfoQO infoQO) {
+        return sendRequest(infoQO, infoQO.getDeviceType(), CebBankConst.QUERY_CONTRIBUTION_RECORD_INFO);
+    }
+
+
 
     /**
      * @author: Pipi
@@ -46,7 +132,7 @@ public class CebBankContributionUtil {
             String content = siteCode + version + transacCode + reqdata_json;
             String signature = SignUtil.getSign(CebBankEntity.privateKey , content , charset);
             //http请求参数
-            Map<String, String> sendMap = new HashMap<String, String>();
+            Map<String, String> sendMap = new HashMap<>();
             sendMap.put("siteCode", siteCode);
             sendMap.put("version", version);
             sendMap.put("deviceType", deviceType);

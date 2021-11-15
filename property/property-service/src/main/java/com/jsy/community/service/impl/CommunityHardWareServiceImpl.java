@@ -118,9 +118,9 @@ public class CommunityHardWareServiceImpl extends ServiceImpl<CommunityHardWareM
         List<UserEntity> userEntityList = userService.queryUnsyncFaceUrlList(communityId, facilityId);
         // 初始化要下发的数据对象
         ArrayList<Map> mapArrayList = new ArrayList<>();
-        // 初始化需要更新的访客数据
-        ArrayList<VisitorFaceSyncRecordEntity> visitorFaceSyncRecordEntities = new ArrayList<>();
         if (!CollectionUtils.isEmpty(visitorEntities)) {
+            // 初始化需要更新的访客数据
+            ArrayList<VisitorFaceSyncRecordEntity> visitorFaceSyncRecordEntities = new ArrayList<>();
             for (VisitorEntity visitorEntity : visitorEntities) {
                 // 同步后需要新增的访客人脸同步数据
                 VisitorFaceSyncRecordEntity visitorFaceSyncRecordEntity = new VisitorFaceSyncRecordEntity();
@@ -147,10 +147,12 @@ public class CommunityHardWareServiceImpl extends ServiceImpl<CommunityHardWareM
                 hashMap.put("picURI", visitorEntity.getFaceUrl());
                 mapArrayList.add(hashMap);
             }
+            // 更新访客人脸同步状态
+            visitorFaceSyncRecordService.batchAddRecord(visitorFaceSyncRecordEntities);
         }
-        // 初始化需要新增的用户同步记录
-        ArrayList<UserFaceSyncRecordEntity> userFaceSyncRecordEntities = new ArrayList<>();
         if (!CollectionUtils.isEmpty(userEntityList)) {
+            // 初始化需要新增的用户同步记录
+            ArrayList<UserFaceSyncRecordEntity> userFaceSyncRecordEntities = new ArrayList<>();
             for (UserEntity userEntity : userEntityList) {
                 // 同步后需要新增的用户同步记录
                 UserFaceSyncRecordEntity userFaceSyncRecordEntity = new UserFaceSyncRecordEntity();
@@ -171,11 +173,10 @@ public class CommunityHardWareServiceImpl extends ServiceImpl<CommunityHardWareM
                 hashMap.put("picURI", userEntity.getFaceUrl());
                 mapArrayList.add(hashMap);
             }
+            // 新增用户人脸同步记录
+            userFaceSyncRecordService.batchInsertSyncRecord(userFaceSyncRecordEntities);
         }
-        // 更新访客人脸同步状态
-        visitorFaceSyncRecordService.batchAddRecord(visitorFaceSyncRecordEntities);
-        // 新增用户人脸同步记录
-        userFaceSyncRecordService.batchInsertSyncRecord(userFaceSyncRecordEntities);
+
         // 推送消息,单次不能超过1000条
         if (mapArrayList.size() > 1000) {
             List<List<Map>> lists = CollUtils.spilList(mapArrayList, 1000);

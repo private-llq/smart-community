@@ -22,6 +22,8 @@
 
 #配置中心的地址
 spring:
+  profiles:
+    active: dev
   main:
     allow-bean-definition-overriding: true
   application:
@@ -33,7 +35,7 @@ spring:
         enabled: true #开启springcloudconfig服务端的服务发现
         service-id: base-config-server #config-server服务的名称
       #你要拉取具体的哪个配置文件
-      name: property-service,common,common-service  #配置文件名字   dev是环境
+      name: property-service,common,common-service,common-web  #配置文件名字   dev是环境
       profile: dev #环境  组成完整的文件名：gateway-service-dev.yml
       label: master #主分支
 
@@ -45,14 +47,6 @@ spring:
 #  instance:
 #    prefer-ip-address: true #使用ip地址注册
 #    instance-id: property-service:6002  #指定服务的id
-eureka:
-  client:
-    service-url:
-      defaultZone: http://192.168.12.49:36366/eureka
-  instance:
-    hostname: ${spring.cloud.client.ip-address}
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}
 #服务调用
 dubbo:
   registry:
@@ -74,3 +68,42 @@ dubbo:
   provider:
     retries: 0
     timeout: 99999
+
+
+
+---
+spring:
+  profiles: dev
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://192.168.12.49:36366/eureka
+  instance:
+    hostname: ${spring.cloud.client.ip-address}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}
+
+---
+spring:
+  profiles: test
+eureka:
+  client:
+    service-url:
+      defaultZone: http://222.178.212.29:36366/eureka
+  instance:
+    hostname: ${spring.cloud.client.ip-address}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}
+
+---
+spring:
+  profiles: prod
+eureka:
+  client:
+    service-url:
+      defaultZone: ${server.eureka-service-address}
+  instance:
+    hostname: ${spring.cloud.client.ip-address}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}

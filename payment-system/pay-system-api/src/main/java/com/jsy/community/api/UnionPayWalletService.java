@@ -2,8 +2,8 @@ package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.payment.UnionPayWalletEntity;
-import com.jsy.community.qo.*;
-import com.jsy.community.vo.*;
+import com.jsy.community.qo.unionpay.*;
+import com.jsy.community.vo.unionpay.*;
 
 import java.util.List;
 
@@ -63,7 +63,7 @@ public interface UnionPayWalletService extends IService<UnionPayWalletEntity> {
      *@Author: Pipi
      *@Description: 获取钱包账户信息
      *@Param: walletIdQO: 钱包ID接参
-     *@Return: com.jsy.community.vo.AcctInfoVO
+     *@Return: com.jsy.community.vo.unionpay.AcctInfoVO
      *@Date: 2021/4/14 13:44
      **/
     AcctInfoVO queryAcctInfo(WalletIdQO walletIdQO);
@@ -72,7 +72,7 @@ public interface UnionPayWalletService extends IService<UnionPayWalletEntity> {
      *@Author: Pipi
      *@Description: 获取钱包账户绑定的银行卡列表
      *@Param: walletIdQO: 钱包ID接参
-     *@Return: java.util.List<com.jsy.community.vo.BindBankCardVO>
+     *@Return: java.util.List<com.jsy.community.vo.unionpay.BindBankCardVO>
      *@Date: 2021/4/14 17:35
      **/
     List<BindBankCardVO> queryBindBankCardList(WalletIdQO walletIdQO);
@@ -90,7 +90,7 @@ public interface UnionPayWalletService extends IService<UnionPayWalletEntity> {
      *@Author: Pipi
      *@Description: 查询钱包余额
      *@Param: balanceQO:
-     *@Return: com.jsy.community.vo.BalanceVO
+     *@Return: com.jsy.community.vo.unionpay.BalanceVO
      *@Date: 2021/4/28 17:47
      **/
     BalanceVO queryBalance(BalanceQO balanceQO);
@@ -99,7 +99,7 @@ public interface UnionPayWalletService extends IService<UnionPayWalletEntity> {
      *@Author: Pipi
      *@Description: 查询开B端开户情况
      *@Param: bizLicNoQO:
-     *@Return: com.jsy.community.vo.BEndAccountOpeningVO
+     *@Return: com.jsy.community.vo.unionpay.BEndAccountOpeningVO
      *@Date: 2021/5/10 9:18
      **/
     BEndAccountOpeningVO queryWalletByBizLicNo(BizLicNoQO bizLicNoQO);
@@ -108,7 +108,7 @@ public interface UnionPayWalletService extends IService<UnionPayWalletEntity> {
      *@Author: Pipi
      *@Description: 发送提现申请
      *@Param: withdrawQO:
-     *@Return: com.jsy.community.vo.WithdrawVO
+     *@Return: com.jsy.community.vo.unionpay.WithdrawVO
      *@Date: 2021/5/10 10:38
      **/
     WithdrawVO withdrawApply(WithdrawQO withdrawQO, String uid);
@@ -117,7 +117,7 @@ public interface UnionPayWalletService extends IService<UnionPayWalletEntity> {
      *@Author: Pipi
      *@Description: 激活账户
      *@Param: activeAcctQO: 
-     *@Return: com.jsy.community.vo.ActiveAcctVO
+     *@Return: com.jsy.community.vo.unionpay.ActiveAcctVO
      *@Date: 2021/5/12 17:24
      **/
     ActiveAcctVO activeAcct(ActiveAcctQO activeAcctQO);
