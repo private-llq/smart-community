@@ -52,6 +52,17 @@ public class CarLaneServiceImpl extends ServiceImpl<CarLaneMapper, CarLaneEntity
     @Override
     @Transactional
     public Integer UpdateCarLane(CarLaneEntity carLaneEntity) {
+        Long communityId = carLaneEntity.getCommunityId();
+
+        CarLaneEntity carLaneEntity1 = carLaneMapper.selectOne(new QueryWrapper<CarLaneEntity>()
+                .eq("community_id", communityId)
+                .eq("equipment_id", carLaneEntity.getEquipmentId())
+        );
+        if (Objects.nonNull(carLaneEntity1)){
+            throw new PropertyException("该设备已经被安装到其他车道，请勿重复添加！");
+        }
+
+
         int Update = carLaneMapper.update(carLaneEntity, new UpdateWrapper<CarLaneEntity>().eq("uid", carLaneEntity.getUid()));
         return Update;
     }
