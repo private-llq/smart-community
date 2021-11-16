@@ -39,7 +39,7 @@ spring:
         service-id: base-config-server #config-server服务的名称
       #你要拉取具体的哪个配置文件
       name: proprietor-web,common,common-service,common-web  #配置文件名字   dev是环境
-      profile: dev #环境  组成完整的文件名：gateway-service-dev.yml
+      profile: ${spring.profiles.active} #环境  组成完整的文件名：gateway-service-dev.yml
       label: master #主分支
 
 #服务发现
