@@ -353,6 +353,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
                 .eq("disposable", 2)
         );
 
+
         if (Objects.nonNull(propertyFeeRuleEntity)){
             orderEntity.setFeeRuleId(propertyFeeRuleEntity.getId());//缴费项目id
             orderEntity.setType(propertyFeeRuleEntity.getType());//账单类型
