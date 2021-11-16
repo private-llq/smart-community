@@ -130,7 +130,7 @@ public class CebBankContributionUtil {
             String reqdata = new String(Base64.encodeBase64(reqdata_json.getBytes(charset)));
             //生成签名(数字签名，采用Base64编码和MD5withRSA算法实现，签名内容顺序为：siteCode、version、transacCode、reqdata_json)
             String content = siteCode + version + transacCode + reqdata_json;
-            String signature = SignUtil.getSign(CebBankEntity.privateKey , content , charset);
+            String signature = SignUtil.getSign(CebBankEntity.privateKey, content , charset);
             //http请求参数
             Map<String, String> sendMap = new HashMap<>();
             sendMap.put("siteCode", siteCode);
@@ -146,6 +146,7 @@ public class CebBankContributionUtil {
             if(null != httpResonse){
                 //根据httpResonse返回结果值，进行验签
                 String respStr = StringUtil.parseResponseToStr(httpResonse);
+                System.out.println("光大云缴费响应结果:" + respStr);
                 HttpResonseModel httpResonseModel = gson.fromJson(respStr, HttpResonseModel.class);
                 if (verifyhttpResonse(httpResonseModel)) {
                     return String.valueOf(Base64.decodeBase64(httpResonseModel.getRespData()));
