@@ -17,7 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @PropertySource(value = "classpath:common-service.properties")
 // @EnableDistributedTransaction
 @EnableDiscoveryClient
-public class PropertyServiceApp {
+public class 	PropertyServiceApp {
 	public static void main(String[] args) {
 		SpringApplication.run(PropertyServiceApp.class, args);
 	}
