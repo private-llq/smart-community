@@ -536,8 +536,6 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		pageInfo.setTotal(integer);
 		pageInfo.setSize(baseQO.getSize());
 		pageInfo.setCurrent(baseQO.getPage());
-
-//		BeanUtils.copyProperties(pageData,pageInfo);
 		return pageInfo;
 	}
 	

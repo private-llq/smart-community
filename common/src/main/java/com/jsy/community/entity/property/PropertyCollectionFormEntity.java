@@ -60,6 +60,9 @@ public class PropertyCollectionFormEntity implements Serializable {
 	
 	@ApiModelProperty(value = "按月查询")
 	private Integer month;
+
+	@ApiModelProperty(value = "按月查询")
+	private String monthStr;
 	
 	@ApiModelProperty(value = "按日查询")
 	@JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")

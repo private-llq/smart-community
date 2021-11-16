@@ -77,13 +77,15 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
         }
         int row = 0;
         // 查询手机号绑定房屋的id
-        List<Long> houseIdList = proprietorMapper.queryBindHouseByMobile(propertyAdvanceDepositEntity.getMobile(), propertyAdvanceDepositEntity.getCommunityId());
+        /*List<Long> houseIdList = proprietorMapper.queryBindHouseByMobile(propertyAdvanceDepositEntity.getMobile(), propertyAdvanceDepositEntity.getCommunityId());
         for (Long houseId : houseIdList) {
             if (houseId.equals(propertyAdvanceDepositEntity.getHouseId())) {
                 propertyAdvanceDepositEntity.setId(SnowFlake.nextId());
                 row = propertyAdvanceDepositMapper.insert(propertyAdvanceDepositEntity);
             }
-        }
+        }*/
+        propertyAdvanceDepositEntity.setId(SnowFlake.nextId());
+        row = propertyAdvanceDepositMapper.insert(propertyAdvanceDepositEntity);
         if (row == 1) {
             // 新增成功后，立即生成预存款变更明细记录
             PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity = new PropertyAdvanceDepositRecordEntity();

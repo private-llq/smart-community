@@ -78,7 +78,7 @@ public class PropertyAdvanceDepositController {
     @PostMapping("/add/recharge")
     @businessLog(operation = "新增",content = "新增了【预存款充值余额】")
     public CommonResult addRechargePropertyAdvanceDeposit(@RequestBody PropertyAdvanceDepositEntity propertyAdvanceDepositEntity){
-        if(propertyAdvanceDepositEntity.getHouseId() == null || propertyAdvanceDepositEntity.getMobile() == null){
+        if(propertyAdvanceDepositEntity.getHouseId() == null){
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
         }
         if (propertyAdvanceDepositEntity.getBalance() == null && propertyAdvanceDepositEntity.getBalance().compareTo(BigDecimal.ZERO) == 0) {

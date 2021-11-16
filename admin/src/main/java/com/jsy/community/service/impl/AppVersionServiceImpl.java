@@ -26,12 +26,12 @@ public class AppVersionServiceImpl extends ServiceImpl<AppVersionMapper,AppVersi
 	private AppVersionMapper appVersionMapper;
 	
 	/**
-	* @Description: 查询APP版本列表 1.安卓 2.IOS
-	 * @Param: [sysType,sysVersion]
-	 * @Return: java.util.List<com.jsy.community.entity.AppVersionEntity>
-	 * @Author: chq459799974
-	 * @Date: 2021/5/31
-	**/
+	 * @Description: 查询APP版本列表 1.安卓 2.IOS
+	 * @author: DKS
+	 * @since: 2021/11/13 13:59
+	 * @Param: [sysType, sysVersion]
+	 * @return: java.util.List<com.jsy.community.entity.AppVersionEntity>
+	 */
 	@Override
 	public List<AppVersionEntity> queryAppVersionList(Integer sysType,String sysVersion){
 		QueryWrapper queryWrapper = new QueryWrapper<>();
@@ -47,12 +47,12 @@ public class AppVersionServiceImpl extends ServiceImpl<AppVersionMapper,AppVersi
 	}
 	
 	/**
-	* @Description: 添加APP版本
+	 * @Description: 添加APP版本
+	 * @author: DKS
+	 * @since: 2021/11/13 13:59
 	 * @Param: [appVersionEntity]
-	 * @Return: void
-	 * @Author: chq459799974
-	 * @Date: 2021/7/12
-	**/
+	 * @return: void
+	 */
 	@Override
 	public void addAppVersion(AppVersionEntity appVersionEntity){
 		try {
@@ -65,11 +65,11 @@ public class AppVersionServiceImpl extends ServiceImpl<AppVersionMapper,AppVersi
 	
 	/**
 	 * @Description: 查询APP版本详情 1.安卓 2.IOS
-	 * @Param: [sysType]
-	 * @Return: com.jsy.community.entity.AppVersionEntity
-	 * @Author: DKS
-	 * @Date: 2021/9/22
-	 **/
+	 * @author: DKS
+	 * @since: 2021/11/13 13:59
+	 * @Param: [sysType, sysVersion]
+	 * @return: com.jsy.community.entity.AppVersionEntity
+	 */
 	@Override
 	public AppVersionEntity queryAppVersion(Integer sysType, String sysVersion) {
 		QueryWrapper<AppVersionEntity> queryWrapper = new QueryWrapper<>();

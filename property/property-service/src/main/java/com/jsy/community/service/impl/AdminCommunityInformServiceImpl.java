@@ -73,6 +73,7 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
         entity.setPushState(1);
         entity.setPushTag(qo.getPushTag());
         entity.setInformType("站内");
+        entity.setPushObject(2);
         entity.setCreateBy(qo.getUid());
         entity.setBrowseCount(0L);
         entity.setPublishBy(qo.getUid());

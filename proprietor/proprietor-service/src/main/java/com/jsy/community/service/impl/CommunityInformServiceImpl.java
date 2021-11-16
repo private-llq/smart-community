@@ -69,13 +69,21 @@ public class CommunityInformServiceImpl extends ServiceImpl<CommunityInformMappe
         return communityInformMapper.selectPage(objectPage, queryWrapper).getRecords();
     }
 
-
-
-
-
-
-
-
+    /**
+     * 列表查询社区消息
+     * @param qo               查询参数对象
+     * @return                 返回查询结果
+     */
+    @Transactional(rollbackFor = {Exception.class})
+    @Override
+    public List<PushInformEntity> queryCommunityInformV2(BaseQO<OldPushInformQO> qo) {
+        //1.查出推送号列表基本列表数据
+        QueryWrapper<PushInformEntity>  queryWrapper = new QueryWrapper<>();
+        OldPushInformQO query = qo.getQuery();
+        //把当前推送账号id 该用户所有未读信息 标记为已读
+        setReadPushInform(query.getAcctId(), query.getUid());
+        return communityInformMapper.selectInformPage(query.getAcctId(), (qo.getPage() - 1) * qo.getSize(), qo.getSize());
+    }
 
     /**
      * 社区主页 当前轮播消息 查询最近的  initialInformCount 条数量

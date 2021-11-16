@@ -5,9 +5,12 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyMarketCategoryService;
 import com.jsy.community.api.IProprietorMarketCategoryService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.ProprietorMarketCategoryEntity;
+import com.jsy.community.entity.proprietor.ProprietorMarketEntity;
 import com.jsy.community.mapper.PropertyMarketCategoryMapper;
+import com.jsy.community.mapper.PropertyMarketMapper;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,8 @@ import java.util.UUID;
 public class PropertyMarketCategoryServiceImpl extends ServiceImpl<PropertyMarketCategoryMapper, ProprietorMarketCategoryEntity> implements IPropertyMarketCategoryService {
     @Autowired
     private PropertyMarketCategoryMapper categoryMapper;
+    @Autowired
+    private PropertyMarketMapper marketMapper;
 
     /**
      * @Description: 新增社区集市商品类别
@@ -48,7 +53,14 @@ public class PropertyMarketCategoryServiceImpl extends ServiceImpl<PropertyMarke
 
     @Override
     public boolean deleteMarketCategory(Long id) {
-
+        // 查询分类下是否含有有效商品,如果有,则提示不能删除
+        QueryWrapper<ProprietorMarketEntity> marketEntityQueryWrapper = new QueryWrapper<>();
+        marketEntityQueryWrapper.eq("state", 1);
+        marketEntityQueryWrapper.last("limit 1");
+        ProprietorMarketEntity proprietorMarketEntity = marketMapper.selectOne(marketEntityQueryWrapper);
+        if (proprietorMarketEntity != null) {
+            throw new PropertyException("该类别下含有代售商品,不能删除");
+        }
         return categoryMapper.delete(new QueryWrapper<ProprietorMarketCategoryEntity>().eq("id",id)) == 1;
     }
 

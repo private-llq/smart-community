@@ -26,10 +26,8 @@ public class BaseEntity implements Serializable {
 	public String getIdStr(){
 		return String.valueOf(id);
 	}
-	
 	@TableLogic
 	private Long deleted;
-
 	@TableField(fill = FieldFill.INSERT)
 	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
 	@JsonSerialize(using = LocalDateTimeSerializer.class)

@@ -727,8 +727,8 @@ public class CarPositionController {
 //            }
 
         } else if (vdcType.equals("out")) {//出口
-            //查询最后订单
-            CarOrderEntity entity = iCarOrderService.selectCarOrderStatusNO(communityId, plateNum, 1);
+            //查询没有支付最后订单
+            CarOrderEntity entity = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
             if (entity != null && entity.getOverdueState() == 0) {//正常订单
                 extracted(plateNum, plateColor, carSubLogo, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carVO, communityId);
 
@@ -948,6 +948,8 @@ public class CarPositionController {
         entity.setRise("无");
         if(statusInvite){//有邀请记录就讲uid设置进去
             entity.setUid(visitorEntity.getUid());//邀请的uid
+            //visitorEntity
+            //entity.setIsPayAnother(1);//设置为代缴
         }
         entity.setCarPlate(plateNum);//车牌号
         entity.setCommunityId(communityId);//社区id

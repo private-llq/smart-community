@@ -24,6 +24,7 @@ import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.property.ProprietorVO;
+import jodd.util.StringUtil;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -623,7 +625,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
             //查询住户数量
             Map<Long, Map<String, Long>> bindMap = houseMapper.selectHouseNumberCount(paramList);
             for (HouseEntity houseEntity : pageData.getRecords()) {
-                Map<String, Long> countMap = bindMap.get(houseEntity.getId());
+                Map<String, Long> countMap = bindMap.get(BigInteger.valueOf(houseEntity.getId()));
                 houseEntity.setHouseNumber(countMap != null ? countMap.get("count") : 0L);
                 houseEntity.setStatus(houseEntity.getHouseNumber() == 0 ? "空置" : "入住");
             }
@@ -1429,5 +1431,30 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         return list;
     }
 
-
+    /**
+     * @param houseEntity : 查询条件-名称模糊查询
+     * @author: Pipi
+     * @description: 通用房屋名称搜索
+     * @return: java.util.List<com.jsy.community.entity.HouseEntity>
+     * @date: 2021/11/11 9:42
+     **/
+    @Override
+    public List<HouseEntity> commonQueryHouse(HouseEntity houseEntity) {
+        QueryWrapper<HouseEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("community_id", houseEntity.getCommunityId());
+        queryWrapper.eq("type", houseEntity.getType());
+        if (StringUtil.isNotBlank(houseEntity.getName())) {
+            queryWrapper.and(wrapper ->
+                    wrapper.like("building", houseEntity.getName())
+                            .or().like("unit", houseEntity.getName())
+                            .or().like("floor", houseEntity.getName())
+                            .or().like("door", houseEntity.getName())
+            );
+        }
+        if (houseEntity.getId() != null) {
+            queryWrapper.eq("pid", houseEntity.getId());
+        }
+        List<HouseEntity> houseEntities = houseMapper.selectList(queryWrapper);
+        return houseEntities;
+    }
 }

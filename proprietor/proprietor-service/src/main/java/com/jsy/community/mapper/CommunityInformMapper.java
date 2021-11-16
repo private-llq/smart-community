@@ -85,4 +85,13 @@ public interface CommunityInformMapper extends BaseMapper<PushInformEntity> {
      */
     @Select("select id,house_title as houseTitle,'true' as leaseHouse from t_house_lease where deleted = 0  ORDER BY create_time desc limit #{limit}")
     List<HouseLeaseVO> selectLeaseLatest(int limit);
+
+    /**
+     * @author: Pipi
+     * @description: 分页查询推送号的推送消息
+     * @param acctId:
+     * @return: java.util.List<com.jsy.community.entity.PushInformEntity>
+     * @date: 2021/11/9 15:07
+     **/
+    List<PushInformEntity> selectInformPage(@Param("acctId") Long acctId, @Param("startNum") Long startNum, @Param("pageSize") Long pageSize);
 }

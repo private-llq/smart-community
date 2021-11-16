@@ -22,7 +22,7 @@ import org.springframework.context.annotation.PropertySource;
 // @EnableDistributedTransaction
 public class PaySystemServiceApp {
     public static void main(String[] args) {
-        SpringApplication.run(PaySystemServiceApp.class);
+        SpringApplication.run(PaySystemServiceApp.class, args);
     }
 
 

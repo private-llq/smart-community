@@ -18,6 +18,6 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource(value = "classpath:common-web.properties")
 public class PaySystemWebApp {
     public static void main(String[] args) {
-        SpringApplication.run(PaySystemWebApp.class);
+        SpringApplication.run(PaySystemWebApp.class, args);
     }
 }
