@@ -41,6 +41,8 @@
     <logger name="com.alibaba.nacos.client.naming" level="OFF"/>
     <logger name="com.alibaba.nacos.client.config.impl" level="OFF"/>
     <logger name="org.apache.dubbo.registry.nacos" level="OFF"/>
+    <logger name="com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver" level="WARN" />
+    <logger name="com.alibaba.cloud.dubbo.registry.DubboCloudRegistry" level="ERROR" />
     <!-- root级别 -->
     <root level="INFO">
         <!-- 文件输出 -->
