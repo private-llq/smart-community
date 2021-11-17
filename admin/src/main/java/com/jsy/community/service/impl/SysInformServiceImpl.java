@@ -1,27 +1,30 @@
 package com.jsy.community.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.entity.InformAcctEntity;
 import com.jsy.community.entity.PushInformEntity;
-import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.mapper.InformAcctMapper;
-import com.jsy.community.mapper.PropertyCompanyMapper;
 import com.jsy.community.mapper.SysInformMapper;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.qo.proprietor.OldPushInformQO;
 import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.service.ISysInformService;
 import com.jsy.community.utils.MyMathUtils;
+import com.jsy.community.utils.MyPageUtils;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.es.ElasticsearchImportProvider;
 import com.jsy.community.utils.es.Operation;
 import com.jsy.community.utils.es.RecordFlag;
 import com.jsy.community.vo.property.PushInfromVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -40,47 +43,59 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 
 	@Resource
 	private SysInformMapper sysInformMapper;
-
-	@Resource
-	private CommunityMapper communityMapper;
-	
-	@Resource
-	private PropertyCompanyMapper companyMapper;
 	
 	@Resource
 	private InformAcctMapper informAcctMapper;
-
+	
+	/**
+	 * @Description: 大后台推送消息分页查询
+	 * @author: DKS
+	 * @since: 2021/11/17 14:58
+	 * @Param: [baseQO]
+	 * @return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.PushInformEntity>
+	 */
 	@Override
-	public boolean add(OldPushInformQO qo) {
-		PushInformEntity sysInformEntity = PushInformEntity.getInstance();
-		BeanUtils.copyProperties(qo, sysInformEntity);
-		sysInformEntity.setId(SnowFlake.nextId());
-		ElasticsearchImportProvider.elasticOperationSingle(sysInformEntity.getId(), RecordFlag.INFORM, Operation.INSERT, sysInformEntity.getPushTitle(), sysInformEntity.getAcctAvatar());
-		return sysInformMapper.insert(sysInformEntity) > 0;
-	}
-
-
-	@Override
-	public boolean delete(Long informId) {
-		ElasticsearchImportProvider.elasticOperationSingle(informId, RecordFlag.INFORM, Operation.DELETE, null, null);
-		return sysInformMapper.deleteById(informId) > 0;
-	}
-
-	@Override
-	public List<PushInformEntity> query(BaseQO<OldPushInformQO> baseQo) {
-		baseQo.setPage((baseQo.getPage() - 1 ) * baseQo.getSize());
-		return sysInformMapper.query(baseQo);
-	}
-
-	@Override
-	public boolean deleteBatchByIds(List<Long> informIds) {
-		informIds.forEach( i -> ElasticsearchImportProvider.elasticOperationSingle(i, RecordFlag.INFORM, Operation.DELETE, null, null));
-		return sysInformMapper.deleteBatchIds(informIds) > 0 ;
+	public PageInfo<PushInformEntity> querySysInform(BaseQO<PushInformQO> baseQO) {
+		PushInformQO query = baseQO.getQuery();
+		Page<PushInformEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page, baseQO);
+		QueryWrapper<PushInformEntity> queryWrapper = new QueryWrapper<>();
+		// 查操作
+		if (StringUtils.isNotBlank(query.getPushTitle())) {
+			queryWrapper.like("push_title", query.getPushTitle());
+		}
+		queryWrapper.orderByDesc("create_time");
+		Page<PushInformEntity> pageData = sysInformMapper.selectPage(page, queryWrapper);
+		if (CollectionUtils.isEmpty(pageData.getRecords())) {
+			return new PageInfo<>();
+		}
+		// 补充用户名
+		for (PushInformEntity entity : pageData.getRecords()) {
+			// 补充推送对象
+			List<String> pushObjectNames = new ArrayList<>();
+			List<Long> list = MyMathUtils.analysisTypeCode(entity.getPushObject(), 3);
+			for (Long aLong : list) {
+				if (aLong == 1) {
+					pushObjectNames.add("物业");
+				} else if (aLong == 2) {
+					pushObjectNames.add("小区");
+				} else if (aLong == 4) {
+					pushObjectNames.add("商家");
+				}
+			}
+			entity.setPushObjectName(pushObjectNames);
+		}
+		PageInfo<PushInformEntity> pageInfo = new PageInfo<>();
+		BeanUtils.copyProperties(pageData, pageInfo);
+		return pageInfo;
 	}
 	
 	/**
-	 * 添加大后台推送消息
-	 * @param qo    接收消息参数的对象
+	 * @Description: 添加大后台推送消息
+	 * @author: DKS
+	 * @since: 2021/11/17 15:00
+	 * @Param: [qo]
+	 * @return: java.lang.Boolean
 	 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -116,7 +131,7 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 	 * @param qo: 推送消息qo
 	 * @param informId: 推送消息id
 	 * @return: void
-	 * @date: 2021/10/27 11:00
+	 * @since: 2021/11/17 15:00
 	 **/
 	private void insetInformAcct(PushInformQO qo, Long informId) {
 		List<InformAcctEntity> informAcctEntities = new ArrayList<>();
@@ -138,10 +153,11 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 	}
 	
 	/**
-	 *
-	 * 逻辑删除 推送消息
-	 * @param id    推送消息id
-	 * @return      返回删除成功
+	 * @Description: 删除推送通知消息
+	 * @author: DKS
+	 * @since: 2021/11/17 15:01
+	 * @Param: [id, updateAdminId]
+	 * @return: java.lang.Boolean
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	@Override
@@ -155,12 +171,12 @@ public class SysInformServiceImpl extends ServiceImpl<SysInformMapper, PushInfor
 	}
 	
 	/**
-	 *@Author: DKS
-	 *@Description: 获取单条消息详情
-	 *@Param: id: 消息ID
-	 *@Return: com.jsy.community.entity.PushInformEntity
-	 *@Date: 2021/10/27 14:32
-	 **/
+	 * @Description: 获取单条消息详情
+	 * @author: DKS
+	 * @since: 2021/11/17 15:01
+	 * @Param: [id]
+	 * @return: com.jsy.community.vo.property.PushInfromVO
+	 */
 	@Override
 	public PushInfromVO getDetail(Long id) {
 		PushInformEntity pushInformEntity = sysInformMapper.selectById(id);
