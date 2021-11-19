@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.qo.admin.AdminUserQO;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -66,4 +63,63 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	 * @date: 2021/9/28 11:41
 	 **/
 	Integer countPageUserEntity(@Param("qo") AdminUserQO adminUserQO);
+	
+	/**
+	 * @Description: 根据手机号查询用户数
+	 * @Param: [mobile]
+	 * @Return: java.lang.Integer
+	 * @Author: chq459799974
+	 * @Date: 2021/7/22
+	 **/
+	@Select("select id from t_admin_user where deleted = 0 and mobile = #{mobile} limit 1")
+	Long countUser(String mobile);
+	
+	/**
+	 * @Description: 更换手机号
+	 * @Param: [newMobile, uid]
+	 * @Return: int
+	 * @Author: chq459799974
+	 * @Date: 2021/4/19
+	 **/
+	@Update("update t_admin_user set mobile = #{newMobile} where mobile = #{oldMobile}")
+	int changeMobile(@Param("newMobile")String newMobile, @Param("oldMobile")String oldMobile);
+	
+	/**
+	 * @author: Pipi
+	 * @description: 根据用户uid查询单条物业公司ID
+	 * @param uid: 用户uid
+	 * @return: java.lang.Long
+	 * @date: 2021/7/29 11:13
+	 **/
+	@Select("select ar.company_id from t_admin_user_role ur left join t_admin_role ar on ar.id = ur.role_id where ur.uid = #{uid} limit 1")
+	Long queryCompanyId(String uid);
+	
+	/**
+	 * @Description: 根据物业公司id查出属于物业公司的Uid
+	 * @author: DKS
+	 * @since: 2021/11/19 14:56
+	 * @Param: [companyIds]
+	 * @return: list
+	 */
+	List<String> queryUidByCompanyIds(@Param("list") List<Long> companyIds);
+	
+	/**
+	 * @Description: 根据uid查询角色id
+	 * @author: DKS
+	 * @since: 2021/11/19 15:50
+	 * @Param:  uid
+	 * @return: Long
+	 */
+	@Select("select role_id from t_admin_user_role where uid = #{uid}")
+	Long queryRoleIdByUid(String uid);
+	
+	/**
+	 * @Description: 根据角色id查找所有菜单名称
+	 * @author: DKS
+	 * @since: 2021/11/19 15:45
+	 * @Param: roleId
+	 * @return: list
+	 */
+	@Select("select name from t_admin_menu where id in (select menu_id from t_admin_role_menu where role_id = #{roleId})")
+	List<String> queryMenuNameByRoleId(Long roleId);
 }
