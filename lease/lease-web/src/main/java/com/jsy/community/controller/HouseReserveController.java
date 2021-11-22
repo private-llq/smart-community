@@ -2,7 +2,8 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.IpLimit;
-import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.IHouseConstService;
+import com.jsy.community.api.IHouseReserveService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.lease.HouseReserveEntity;
@@ -12,8 +13,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.lease.HouseReserveVO;
-import com.jsy.community.api.IHouseConstService;
-import com.jsy.community.api.IHouseReserveService;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -43,10 +43,10 @@ public class HouseReserveController {
     @DubboReference(version = Const.version, group = Const.group_lease, check = false)
     private IHouseConstService houseConstService;
 
-    @Login
     @IpLimit(prefix = "reserveConst", second = 60, count = 10, desc = "预约时间常量")
     @GetMapping("/datetime")
     @ApiOperation("预约常量时间查询接口")
+    @Permit("community:lease:house:reserve:datetime")
     public CommonResult<Map<String, List<String>>> datetime() {
         //获得租房可选择的预约时间常量
         List<HouseLeaseConstEntity> houseConstListByType = houseConstService.getHouseConstListByType(String.valueOf(15));
@@ -58,10 +58,9 @@ public class HouseReserveController {
         return CommonResult.ok(reserveDateTime);
     }
 
-
-    @Login
     @PostMapping("/add")
     @ApiOperation("预约提交接口")
+    @Permit("community:lease:house:reserve:add")
     public CommonResult<Boolean> add(@RequestBody HouseReserveEntity qo) {
         //基本参数验证
         ValidatorUtils.validateEntity(qo, HouseReserveEntity.Add.class);
@@ -69,11 +68,10 @@ public class HouseReserveController {
         qo.setReserveUid(UserUtils.getUserId());
         return iHouseReserveService.add(qo) ? CommonResult.ok("提交预约成功!") : CommonResult.error("提交预约失败!可能数据已经存在");
     }
-
-
-    @Login
+    
     @DeleteMapping("/cancel")
     @ApiOperation("预约取消接口")
+    @Permit("community:lease:house:reserve:cancel")
     public CommonResult<Boolean> cancel(@RequestBody HouseReserveQO qo) {
         ValidatorUtils.validateEntity(qo, HouseReserveQO.Cancel.class);
         qo.setReserveUid(UserUtils.getUserId());
@@ -81,10 +79,10 @@ public class HouseReserveController {
         return CommonResult.ok(cancel ? "取消预约成功!" : "取消预约失败!");
     }
 
-    @Login
     @DeleteMapping("/reject")
     @ApiOperation("预约拒绝接口")
     @Deprecated
+    @Permit("community:lease:house:reserve:reject")
     public CommonResult<Boolean> reject(@RequestBody HouseReserveQO qo) {
         ValidatorUtils.validateEntity(qo, HouseReserveQO.Reject.class);
         qo.setReserveUid(UserUtils.getUserId());
@@ -92,19 +90,17 @@ public class HouseReserveController {
         return CommonResult.ok(cancel ? "拒绝预约成功!" : "拒绝预约失败!数据不存在");
     }
 
-
-    @Login
     @PostMapping("/confirm")
     @ApiOperation("预约确认接口")
+    @Permit("community:lease:house:reserve:confirm")
     public CommonResult<Boolean> confirm(@RequestBody HouseReserveQO qo) {
         Boolean confirm = iHouseReserveService.confirm(qo, UserUtils.getUserId());
         return CommonResult.ok(confirm ? "确认预约成功!" : "确认预约失败!重复提交或数据不存在!");
     }
-
-
-    @Login
+    
     @PostMapping("/whole")
     @ApiOperation("全部预约接口")
+    @Permit("community:lease:house:reserve:whole")
     public CommonResult<List<HouseReserveVO>> whole(@RequestBody BaseQO<HouseReserveQO> qo) {
         //预约分为两部分：1. 租客预约我发布的房子  2.我预约其他人发布的房子
         ValidatorUtils.validatePageParam(qo);
@@ -119,9 +115,9 @@ public class HouseReserveController {
      * @Return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
      * @Date: 2021/3/30 11:32
      **/
-    @Login
     @DeleteMapping("/deleteReserve")
     @ApiOperation("删除预约信息")
+    @Permit("community:lease:house:reserve:deleteReserve")
     public CommonResult<Boolean> delete(@RequestBody HouseReserveQO qo) {
         qo.setReserveUid(UserUtils.getUserId());
         ValidatorUtils.validateEntity(qo, HouseReserveQO.Cancel.class);
@@ -137,9 +133,9 @@ public class HouseReserveController {
      * @Return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
      * @Date: 2021/3/30 15:23
      **/
-    @Login
     @PostMapping("/completeChecking")
     @ApiOperation("租房用户确认完成看房")
+    @Permit("community:lease:house:reserve:completeChecking")
     public CommonResult<Boolean> completeChecking(@RequestBody HouseReserveQO qo) {
         qo.setReserveUid(UserUtils.getUserId());
         ValidatorUtils.validateEntity(qo, HouseReserveQO.Reject.class);

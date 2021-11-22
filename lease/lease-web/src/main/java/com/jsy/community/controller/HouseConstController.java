@@ -5,6 +5,8 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.api.IHouseConstService;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +46,8 @@ public class HouseConstController {
 
     @PostMapping()
     @ApiOperation("房屋常量查询根据id")
+    @LoginIgnore
+    @Permit("community:lease:const")
     public CommonResult<Map<String, List<HouseLeaseConstEntity>>> all(@RequestBody Long[] ids) {
         Map<String, List<HouseLeaseConstEntity>> map = new HashMap<>();
         for (Long id : ids) {
@@ -66,6 +70,8 @@ public class HouseConstController {
      **/
     @GetMapping("/getTag")
     @ApiOperation("查询商铺标签")
+    @LoginIgnore
+    @Permit("community:lease:const:getTag")
     public CommonResult getTag() {
         Map<String, Object> list = houseConstService.getTag();
         return CommonResult.ok(list);
@@ -74,6 +80,8 @@ public class HouseConstController {
 
     @ApiOperation("商铺类型标签查询")
     @GetMapping("/getShopType")
+    @LoginIgnore
+    @Permit("community:lease:const:getShopType")
     public CommonResult getShopType() {
         String type = "7";
         List<HouseLeaseConstEntity> constEntityList = houseConstService.getHouseConstListByType(type);
@@ -82,6 +90,8 @@ public class HouseConstController {
 
     @ApiOperation("商铺行业标签查询")
     @GetMapping("/getShopBusiness")
+    @LoginIgnore
+    @Permit("community:lease:const:getShopBusiness")
     public CommonResult getShopBusiness() {
         String type = "8";
         List<HouseLeaseConstEntity> constEntityList = houseConstService.getHouseConstListByType(type);
@@ -90,6 +100,8 @@ public class HouseConstController {
 
     @ApiOperation("商铺发布时的配套设施和客流人群选项")
     @GetMapping("/getShopTags")
+    @LoginIgnore
+    @Permit("community:lease:const:getShopTags")
     public CommonResult getAddShopTags() {
         Map<String, Object> map = houseConstService.getAddShopTags(FACILITY_TYPE, PEOPLE_TYPE);
         return CommonResult.ok(map);

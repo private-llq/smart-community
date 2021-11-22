@@ -1,14 +1,11 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.CebBankService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.qo.cebbank.CebLoginQO;
 import com.jsy.community.qo.cebbank.CebQueryCityContributionCategoryQO;
-import com.jsy.community.qo.cebbank.CebQueryCityQO;
-import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiJSYController
 @RequestMapping("/cebBank")
-@Login
 @Slf4j
 public class CebBankController {
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
@@ -39,6 +35,7 @@ public class CebBankController {
      * @date: 2021/11/17 17:47
      **/
     @PostMapping("/v2/cityContributionCategory")
+    @Permit("community:payment:AlipayPhoneH5:v2:cityContributionCategory")
     public CommonResult queryCityContributionCategory(@RequestBody CebQueryCityContributionCategoryQO categoryQO) {
         cebBankService.queryCityContributionCategory(categoryQO);
         return CommonResult.ok();

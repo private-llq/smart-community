@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.gnete.api.GneteSignatureAlgorithm;
 import com.gnete.api.internal.crypto.DefaultRsaSigner;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.UnionPayBApplyRecordService;
 import com.jsy.community.api.UnionPayOrderRecordService;
 import com.jsy.community.api.UnionPayWalletService;
@@ -15,8 +14,10 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.unionpay.*;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
-import com.jsy.community.vo.*;
+import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.unionpay.*;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -60,9 +61,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult<org.apache.poi.ss.formula.functions.T>
      *@Date: 2021/4/8 10:38
      **/
-    @Login
     @PostMapping("/openAccountForC")
     @ApiOperation("C端用户开户")
+    @Permit("community:payment:unionPay:openAccountForC")
     public CommonResult openAccountForC(@RequestBody OpenAccountForCQO openAccountForCQO) {
         if (openAccountForCQO.getAuthType() == 1 && org.springframework.util.StringUtils.isEmpty(openAccountForCQO.getBankAcctNo())) {
             throw new JSYException(400, "当认证类型为1：银行卡3要素时,请填写银行卡号");
@@ -83,9 +84,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult<org.apache.poi.ss.formula.functions.T>
      *@Date: 2021/4/10 13:56
      **/
-    @Login
     @GetMapping("/getPlugRandomKey")
     @ApiOperation("获取控件随机因子")
+    @Permit("community:payment:unionPay:getPlugRandomKey")
     public CommonResult getPlugRandomKey() {
         return CommonResult.ok(unionPayWalletService.getPlugRandomKey());
     }
@@ -97,9 +98,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/12 15:09
      **/
-    @Login
     @PostMapping("/bindBankCard")
     @ApiOperation("钱包银行卡操作,账户绑定/解绑/设置默认银行卡")
+    @Permit("community:payment:unionPay:bindBankCard")
     public CommonResult bindBankCard(@RequestBody BindBankCardQO bindBankCardQO) {
         ValidatorUtils.validateEntity(bindBankCardQO);
         Integer oprtType = bindBankCardQO.getOprtType();
@@ -134,9 +135,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/12 17:34
      **/
-    @Login
     @PostMapping("/sendSmsAuthCode")
     @ApiOperation("银联发送短信验证码")
+    @Permit("community:payment:unionPay:sendSmsAuthCode")
     public CommonResult sendSmsAuthCode(@RequestBody SendSmsAuthCodeQO sendSmsAuthCodeQO) {
         ValidatorUtils.validateEntity(sendSmsAuthCodeQO);
         Boolean result = unionPayWalletService.sendSmsAuthCode(sendSmsAuthCodeQO);
@@ -150,9 +151,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/14 9:35
      **/
-    @Login
     @PostMapping("/modifyUserMobile")
     @ApiOperation("修改用户手机号")
+    @Permit("community:payment:unionPay:modifyUserMobile")
     public CommonResult modifyUserMobile(@RequestBody ModifyUserMobileQO modifyUserMobileQO) {
         ValidatorUtils.validateEntity(modifyUserMobileQO);
         Boolean result = unionPayWalletService.modifyUserMobile(modifyUserMobileQO);
@@ -166,9 +167,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/14 10:58
      **/
-    @Login
     @PostMapping("/queryAcctInfo")
     @ApiOperation("获取钱包账户信息")
+    @Permit("community:payment:unionPay:queryAcctInfo")
     public CommonResult queryAcctInfo(@RequestBody WalletIdQO walletIdQO) {
         ValidatorUtils.validateEntity(walletIdQO);
         AcctInfoVO acctInfoVO = unionPayWalletService.queryAcctInfo(walletIdQO);
@@ -182,9 +183,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/14 17:34
      **/
-    @Login
     @PostMapping("/queryBindBankCardList")
     @ApiOperation("获取钱包账户绑定的银行卡列表")
+    @Permit("community:payment:unionPay:queryBindBankCardList")
     public CommonResult queryBindBankCardList(@RequestBody WalletIdQO walletIdQO) {
         ValidatorUtils.validateEntity(walletIdQO);
         List<BindBankCardVO> bindBankCardVOS = unionPayWalletService.queryBindBankCardList(walletIdQO);
@@ -198,9 +199,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/15 11:30
      **/
-    @Login
     @PostMapping("/modifyPwd")
     @ApiOperation("修改银联支付密码")
+    @Permit("community:payment:unionPay:modifyPwd")
     public CommonResult modifyPwd(@RequestBody ModifyPwdQO modifyPwdQO) {
         ValidatorUtils.validateEntity(modifyPwdQO);
         Boolean result = unionPayWalletService.modifyPwd(modifyPwdQO);
@@ -214,9 +215,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/26 16:33
      **/
-    @Login
     @PostMapping("/generateOrder")
     @ApiOperation("银联消费类下单")
+    @Permit("community:payment:unionPay:generateOrder")
     public CommonResult generateOrder(@RequestBody UnionPayOrderRecordEntity unionPayOrderRecordEntity) {
         ValidatorUtils.validateEntity(unionPayOrderRecordEntity, UnionPayOrderRecordEntity.GenerateOrderValidate.class);
         unionPayOrderRecordEntity.setUid(UserUtils.getUserId());
@@ -231,8 +232,10 @@ public class UnionPayController {
      *@Return: void
      *@Date: 2021/4/26 18:04
      **/
+    @LoginIgnore
     @PostMapping(value = "/unionPayNotifyUrl")
     @ApiOperation("银联消费支付回调接口")
+    @Permit("community:payment:unionPay:unionPayNotifyUrl")
     public void unionPayNotifyUrl(HttpServletRequest request) {
         // 获取回调参数
         StringBuilder data = new StringBuilder();
@@ -283,9 +286,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/28 17:45
      **/
-    @Login
     @PostMapping("/queryBalance")
     @ApiOperation("查询钱包余额")
+    @Permit("community:payment:unionPay:queryBalance")
     public CommonResult queryBalance(@RequestBody BalanceQO balanceQO) {
         ValidatorUtils.validateEntity(balanceQO);
         if (balanceQO.getIsNeedPwd() == 1) {
@@ -307,9 +310,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/7 17:38
      **/
-    @Login
     @PostMapping("/getCredential")
     @ApiOperation("银联支付获取凭据接口")
+    @Permit("community:payment:unionPay:getCredential")
     public CommonResult getCredential(@RequestBody CredentialQO credentialsQO) {
         credentialsQO.setNotifyUrl(UnionPayConfig.CREDENTIAL_NOTIFY_URL);
         ValidatorUtils.validateEntity(credentialsQO);
@@ -324,8 +327,10 @@ public class UnionPayController {
      *@Return: void
      *@Date: 2021/5/8 11:35
      **/
+    @LoginIgnore
     @PostMapping("/credentialNotifyUrl")
     @ApiOperation("凭据异步回调接口")
+    @Permit("community:payment:unionPay:credentialNotifyUrl")
     public void credentialNotifyUrl(HttpServletRequest request) {
         // 获取回调参数
         StringBuilder data = new StringBuilder();
@@ -363,9 +368,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/10 9:08
      **/
-    @Login
     @PostMapping("/queryWalletByBizLicNo")
     @ApiOperation("查询开B端开户情况")
+    @Permit("community:payment:unionPay:queryWalletByBizLicNo")
     public CommonResult queryWalletByBizLicNo(@RequestBody BizLicNoQO bizLicNoQO) {
         ValidatorUtils.validateEntity(bizLicNoQO);
         BEndAccountOpeningVO openingVO = unionPayWalletService.queryWalletByBizLicNo(bizLicNoQO);
@@ -379,9 +384,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/10 10:19
      **/
-    @Login
     @PostMapping("/withdrawApply")
     @ApiOperation("提现申请接口")
+    @Permit("community:payment:unionPay:withdrawApply")
     public CommonResult withdrawApply(@RequestBody WithdrawQO withdrawQO) {
         withdrawQO.setWithdrawType("T0");
         ValidatorUtils.validateEntity(withdrawQO);
@@ -396,9 +401,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/11 17:47
      **/
-    @Login
     @PostMapping("/resetBtypeAcctPwd")
     @ApiOperation("B端钱包重置支付密码")
+    @Permit("community:payment:unionPay:resetBtypeAcctPwd")
     public CommonResult resetBtypeAcctPwd(@RequestBody ResetBtypeAcctPwdQO resetBtypeAcctPwdQO) {
         ValidatorUtils.validateEntity(resetBtypeAcctPwdQO);
         Boolean result = bApplyRecordService.resetBtypeAcctPwd(resetBtypeAcctPwdQO);
@@ -412,9 +417,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/12 9:59
      **/
-    @Login
     @PostMapping("/queryTransList")
     @ApiOperation("查询交易明细")
+    @Permit("community:payment:unionPay:queryTransList")
     public CommonResult queryTransList(@RequestBody QueryTransListQO queryTransListQO) {
         ValidatorUtils.validateEntity(queryTransListQO);
         if ((StringUtils.isNotBlank(queryTransListQO.getStartDate()) && StringUtils.isBlank(queryTransListQO.getEndDate())) || (StringUtils.isBlank(queryTransListQO.getStartDate()) && StringUtils.isNotBlank(queryTransListQO.getEndDate()))) {
@@ -437,9 +442,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/12 11:22
      **/
-    @Login
     @PostMapping("/queryBillInfo")
     @ApiOperation("账单查询")
+    @Permit("community:payment:unionPay:queryBillInfo")
     public CommonResult queryBillInfo(@RequestBody QueryBillInfoQO queryBillInfoQO) {
         ValidatorUtils.validateEntity(queryBillInfoQO);
         Integer walletNullNum = 0;
@@ -472,9 +477,9 @@ public class UnionPayController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/12 17:13
      **/
-    @Login
     @PostMapping("/activeAcct")
     @ApiOperation("激活账户")
+    @Permit("community:payment:unionPay:activeAcct")
     public CommonResult activeAcct(@RequestBody ActiveAcctQO activeAcctQO) {
         ValidatorUtils.validateEntity(activeAcctQO);
         ActiveAcctVO activeAcctVO = unionPayWalletService.activeAcct(activeAcctQO);

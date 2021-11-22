@@ -2,7 +2,6 @@ package com.jsy.community.controller;
 
 import cn.hutool.json.JSONUtil;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.ICompanyPayConfigService;
 import com.jsy.community.api.IWeChatService;
@@ -15,6 +14,8 @@ import com.jsy.community.untils.wechat.MyHttpClient;
 import com.jsy.community.untils.wechat.PublicConfig;
 import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -57,8 +58,8 @@ public class WechatRefundController {
      * @Param:
      * @return:
      */
-    @Login
     @PostMapping("/refund")
+    @Permit("community:payment:refund")
     public CommonResult refund(@RequestBody WechatRefundQO wechatRefundQO) throws Exception {
         String body = null;
         CloseableHttpResponse execute=null;
@@ -130,7 +131,9 @@ public class WechatRefundController {
      * @Param:
      * @return:
      */
+    @LoginIgnore
     @RequestMapping(value = "/refund/callback/{companyId}", method = {RequestMethod.POST,RequestMethod.GET})
+    @Permit("community:payment:refund:callback")
     public void callback(HttpServletRequest request, HttpServletResponse response, @PathVariable("companyId") Long companyId) throws Exception {
         log.info("退款回调成功");
         log.info(String.valueOf(companyId));

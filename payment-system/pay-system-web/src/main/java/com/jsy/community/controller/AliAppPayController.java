@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.ConstClasses;
@@ -12,11 +11,13 @@ import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.lease.AliAppPayQO;
-import com.jsy.community.utils.AlipayUtils;
 import com.jsy.community.untils.wechat.OrderNoUtil;
+import com.jsy.community.utils.AlipayUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -36,7 +37,6 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @ApiJSYController
 @Slf4j
-//@Login
 @RequestMapping("alipay")
 public class AliAppPayController {
 	
@@ -69,7 +69,7 @@ public class AliAppPayController {
 	
 	@ApiOperation("下单")
 	@PostMapping("order")
-	@Login
+	@Permit("community:payment:alipay:order")
 	public CommonResult getOrderStr(@RequestBody AliAppPayQO aliAppPayQO, HttpServletRequest req){
 		if (aliAppPayQO.getTradeFrom()==9){
 			aliAppPayQO.setCommunityId(1L);
@@ -157,7 +157,9 @@ public class AliAppPayController {
 		return createResult ? CommonResult.ok(returnMap, "下单成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"下单失败");
 	}
 	
+	@LoginIgnore
 	@PostMapping("close")
+	@Permit("community:payment:alipay:close")
 	public void test(@RequestParam Long communityId,@RequestParam String orderId){
 		CommunityEntity entity = communityService.getCommunityNameById(communityId);
 		PayConfigureEntity serviceConfig;
@@ -181,7 +183,9 @@ public class AliAppPayController {
 	 * @return: com.jsy.community.vo.CommonResult
 	 * @date: 2021/8/17 10:17
 	 **/
+	@LoginIgnore
 	@GetMapping("/v2/checkPayTradeStatus")
+	@Permit("community:payment:alipay:v2:checkPayTradeStatus")
 	public CommonResult checkPayTradeStatus(@RequestParam("orderNo") String orderNo, @RequestParam("serviceOrderNo") String serviceOrderNo) {
 		Boolean aliStatus = ailiAppPayRecordService.checkPayTradeStatus(orderNo, serviceOrderNo);
 		Boolean wechatStatus = weChatService.checkPayStatus(orderNo, serviceOrderNo);

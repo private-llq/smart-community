@@ -9,25 +9,27 @@ import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradeFastpayRefundQueryRequest;
 import com.alipay.api.request.AlipayTradeRefundRequest;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
-
 import com.alipay.api.response.AlipayTradeFastpayRefundQueryResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.ICarOrderService;
-import com.jsy.community.config.web.AliH5CertificateConfig;
 import com.jsy.community.config.web.AlipayConfig;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderEntity;
 import com.jsy.community.qo.payment.AliOrderContentQO;
 import com.jsy.community.qo.payment.RefundQO;
 import com.jsy.community.utils.AlipayUtils;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -46,7 +48,9 @@ public class AlipayPhoneH5Controller {
     @Autowired
     private AlipayUtils alipayUtils;
     //下单
+    @LoginIgnore
     @RequestMapping(value = "/pay")
+    @Permit("community:payment:AlipayPhoneH5:pay")
     public String test(@RequestBody AliOrderContentQO qo) {
         System.out.println(qo.toString());
         //普通方式
@@ -92,7 +96,9 @@ public class AlipayPhoneH5Controller {
     }
 
     //异步通知
+    @LoginIgnore
     @PostMapping("returnPay")
+    @Permit("community:payment:AlipayPhoneH5:returnPay")
     public String alipaynotify(Model model, HttpServletRequest request) {
         System.out.println("支付宝异步回调 ------------begin-----------");
         String result = "fail"; //默认验签失败
@@ -189,7 +195,9 @@ public class AlipayPhoneH5Controller {
 
 
     //支付宝退款
+    @LoginIgnore
     @RequestMapping(value = "/refund")
+    @Permit("community:payment:AlipayPhoneH5:refund")
     public String refund(@RequestBody RefundQO qo) {
         AlipayClient alipayClient = new DefaultAlipayClient(
                 AlipayConfig.URL,
@@ -222,7 +230,9 @@ public class AlipayPhoneH5Controller {
 
 
     //查询退款记录
+    @LoginIgnore
     @RequestMapping(value = "/selectRefund")
+    @Permit("community:payment:AlipayPhoneH5:selectRefund")
     public AlipayTradeFastpayRefundQueryResponse selectRefund(@RequestBody RefundQO qo) throws AlipayApiException {
         AlipayClient alipayClient = new DefaultAlipayClient(
                 AlipayConfig.URL,

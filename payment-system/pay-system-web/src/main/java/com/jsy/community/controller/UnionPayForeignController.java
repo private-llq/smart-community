@@ -8,6 +8,8 @@ import com.jsy.community.qo.unionpay.*;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.unionpay.OpenApiResponseVO;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -40,8 +42,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult<org.apache.poi.ss.formula.functions.T>
      *@Date: 2021/4/8 10:38
      **/
+    @LoginIgnore
     @PostMapping("/openAccountForC")
     @ApiOperation("C端用户开户")
+    @Permit("community:payment:unionPay:api:openAccountForC")
     public CommonResult openAccountForC(@RequestBody OpenAccountForCQO openAccountForCQO) {
         openAccountForCQO.setIsActive(1);
         ValidatorUtils.validateEntity(openAccountForCQO);
@@ -62,8 +66,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult<org.apache.poi.ss.formula.functions.T>
      *@Date: 2021/4/10 13:56
      **/
+    @LoginIgnore
     @GetMapping("/getPlugRandomKey")
     @ApiOperation("获取控件随机因子")
+    @Permit("community:payment:unionPay:api:getPlugRandomKey")
     public CommonResult getPlugRandomKey(@RequestParam Integer num) {
         if (num == null || num <= 0) {
             num = 1;
@@ -79,8 +85,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/12 15:09
      **/
+    @LoginIgnore
     @PostMapping("/bindBankCard")
     @ApiOperation("钱包银行卡操作,账户绑定/解绑/设置默认银行卡")
+    @Permit("community:payment:unionPay:api:bindBankCard")
     public CommonResult bindBankCard(@RequestBody BindBankCardQO bindBankCardQO) {
         ValidatorUtils.validateEntity(bindBankCardQO);
         Integer oprtType = bindBankCardQO.getOprtType();
@@ -115,8 +123,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/12 17:34
      **/
+    @LoginIgnore
     @PostMapping("/sendSmsAuthCode")
     @ApiOperation("银联发送短信验证码")
+    @Permit("community:payment:unionPay:api:sendSmsAuthCode")
     public CommonResult sendSmsAuthCode(@RequestBody SendSmsAuthCodeQO sendSmsAuthCodeQO) {
         ValidatorUtils.validateEntity(sendSmsAuthCodeQO);
         OpenApiResponseVO responseVO = unionPayService.sendSmsAuthCode(sendSmsAuthCodeQO);
@@ -130,8 +140,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/14 9:35
      **/
+    @LoginIgnore
     @PostMapping("/modifyUserMobile")
     @ApiOperation("修改用户手机号")
+    @Permit("community:payment:unionPay:api:modifyUserMobile")
     public CommonResult modifyUserMobile(@RequestBody ModifyUserMobileQO modifyUserMobileQO) {
         ValidatorUtils.validateEntity(modifyUserMobileQO);
         OpenApiResponseVO responseVO = unionPayService.modifyUserMobile(modifyUserMobileQO);
@@ -145,8 +157,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/14 10:58
      **/
+    @LoginIgnore
     @PostMapping("/queryAcctInfo")
     @ApiOperation("获取钱包账户信息")
+    @Permit("community:payment:unionPay:api:queryAcctInfo")
     public CommonResult queryAcctInfo(@RequestBody WalletIdQO walletIdQO) {
         ValidatorUtils.validateEntity(walletIdQO);
         OpenApiResponseVO responseVO = unionPayService.queryAcctInfo(walletIdQO);
@@ -160,8 +174,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/14 17:34
      **/
+    @LoginIgnore
     @PostMapping("/queryBindBankCardList")
     @ApiOperation("获取钱包账户绑定的银行卡列表")
+    @Permit("community:payment:unionPay:api:queryBindBankCardList")
     public CommonResult queryBindBankCardList(@RequestBody WalletIdQO walletIdQO) {
         ValidatorUtils.validateEntity(walletIdQO);
         OpenApiResponseVO responseVO = unionPayService.queryBindBankCardList(walletIdQO);
@@ -175,8 +191,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/15 11:30
      **/
+    @LoginIgnore
     @PostMapping("/modifyPwd")
     @ApiOperation("修改银联支付密码")
+    @Permit("community:payment:unionPay:api:modifyPwd")
     public CommonResult modifyPwd(@RequestBody ModifyPwdQO modifyPwdQO) {
         ValidatorUtils.validateEntity(modifyPwdQO);
         OpenApiResponseVO responseVO = unionPayService.modifyPwd(modifyPwdQO);
@@ -190,8 +208,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/26 16:33
      **/
+    @LoginIgnore
     @PostMapping("/generateOrder")
     @ApiOperation("银联消费类下单")
+    @Permit("community:payment:unionPay:api:generateOrder")
     public CommonResult generateOrder(@RequestBody GenerateOrderQO generateOrderQO) {
         ValidatorUtils.validateEntity(generateOrderQO);
         OpenApiResponseVO responseVO = unionPayService.generateConsumeOrder(generateOrderQO);
@@ -205,8 +225,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/28 17:45
      **/
+    @LoginIgnore
     @PostMapping("/queryBalance")
     @ApiOperation("查询钱包余额")
+    @Permit("community:payment:unionPay:api:queryBalance")
     public CommonResult queryBalance(@RequestBody BalanceQO balanceQO) {
         ValidatorUtils.validateEntity(balanceQO);
         if (balanceQO.getIsNeedPwd() == 1) {
@@ -231,8 +253,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/7 17:38
      **/
+    @LoginIgnore
     @PostMapping("/getCredential")
     @ApiOperation("银联支付获取凭据接口")
+    @Permit("community:payment:unionPay:api:getCredential")
     public CommonResult getCredential(@RequestBody CredentialQO credentialsQO) {
         ValidatorUtils.validateEntity(credentialsQO);
         OpenApiResponseVO responseVO = unionPayService.getCredential(credentialsQO);
@@ -246,8 +270,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/10 9:08
      **/
+    @LoginIgnore
     @PostMapping("/queryWalletByBizLicNo")
     @ApiOperation("查询开B端开户情况")
+    @Permit("community:payment:unionPay:api:queryWalletByBizLicNo")
     public CommonResult queryWalletByBizLicNo(@RequestBody BizLicNoQO bizLicNoQO) {
         ValidatorUtils.validateEntity(bizLicNoQO);
         OpenApiResponseVO responseVO = unionPayService.queryWalletByBizLicNo(bizLicNoQO);
@@ -261,8 +287,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/10 10:19
      **/
+    @LoginIgnore
     @PostMapping("/withdrawApply")
     @ApiOperation("提现申请接口")
+    @Permit("community:payment:unionPay:api:withdrawApply")
     public CommonResult withdrawApply(@RequestBody WithdrawQO withdrawQO) {
         ValidatorUtils.validateEntity(withdrawQO);
         OpenApiResponseVO responseVO = unionPayService.withdrawApply(withdrawQO);
@@ -276,8 +304,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/11 17:47
      **/
+    @LoginIgnore
     @PostMapping("/resetBtypeAcctPwd")
     @ApiOperation("B端钱包重置支付密码")
+    @Permit("community:payment:unionPay:api:resetBtypeAcctPwd")
     public CommonResult resetBtypeAcctPwd(@RequestBody ResetBtypeAcctPwdQO resetBtypeAcctPwdQO) {
         ValidatorUtils.validateEntity(resetBtypeAcctPwdQO);
         OpenApiResponseVO responseVO = unionPayService.resetBtypeAcctPwd(resetBtypeAcctPwdQO);
@@ -291,8 +321,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/12 9:59
      **/
+    @LoginIgnore
     @PostMapping("/queryTransList")
     @ApiOperation("查询交易明细")
+    @Permit("community:payment:unionPay:api:queryTransList")
     public CommonResult queryTransList(@RequestBody QueryTransListQO queryTransListQO) {
         ValidatorUtils.validateEntity(queryTransListQO);
         if ((StringUtils.isNotBlank(queryTransListQO.getStartDate()) && StringUtils.isBlank(queryTransListQO.getEndDate())) || (StringUtils.isBlank(queryTransListQO.getStartDate()) && StringUtils.isNotBlank(queryTransListQO.getEndDate()))) {
@@ -326,8 +358,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/12 11:22
      **/
+    @LoginIgnore
     @PostMapping("/queryBillInfo")
     @ApiOperation("账单查询")
+    @Permit("community:payment:unionPay:api:queryBillInfo")
     public CommonResult queryBillInfo(@RequestBody QueryBillInfoQO queryBillInfoQO) {
         ValidatorUtils.validateEntity(queryBillInfoQO);
         Integer walletNullNum = 0;
@@ -360,8 +394,10 @@ public class UnionPayForeignController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/5/12 17:13
      **/
+    @LoginIgnore
     @PostMapping("/activeAcct")
     @ApiOperation("激活账户")
+    @Permit("community:payment:unionPay:api:activeAcct")
     public CommonResult activeAcct(@RequestBody ActiveAcctQO activeAcctQO) {
         ValidatorUtils.validateEntity(activeAcctQO);
         OpenApiResponseVO responseVO = unionPayService.activeAcct(activeAcctQO);

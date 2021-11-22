@@ -2,7 +2,6 @@ package com.jsy.community.controller;
 
 import cn.hutool.json.JSONUtil;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderRecordEntity;
@@ -18,6 +17,8 @@ import com.jsy.community.qo.payment.WithdrawalQO;
 import com.jsy.community.untils.wechat.*;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -113,8 +114,8 @@ public class WeChatPayController {
      * @Param:
      * @return:
      */
-    @Login
     @PostMapping("/wxPay")
+    @Permit("community:payment:wxPay")
     public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
         if (weChatPayQO.getTradeFrom()==9){
             weChatPayQO.setCommunityId(1L);
@@ -234,7 +235,9 @@ public class WeChatPayController {
      * @Param: dsds
      * @return:
      */
+    @LoginIgnore
     @RequestMapping(value = "/callback/{companyId}", method = {RequestMethod.POST,RequestMethod.GET})
+    @Permit("community:payment:callback")
     public void callback(HttpServletRequest request, HttpServletResponse response,@PathVariable("companyId") Long companyId) throws Exception {
         log.info("回调成功");
         log.info(String.valueOf(companyId));
@@ -323,7 +326,7 @@ public class WeChatPayController {
      * @return:
      */
     @PostMapping(value = "/withdrawDeposit")
-    @Login
+    @Permit("community:payment:withdrawDeposit")
     public CommonResult<Map<String, String>> withdrawDeposit(@RequestBody WithdrawalQO withdrawalQO) throws Exception {
 
         String body=null;
@@ -371,7 +374,7 @@ public class WeChatPayController {
      * @return:
      */
     @GetMapping("/wxPayQuery")
-    @Login
+    @Permit("community:payment:wxPayQuery")
     public CommonResult wxPayQuery(@RequestParam("orderId")String orderId){
         String body = "";
         HttpGet httpGet = new HttpGet(WechatConfig.WXPAY_PAY+orderId+""+"?mchid="+WechatConfig.MCH_ID+"");
@@ -403,7 +406,7 @@ public class WeChatPayController {
      * @return: CommonResult
      */
     @GetMapping("/withdrawDepositQuery")
-    @Login
+    @Permit("community:payment:withdrawDepositQuery")
     public CommonResult withdrawDepositQuery(@RequestParam("orderId")String orderId){
         HashMap<String, Object> map = new LinkedHashMap<>();
         map.put("appid",WechatConfig.APPID);

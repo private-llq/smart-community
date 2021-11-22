@@ -2,58 +2,39 @@ package com.jsy.community.controller;
 
 import cn.hutool.json.JSONUtil;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.*;
+import com.jsy.community.api.ICarChargeService;
+import com.jsy.community.api.ICarMonthlyVehicleService;
+import com.jsy.community.api.ICarOrderService;
+import com.jsy.community.api.ICompanyPayConfigService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderEntity;
-import com.jsy.community.entity.CarOrderRecordEntity;
-import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.CompanyPayConfigEntity;
-import com.jsy.community.entity.payment.WeChatOrderEntity;
-import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
-import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.payment.AliOrderContentQO;
-import com.jsy.community.qo.payment.WeChatH5PayQO;
-import com.jsy.community.qo.payment.WeChatPayQO;
-import com.jsy.community.qo.payment.WithdrawalQO;
 import com.jsy.community.qo.property.orderChargeDto;
-import com.jsy.community.untils.wechat.*;
-import com.jsy.community.utils.UserUtils;
+import com.jsy.community.untils.wechat.OrderNoUtil;
+import com.jsy.community.untils.wechat.PublicConfig;
+import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
-import org.springframework.amqp.AmqpException;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessagePostProcessor;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
-import org.xmlpull.v1.XmlPullParserException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @program: pay
@@ -87,10 +68,10 @@ public class WeChatH5PayController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarMonthlyVehicleService carMonthlyVehicleService;
-
-
-    //    @Login
+    
+    @LoginIgnore
     @PostMapping("/wxH5Pay")
+    @Permit("community:payment:wxH5Pay")
     public CommonResult<Map<String, Object>> wxH5Pay(@RequestBody AliOrderContentQO qo) throws Exception {
         System.out.println(qo);
         //返回前端参数
@@ -154,7 +135,9 @@ public class WeChatH5PayController {
      * @Author: Tian
      * @Date: 2021/10/7-10:02
      **/
+    @LoginIgnore
     @RequestMapping(value = "/callback/H5/{companyId}", method = {RequestMethod.POST,RequestMethod.GET})
+    @Permit("community:payment:callback:H5")
     public void callback(HttpServletRequest request, HttpServletResponse response,@PathVariable("companyId") String companyId) throws Exception {
         log.info("\n\n\n\n回调成功\n\n\n\n");
         System.out.println(companyId);
@@ -211,7 +194,9 @@ public class WeChatH5PayController {
 
     }
 
+    @LoginIgnore
     @GetMapping("ip")
+    @Permit("community:payment:ip")
     public String getClientIpAddress(HttpServletRequest request) {
         String clientIp = request.getHeader("x-forwarded-for");
         if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
