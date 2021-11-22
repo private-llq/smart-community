@@ -16,6 +16,7 @@ import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
+import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -63,7 +64,7 @@ public class UserAuthController {
     @SuppressWarnings("unused")
     private ICommonService commonService;
 
-//    @DubboReference(version = )
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
     private IBaseAuthRpcService baseAuthRpcService;
 
     /**
@@ -86,7 +87,6 @@ public class UserAuthController {
         } else {
             throw new ProprietorException(JSYError.REQUEST_PARAM);
         }
-
         return b ? CommonResult.ok() : CommonResult.error("验证码发送失败");
     }
 

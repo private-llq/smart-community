@@ -28,7 +28,6 @@ public class CommonController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ICommonService commonService;
 
-
 	@ApiOperation("查询下级省市区、查询城市等")
     @GetMapping("/region")
     public CommonResult<?> queryRegion(@RequestParam Integer queryType,Integer regionNumber,String searchStr) {
