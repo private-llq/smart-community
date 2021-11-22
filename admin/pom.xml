@@ -7,7 +7,7 @@
 	<parent>
 		<artifactId>com.jsy.community</artifactId>
 		<groupId>com.jsy</groupId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>1.0-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>admin</artifactId>
@@ -20,6 +20,16 @@
 			<groupId>com.jsy</groupId>
 			<artifactId>common</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.zhsj</groupId>
+					<artifactId>base_web</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		
 		<!-- 安全认证 -->

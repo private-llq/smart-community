@@ -29,7 +29,7 @@
         <!-- 分布式事务 -->
 <!--        <module>tx-manager</module>-->
         <!-- 管理 -->
-<!--        <module>admin</module>-->
+        <module>admin</module>
         <!-- 业主 -->
         <module>proprietor</module>
         <!-- 物业 -->
@@ -39,7 +39,7 @@
         <!-- 网关 -->
 <!--        <module>gateway</module>-->
         <!-- MQ -->
-<!--        <module>rabbitmq</module>-->
+        <module>rabbitmq</module>
         <!-- 任务 -->
 <!--        <module>task</module>-->
         <module>payment-system</module>

@@ -16,6 +16,7 @@ import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
+import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -61,6 +62,9 @@ public class UserAuthController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     @SuppressWarnings("unused")
     private ICommonService commonService;
+
+//    @DubboReference(version = )
+    private IBaseAuthRpcService baseAuthRpcService;
 
     /**
      * 发送验证码
@@ -121,6 +125,7 @@ public class UserAuthController {
 
     @ApiOperation("三方登录")
     @PostMapping("/third/login")
+
     public CommonResult thirdPlatformLogin(@RequestBody UserThirdPlatformQO userThirdPlatformQO) {
         ValidatorUtils.validateEntity(userThirdPlatformQO);
         if (StringUtils.isEmpty(userThirdPlatformQO.getAccessToken())
