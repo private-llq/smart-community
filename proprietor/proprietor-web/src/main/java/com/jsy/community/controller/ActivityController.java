@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.github.xiaoymin.knife4j.annotations.Ignore;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IActivityService;
 import com.jsy.community.constant.Const;
@@ -12,6 +11,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +33,7 @@ public class ActivityController {
 
     @ApiOperation("该小区所有活动")
     @PostMapping("/list")
+    @Permit("community:proprietor:activity:list")
     public CommonResult list(@RequestBody BaseQO<ActivityEntity> baseQO) {
         return CommonResult.ok(activityService.list(baseQO));
     }
