@@ -228,7 +228,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
 
         //保存车辆数据到基础车辆表t_car中
-        CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carMonthlyVehicle.getCarPosition()));
+        CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("community_id",carMonthlyVehicle.getCommunityId()).eq("car_position", carMonthlyVehicle.getCarPosition()));
 
             CarEntity carEntity = new CarEntity();
             carEntity.setId(SnowFlake.nextId());//雪花算法生成ID
@@ -352,6 +352,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
                 .eq("disposable", 2)
         );
 
+
         if (Objects.nonNull(propertyFeeRuleEntity)){
             orderEntity.setFeeRuleId(propertyFeeRuleEntity.getId());//缴费项目id
             orderEntity.setType(propertyFeeRuleEntity.getType());//账单类型
@@ -360,7 +361,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
             String orderNum = FinanceBillServiceImpl.getOrderNum(String.valueOf(carMonthlyVehicle.getId()));
             orderEntity.setOrderNum(orderNum);//账单号
             //查车位id
-            CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carMonthlyVehicle.getCarPosition()));
+            CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("community_id",carMonthlyVehicle.getCommunityId()).eq("car_position", carMonthlyVehicle.getCarPosition()));
             if (Objects.nonNull(car_position)) {
                 orderEntity.setTargetId(car_position.getId());//车位id
             }
@@ -512,7 +513,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         }
 
 
-        CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carMonthlyVehicle.getCarPosition()));
+        CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("community_id",carMonthlyVehicle.getCommunityId()).eq("car_position", carMonthlyVehicle.getCarPosition()));
         //生成月租账单
         PropertyFinanceOrderEntity orderEntity = new PropertyFinanceOrderEntity();
         orderEntity.setCommunityId(communityId);//社区id
@@ -701,7 +702,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
 
             //保存车辆数据到基础车辆表t_car中
-            CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carPosition));
+            CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("community_id",communityId).eq("car_position", carPosition));
             CarEntity carEntity = new CarEntity();
             carEntity.setId(SnowFlake.nextId());//雪花算法生成ID
             carEntity.setCommunityId(communityId);//社区id
@@ -1051,7 +1052,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
 
         //保存车辆数据到基础车辆表t_car中
-        CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carMonthlyVehicle.getCarPosition()));
+        CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("community_id",carMonthlyVehicle.getCommunityId()).eq("car_position", carMonthlyVehicle.getCarPosition()));
 
             CarEntity carEntity = new CarEntity();
             carEntity.setId(SnowFlake.nextId());//雪花算法生成ID
@@ -1239,7 +1240,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
 
 
             //保存车辆数据到基础车辆表t_car中
-            CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("car_position", carPosition));
+            CarPositionEntity car_position = carPositionMapper.selectOne(new QueryWrapper<CarPositionEntity>().eq("community_id",communityId).eq("car_position", carPosition));
 
                 CarEntity carEntity = new CarEntity();
                 carEntity.setId(SnowFlake.nextId());//雪花算法生成ID

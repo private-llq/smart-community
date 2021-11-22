@@ -4,14 +4,13 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
 import com.jsy.community.utils.RegexUtils;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.*;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 物业端用户
@@ -221,6 +220,14 @@ public class AdminUserEntity extends BaseEntity {
 	// 角色名称
 	@TableField(exist = false)
 	private String roleName;
+	
+	@ApiModelProperty(value = "物业公司名称")
+	@TableField(exist = false)
+	private String companyName;
+	
+	@ApiModelProperty(value = "应用菜单名称")
+	@TableField(exist = false)
+	private String menuName;
 	
 	/**
 	 * 注册邀请传参验证

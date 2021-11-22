@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jsy.community.mapper.AdminUserMapper">
+	<!-- 编辑操作员 -->
+	<update id="updateOperator">
+		update t_admin_user u
+		<set>
+			<if test="entity.realName != null and entity.realName != ''">,u.real_name = #{entity.realName}</if>
+			<if test="entity.mobile != null and entity.mobile != ''">,u.mobile = #{entity.mobile}</if>
+			,update_time = now()
+		</set>
+		where id = #{entity.id}
+	</update>
+
+	<!-- 操作员条件查询 -->
+    <select id="queryPageUserEntity" resultType="com.jsy.community.entity.admin.AdminUserEntity">
+		select
+			au.id,
+			au.uid,
+			au.real_name,
+			au.mobile,
+			au.create_time,
+			aur.role_id,
+			aur.role_id as roleIdStr,
+			ar.name as roleName
+		from t_admin_user au
+		left join t_admin_user_role aur on aur.uid = au.uid
+		left join t_admin_role ar on ar.id = aur.role_id
+		<where>
+			au.deleted = 0
+			and au.uid != #{qo.uid}
+			and ar.company_id = #{qo.companyId}
+			<if test="qo.name != null and qo.name !=''">
+				and (au.real_name like concat("%", #{qo.name}, "%")
+				or au.mobile like concat("%", #{qo.name}, "%"))
+			</if>
+			<if test="qo.roleId != null">
+				and aur.role_id = #{qo.roleId}
+			</if>
+		</where>
+		order by au.create_time
+		limit #{startSize}, #{size}
+	</select>
+	<select id="countPageUserEntity" resultType="java.lang.Integer">
+		select count(*) from (
+		select
+			au.id,
+			au.uid,
+			au.real_name,
+			au.mobile,
+			au.create_time,
+			aur.role_id,
+			ar.name as roleName
+		from t_admin_user au
+		left join t_admin_user_role aur on aur.uid = au.uid
+		left join t_admin_role ar on ar.id = aur.role_id
+		<where>
+			au.deleted = 0
+			and ar.company_id = #{qo.companyId}
+			<if test="qo.name != null and qo.name !=''">
+				and (au.real_name like concat("%", #{qo.name}, "%")
+				or au.mobile like concat("%", #{qo.name}, "%"))
+			</if>
+			<if test="qo.roleId != null">
+				and aur.role_id = #{qo.roleId}
+			</if>
+		</where>) as a
+	</select>
+
+    <select id="queryUidByCompanyIds" resultType="java.lang.String">
+		select ur.uid
+		from t_admin_user_role ur
+		left join t_admin_role ar on ar.id = ur.role_id
+		where ar.company_id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+
+</mapper>

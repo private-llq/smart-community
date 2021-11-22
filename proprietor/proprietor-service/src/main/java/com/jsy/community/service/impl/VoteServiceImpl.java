@@ -180,7 +180,7 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, VoteEntity> impleme
     public Map<String,Object> list(BaseQO<VoteEntity> baseQO) {
         Map<String,Object> map=new HashMap<>();
         Page<VoteEntity> page = voteMapper.selectPage(new Page<VoteEntity>(baseQO.getPage(), baseQO.getSize()), new QueryWrapper<VoteEntity>()
-                .eq("community_id", baseQO.getQuery().getCommunityId()).in("vote_status",1,2));
+                .eq("community_id", baseQO.getQuery().getCommunityId()).in("vote_status",1,2).eq("issue_status",1));
         map.put("total",page.getTotal());
         map.put("list",page.getRecords());
         return map;

@@ -1,5 +1,6 @@
 package com.jsy.community.qo.admin;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -49,5 +50,9 @@ public class AdminUserQO implements Serializable {
 
 	// 角色ID
 	private Long roleId;
+	
+	@ApiModelProperty(value = "物业公司名称或者手机号")
+	@TableField(exist = false)
+	private String companyNameOrMobile;
 
 }
