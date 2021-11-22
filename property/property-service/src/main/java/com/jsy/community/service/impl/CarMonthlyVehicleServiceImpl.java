@@ -25,7 +25,6 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.property.OverdueVo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;

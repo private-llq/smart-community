@@ -20,7 +20,6 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.elasticsearch.search.sort.MinAndMax;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

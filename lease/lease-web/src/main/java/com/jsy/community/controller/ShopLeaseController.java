@@ -38,9 +38,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -447,15 +444,6 @@ public class ShopLeaseController {
             }
         }
     }
-
-    //********************************
-    public static RestHighLevelClient getClient() {
-        HttpHost httpHost = new HttpHost("127.0.0.1", 9200);
-        RestClientBuilder clientBuilder = RestClient.builder(httpHost);
-        RestHighLevelClient client = new RestHighLevelClient(clientBuilder);
-        return client;
-    }
-    //
 
     @Login(allowAnonymous = true)
     @ApiOperation("根据筛选条件查询商铺列表")

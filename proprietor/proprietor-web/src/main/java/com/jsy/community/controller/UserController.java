@@ -290,7 +290,6 @@ public class UserController {
      * @author YuLF
      * @since  2020/12/18 11:39
      */
-    @Login
     @ApiOperation("业主信息及业主家属信息查询接口")
     @GetMapping("query")
     public CommonResult<UserInfoVo> proprietorQuery(@RequestParam Long houseId) {

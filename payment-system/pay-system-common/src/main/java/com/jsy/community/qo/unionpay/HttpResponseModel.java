@@ -6,7 +6,7 @@ package com.jsy.community.qo.unionpay;
  * @Date: 2021/11/11 11:51
  * @Version: 1.0
  **/
-public class HttpResonseModel {
+public class HttpResponseModel {
     private String respData;
     private String respCode;
     private String respMsg;

@@ -32,7 +32,6 @@ import com.jsy.community.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,8 +121,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Autowired
     private UserIMMapper userIMMapper;
 
-    @Autowired
-    private RestHighLevelClient restHighLevelClient;
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IHouseInfoService houseInfoService;

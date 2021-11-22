@@ -4,18 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.DistributedLock;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.IUserInformService;
-import com.jsy.community.config.web.ElasticsearchConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.utils.DateUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.rest.RestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,9 +58,6 @@ public class ProprietorTaskActuator {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ICommonService commonService;
 
-    @Resource
-    private  RestHighLevelClient elasticsearchClient;
-
 
     @Value("${jsy.sys.clear.inform.expire}")
     private Integer clearInformExpireDay;
@@ -94,42 +84,6 @@ public class ProprietorTaskActuator {
 
         commonService.cleanHotKey(hotKeyActiveDay);
     }
-
-    /**
-     * 【es批量导入数据库数据】
-     * 数据库全量导入数据至 elasticsearch 查询的表t_acct_push_inform、t_community_fun、t_house_lease、t_shop_lease
-     */
-    @Scheduled(cron = ES_IMPORT_CRON)
-    public void esImportActuator()  {
-        //如果当前执行时间已经超过 指定 执行时间
-        if(DateUtils.notNeedImplemented(ES_IMPORT_CRON)){
-            return;
-        }
-        List<FullTextSearchEntity> fullTextSearchEntities = commonService.fullTextSearchEntities();
-        BulkRequest bulkRequest = new BulkRequest();
-        fullTextSearchEntities.forEach( l -> {
-            JSONObject jsonObject = (JSONObject) JSONObject.toJSON(l);
-            jsonObject.put("searchTitle", l.getTitle());
-            jsonObject.put("esId", l.getId());
-            IndexRequest indexRequest = new IndexRequest(BusinessConst.FULL_TEXT_SEARCH_INDEX)
-                    .id(String.valueOf(l.getId()))
-                    .source(jsonObject.toJSONString(), XContentType.JSON);
-            bulkRequest.add(indexRequest);
-        });
-        BulkResponse bulk = null;
-        try {
-            bulk = elasticsearchClient.bulk(bulkRequest, ElasticsearchConfig.COMMON_OPTIONS);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if(Objects.requireNonNull(bulk).status() == RestStatus.OK){
-            logger.info("全量数据导入数据：t_acct_push_inform、t_community_fun、t_house_lease、t_shop_lease表数据至Elasticsearch成功!");
-        } else {
-            logger.error("全量数据导入表数据至Elasticsearch失败!");
-        }
-    }
-
-
 
     /**
      * 【社区消息清理器】

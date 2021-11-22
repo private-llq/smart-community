@@ -2,6 +2,7 @@ package com.jsy.community.api;
 
 import com.jsy.community.qo.cebbank.CebBaseQO;
 import com.jsy.community.qo.cebbank.CebLoginQO;
+import com.jsy.community.qo.cebbank.CebQueryCityContributionCategoryQO;
 
 /**
  * @Author: Pipi
@@ -10,12 +11,13 @@ import com.jsy.community.qo.cebbank.CebLoginQO;
  * @Version: 1.0
  **/
 public interface CebBankService {
-    /*
+
+    /**
      * @author: Pipi
-     * @description: 光大银行用户注册
-     * @param cebLoginQO:
-     * @return: void
-     * @date: 2021/11/15 17:23
+     * @description: 查询城市下缴费类别
+     * @param categoryQO:
+     * @return: java.lang.String
+     * @date: 2021/11/17 17:50
      **/
-    void login(CebLoginQO cebLoginQO);
+    String queryCityContributionCategory(CebQueryCityContributionCategoryQO categoryQO);
 }

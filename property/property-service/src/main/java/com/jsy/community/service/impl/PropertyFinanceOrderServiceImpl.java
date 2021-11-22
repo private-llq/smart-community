@@ -2151,12 +2151,14 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 entity.setAddress(houseMap.get(entity.getTargetId()));
             } else {
                 String[] split = carPositionMap.get(entity.getTargetId()).split(",");
-                entity.setAddress(split[0]);
-                PropertyAdvanceDepositEntity depositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(Long.parseLong(split[1]), adminCommunityId);
-                if (depositEntity != null) {
-                    entity.setDeduction(depositEntity.getBalance());
-                } else {
-                    entity.setDeduction(new BigDecimal(0));
+                if (split.length > 0) {
+                    entity.setAddress(split[0]);
+                    PropertyAdvanceDepositEntity depositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(Long.parseLong(split[1]), adminCommunityId);
+                    if (depositEntity != null) {
+                        entity.setDeduction(depositEntity.getBalance());
+                    } else {
+                        entity.setDeduction(new BigDecimal(0));
+                    }
                 }
             }
         }

@@ -51,6 +51,14 @@ spring:
 #    prefer-ip-address: true #使用ip地址注册
 #    instance-id: proprietor-web:6001  #指定服务的id
 #服务调用
+
+
+jsy:
+  redis:
+    annotation:
+      # 当前模块@Cacheable 缓存的数据的超时时间/s
+      cacheTimeout: 1800
+
 dubbo:
   registry:
     address: spring-cloud://127.0.0.1
@@ -64,21 +72,13 @@ dubbo:
   application:
     name: ${spring.application.name}
   cloud:
-    subscribed-services: proprietor-service
+    subscribed-services: proprietor-service,base-user-service
   consumer:
     retries: 0
     timeout: 99999
   provider:
     retries: 0
     timeout: 99999
-
-jsy:
-  redis:
-    annotation:
-      # 当前模块@Cacheable 缓存的数据的超时时间/s
-      cacheTimeout: 1800
-
-
 
 ---
 spring:

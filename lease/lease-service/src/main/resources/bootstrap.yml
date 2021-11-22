@@ -1,26 +1,3 @@
-#spring:
-#  main:
-#    allow-bean-definition-overriding: true
-#  application:
-#    name: lease-service
-#  profiles:
-#    active: dev
-#  cloud:
-#    nacos:
-#      discovery:
-#        server-addr: 127.0.0.1:8848
-#      config:
-#        server-addr: 127.0.0.1:8848
-#        file-extension: yaml
-#        # 全部服务提供模块固定不变的配置，比如mybatis plus配置，三方登录配置，
-#        extension-configs[0]:
-#          data-id: common-service-fixed.yaml
-#          refresh: true
-#        extension-configs[1]:
-#          data-id: common.yaml
-#          refresh: true
-
-#配置中心的地址
 spring:
   profiles:
     active: dev
@@ -70,14 +47,6 @@ alipay:
   #appid(测试)
   appid: 2021000116687297
 
-#服务发现
-#eureka:
-#  client:
-#    serviceUrl:
-#      defaultZone: http://192.168.12.49:36366/eureka/ #注册中心地址
-#  instance:
-#    prefer-ip-address: true #使用ip地址注册
-#    instance-id: lease-service:8002  #指定服务的id
 ---
 spring:
   profiles: dev

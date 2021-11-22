@@ -62,7 +62,7 @@ public class PatrolController {
 		patrolEquipEntity.setCommunityId(UserUtils.getAdminCommunityId());
 		return patrolService.addEquip(patrolEquipEntity) ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
 	}
-	
+
 	/**
 	* @Description: 巡检设备 分页查询
 	 * @Param: [baseQO]

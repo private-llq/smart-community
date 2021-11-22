@@ -1,7 +1,6 @@
 package com.jsy.community.config;
 
 import com.jsy.community.constant.BusinessConst;
-import com.jsy.community.controller.ElasticsearchImportConsumer;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
@@ -143,24 +142,6 @@ public class RabbitMqConfig {
         return BindingBuilder.bind(appSearchQueue).to(appSearchTopicExchange).with(BusinessConst.APP_SEARCH_ROUTE_KEY);
     }
 
-    /**
-     *  监听队列(多个队列)、自动启动、自动声明功能
-     * 设置事务特性、事务管理器、事务属性、事务容量(并发)、是否开启事务、回滚消息等
-     * 设置消费者数量、最小最大数量、批量消费
-     * 设置消息确认和自动确认模式、是否重回队列、异常捕获
-     */
-    @Bean
-    public SimpleMessageListenerContainer simpleMessageListenerContainer(ConnectionFactory remoteConnectionFactory, ElasticsearchImportConsumer elasticsearchImportConsumer){
-        SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer(remoteConnectionFactory);
-        //监听全文搜索队列
-        simpleMessageListenerContainer.setQueueNames(BusinessConst.APP_SEARCH_QUEUE_NAME);
-        //手动签收
-        simpleMessageListenerContainer.setAcknowledgeMode(AcknowledgeMode.MANUAL);
-        //自定义消费者
-        simpleMessageListenerContainer.setMessageListener(elasticsearchImportConsumer);
-        simpleMessageListenerContainer.setDefaultRequeueRejected(false);
-        return simpleMessageListenerContainer;
-    }
     //@author YuLF end
 
 

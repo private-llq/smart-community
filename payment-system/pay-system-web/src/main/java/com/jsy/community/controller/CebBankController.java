@@ -5,8 +5,11 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.CebBankService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.cebbank.CebLoginQO;
+import com.jsy.community.qo.cebbank.CebQueryCityContributionCategoryQO;
+import com.jsy.community.qo.cebbank.CebQueryCityQO;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,21 +26,22 @@ import org.springframework.web.bind.annotation.RestController;
 @ApiJSYController
 @RequestMapping("/cebBank")
 @Login
+@Slf4j
 public class CebBankController {
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private CebBankService cebBankService;
 
     /**
      * @author: Pipi
-     * @description: 光大银行用户注册
-     * @param cebLoginQO:
+     * @description: 查询城市下缴费类别
+     * @param categoryQO:
      * @return: com.jsy.community.vo.CommonResult
-     * @date: 2021/11/15 17:29
+     * @date: 2021/11/17 17:47
      **/
-    @PostMapping("/v2/cebBankLogin")
-    public CommonResult cebBankLogin(@RequestBody CebLoginQO cebLoginQO) {
-        ValidatorUtils.validateEntity(cebLoginQO);
-        cebBankService.login(cebLoginQO);
+    @PostMapping("/v2/cityContributionCategory")
+    public CommonResult queryCityContributionCategory(@RequestBody CebQueryCityContributionCategoryQO categoryQO) {
+        cebBankService.queryCityContributionCategory(categoryQO);
         return CommonResult.ok();
     }
+
 }
