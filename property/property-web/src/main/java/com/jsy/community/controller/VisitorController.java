@@ -5,8 +5,8 @@ import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.PeopleHistoryEntity;
+import com.jsy.community.entity.VisitorEntity;
 import com.jsy.community.entity.VisitorStrangerEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.MinioUtils;
@@ -14,6 +14,7 @@ import com.jsy.community.utils.PicUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.util.StringUtils;
@@ -30,7 +31,6 @@ import java.time.LocalDateTime;
 @RequestMapping("visitor")
 @Api(tags = "访客控制器")
 @RestController
-@Login
 @ApiJSYController
 public class VisitorController {
 	
@@ -45,6 +45,7 @@ public class VisitorController {
 	 * @Date: 2021/4/12
 	**/
 	@PostMapping("page")
+	@Permit("community:property:visitor:page")
 	public CommonResult queryVisitorPage(@RequestBody BaseQO<PeopleHistoryEntity> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new PeopleHistoryEntity());
@@ -61,6 +62,7 @@ public class VisitorController {
 	 * @date: 2021/8/13 17:25
 	 **/
 	@PostMapping("/visitorPage")
+	@Permit("community:property:visitor:visitorPage")
 	public CommonResult visitorPage(@RequestBody BaseQO<VisitorEntity> baseQO) {
 		return CommonResult.ok(visitorService.visitorPage(baseQO));
 	}
@@ -73,6 +75,7 @@ public class VisitorController {
 	 * @Date: 2021/4/15
 	**/
 	@GetMapping("follow")
+	@Permit("community:property:visitor:follow")
 	public CommonResult queryFollowPersonListByVisitorId(@RequestParam Long visitorId){
 		return CommonResult.ok(visitorService.queryFollowPersonListByVisitorId(visitorId),"查询成功");
 	}
@@ -85,6 +88,7 @@ public class VisitorController {
 	 * @Date: 2021-08-02
 	**/
 	@PostMapping("stranger/page")
+	@Permit("community:property:visitor:stranger:page")
 	public CommonResult queryStrangerPage(@RequestBody BaseQO<VisitorStrangerEntity> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new VisitorStrangerEntity());
@@ -102,6 +106,7 @@ public class VisitorController {
 	 **/
 	@PostMapping("/addPropertyVisitor")
 	@businessLog(operation = "新增",content = "新增了【访客邀请】")
+	@Permit("community:property:visitor:addPropertyVisitor")
 	public CommonResult addVisitor(@RequestBody VisitorEntity visitorEntity) {
 		visitorEntity.setCommunityId(UserUtils.getAdminCommunityId());
 		ValidatorUtils.validateEntity(visitorEntity, VisitorEntity.addVisitorValidate.class);
@@ -132,6 +137,7 @@ public class VisitorController {
 	 **/
 	@Login
 	@PostMapping("/v2/uploadVisitorFace")
+	@Permit("community:property:visitor:v2:uploadVisitorFace")
 	public CommonResult uploadVisitorFace(MultipartFile file) {
 		PicUtil.imageQualified(file);
 		String url = MinioUtils.upload(file, "visitor-face");

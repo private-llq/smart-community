@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.PropertyFaceService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFaceEntity;
@@ -10,6 +9,7 @@ import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,8 +37,8 @@ public class PropertyFaceController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/24 11:59
      **/
-    @Login
     @PostMapping("/v2/faceOpration")
+    @Permit("community:property:propertyFace:v2:faceOpration")
     public CommonResult faceOpration(@RequestBody PropertyFaceEntity propertyFaceEntity) {
         if (propertyFaceEntity.getId() == null) {
             throw new JSYException(400, "物业人员ID不能为空");
@@ -57,8 +57,8 @@ public class PropertyFaceController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/24 11:59
      **/
-    @Login
     @PostMapping("/v2/deleteFace")
+    @Permit("community:property:propertyFace:v2:deleteFace")
     public CommonResult deleteFace(@RequestBody PropertyFaceEntity propertyFaceEntity) {
         if (propertyFaceEntity.getId() == null) {
             throw new JSYException(400, "物业人员ID不能为空");
@@ -74,8 +74,8 @@ public class PropertyFaceController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/24 12:01
      **/
-    @Login
     @PostMapping("/v2/uploadPropertyFace")
+    @Permit("community:property:propertyFace:v2:uploadPropertyFace")
     public CommonResult uploadFace(MultipartFile file) {
         String upload = MinioUtils.upload(file, "property-face-url");
         return CommonResult.ok(upload, "上传成功");
@@ -88,8 +88,8 @@ public class PropertyFaceController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/24 12:00
      **/
-    @Login
     @PostMapping("/v2/addFace")
+    @Permit("community:property:propertyFace:v2:addFace")
     public CommonResult addFace(@RequestBody PropertyFaceEntity propertyFaceEntity) {
         ValidatorUtils.validateEntity(propertyFaceEntity, PropertyFaceEntity.AddFaceValidate.class);
         Integer integer = propertyFaceService.addFace(propertyFaceEntity, UserUtils.getAdminCommunityId());

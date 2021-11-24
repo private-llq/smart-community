@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ISmsSendRecordService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.SmsSendRecordEntity;
@@ -12,6 +11,7 @@ import com.jsy.community.qo.SmsSendRecordQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -32,7 +32,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/sms/send")
 @ApiJSYController
-@Login
 public class SmsSendRecordController {
     
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -45,9 +44,9 @@ public class SmsSendRecordController {
      * @Author: DKS
      * @Date: 2021/09/08
      **/
-    @Login
     @ApiOperation("分页查询短信发送记录")
     @PostMapping("/query")
+    @Permit("community:property:sms:send:query")
     public CommonResult<PageInfo<SmsSendRecordEntity>> queryPropertyDeposit(@RequestBody BaseQO<SmsSendRecordQO> baseQO) {
         SmsSendRecordQO query = baseQO.getQuery();
         if(query == null){

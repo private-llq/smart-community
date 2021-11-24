@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyFinanceReceiptService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
@@ -11,6 +10,7 @@ import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -40,7 +40,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/finance/receipt")
 @ApiJSYController
-@Login
 public class PropertyFinanceReceiptController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -58,6 +57,7 @@ public class PropertyFinanceReceiptController {
 	**/
 	@ApiOperation("分页查询")
 	@PostMapping("page")
+	@Permit("community:property:finance:receipt:page")
 	public CommonResult queryPage(@RequestBody BaseQO<PropertyFinanceReceiptEntity> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new PropertyFinanceReceiptEntity());
@@ -66,9 +66,9 @@ public class PropertyFinanceReceiptController {
 		return CommonResult.ok(propertyFinanceReceiptService.queryPage(baseQO),"查询成功");
 	}
 
-	@Login
 	@ApiOperation("物业财务-导出收款单")
 	@PostMapping("/downloadReceiptList")
+	@Permit("community:property:finance:receipt:downloadReceiptList")
 	public ResponseEntity<byte[]> downloadReceiptList(@RequestBody PropertyFinanceReceiptEntity receiptEntity) {
 		ValidatorUtils.validateEntity(receiptEntity, PropertyFinanceReceiptEntity.ExportValiadate.class);
 		receiptEntity.setCommunityId(UserUtils.getAdminCommunityId());

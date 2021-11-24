@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.AdminRoleService;
 import com.jsy.community.api.IAdminConfigService;
@@ -12,6 +11,7 @@ import com.jsy.community.qo.admin.AdminRoleQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +24,6 @@ import java.util.List;
  **/
 @ApiJSYController
 @RestController
-@Login
 @RequestMapping("role")
 public class AdminRoleController {
 	
@@ -41,6 +40,7 @@ public class AdminRoleController {
 	**/
 	@PostMapping("")
 	@businessLog(operation = "新增",content = "新增了【角色】")
+	@Permit("community:property:role")
 	public CommonResult addRole(@RequestBody AdminRoleEntity adminRoleEntity){
 		ValidatorUtils.validateEntity(adminRoleEntity);
 		adminRoleEntity.setCompanyId(UserUtils.getAdminCompanyId());
@@ -56,6 +56,7 @@ public class AdminRoleController {
 	**/
 	@DeleteMapping("")
 	@businessLog(operation = "删除",content = "删除了【角色】")
+	@Permit("community:property:role")
 	public CommonResult delRole(@RequestParam("id") Long id){
 		return adminConfigService.delRole(id,UserUtils.getAdminCompanyId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
 	}
@@ -69,6 +70,7 @@ public class AdminRoleController {
 	**/
 	@PutMapping("")
 	@businessLog(operation = "编辑",content = "更新了【角色】")
+	@Permit("community:property:role")
 	public CommonResult updateRole(@RequestBody AdminRoleQO adminRoleQO){
 		if(adminRoleQO.getId() == null){
 			return CommonResult.error("缺少ID");
@@ -85,6 +87,7 @@ public class AdminRoleController {
 	 * @Date: 2020/12/14
 	**/
 	@PostMapping("/page")
+	@Permit("community:property:role:page")
 	public CommonResult queryPage(@RequestBody BaseQO<AdminRoleEntity> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new AdminRoleEntity());
@@ -94,7 +97,7 @@ public class AdminRoleController {
 	}
 
 	@PostMapping("/selectAllRole")
-	@Login
+	@Permit("community:property:role:selectAllRole")
 	public CommonResult selectAllRole(){
 		Long adminCommunityId = UserUtils.getAdminCommunityId();
 	  List<AdminRoleEntity> list=adminRoleService.selectAllRole(adminCommunityId);
@@ -113,8 +116,8 @@ public class AdminRoleController {
 	 * @return: com.jsy.community.vo.CommonResult
 	 * @date: 2021/8/9 10:23
 	 **/
-	@Login
 	@GetMapping("/roleDetail")
+	@Permit("community:property:role:roleDetail")
 	public CommonResult roleDetail(@RequestParam("roleId") Long roleId) {
 		return CommonResult.ok(adminConfigService.queryRoleDetail(roleId, UserUtils.getAdminCompanyId()), "查询成功!");
 	}

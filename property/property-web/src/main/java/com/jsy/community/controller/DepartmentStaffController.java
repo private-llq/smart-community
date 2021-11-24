@@ -6,7 +6,6 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IDepartmentStaffService;
 import com.jsy.community.constant.Const;
@@ -15,6 +14,7 @@ import com.jsy.community.qo.DepartmentStaffQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.DepartmentStaffVO;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -41,7 +41,6 @@ import java.util.Map;
 @RestController
 @ApiJSYController
 @RequestMapping("/staff")
-@Login
 public class DepartmentStaffController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -49,6 +48,7 @@ public class DepartmentStaffController {
 	
 	@ApiOperation("分页查询所有员工信息")
 	@GetMapping("/listDepartmentStaff")
+	@Permit("community:property:staff:listDepartmentStaff")
 	public CommonResult<PageInfo<DepartmentStaffEntity>> listDepartmentStaff(@ApiParam("部门id") @RequestParam Long departmentId, @RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "10") Long size) {
 		PageInfo<DepartmentStaffEntity> pageInfo = departmentStaffService.listDepartmentStaff(departmentId, page, size);
 		return CommonResult.ok(pageInfo);
@@ -56,6 +56,7 @@ public class DepartmentStaffController {
 	
 	@ApiOperation("根据id查询员工信息")
 	@GetMapping("/getDepartmentStaffById")
+	@Permit("community:property:staff:getDepartmentStaffById")
 	public CommonResult getDepartmentStaffById(@ApiParam("员工id") Long id) {
 		DepartmentStaffEntity staffEntity = departmentStaffService.getDepartmentStaffById(id);
 		return CommonResult.ok(staffEntity);
@@ -64,6 +65,7 @@ public class DepartmentStaffController {
 	@ApiOperation("添加员工")
 	@PostMapping("/addDepartmentStaff")
 	@businessLog(operation = "新增",content = "新增了【社区员工】")
+	@Permit("community:property:staff:addDepartmentStaff")
 	// TODO: 2021/3/22 添加员工这里 我觉得姓名应该是唯一的  不过需求没要求唯一
 	// // TODO: 2021/4/14 今天做Excel添加时  当时问的经理 说是同一个部门 有一个人姓名相同,电话号码有一个相同  就算重复 不能添加成功
 	// // TODO: 2021/4/14 但是原型上面没有体现出来这个需求啊，没说。  好吧所以需求应该是员工（姓名相同，电话号码有一个以上相同就属于是同一个员工就不应该让其添加成功）
@@ -81,6 +83,7 @@ public class DepartmentStaffController {
 	@ApiOperation("修改员工信息")
 	@PostMapping("/updateDepartmentStaff")
 	@businessLog(operation = "编辑",content = "更新了【社区员工】")
+	@Permit("community:property:staff:updateDepartmentStaff")
 	public CommonResult updateDepartmentStaff(@RequestBody DepartmentStaffQO departmentStaffEntity) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		departmentStaffEntity.setCommunityId(communityId);
@@ -92,6 +95,7 @@ public class DepartmentStaffController {
 	@ApiOperation("删除员工")
 	@GetMapping("/deleteDepartmentStaff")
 	@businessLog(operation = "删除",content = "删除了【社区员工】")
+	@Permit("community:property:staff:deleteDepartmentStaff")
 	public CommonResult deleteStaffByIds(@ApiParam("员工id") Long id) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		departmentStaffService.deleteStaffByIds(id, communityId);
@@ -101,6 +105,7 @@ public class DepartmentStaffController {
 	
 	@ApiOperation("通过Excel添加通讯录")
 	@PostMapping("/addLinkByExcel")
+	@Permit("community:property:staff:addLinkByExcel")
 	public CommonResult addLinkByExcel(@RequestParam("file") MultipartFile file) {
 		try {
 			// 获取Excel中的数据，每一行数据封装成一个String[]，将一个工作簿里面的每行数据封装成一个List<String[]>
@@ -120,7 +125,7 @@ public class DepartmentStaffController {
 	// TODO: 2021/4/16 这里暂时采用从服务器下载吧
 	@GetMapping("/down")
 	@ApiOperation("下载模板")
-	@Login(allowAnonymous = true)
+	@Permit("community:property:staff:down")
 	public String down() {
 		return "http://222.178.212.29:9000/excel/通讯录导入模板";
 	}
@@ -135,7 +140,7 @@ public class DepartmentStaffController {
 	
 	@PostMapping("/export")
 	@ApiOperation("导出错误数据")
-	@Login(allowAnonymous = true)
+	@Permit("community:property:staff:export")
 	public void export(HttpServletResponse response, @RequestBody Map<String, Object> map) {
 		List<DepartmentStaffVO> list = new ArrayList<>();
 		

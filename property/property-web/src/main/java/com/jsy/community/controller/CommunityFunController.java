@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICommunityFunService;
 import com.jsy.community.constant.Const;
@@ -12,6 +11,7 @@ import com.jsy.community.qo.property.CommunityFunQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -49,15 +49,15 @@ public class CommunityFunController {
 
     @ApiOperation("分页查询所有社区趣事")
     @PostMapping("/list")
-    @Login
+    @Permit("community:property:communityfun:list")
     public CommonResult list(@RequestBody BaseQO<CommunityFunQO> baseQO) {
         PageInfo pageInfo = communityFunService.findList(baseQO);
         return CommonResult.ok(pageInfo);
     }
     @ApiOperation("新增")
     @PostMapping("/save")
-    @Login
     @businessLog(operation = "新增",content = "新增了【物业社区趣事】")
+    @Permit("community:property:communityfun:save")
     public CommonResult save(@RequestBody CommunityFunOperationQO communityFunOperationQO) {
         ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunOperationQO.CommunityFunOperationValidated.class);
         AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
@@ -67,8 +67,7 @@ public class CommunityFunController {
 
     @ApiOperation("新增缩略图")
     @PostMapping("/smallImge")
-    @Login
-//    @businessLog(operation = "新增",content = "新增了【物业社区趣事缩略图】")
+    @Permit("community:property:communityfun:smallImge")
     public CommonResult upload(@RequestParam("file") MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -81,8 +80,7 @@ public class CommunityFunController {
 
     @ApiOperation("新增封面图片")
     @PostMapping("/coverImge")
-    @Login
-//    @businessLog(operation = "新增",content = "新增了【物业社区趣事封面图片】")
+    @Permit("community:property:communityfun:coverImge")
     public CommonResult coverImge(@RequestParam("file") MultipartFile file) throws IOException {
         if (PicUtil.isPic(file)){
             String originalFilename = file.getOriginalFilename();
@@ -113,8 +111,7 @@ public class CommunityFunController {
 
     @ApiOperation("新增内容图片")
     @PostMapping("/contentImge")
-    @Login
-//    @businessLog(operation = "新增",content = "新增了【物业社区趣事内容图片】")
+    @Permit("community:property:communityfun:contentImge")
     public CommonResult content(@RequestParam("file") MultipartFile file){
         if (PicUtil.isPic(file)){
             String originalFilename = file.getOriginalFilename();
@@ -130,8 +127,8 @@ public class CommunityFunController {
 
     @ApiOperation("修改")
     @PutMapping("/update")
-    @Login
     @businessLog(operation = "编辑",content = "更新了【物业社区趣事】")
+    @Permit("community:property:communityfun:update")
     public CommonResult update(@RequestBody CommunityFunOperationQO communityFunOperationQO) {
         ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunOperationQO.CommunityFunOperationValidated.class);
         AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
@@ -141,8 +138,8 @@ public class CommunityFunController {
 
     @ApiOperation("删除")
     @DeleteMapping("/delete")
-    @Login
     @businessLog(operation = "删除",content = "删除了【物业社区趣事】")
+    @Permit("community:property:communityfun:delete")
     public CommonResult delete(@ApiParam("社区趣事id")
                                @RequestParam("id") Long id) {
         communityFunService.deleteById(id);
@@ -151,7 +148,7 @@ public class CommunityFunController {
 
     @ApiOperation("查询一条---表单回填")
     @GetMapping("/findOne")
-    @Login
+    @Permit("community:property:communityfun:findOne")
     public CommonResult findOne(@ApiParam("社区趣事id")
                                     @RequestParam("id") Long id) {
         CommunityFunEntity communityFunEntity = communityFunService.selectOne(id);
@@ -160,7 +157,7 @@ public class CommunityFunController {
 
     @ApiOperation("上线")
     @GetMapping("/popUpOnline")
-    @Login
+    @Permit("community:property:communityfun:popUpOnline")
     public CommonResult popUpOnline(@ApiParam("社区趣事id")
                                         @RequestParam("id") Long id) {
         AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
@@ -170,7 +167,7 @@ public class CommunityFunController {
 
     @ApiOperation("下线")
     @GetMapping("/tapeOut")
-    @Login
+    @Permit("community:property:communityfun:tapeOut")
     public CommonResult tapeOut(@ApiParam("社区趣事id")
                                 @RequestParam Long id) {
         communityFunService.tapeOut(id);

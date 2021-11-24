@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Auth;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
@@ -20,6 +19,7 @@ import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -217,8 +217,8 @@ public class AdminUserController {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/17
 	**/
-	@Login
 	@PostMapping("query")
+	@Permit("community:property:sys:user:query")
 	public CommonResult queryOperator(@RequestBody BaseQO<AdminUserQO> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new AdminUserQO());
@@ -237,9 +237,9 @@ public class AdminUserController {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/17
 	**/
-	@Login
 	@PostMapping("")
 	@businessLog(operation = "新增",content = "新增了【操作员】")
+	@Permit("community:property:sys:user")
 	public CommonResult addOperator(@RequestBody AdminUserEntity adminUserEntity){
 		ValidatorUtils.validateEntity(adminUserEntity,AdminUserEntity.addOperatorValidatedGroup.class);
 		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
@@ -257,9 +257,9 @@ public class AdminUserController {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/17
 	**/
-	@Login
 	@PutMapping("")
 	@businessLog(operation = "编辑",content = "更新了【操作员】")
+	@Permit("community:property:sys:user")
 	public CommonResult updateOperator(@RequestBody AdminUserEntity adminUserEntity){
 		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
 			//验证社区权限
@@ -276,8 +276,8 @@ public class AdminUserController {
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
-	@Login
 	@DeleteMapping("delete")
+	@Permit("community:property:sys:user:delete")
 	public CommonResult deleteOperator(Long id){
 		adminUserService.deleteOperator(id);
 		return CommonResult.ok("操作成功");
@@ -290,8 +290,8 @@ public class AdminUserController {
 	 * @Author: chq459799974
 	 * @Date: 2021/7/22
 	**/
-	@Login
 	@GetMapping("/community/list")
+	@Permit("community:property:sys:user:community:list")
 	public CommonResult queryUserCommunityList(){
 		List<Long> adminCommunityIdList = adminConfigService.queryAdminCommunityIdListByUid(UserUtils.getUserId());
 		if(CollectionUtils.isEmpty(adminCommunityIdList)){
@@ -309,9 +309,9 @@ public class AdminUserController {
 	 * @Author: chq459799974
 	 * @Date: 2021/4/16
 	**/
-	@Login
 	@PutMapping("avatar")
 	@businessLog(operation = "编辑",content = "更新了【用户头像】")
+	@Permit("community:property:sys:user:avatar")
 	public CommonResult uploadAvatar(MultipartFile file){
 		if(!PicUtil.checkSizeAndType(file,5*1024)){
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"图片格式错误");
@@ -330,8 +330,8 @@ public class AdminUserController {
 	 * @Author: chq459799974
 	 * @Date: 2021/4/16
 	**/
-	@Login
 	@GetMapping("info")
+	@Permit("community:property:sys:user:info")
 	public CommonResult queryPersonalData(){
 		return CommonResult.ok(adminUserService.queryPersonalData(UserUtils.getUserId()),"查询成功");
 	}
@@ -347,8 +347,8 @@ public class AdminUserController {
 	@ApiOperation("修改/忘记密码")
 	@PutMapping("password")
 	@Auth
-	@Login(allowAnonymous = true)
 	@businessLog(operation = "编辑",content = "更新了【用户密码】")
+	@Permit("community:property:sys:user:password")
 	public CommonResult<Boolean> updatePassword(@RequestAttribute(value = "body") String body) {
 		ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
 		String uid = UserUtils.getUserId();
@@ -375,8 +375,8 @@ public class AdminUserController {
 	
 	@ApiOperation("更换手机号")
 	@PutMapping("mobile")
-	@Login
 	@businessLog(operation = "编辑",content = "更新了【用户手机号】")
+	@Permit("community:property:sys:user:mobile")
 	public CommonResult changeMobile(@RequestBody Map<String,String> map){
 		//入参验证
 		String newMobile = map.get("newMobile");

@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyFinanceLogService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FinanceLogEntity;
@@ -12,6 +11,7 @@ import com.jsy.community.qo.property.FinanceLogQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -41,9 +41,9 @@ public class PropertyFinanceLogController {
 	 * @Author: DKS
 	 * @Date: 2021/08/23 16:22
 	 **/
-	@Login
 	@ApiOperation("收款管理操作日志分页查询")
 	@PostMapping("/query")
+	@Permit("community:property:finance:log:query")
 	public CommonResult<PageInfo<FinanceLogEntity>> queryFinanceLogPage(@RequestBody BaseQO<FinanceLogQO> baseQO) {
 		FinanceLogQO query = baseQO.getQuery();
 		if(query == null){

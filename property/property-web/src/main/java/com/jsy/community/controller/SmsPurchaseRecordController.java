@@ -1,12 +1,12 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ISmsPurchaseRecordService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.SmsPurchaseRecordEntity;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -26,7 +26,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/sms/purchase")
 @ApiJSYController
-@Login
 public class SmsPurchaseRecordController {
     
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -39,9 +38,9 @@ public class SmsPurchaseRecordController {
      * @Author: DKS
      * @Date: 2021/09/14
      **/
-    @Login
     @ApiOperation("查询短信发送记录")
     @PostMapping("/query")
+    @Permit("community:property:sms:purchase:query")
     public CommonResult<List<SmsPurchaseRecordEntity>> queryPropertyDeposit() {
         Long companyId = UserUtils.getAdminCompanyId();
         return CommonResult.ok(smsPurchaseRecordService.querySmsPurchaseRecord(companyId));

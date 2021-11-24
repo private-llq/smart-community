@@ -1,14 +1,14 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
+import com.jsy.community.api.ICarEntranceService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarEntranceQO;
-import com.jsy.community.api.ICarEntranceService;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -31,7 +31,7 @@ public class CarEntranceController {
 
     @PostMapping("/selectCarEntrance")
     @ApiOperation("社区集市所有已发布商品")
-    @Login
+    @Permit("community:property:carEntrance:selectCarEntrance")
     public CommonResult selectCarEntrance(@RequestBody BaseQO<CarEntranceQO> baseQO){
         ValidatorUtils.validatePageParam(baseQO);
         if (baseQO.getQuery()==null){

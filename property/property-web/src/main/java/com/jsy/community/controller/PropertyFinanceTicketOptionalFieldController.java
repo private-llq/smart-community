@@ -4,6 +4,8 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IPropertyFinanceTicketOptionalFieldService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +35,9 @@ public class PropertyFinanceTicketOptionalFieldController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/8/2 16:46
      **/
+    @LoginIgnore
     @GetMapping("/optionalFieldList")
+    @Permit("community:property:ticketOptionalField:optionalFieldList")
     public CommonResult optionalFieldList(@RequestParam("templateType") Integer templateType, @RequestParam("chargeType") Integer chargeType) {
         return CommonResult.ok(ticketOptionalFieldService.queryOptionalFieldList(templateType, chargeType));
     }

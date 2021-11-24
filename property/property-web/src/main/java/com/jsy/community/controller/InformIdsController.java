@@ -5,6 +5,8 @@ import com.jsy.community.api.IInformIdsService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.InformIdsEntity;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -35,8 +37,10 @@ public class InformIdsController {
      * @Param:
      * @return:
      */
+    @LoginIgnore
     @ApiOperation("所有收到通知用户")
     @PostMapping("/addIds")
+    @Permit("community:property:inform:addIds")
     public CommonResult list(@RequestBody InformIdsEntity informIdsEntity){
         iInformIdsService.addIds(informIdsEntity);
         return CommonResult.ok();

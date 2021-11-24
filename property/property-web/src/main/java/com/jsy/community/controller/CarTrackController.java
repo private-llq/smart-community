@@ -2,7 +2,6 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarTrackService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarTrackEntity;
@@ -11,6 +10,7 @@ import com.jsy.community.qo.CarTrackQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/carTrack")
 @ApiJSYController
-@Login
 public class CarTrackController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -39,6 +38,7 @@ public class CarTrackController {
 	
 	@ApiOperation("分页查询车辆轨迹")
 	@PostMapping("/listCarTrack")
+	@Permit("community:property:carTrack:listCarTrack")
 	public CommonResult listCarTrack(@RequestBody BaseQO<CarTrackQO> carQo) {
 		if (carQo.getQuery() == null) {
 			carQo.setQuery(new CarTrackQO());

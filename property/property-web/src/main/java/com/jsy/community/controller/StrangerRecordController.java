@@ -1,13 +1,13 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.StrangerRecordService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.StrangerRecordEntiy;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,8 +34,8 @@ public class StrangerRecordController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/8/27 11:32
      **/
-    @Login
     @PostMapping("/v2/pageStrangerRecord")
+    @Permit("community:property:strangerRecord:v2:pageStrangerRecord")
     public CommonResult pageStrangerRecord(@RequestBody BaseQO<StrangerRecordEntiy> baseQO) {
         return CommonResult.ok(strangerRecordService.pageStrangerRecord(baseQO, UserUtils.getAdminCommunityId()));
     }

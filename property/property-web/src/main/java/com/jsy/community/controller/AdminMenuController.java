@@ -5,13 +5,14 @@ import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminMenuEntity;
-import com.jsy.community.exception.JSYError;
-import com.jsy.community.qo.admin.AdminMenuQO;
-import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.List;
@@ -85,6 +86,8 @@ public class AdminMenuController {
 	 * @Date: 2020/12/14
 	**/
 	@GetMapping("")
+	@LoginIgnore
+	@Permit("community:property:menu")
 	public CommonResult listOfMenu(Long id){
 		Map<String, Object> returnMap = new HashMap<>(16);
 		List<AdminMenuEntity> allMenu = adminConfigService.listOfMenu();

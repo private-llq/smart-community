@@ -6,6 +6,8 @@ import com.jsy.community.api.ICommonConstService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -38,8 +40,10 @@ public class CommonConstController {
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private ICommonConstService commonConstService;
 
+	@LoginIgnore
 	@ApiOperation("字典资源查询")
 	@GetMapping("typeSources")
+	@Permit("community:property:const:typeSources")
 	public CommonResult typeSources(@RequestParam String typeKey){
 		HashMap<String, Object> map = new HashMap<>();
 		String[] split = typeKey.split(",");

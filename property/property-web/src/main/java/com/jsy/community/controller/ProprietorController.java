@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.IpLimit;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IProprietorService;
@@ -23,6 +22,8 @@ import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.property.ProprietorVO;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -76,9 +77,11 @@ public class ProprietorController {
      *
      * @return 返回Excel模板
      */
+    @LoginIgnore
     @IpLimit(prefix = "excel", second = 60, count = 5, desc = "下载业主信息录入Excel")
     @GetMapping(params = {"downloadExcel"})
     @ApiOperation("下载业主信息录入Excel")
+    @Permit("community:property:proprietor")
     public ResponseEntity<byte[]> downloadExcel(HttpServletResponse response, @RequestParam long communityId) {
         //1. 设置响应头
         MultiValueMap<String, String> multiValueMap = ExcelUtil.setHeader("业主导入模板.xls");
@@ -102,9 +105,9 @@ public class ProprietorController {
      * @param communityId     社区id
      * @return 返回效验或登记结果
      */
-    @Login
     @PostMapping(params = {"importProprietorExcel"})
     @ApiOperation("导入业主信息excel")
+    @Permit("community:property:proprietor")
     public CommonResult<ProprietorVO> importProprietorExcel(MultipartFile excel, Long communityId) {
         //参数验证
         validFileSuffix(excel, communityId);
@@ -371,9 +374,9 @@ public class ProprietorController {
      * @param baseQo 查询参数实体
      * @return 返回删除是否成功
      */
-    @Login
     @PostMapping()
     @ApiOperation("分页查询业主信息")
+    @Permit("community:property:proprietor")
     public CommonResult<Page<ProprietorVO>> query(@RequestBody BaseQO<ProprietorQO> baseQo) {
         //1.验证分页 查询参数
         ValidatorUtils.validatePageParam(baseQo);
@@ -387,21 +390,19 @@ public class ProprietorController {
         return CommonResult.ok(iProprietorService.query(baseQo));
     }
 
-
-    @Login
     @PutMapping()
     @ApiOperation("更新业主信息")
     @businessLog(operation = "编辑",content = "更新了【业主信息】")
+    @Permit("community:property:proprietor")
     public CommonResult<Boolean> update(@RequestBody ProprietorQO qo) {
         ValidatorUtils.validateEntity(qo, ProprietorQO.PropertyUpdateValid.class);
         return iProprietorService.update(qo, UserUtils.getUserId()) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
-
-    @Login
     @PostMapping("/addUser")
     @ApiOperation("添加业主信息")
     @businessLog(operation = "新增",content = "新增了【业主信息】")
+    @Permit("community:property:proprietor:addUser")
     public CommonResult<Boolean> addUser(@RequestBody ProprietorQO qo) {
         qo.setCommunityId(UserUtils.getAdminCommunityId());
         ValidatorUtils.validateEntity(qo, ProprietorQO.PropertyAddValid.class);
@@ -414,10 +415,10 @@ public class ProprietorController {
      * 删除业主的房屋认证信息
      * 实则 只是去除 用户 和 房屋信息的信息解绑
      */
-    @Login
     @DeleteMapping()
     @ApiOperation("删除业主信息")
     @businessLog(operation = "删除",content = "删除了【业主信息】")
+    @Permit("community:property:proprietor")
     public CommonResult<Boolean> del(@RequestParam Long id) {
         //TODO : 验证物业人员是否具有管理这个社区的权限
         Boolean isSuccess = iProprietorService.unbindHouse(id);
@@ -431,9 +432,9 @@ public class ProprietorController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/6/12 11:57
      **/
-    @Login
     @PostMapping("/unboundHouseList")
     @ApiOperation("查询未绑定房屋列表")
+    @Permit("community:property:proprietor:unboundHouseList")
     public CommonResult getUnboundHouseList(@RequestBody BaseQO<RelationListQO> baseQO) {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new RelationListQO());
@@ -450,8 +451,8 @@ public class ProprietorController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/8 16:34
      **/
-    @Login
     @PostMapping("/v2/facePageList")
+    @Permit("community:property:proprietor:v2:facePageList")
     public CommonResult facePageList(@RequestBody BaseQO<UserEntity> baseQO) {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new UserEntity());
@@ -473,8 +474,8 @@ public class ProprietorController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/22 10:33
      **/
-    @Login
     @PostMapping("/v2/faceOpration")
+    @Permit("community:property:proprietor:v2:faceOpration")
     public CommonResult faceOpration(@RequestBody UserEntity userEntity) {
         ValidatorUtils.validateEntity(userEntity, UserEntity.FaceOprationValidate.class);
         Integer integer = iUserService.faceOpration(userEntity, UserUtils.getAdminCommunityId());
@@ -488,8 +489,8 @@ public class ProprietorController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/23 17:19
      **/
-    @Login
     @PostMapping("/v2/deleteFace")
+    @Permit("community:property:proprietor:v2:deleteFace")
     public CommonResult deleteFace(@RequestBody UserEntity userEntity) {
         ValidatorUtils.validateEntity(userEntity, UserEntity.FaceDeleteValidate.class);
         Integer integer = iUserService.deleteFace(userEntity, UserUtils.getAdminCommunityId());
@@ -503,8 +504,8 @@ public class ProprietorController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/23 17:54
      **/
-    @Login
     @PostMapping("/v2/addFace")
+    @Permit("community:property:proprietor:v2:addFace")
     public CommonResult addFace(@RequestBody UserEntity userEntity) {
         ValidatorUtils.validateEntity(userEntity, UserEntity.AddFaceValidate.class);
         Integer integer = iUserService.addFace(userEntity, UserUtils.getAdminCommunityId());
@@ -518,8 +519,8 @@ public class ProprietorController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/24 9:35
      **/
-    @Login
     @PostMapping("/v2/uploadFace")
+    @Permit("community:property:proprietor:v2:uploadFace")
     public CommonResult uploadFace(MultipartFile file) {
         String upload = MinioUtils.upload(file, "face-url");
         return CommonResult.ok(upload, "上传成功");

@@ -3,7 +3,6 @@ package com.jsy.community.controller;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
@@ -18,6 +17,8 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -102,6 +103,8 @@ public class AdminLoginController {
 		@ApiImplicitParam(name = "type", value = UserAuthEntity.CODE_TYPE_NOTE, required = true,
 			allowableValues = "1,2,3,4,5,6", paramType = "query")
 	})
+	@LoginIgnore
+	@Permit("community:property:send:code")
 	public CommonResult<Boolean> sendCode(@RequestParam String account,
 	                                      @RequestParam Integer type) {
 		boolean b;
@@ -121,7 +124,9 @@ public class AdminLoginController {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/25
 	**/
+	@LoginIgnore
 	@PostMapping("/sys/login")
+	@Permit("community:property:sys:login")
 	public CommonResult<?> login(@RequestBody AdminLoginQO form) {
 		//图形验证码
 //		boolean captcha = adminCaptchaService.validate(form.getUsername(), form.getCaptcha());
@@ -225,7 +230,7 @@ public class AdminLoginController {
 	 * @Date: 2021/7/24
 	**/
 	@PostMapping("sys/enter")
-	@Login
+	@Permit("community:property:sys:enter")
 	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
 		Long communityId = jsonObject.getLong("communityId");
 		List communityIds = UserUtils.getAdminCommunityIdList();
@@ -276,6 +281,8 @@ public class AdminLoginController {
 	**/
 	@ApiOperation(value = "敏感操作短信验证", notes = "忘记密码等")
 	@GetMapping("/check/code")
+	@LoginIgnore
+	@Permit("community:property:check:code")
 	public CommonResult<Map<String,Object>> checkCode(@RequestParam String account, @RequestParam String code) {
 		checkVerifyCode(account, code);
 		String token = UserUtils.setRedisTokenWithTime("Admin:Auth", account,1, TimeUnit.HOURS);
@@ -289,7 +296,7 @@ public class AdminLoginController {
 	 * 退出
 	 */
 	@PostMapping("/sys/logout")
-	@Login
+	@Permit("community:property:sys:logout")
 	public CommonResult<Boolean> logout() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		String token = request.getHeader("token");

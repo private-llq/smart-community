@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyAdvanceDepositRecordService;
 import com.jsy.community.constant.Const;
@@ -17,6 +16,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -44,7 +44,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/advance/deposit/record")
 @ApiJSYController
-@Login
 public class PropertyAdvanceDepositRecordController {
     
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -59,10 +58,10 @@ public class PropertyAdvanceDepositRecordController {
      * @author: DKS
      * @create: 2021-08-12 15:23
      **/
-    @Login
     @ApiOperation("新增预存款变更明细记录")
     @PostMapping("/add")
     @businessLog(operation = "新增",content = "新增了【预存款变更明细记录】")
+    @Permit("community:property:advance:deposit:record:add")
     public CommonResult addPropertyAdvanceDepositRecord(@RequestBody PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity){
 	    if(propertyAdvanceDepositRecordEntity.getType() == null){
 		    throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
@@ -88,9 +87,9 @@ public class PropertyAdvanceDepositRecordController {
      * @Author: DKS
      * @Date: 2021/08/12
      **/
-    @Login
     @ApiOperation("预存款分页查询变更明细")
     @PostMapping("/query")
+    @Permit("community:property:advance:deposit:record:query")
     public CommonResult<PageInfo<PropertyAdvanceDepositRecordEntity>> queryPropertyDepositRecord(@RequestBody BaseQO<PropertyAdvanceDepositRecordQO> baseQO) {
 	    PropertyAdvanceDepositRecordQO query = baseQO.getQuery();
         if(query == null){
@@ -107,9 +106,9 @@ public class PropertyAdvanceDepositRecordController {
 	 *@Return: com.jsy.community.vo.CommonResult
 	 *@Date: 2021/8/17 9:05
 	 **/
-	@Login
 	@ApiOperation("导出预存款明细记录")
 	@PostMapping("/downloadAdvanceDepositList")
+	@Permit("community:property:advance:deposit:record:downloadAdvanceDepositList")
 	public ResponseEntity<byte[]> downloadOrderList(@RequestBody PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity) {
 		propertyAdvanceDepositRecordEntity.setCommunityId(UserUtils.getAdminCommunityId());
 		List<PropertyAdvanceDepositRecordEntity> propertyAdvanceDepositRecordEntities = propertyAdvanceDepositRecordService.queryExportHouseExcel(propertyAdvanceDepositRecordEntity);
@@ -137,9 +136,9 @@ public class PropertyAdvanceDepositRecordController {
 	 * @Author: DKS
 	 * @Date: 2021/08/20
 	 **/
-	@Login
 	@ApiOperation("通过id获取预存款明细记录")
 	@GetMapping("/getAdvanceDepositRecordById")
+	@Permit("community:property:advance:deposit:record:getAdvanceDepositRecordById")
 	public CommonResult getAdvanceDepositRecordById(Long id) {
 		return CommonResult.ok(propertyAdvanceDepositRecordService.getAdvanceDepositRecordById(id, UserUtils.getAdminCommunityId()));
 	}

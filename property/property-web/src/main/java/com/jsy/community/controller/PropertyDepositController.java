@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyDepositService;
 import com.jsy.community.constant.BusinessConst;
@@ -18,10 +17,10 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.apache.http.entity.ContentType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +34,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/deposit")
 @ApiJSYController
-@Login
 public class PropertyDepositController {
     
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -47,10 +45,10 @@ public class PropertyDepositController {
      * @author: DKS
      * @create: 2021-08-10 17:35
      **/
-    @Login
     @ApiOperation("新增物业押金账单")
     @PostMapping("/add")
     @businessLog(operation = "新增",content = "新增了【物业押金账单】")
+    @Permit("community:property:deposit:add")
     public CommonResult addPropertyDeposit(@RequestBody PropertyDepositEntity propertyDepositEntity){
         if(propertyDepositEntity.getDepositType() == null || propertyDepositEntity.getDepositTargetId() == null || propertyDepositEntity.getPayService() == null || propertyDepositEntity.getBillMoney() == null){
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
@@ -69,10 +67,10 @@ public class PropertyDepositController {
      * @author: DKS
      * @create: 2021-08-11 9:15
      **/
-    @Login
     @ApiOperation("修改物业押金账单")
     @PutMapping("/update")
     @businessLog(operation = "编辑",content = "更新了【物业押金账单】")
+    @Permit("community:property:deposit:update")
     public CommonResult updatePropertyDeposit(@RequestBody PropertyDepositEntity propertyDepositEntity){
         ValidatorUtils.validateEntity(propertyDepositEntity);
         AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
@@ -88,10 +86,10 @@ public class PropertyDepositController {
      * @author: DKS
      * @create: 2021-08-11 9:20
      **/
-    @Login
     @ApiOperation("删除物业押金账单")
     @DeleteMapping("/delete")
     @businessLog(operation = "删除",content = "删除了【物业押金账单】")
+    @Permit("community:property:deposit:delete")
     public CommonResult deletePropertyDeposit(@RequestParam Long id){
         return propertyDepositService.deletePropertyDeposit(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
     }
@@ -103,9 +101,9 @@ public class PropertyDepositController {
      * @Author: DKS
      * @Date: 2021/08/11
      **/
-    @Login
     @ApiOperation("分页查询物业押金账单")
     @PostMapping("/query")
+    @Permit("community:property:deposit:query")
     public CommonResult<PageInfo<PropertyDepositEntity>> queryPropertyDeposit(@RequestBody BaseQO<PropertyDepositQO> baseQO) {
         PropertyDepositQO query = baseQO.getQuery();
         if(query == null){
@@ -122,9 +120,9 @@ public class PropertyDepositController {
      * @Author: DKS
      * @Date: 2021/08/16
      **/
-    @Login
     @ApiOperation("生成押金凭证二维码")
     @GetMapping("/generate/qr/code")
+    @Permit("community:property:deposit:generate:qr:code")
     public CommonResult GenerateQRCode(String url) {
         // TODO:url是app路径地址,后面需要写死路径，没有入参，前端只需要返回qrCodeUrl
         String qrCodeUrl = "";
@@ -147,9 +145,9 @@ public class PropertyDepositController {
      * @Author: DKS
      * @Date: 2021/08/20
      **/
-    @Login
     @ApiOperation("通过id获取押金凭证数据")
     @GetMapping("/getDepositById")
+    @Permit("community:property:deposit:getDepositById")
     public CommonResult getDepositById(Long id) {
         PropertyDepositEntity propertyDepositEntity = new PropertyDepositEntity();
         propertyDepositEntity.setCommunityId(UserUtils.getAdminCommunityId());

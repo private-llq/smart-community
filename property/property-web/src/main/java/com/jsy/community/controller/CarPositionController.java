@@ -3,10 +3,8 @@ package com.jsy.community.controller;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-//import com.alibaba.nacos.common.utils.UuidUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
 import com.jsy.community.config.ExcelListener;
 import com.jsy.community.config.ExcelUtils;
@@ -27,6 +25,8 @@ import com.jsy.community.vo.car.GpioData;
 import com.jsy.community.vo.car.Rs485Data;
 import com.jsy.community.vo.property.OverdueVo;
 import com.jsy.community.vo.property.PageVO;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -47,6 +47,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+
+//import com.alibaba.nacos.common.utils.UuidUtils;
 
 /**
  * <p>
@@ -93,8 +95,8 @@ public class CarPositionController {
     private ICarProprietorService iCarProprietorService;
 
     @ApiOperation("分页查询车位信息")
-    @Login
     @RequestMapping(value = "/selectCarPositionPaging", method = RequestMethod.POST)
+    @Permit("community:property:car-position:selectCarPositionPaging")
     public CommonResult<PageVO> selectCarPositionPaging(@RequestBody SelectCarPositionPagingQO qo) {
         Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
 
@@ -131,8 +133,8 @@ public class CarPositionController {
     @ApiOperation("导入车位信息")
     @PostMapping("/carPositionUpload")
     @ResponseBody
-    @Login
     @CarOperation(operation = "导入车位信息")
+    @Permit("community:property:car-position:carPositionUpload")
     public String upload(MultipartFile file) throws IOException {
         System.out.println("wenjian" + file);
         Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
@@ -145,10 +147,12 @@ public class CarPositionController {
 
     }
 
+    @LoginIgnore
     @ApiOperation("导出模板")
     @GetMapping("/carPositionExport")
     @ResponseBody
     @CarOperation(operation = "导出模板")
+    @Permit("community:property:car-position:carPositionExport")
     public void downLoadFile(HttpServletResponse response) throws IOException {
 
         ExcelUtils.exportModule("车位信息表", response, CarPositionEntity.class, null, 2);
@@ -157,8 +161,8 @@ public class CarPositionController {
 
 
     @ApiOperation("查询所有可用车位信息")
-    @Login
     @RequestMapping(value = "/selectAllCarPosition", method = RequestMethod.POST)
+    @Permit("community:property:car-position:selectAllCarPosition")
     public CommonResult<List<CarPositionEntity>> selectCarPositionPaging() {
         Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
         List<CarPositionEntity> list = iCarPositionService.getAll(adminCommunityId);
@@ -167,9 +171,9 @@ public class CarPositionController {
     }
 
     @ApiOperation("新增车位信息")
-    @Login
     @CarOperation(operation = "新增车位信息")
     @RequestMapping(value = "/insterCarPosition", method = RequestMethod.POST)
+    @Permit("community:property:car-position:insterCarPosition")
     public CommonResult<Boolean> insterCarPosition(@RequestBody InsterCarPositionQO qo) {
         Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
         Boolean boo = iCarPositionService.insterCarPosition(qo, adminCommunityId);
@@ -177,9 +181,9 @@ public class CarPositionController {
     }
 
     @ApiOperation("批量新增车位信息")
-    @Login
     @CarOperation(operation = "批量新增车位信息")
     @RequestMapping(value = "/moreInsterCarPosition", method = RequestMethod.POST)
+    @Permit("community:property:car-position:moreInsterCarPosition")
     public CommonResult<Boolean> moreInsterCarPosition(@RequestBody MoreInsterCarPositionQO qo) {
         Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
 
@@ -190,9 +194,9 @@ public class CarPositionController {
     }
 
     @ApiOperation("绑定用户")
-    @Login
     @CarOperation(operation = "绑定用户")
     @RequestMapping(value = "/customerBinding", method = RequestMethod.POST)
+    @Permit("community:property:car-position:customerBinding")
     public CommonResult<Boolean> customerBinding(@RequestBody CustomerBindingQO qo) {
         Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
         CarPositionEntity carPositionEntity = new CarPositionEntity();
@@ -238,9 +242,9 @@ public class CarPositionController {
     }
 
     @ApiOperation("解除绑定")
-    @Login
     @CarOperation(operation = "解除绑定")
     @RequestMapping(value = "/relieve", method = RequestMethod.POST)
+    @Permit("community:property:car-position:relieve")
     public CommonResult<Boolean> relieve(Long id) {
 
         //查询业主车辆
@@ -257,9 +261,9 @@ public class CarPositionController {
     }
 
     @ApiOperation("删除车位")
-    @Login
     @CarOperation(operation = "删除车位")
     @RequestMapping(value = "/deletedCarPosition", method = RequestMethod.POST)
+    @Permit("community:property:car-position:deletedCarPosition")
     public CommonResult<Boolean> deletedCarPosition(Long id) {
         Boolean b = iCarPositionService.deletedCarPosition(id);
         if (b) {
@@ -270,8 +274,8 @@ public class CarPositionController {
 
     @CarOperation(operation = "编辑车位")
     @ApiOperation("编辑车位")
-    @Login
     @RequestMapping(value = "/updateCarPosition", method = RequestMethod.POST)
+    @Permit("community:property:car-position:updateCarPosition")
     public CommonResult<Boolean> updateCarPosition(@RequestBody UpdateCarPositionQO qo) {
 
 
@@ -289,9 +293,10 @@ public class CarPositionController {
 
 
 
-
+    @LoginIgnore
     @ApiOperation("过车记录")
     @RequestMapping(value = "/test", method = RequestMethod.POST)
+    @Permit("community:property:car-position:test")
     public void carBeforeRecord(@RequestParam Map<String, Object> body,
                                 HttpServletResponse response) throws IOException {
 

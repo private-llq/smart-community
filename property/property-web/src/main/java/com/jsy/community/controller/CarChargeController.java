@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICarChargeService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarChargeEntity;
@@ -12,6 +11,8 @@ import com.jsy.community.util.CarOperation;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +29,8 @@ public class CarChargeController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarChargeService carChargeService;
 
-    @Login
     @PostMapping("/listPage")
+    @Permit("community:property:carCharge:listPage")
     public CommonResult<PageInfo> listPage(@RequestBody BaseQO baseQO){
 
         PageInfo pageInfo= carChargeService.listCarChargePage(baseQO, UserUtils.getAdminCommunityId());
@@ -37,31 +38,37 @@ public class CarChargeController {
         return  CommonResult.ok(pageInfo);
     }
 
-    @Login
     @PostMapping("/save")
     @CarOperation(operation = "新增了【停车收费设置】")
+    @Permit("community:property:carCharge:save")
     public CommonResult save(@RequestBody CarChargeEntity carChargeEntity){
         carChargeService.SaveCarCharge(carChargeEntity,UserUtils.getAdminCommunityId());
         return CommonResult.ok();
     }
-    @Login
+    
     @PostMapping("/openCarCharge")
     @CarOperation(operation = "启用了【停车收费设置模板】")
+    @Permit("community:property:carCharge:openCarCharge")
     public CommonResult openCarCharge(@RequestParam("uid") String uid,@RequestParam("type") Integer type){
         Long adminCommunityId = UserUtils.getAdminCommunityId();
         carChargeService.openCarCharge(uid,type,adminCommunityId);
         return CommonResult.ok();
     }
 
+    @LoginIgnore
     @PutMapping("/update")
     @CarOperation(operation = "更新了【停车收费设置模板】")
+    @Permit("community:property:carCharge:update")
     public CommonResult update(@RequestBody CarChargeEntity carChargeEntity){
         carChargeService.UpdateCarCharge(carChargeEntity);
         return CommonResult.ok();
 
     }
+    
+    @LoginIgnore
     @DeleteMapping("/del")
     @CarOperation(operation = "删除了【停车收费设置模板】")
+    @Permit("community:property:carCharge:del")
     public CommonResult delete(@RequestParam("uid") String uid){
         carChargeService.DelCarCharge(uid);
         return CommonResult.ok();
@@ -72,8 +79,8 @@ public class CarChargeController {
      * @param type
      * @return
      */
-    @Login
     @GetMapping("/getTypeList")
+    @Permit("community:property:carCharge:getTypeList")
     public CommonResult getTypeList(@RequestParam Integer type){
         List<CarChargeEntity> list = carChargeService.selectCharge(type,UserUtils.getAdminCommunityId());
         return CommonResult.ok(list);
@@ -83,9 +90,9 @@ public class CarChargeController {
     /**
      * 临时停车收费设置 save
      */
-    @Login
     @PostMapping("/temporaryParkingSet")
     @CarOperation(operation = "新增了【临时停车收费设置模板】")
+    @Permit("community:property:carCharge:temporaryParkingSet")
     public CommonResult temporaryParkingSet(@RequestBody CarChargeEntity carChargeEntity){
         Integer integer = carChargeService.temporaryParkingSet(carChargeEntity, UserUtils.getAdminCommunityId());
 
@@ -95,10 +102,9 @@ public class CarChargeController {
     /**
      * 计算该项设置的收费 Test charge
      */
-
-    @Login
     @PostMapping("/TestCharge")
     @CarOperation(operation = "计算了【模板设置的费用】")
+    @Permit("community:property:carCharge:TestCharge")
     public CommonResult TestCharge(@RequestBody CarChargeQO carChargeQO){
        BigDecimal charge =carChargeService.testCharge(carChargeQO);
         return CommonResult.ok(charge);
@@ -108,7 +114,9 @@ public class CarChargeController {
     /**
      * 订单支付返回收费详情
      */
+    @LoginIgnore
     @PostMapping("/orderCharge")
+    @Permit("community:property:carCharge:orderCharge")
     public CommonResult orderCharge(@RequestParam Long adminCommunityId,@RequestParam String carNumber){
         orderChargeDto orderCharge =carChargeService.orderCharge(adminCommunityId,carNumber);
 
@@ -122,8 +130,8 @@ public class CarChargeController {
      * 查询包月的所有收费标准
      */
     //todo 暂时没用到
-    @Login
     @GetMapping("/ListCharge")
+    @Permit("community:property:carCharge:ListCharge")
     public CommonResult ListCharge(){
         Long adminCommunityId = UserUtils.getAdminCommunityId();
         List<CarChargeEntity> chargeEntityList= carChargeService.ListCharge(adminCommunityId);
@@ -134,8 +142,8 @@ public class CarChargeController {
      * 查询临时停车收费标准
      */
     //todo 暂时没用到
-    @Login
     @GetMapping("/ListCharge2")
+    @Permit("community:property:carCharge:ListCharge2")
     public CommonResult ListCharge2(){
         Long adminCommunityId = UserUtils.getAdminCommunityId();
         List<CarChargeEntity> chargeEntityList= carChargeService.ListCharge2(adminCommunityId);
@@ -145,8 +153,8 @@ public class CarChargeController {
     /**
      * 根据uid查询单个收费设置标准
      */
-    @Login
     @GetMapping("/selectOneCharge")
+    @Permit("community:property:carCharge:selectOneCharge")
     public CommonResult selectOneCharge(@RequestParam("uid") String uid){
         CarChargeEntity chargeEntity= carChargeService.selectOneCharge(uid,UserUtils.getAdminCommunityId());
         return CommonResult.ok(chargeEntity);

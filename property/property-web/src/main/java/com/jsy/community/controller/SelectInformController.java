@@ -6,6 +6,8 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.proprietor.UserInformQO;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -39,8 +41,10 @@ public class SelectInformController {
      * @Param:
      * @return:
      */
+    @LoginIgnore
     @ApiOperation("所有已读通知人员")
     @PostMapping("/list")
+    @Permit("community:property:inform:list")
     public CommonResult list(@RequestBody UserInformQO userInformQO){
         System.out.println(userInformQO);
         Map<String,Object> map = selectInformService.findList(userInformQO);
@@ -54,8 +58,10 @@ public class SelectInformController {
      * @Param:
      * @return:
      */
+    @LoginIgnore
     @ApiOperation("所有未读通知人员")
     @PostMapping("/notList")
+    @Permit("community:property:inform:notList")
     public CommonResult notList(@RequestBody UserInformQO userInformQO){
         System.out.println(userInformQO);
         List<UserEntity> notList = selectInformService.findNotList(userInformQO);

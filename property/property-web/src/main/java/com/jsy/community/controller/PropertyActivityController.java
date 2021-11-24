@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyActivityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.ActivityUserEntity;
@@ -10,6 +9,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +26,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/activity")
 @ApiJSYController
-@Login
 public class PropertyActivityController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -34,6 +33,7 @@ public class PropertyActivityController {
 
     @ApiOperation("查询列表")
     @PostMapping("/list")
+    @Permit("community:property:activity:list")
     public CommonResult list(@RequestBody BaseQO<ActivityEntity> baseQO){
         Map<String, Object> map = propertyActivityService.list(baseQO, UserUtils.getAdminCommunityId());
         return CommonResult.ok(map);
@@ -41,6 +41,7 @@ public class PropertyActivityController {
 
     @ApiOperation("新增")
     @PostMapping("/save")
+    @Permit("community:property:activity:save")
     public CommonResult save(@RequestBody ActivityEntity activityEntity){
         activityEntity.setCommunityId(UserUtils.getAdminCommunityId());
         propertyActivityService.saveBy(activityEntity);
@@ -49,6 +50,7 @@ public class PropertyActivityController {
 
     @ApiOperation("查报名详情详情")
     @GetMapping("/getOne")
+    @Permit("community:property:activity:getOne")
     public CommonResult getOne(@RequestParam Long id){
         ActivityEntity entity = propertyActivityService.getOne(id);
         return CommonResult.ok(entity);
@@ -56,6 +58,7 @@ public class PropertyActivityController {
 
     @ApiOperation("编辑")
     @PutMapping("/update")
+    @Permit("community:property:activity:update")
     public CommonResult update(@RequestBody ActivityEntity activityEntity){
         propertyActivityService.update(activityEntity);
         return CommonResult.ok();
@@ -63,6 +66,7 @@ public class PropertyActivityController {
 
     @ApiOperation("报名详情")
     @PostMapping("/detail/page")
+    @Permit("community:property:activity:detail:page")
     public CommonResult detailPage(@RequestBody BaseQO<ActivityUserEntity> baseQO){
         Map<String,Object> map = propertyActivityService.detailPage(baseQO,UserUtils.getAdminCommunityId());
         return CommonResult.ok(map);
@@ -70,6 +74,7 @@ public class PropertyActivityController {
 
     @ApiOperation("上传图片")
     @PostMapping("/file")
+    @Permit("community:property:activity:file")
     public CommonResult file(@RequestParam MultipartFile[] file){
         String[] votes = MinioUtils.uploadForBatch(file, "activity");
         return CommonResult.ok(votes);

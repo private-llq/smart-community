@@ -1,10 +1,10 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyFinanceStatementRecordService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -35,9 +35,9 @@ public class PropertyFinanceStatementRecordController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/24 10:54
      **/
-    @Login
     @ApiOperation("物业结算-结算进程")
     @GetMapping("/getStatementRecord")
+    @Permit("community:property:statementRecord:getStatementRecord")
     public CommonResult getStatementRecord(@RequestParam String statementNum) {
         return CommonResult.ok(statementRecordService.statementRecordList(statementNum));
     }
