@@ -172,6 +172,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return userAuthVo;
     }
 
+    /***
+     * @author: Pipi
+     * @description: 查询极光推送标签
+     * @param uid: 用户uid
+     * @return: {@link String}
+     * @date: 2021/11/22 17:01
+     **/
+    @Override
+    public String getUroraTags(String uid) {
+        //查询极光推送标签
+        UserUroraTagsEntity userUroraTagsEntity = userUroraTagsService.queryUroraTags(uid);
+        if (userUroraTagsEntity != null) {
+            return userUroraTagsEntity.getUroraTags();
+        }
+        return null;
+    }
+
     /**
      * 查询用户信息
      */
@@ -477,6 +494,67 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         CallUtil.updateUserInfo(imId, user.getNickname(), avatar);
         log.info("同步聊天头像昵称成功：userid -> {},nickName -> {},image -> {}", imId, user.getNickname(), avatar);
         return uuid;
+    }
+
+    /***
+     * @author: Pipi
+     * @description: 第三版注册, 在用户基础模块注册后, 添加需要添加用户信息
+     * @param qo :
+     * @return: {@link String}
+     * @date: 2021/11/23 10:55
+     **/
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void registerV3(RegisterQO qo) {
+        //创建极光推送tags(t_user_urora_tags表)
+        UserUroraTagsEntity userUroraTagsEntity = new UserUroraTagsEntity();
+        userUroraTagsEntity.setUid(qo.getUid());
+        userUroraTagsEntity.setCommunityTags("all"); //给所有用户加一个通用tag，用于全体消息推送
+        boolean uroraTagsResult = userUroraTagsService.createUroraTags(userUroraTagsEntity);
+        if (!uroraTagsResult) {
+            log.error("用户极光推送tags设置失败，用户创建失败，相关账户：" + qo.getAccount());
+            throw new ProprietorException(JSYError.INTERNAL);
+        }
+
+        //推送房屋消息
+        List<HouseInfoEntity> houseInfoEntities = houseInfoService.selectList(qo.getAccount());
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", 9);
+        if (!houseInfoEntities.isEmpty()) {
+            for (HouseInfoEntity houseInfoEntity : houseInfoEntities) {
+                //推送消息
+                PushInfoUtil.PushPublicMsg(
+                        qo.getImId(),
+                        "房屋管理",
+                        houseInfoEntity.getTitle(),
+                        H5Url + "?id=" + houseInfoEntity.getId() + "mobile=" + qo.getAccount(),
+                        houseInfoEntity.getContent(),
+                        map,
+                        BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
+            }
+        }
+
+        //如果当前注册用户有房屋，则更新房屋信息
+        List<HouseMemberEntity> mobile = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("mobile", qo.getAccount()).eq("relation",1));
+        Set<Long> ids = null;
+        Set<Long> houseIds = null;
+        if (!mobile.isEmpty()) {
+            ids = new HashSet<>();
+            houseIds = new HashSet<>();
+            for (HouseMemberEntity houseMemberEntity : mobile) {
+                ids.add(houseMemberEntity.getId());
+                houseIds.add(houseMemberEntity.getHouseId());
+            }
+            houseMemberMapper.updateByMobile(ids, qo.getUid());
+            userHouseService.updateMobile(houseIds, qo.getUid());
+        }
+
+        //创建金钱账户(t_user_account表)
+        boolean userAccountResult = userAccountService.createUserAccount(qo.getUid());
+        if (!userAccountResult) {
+            log.error("用户账户创建失败，用户创建失败，相关账户：" + qo.getAccount());
+            throw new ProprietorException(JSYError.INTERNAL);
+        }
     }
 
     /**

@@ -39,7 +39,7 @@
         <!-- 网关 -->
 <!--        <module>gateway</module>-->
         <!-- MQ -->
-        <module>rabbitmq</module>
+<!--        <module>rabbitmq</module>-->
         <!-- 任务 -->
 <!--        <module>task</module>-->
         <module>payment-system</module>

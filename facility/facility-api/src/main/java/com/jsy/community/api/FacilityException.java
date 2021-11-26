@@ -10,9 +10,10 @@ import com.jsy.community.exception.JSYException;
  * @author ling
  * @since 2020-11-18 14:32
  */
-public class FacilityException extends JSYException {
+public class FacilityException extends RuntimeException {
 	public FacilityException(Integer code, String message) {
-		super(code, message);
+		super();
+//		super(code, message);
 	}
 	
 	public FacilityException() {
@@ -20,10 +21,13 @@ public class FacilityException extends JSYException {
 	}
 	
 	public FacilityException(String message) {
-		super(ConstError.NORMAL, message);
+//		super(ConstError.NORMAL, message);
+		super();
+
 	}
 	
 	public FacilityException(JSYError error) {
-		super(error);
+//		super(error);
+		super();
 	}
 }

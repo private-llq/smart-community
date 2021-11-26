@@ -15,19 +15,21 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * @author ling
  * @since 2020-11-18 14:36
  */
-@RestControllerAdvice
+//@RestControllerAdvice
 @Slf4j
-public class PropertyExceptionHandler extends JSYExceptionHandler {
+public class FacilityExceptionHandler extends JSYExceptionHandler {
 	@ExceptionHandler(FacilityException.class)
 	public CommonResult<Boolean> handlerProprietorException(FacilityException e) {
-		return CommonResult.error(e.getCode(), e.getMessage());
+//		return CommonResult.error(e.getCode(), e.getMessage());
+		return CommonResult.error(400, e.getMessage());
 	}
 	
 	@ExceptionHandler(Exception.class)
 	public CommonResult<Boolean> handleException(Exception e) {
 		log.error(e.getMessage(), e);
 		if (e instanceof FacilityException) {
-			return CommonResult.error(((FacilityException) e).getCode(), e.getMessage());
+//			return CommonResult.error(((FacilityException) e).getCode(), e.getMessage());
+			return CommonResult.error(400, e.getMessage());
 		}
 		return CommonResult.error(JSYError.INTERNAL);
 	}

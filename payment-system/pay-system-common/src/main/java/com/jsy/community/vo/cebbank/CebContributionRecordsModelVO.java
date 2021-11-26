@@ -13,33 +13,33 @@ import java.io.Serializable;
 @Data
 public class CebContributionRecordsModelVO implements Serializable {
 
-    // 订单号
-    private String orderNo;
-
-    // 订单日期
-    private String tranDate;
-
-    // 缴费项目名称
-    private String paymentItemName;
-
-    // 缴款码
-    private String billKey;
-
-    // 状态
-    // 1、5：处理中
-    // 3：缴费成功
-    // 2、4、8：缴费失败
-    private String status;
-
-    // 交易时间
-    private String paymentDate;
-
-    // 交易金额（单位元）
-    private String payAmount;
-
-    // 缴费项目类别例如水费、电费
-    private String paymentType;
-
-    // 缴费类型图片url
-    private String pictureUrl;
+     private String paymentItemName;
+     private String tranDate;
+     private String billKey;
+     private String billNo;
+     private String payDate;
+     private String filed1;
+     private String filed2;
+     private String filed3;
+     private String filed4;
+     private String customerName;
+     private String payAccount;
+     private String pin;
+     private String payAmount;
+     private String acType;
+     private String contractNo;
+     private String tranDesc;
+     private String bankBillNo;
+     private String acctDate;
+     private String userId;
+     private String companyName;
+     private String invoiceCode;
+     private String invoiceInformation;
+     private String paymentDate;
+     private String status;
+     private String orderNo;
+     private String payBusinessCode;
+     private String paymentType;
+     private String pictureUrl;
+     private String payType;
 }

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * @author ling
  * @since 2020-11-18 14:36
  */
-@RestControllerAdvice
+//@RestControllerAdvice
 @Slf4j
 public class PropertyExceptionHandler extends JSYExceptionHandler {
 	@ExceptionHandler(PropertyException.class)

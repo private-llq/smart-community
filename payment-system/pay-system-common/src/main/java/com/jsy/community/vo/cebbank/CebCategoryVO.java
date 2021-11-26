@@ -1,5 +1,7 @@
 package com.jsy.community.vo.cebbank;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
 /**
@@ -8,10 +10,20 @@ import java.io.Serializable;
  * @Date: 2021/11/12 17:40
  * @Version: 1.0
  **/
+@Data
 public class CebCategoryVO implements Serializable {
-    // 缴费类别的类型
     private String type;
-
-    // 缴费类别名称
     private String typeName;
+    private String citycode;
+    private String cityName;
+    private String sort;
+    private String picUrlClient;
+    private String version;
+    private String picName;
+    private String paymentType;
+    private String pictureUrl;
+    private String paymentWay;
+    private String CebPaymentItemsList;
+    private String cornerMarker;
+    private String howView;
 }
