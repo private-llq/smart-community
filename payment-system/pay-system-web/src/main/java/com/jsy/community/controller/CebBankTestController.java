@@ -34,9 +34,9 @@ import java.util.HashMap;
  **/
 @RestController
 @ApiJSYController
-@RequestMapping("/cebBank")
+@RequestMapping("/cebBankTest")
 @Slf4j
-public class CebBankController {
+public class CebBankTestController {
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private CebBankService cebBankService;
 
@@ -68,7 +68,6 @@ public class CebBankController {
      * @date: 2021/11/17 17:47
      **/
     @PostMapping("/v2/cityContributionCategory")
-//    @Permit("community:payment:AlipayPhoneH5:v2:cityContributionCategory")
     @LoginIgnore
     public CommonResult queryCityContributionCategory(@RequestBody CebQueryCityContributionCategoryQO categoryQO) {
         String sessionId = getCebBankSessionId();
@@ -183,7 +182,7 @@ public class CebBankController {
         String sessionId = getCebBankSessionId();
         deskQO.setMerOrderNo(String.valueOf(SnowFlake.nextId()));
         deskQO.setMerOrderDate(String.valueOf(LocalDate.now()).replaceAll("-", ""));
-        /*deskQO.setPayAmount(new BigDecimal("221"));
+        deskQO.setPayAmount(new BigDecimal("221"));
         deskQO.setPaymentItemCode("470191419");
         deskQO.setPaymentItemId("172805");
         deskQO.setBillKey("051245000023");
@@ -200,8 +199,8 @@ public class CebBankController {
         deskQO.setRedirectUrl("http://zhsj.free.svipss.top");
 //        deskQO.setNotifyUrl("http://222.178.212.29:8090/zhsj/community/payment/api/v1/payment/cebBank/v2/cebCallback");
 //        deskQO.setRefundUrl("http://222.178.212.29:8090/zhsj/community/payment/api/v1/payment/cebBank/v2/refund");
-        deskQO.setNotifyUrl("http://zhsj.free.svipss.top/api/v1/payment/cebBak/v2/cebCallback");
-        deskQO.setRefundUrl("http://zhsj.free.svipss.top/api/v1/payment/cebBank/v2/refund");
+        deskQO.setNotifyUrl("http://zhsj.free.svipss.top/api/v1/payment/cebBankTest/v2/cebCallback");
+        deskQO.setRefundUrl("http://zhsj.free.svipss.top/api/v1/payment/cebBankTest/v2/refund");
         CebBillQueryResultDataModelQO resultDataModelQO = new CebBillQueryResultDataModelQO();
         resultDataModelQO.setContractNo("051245000023");
         resultDataModelQO.setCustomerName("**");
@@ -221,10 +220,10 @@ public class CebBankController {
         resultDataModelQO.setAccount(null);
         deskQO.setBillQueryResultDataModel(JSON.toJSONString(resultDataModelQO));
         deskQO.setType("20");
-        deskQO.setDeviceType("1");*/
+        deskQO.setDeviceType("1");
 
 
-        deskQO.setPayAmount(new BigDecimal("50"));
+        /*deskQO.setPayAmount(new BigDecimal("50"));
         deskQO.setPaymentItemCode("956084211");
         deskQO.setPaymentItemId("231106");
         deskQO.setBillKey("13581778060");
@@ -234,10 +233,10 @@ public class CebBankController {
         deskQO.setAppName("E到家");
         deskQO.setAppVersion("1.0.0");
         deskQO.setRedirectUrl("http://zhsj.free.svipss.top");
-        deskQO.setNotifyUrl("http://zhsj.free.svipss.top/api/v1/payment/cebBank/v2/cebCallback");
-        deskQO.setRefundUrl("http://zhsj.free.svipss.top/api/v1/payment/cebBank/v2/refund");
+        deskQO.setNotifyUrl("http://zhsj.free.svipss.top/api/v1/payment/cebBankTest/v2/cebCallback");
+        deskQO.setRefundUrl("http://zhsj.free.svipss.top/api/v1/payment/cebBankTest/v2/refund");
         deskQO.setType("1");
-        deskQO.setDeviceType("1");
+        deskQO.setDeviceType("1");*/
         return CommonResult.ok(cebBankService.createCashierDesk(deskQO));
     }
 

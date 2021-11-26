@@ -172,13 +172,13 @@
 <!--        </plugins>-->
 <!--    </build>-->
 
-    <dependencies>
-        <dependency>
-            <groupId>com.zhsj</groupId>
-            <artifactId>base_common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
+<!--    <dependencies>-->
+<!--        <dependency>-->
+<!--            <groupId>com.zhsj</groupId>-->
+<!--            <artifactId>base_common</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
+<!--    </dependencies>-->
 
     <repositories>
         <repository>

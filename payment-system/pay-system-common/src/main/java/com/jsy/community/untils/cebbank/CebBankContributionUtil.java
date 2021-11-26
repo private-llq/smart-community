@@ -146,7 +146,7 @@ public class CebBankContributionUtil {
         String deviceType = deskQO.getDeviceType();
         deskQO.setCanal(CebBankEntity.siteCode);
         deskQO.setDeviceType(null);
-        return sendRequest(deskQO, deviceType, CebBankConst.QUERY_CONTRIBUTION_RECORD_INFO);
+        return sendRequest(deskQO, deviceType, CebBankConst.CREATE_CASHIER_DESK);
     }
 
 
