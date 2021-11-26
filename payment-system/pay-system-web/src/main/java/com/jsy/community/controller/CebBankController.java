@@ -1,25 +1,20 @@
 package com.jsy.community.controller;
+
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
-import com.jsy.community.qo.cebbank.CebBillQueryResultDataModelQO;
-
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.CebBankService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.cebbank.*;
-import com.jsy.community.qo.unionpay.HttpResponseModel;
 import com.jsy.community.untils.cebbank.CebBankContributionUtil;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.cebbank.*;
 import com.zhsj.baseweb.annotation.LoginIgnore;
-import com.zhsj.baseweb.annotation.Permit;
-import jdk.jfr.ContentType;
 import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,9 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @Author: Pipi
