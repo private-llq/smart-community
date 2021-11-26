@@ -1,6 +1,9 @@
 package com.jsy.community.qo.cebbank;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.math.BigDecimal;
 
 /**
  * @Author: Pipi
@@ -9,6 +12,7 @@ import lombok.Data;
  * @Version: 1.0
  **/
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class CebCreateCashierDeskQO extends CebBaseQO {
     // 商户订单号-必填
     private String merOrderNo;
@@ -19,7 +23,7 @@ public class CebCreateCashierDeskQO extends CebBaseQO {
 
     // 支付金额-必填
     // NUMBER(16,2)
-    private String payAmount;
+    private BigDecimal payAmount;
 
     // 缴费项目编号-必填
     private String paymentItemCode;
@@ -34,7 +38,7 @@ public class CebCreateCashierDeskQO extends CebBaseQO {
     private String sessionId;
 
     // 账单金额-必填
-    private String billAmount;
+    private BigDecimal billAmount;
 
     // 账单交易码-必填
     private String queryAcqSsn;
@@ -49,6 +53,10 @@ public class CebCreateCashierDeskQO extends CebBaseQO {
     // 备用字段-非必填
     // 为用户输入信息（查询账单时输入的信息，有就上送）
     private String filed1;
+    private String filed2;
+    private String filed3;
+    private String filed4;
+    private String filed5;
 
     // 应用名称-必填
     // 云缴费（第三方商户调用云缴费客户端收银台的产品名称，商户自行定义参数）
@@ -72,7 +80,7 @@ public class CebCreateCashierDeskQO extends CebBaseQO {
 
     // 用户选择的账单信息（既通过查询账单接口返回的账单）-必填
     // Json格式的字符串reqdata示例中billQueryResultDataModel字段的值
-    private CebBillQueryResultDataModelQO billQueryResultDataModel;
+    private String billQueryResultDataModel;
 
     // 手机充值标记-必填
     // 手机充值该字段必传1。手机充值时可以不用传filed,qryAcnSsn,contractNo、这些5接口没有返回的值

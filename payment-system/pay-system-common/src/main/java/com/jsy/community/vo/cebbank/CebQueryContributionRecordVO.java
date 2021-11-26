@@ -14,8 +14,8 @@ import java.util.List;
 @Data
 public class CebQueryContributionRecordVO implements Serializable {
     // 返回对象
-    private String hkPaymentRecordsModel;
+    private CebQueryContributionRecordVO hkPaymentRecordsModel;
     private List<CebContributionRecordsModelVO> recordsModel;
-    private List<CebContributionRecordPageInfoVO> pageInfo;
+    private CebPageInfoVO pageInfo;
 
 }

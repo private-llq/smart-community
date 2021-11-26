@@ -11,6 +11,8 @@ public class HttpResponseModel {
     private String respCode;
     private String respMsg;
     private String signature;
+    private String transacCode;
+    private String reqdata;
 
     public String getRespData() {
         return respData;
@@ -35,5 +37,21 @@ public class HttpResponseModel {
     }
     public void setSignature(String signature) {
         this.signature = signature;
+    }
+
+    public String getTransacCode() {
+        return transacCode;
+    }
+
+    public void setTransacCode(String transacCode) {
+        this.transacCode = transacCode;
+    }
+
+    public String getReqdata() {
+        return reqdata;
+    }
+
+    public void setReqdata(String reqdata) {
+        this.reqdata = reqdata;
     }
 }

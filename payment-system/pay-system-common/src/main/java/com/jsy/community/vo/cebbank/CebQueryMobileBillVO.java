@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 public class CebQueryMobileBillVO implements Serializable {
     // 数据模型
-    private String mobileRechargeModel;
+    private CebQueryMobileBillVO mobileRechargeModel;
 
     // 手机号码
     private String mobile;
@@ -28,4 +28,7 @@ public class CebQueryMobileBillVO implements Serializable {
 
     // 缴费信息模型
     private List<CebMobilePaymentItemModelVO> paymentItemModelList;
+
+    private String serialNumber;
+    private String userPhoneEnc;
 }

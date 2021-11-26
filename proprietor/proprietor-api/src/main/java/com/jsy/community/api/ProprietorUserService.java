@@ -40,6 +40,15 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @date: 2021/10/28 11:26
 	 **/
 	UserInfoVo queryUserInfo(String uid);
+
+	/***
+	 * @author: Pipi
+	 * @description: 查询极光推送标签
+	 * @param uid: 用户uid
+	 * @return: {@link String}
+	 * @date: 2021/11/22 17:01
+	 **/
+	String getUroraTags(String uid);
 	
 	/**
 	* @Description: 更新用户极光ID
@@ -66,7 +75,6 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 */
 	String register(RegisterQO qo);
 
-
 	/**
 	 * @Description: 第二版注册
 	 * @author: Hu
@@ -75,6 +83,15 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @return:
 	 */
 	String registerV2(RegisterQO qo);
+
+	/***
+	 * @author: Pipi
+	 * @description: 第三版注册,在用户基础模块注册后,添加需要添加用户信息
+	 * @param qo:
+	 * @return: {@link String}
+	 * @date: 2021/11/23 10:55
+	 **/
+	void registerV3(RegisterQO qo);
 
 	/**
 	* @Description: 三方登录

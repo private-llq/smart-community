@@ -13,10 +13,47 @@ import java.util.List;
  **/
 @Data
 public class CebMobilePaymentItemModelVO implements Serializable {
-    // 业务流程
-    // 0：先查后缴1：直接缴费2：二次查询
+    private String paymentItemId;
+    private String merchantNo;
+    private String categoryId;
+    private String companyId;
+    private String paymentItemName;
+    private String companyName;
+    private String createdAt;
+    private String updatedAt;
+    private String description;
+    private String proxyBankCode;
+    private String proxyBankName;
+    private String isUploadAreaCode;
+    private String paymentItemNo;
+    private String isShowChannel;
+    private String queryBusinessCode;
+    private String paymentBusinessCode;
+    private String businessSubCode;
     private String businessFlow;
-
-    // 缴费项目条件限制模型
-    private List<CebMobileCreatePaymentBillParamsModeVO> createPaymentBillParamsModelList;
+    private String printAddress;
+    private String status;
+    private String isAppoint;
+    private String operator;
+    private String getInvoiceDescription;
+    private String paymentConstraint;
+    private String paymentItemCode;
+    private String customerWritable;
+    private String pictureUrl;
+    private String typeSheb;
+    private String categoryChildrenId;
+    private String categoryChildrenName;
+    private String isPaymentWithhold;
+    private String withhold_Channel;
+    private String categoryName;
+    private String categoryType;
+    private String howView;
+    private List<CebPaymentBillFieldsInfoModelListVO> paymentBillFieldsInfoModelList;
+    private List<CebQueryPaymentBillParamModelListVO> queryPaymentBillParamModelList;
+    private List<CebCreatePaymentBillParamsModelListVO> createPaymentBillParamsModelList;
+    private List<CebPaymentNameModelListVO> cebPaymentNameModelList;
+    private String cebPaymentName;
+    private List<CebCityModelVO> cityModelList;
+    private String tempOffStatus;
+    private String tempOffTips;
 }

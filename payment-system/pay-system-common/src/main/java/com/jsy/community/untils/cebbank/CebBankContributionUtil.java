@@ -5,6 +5,7 @@ import com.jsy.community.config.service.CebBankEntity;
 import com.jsy.community.constant.CebBankConst;
 import com.jsy.community.qo.cebbank.*;
 import com.jsy.community.qo.unionpay.HttpResponseModel;
+import com.jsy.community.vo.cebbank.HttpRequestModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -30,8 +31,10 @@ public class CebBankContributionUtil {
      * @date: 2021/11/12 10:18
      **/
     public static HttpResponseModel login(CebLoginQO cebLoginQO) {
+        String deviceType = cebLoginQO.getDeviceType();
         cebLoginQO.setCanal(CebBankEntity.siteCode);
-        return sendRequest(cebLoginQO, cebLoginQO.getDeviceType(), CebBankConst.LOGIN);
+        cebLoginQO.setDeviceType(null);
+        return sendRequest(cebLoginQO, deviceType, CebBankConst.LOGIN);
     }
 
     /**
@@ -42,7 +45,10 @@ public class CebBankContributionUtil {
      * @date: 2021/11/12 10:19
      **/
     public static HttpResponseModel queryCity(CebQueryCityQO cebQueryCityQO) {
-        return sendRequest(cebQueryCityQO, cebQueryCityQO.getDeviceType(), CebBankConst.QUERY_CITY);
+        String deviceType = cebQueryCityQO.getDeviceType();
+        cebQueryCityQO.setCanal(CebBankEntity.siteCode);
+        cebQueryCityQO.setDeviceType(null);
+        return sendRequest(cebQueryCityQO, deviceType, CebBankConst.QUERY_CITY);
     }
 
     /**
@@ -53,7 +59,10 @@ public class CebBankContributionUtil {
      * @date: 2021/11/12 10:57
      **/
     public static HttpResponseModel queryCityContributionCategory(CebQueryCityContributionCategoryQO categoryQO) {
-        return sendRequest(categoryQO, categoryQO.getDeviceType(), CebBankConst.QUERY_CITY_CONTRIBUTION_CATEGORY);
+        String deviceType = categoryQO.getDeviceType();
+        categoryQO.setCanal(CebBankEntity.siteCode);
+        categoryQO.setDeviceType(null);
+        return sendRequest(categoryQO, deviceType, CebBankConst.QUERY_CITY_CONTRIBUTION_CATEGORY);
     }
     
     /**
@@ -64,7 +73,10 @@ public class CebBankContributionUtil {
      * @date: 2021/11/12 11:08
      **/
     public static HttpResponseModel queryContributionProject(CebQueryContributionProjectQO projectQO) {
-        return sendRequest(projectQO, projectQO.getDeviceType(), CebBankConst.QUERY_CONTRIBUTION_PROJECT);
+        String deviceType = projectQO.getDeviceType();
+        projectQO.setCanal(CebBankEntity.siteCode);
+        projectQO.setDeviceType(null);
+        return sendRequest(projectQO, deviceType, CebBankConst.QUERY_CONTRIBUTION_PROJECT);
     }
 
     /**
@@ -75,7 +87,10 @@ public class CebBankContributionUtil {
      * @date: 2021/11/12 11:33
      **/
     public static HttpResponseModel queryBillInfo(CebQueryBillInfoQO billInfoQO) {
-        return sendRequest(billInfoQO, billInfoQO.getDeviceType(), CebBankConst.QUERY_BILL_INFO);
+        String deviceType = billInfoQO.getDeviceType();
+        billInfoQO.setCanal(CebBankEntity.siteCode);
+        billInfoQO.setDeviceType(null);
+        return sendRequest(billInfoQO, deviceType, CebBankConst.QUERY_BILL_INFO);
     }
 
     /**
@@ -86,7 +101,10 @@ public class CebBankContributionUtil {
      * @date: 2021/11/12 11:46
      **/
     public static HttpResponseModel queryMobileBill(CebQueryMobileBillQO billQO) {
-        return sendRequest(billQO, billQO.getDeviceType(), CebBankConst.QUERY_MOBILE_BILL);
+        String deviceType = billQO.getDeviceType();
+        billQO.setCanal(CebBankEntity.siteCode);
+        billQO.setDeviceType(null);
+        return sendRequest(billQO, deviceType, CebBankConst.QUERY_MOBILE_BILL);
     }
 
     /**
@@ -97,7 +115,10 @@ public class CebBankContributionUtil {
      * @date: 2021/11/12 11:53
      **/
     public static HttpResponseModel queryContributionRecord(CebQueryContributionRecordQO recordQO) {
-        return sendRequest(recordQO, recordQO.getDeviceType(), CebBankConst.QUERY_CONTRIBUTION_RECORD);
+        String deviceType = recordQO.getDeviceType();
+        recordQO.setCanal(CebBankEntity.siteCode);
+        recordQO.setDeviceType(null);
+        return sendRequest(recordQO, deviceType, CebBankConst.QUERY_CONTRIBUTION_RECORD);
     }
 
     /**
@@ -108,9 +129,25 @@ public class CebBankContributionUtil {
      * @date: 2021/11/12 14:51
      **/
     public static HttpResponseModel queryContributionRecordInfo(CebQueryContributionRecordInfoQO infoQO) {
-        return sendRequest(infoQO, infoQO.getDeviceType(), CebBankConst.QUERY_CONTRIBUTION_RECORD_INFO);
+        String deviceType = infoQO.getDeviceType();
+        infoQO.setCanal(CebBankEntity.siteCode);
+        infoQO.setDeviceType(null);
+        return sendRequest(infoQO, deviceType, CebBankConst.QUERY_CONTRIBUTION_RECORD_INFO);
     }
 
+    /***
+     * @author: Pipi
+     * @description: 创建收银台
+     * @param deskQO:
+     * @return: {@link HttpResponseModel}
+     * @date: 2021/11/23 18:20
+     **/
+    public static HttpResponseModel createCashierDesk(CebCreateCashierDeskQO deskQO) {
+        String deviceType = deskQO.getDeviceType();
+        deskQO.setCanal(CebBankEntity.siteCode);
+        deskQO.setDeviceType(null);
+        return sendRequest(deskQO, deviceType, CebBankConst.QUERY_CONTRIBUTION_RECORD_INFO);
+    }
 
 
     /**
@@ -150,13 +187,6 @@ public class CebBankContributionUtil {
             sendMap.put("signature", signature);
             //发送请求
             log.info("请求sendMap:{}", sendMap.toString());
-            /*HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(CebBankEntity.requestUrl, sendMap);
-            //执行
-            String httpResult;
-            JSONObject result = null;
-            httpResult = (String) MyHttpUtils.exec(httpPost, MyHttpUtils.ANALYZE_TYPE_STR);
-            result = JSON.parseObject(httpResult);
-            log.info("result:{}", result);*/
             CloseableHttpResponse httpResonse = HttpSendUtil.sendToOtherServer2(CebBankEntity.requestUrl, sendMap);
             log.info("响应接口", httpResonse);
             //接收返回，并验签
@@ -183,7 +213,7 @@ public class CebBankContributionUtil {
      * @return: java.lang.Boolean
      * @date: 2021/11/11 15:08
      **/
-    private static Boolean verifyhttpResonse(HttpResponseModel httpResponseModel) throws IOException {
+    public static Boolean verifyhttpResonse(HttpResponseModel httpResponseModel) throws IOException {
         String respData = httpResponseModel.getRespData();
         String respCode = httpResponseModel.getRespCode();
         String respMsg = httpResponseModel.getRespMsg();
@@ -198,6 +228,31 @@ public class CebBankContributionUtil {
 
         String content = respCode+respMsg+respData_json;
         //验签
-        return VerifyUtil.verify(CebBankEntity.publicKey, signature, content, "utf-8");
+        return VerifyUtil.verify(CebBankEntity.cebBankPublicKey, signature, content, "utf-8");
+    }
+
+    /***
+     * @author: Pipi
+     * @description: 支付回调验签
+     * @param httpRequestModel:
+     * @return: {@link Boolean}
+     * @date: 2021/11/24 18:15
+     **/
+    public static Boolean verifyhttpResonse(HttpRequestModel httpRequestModel) throws IOException {
+        String siteCode = httpRequestModel.getSiteCode();
+        String transacCode = httpRequestModel.getTransacCode();
+        String reqdata = httpRequestModel.getReqdata();
+        String signature = httpRequestModel.getSignature();
+
+        byte[] decodeBase64 = Base64.decodeBase64(httpRequestModel.getReqdata().replaceAll("%3D", ""));
+        String respData_json = new String(decodeBase64);
+        log.info("返回应答，respCode={}", reqdata);
+        log.info("返回应答，signature={}", signature);
+        log.info("返回应答，respData={}", respData_json);
+        log.info("返回应答，transacCode={}", transacCode);
+
+         String content = siteCode+"1.0.0"+transacCode+respData_json;
+        //验签
+        return VerifyUtil.verify(CebBankEntity.cebBankPublicKey, signature, content, "utf-8");
     }
 }

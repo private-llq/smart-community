@@ -1,4 +1,6 @@
 package com.jsy.community.controller;
+import com.google.common.collect.Lists;
+import java.time.LocalDateTime;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -17,20 +19,26 @@ import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
 import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
 import com.zhsj.base.api.rpc.IBaseAuthRpcService;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.LoginVo;
+import com.zhsj.base.api.vo.ThirdBindStatusVo;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -67,6 +75,9 @@ public class UserAuthController {
     @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
     private IBaseAuthRpcService baseAuthRpcService;
 
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
+
     /**
      * 发送验证码
      */
@@ -90,6 +101,48 @@ public class UserAuthController {
         return b ? CommonResult.ok() : CommonResult.error("验证码发送失败");
     }
 
+    @ApiOperation("注册")
+    @PostMapping("/register")
+    @Transactional(rollbackFor = Exception.class)
+    @LoginIgnore
+    public CommonResult<UserAuthVo> register(@RequestBody RegisterQO qo) {
+        ValidatorUtils.validateEntity(qo);
+        //验证码验证
+        //commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
+        //调用基础用户模块注册
+        LoginVo loginVo = baseAuthRpcService.eHomeUserPhoneRegister(qo.getAccount(), qo.getPassword(), qo.getCode());
+        qo.setImId(loginVo.getUserIm().getImId());
+        qo.setUid(loginVo.getUserInfo().getAccount());
+        userService.registerV3(qo);
+        UserInfoVo userInfoVo = new UserInfoVo();
+        userInfoVo.setUid(loginVo.getUserInfo().getAccount());
+        userInfoVo.setIsBindMobile(1);
+        UserAuthVo userAuthVo = new UserAuthVo();
+        userAuthVo.setToken(loginVo.getToken().getToken());
+        userAuthVo.setExpiredTime(LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime(), 0, ZoneOffset.ofHours(8)));
+        userAuthVo.setUserInfo(userInfoVo);
+
+        //生成带token和用户信息的的UserAuthVo(注册后设置密码用)
+//        UserAuthVo userAuthVo = userService.createAuthVoWithToken(userInfoVo);
+        return CommonResult.ok(userAuthVo, "注册成功");
+    }
+
+   /* @ApiOperation("注册")
+    @PostMapping("/register")
+    @Transactional(rollbackFor = Exception.class)
+    public CommonResult<UserAuthVo> register(@RequestBody RegisterQO qo) {
+        ValidatorUtils.validateEntity(qo);
+        //验证码验证
+//		commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
+        userService.register(qo);
+        UserInfoVo userInfoVo = new UserInfoVo();
+        userInfoVo.setUid(uid);
+
+        //生成带token和用户信息的的UserAuthVo(注册后设置密码用)
+        UserAuthVo userAuthVo = userService.createAuthVoWithToken(userInfoVo);
+        return CommonResult.ok(userAuthVo, "注册成功");
+    }*/
+
     @ApiOperation("游客登录")
     @GetMapping("/login/tourist")
     public CommonResult getTouristToken() {
@@ -104,10 +157,49 @@ public class UserAuthController {
             throw new ProprietorException("验证码和密码不能同时为空");
         }
         log.info(qo.getAccount() + "开始登录");
-        UserInfoVo infoVo = userService.login(qo);
+        LoginVo loginVo;
+        // 调用基础用户模块登录
+        if (StrUtil.isEmpty(qo.getCode())) {
+            loginVo = baseAuthRpcService.loginEHome(qo.getAccount(), qo.getPassword(), "PHONE_PWD");
+        } else {
+            loginVo = baseAuthRpcService.loginEHome(qo.getAccount(), qo.getCode(), "PHONE_CODE");
+        }
+        // 调用基础用户模块获取三方绑定状态
+        ThirdBindStatusVo thirdBindStatus = baseUserInfoRpcService.getThirdBindStatus(loginVo.getUserInfo().getId());
+        // 调用基础用户模块获取支付密码设置状态
+        Boolean payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(loginVo.getUserInfo().getId(), loginVo.getUserInfo().getAccount());
+        // 调用基础用户模块获取实名信息
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(loginVo.getUserInfo().getId());
+        UserInfoVo userInfoVo = new UserInfoVo();
+        userInfoVo.setIsBindMobile(loginVo.getUserInfo().getIsBindPhone() ? 1 : 0);
+        if (thirdBindStatus != null) {
+            userInfoVo.setIsBindWechat(thirdBindStatus.getWeChatBind() ? 1 : 0);
+            userInfoVo.setIsBindAlipay(thirdBindStatus.getAliPayBind() ? 1 : 0);
+        }
+        userInfoVo.setIsBindPayPassword(payPasswordStatus != null && payPasswordStatus ? 1 : 0);
+        userInfoVo.setMobile(loginVo.getUserInfo().getPhone());
+        userInfoVo.setUid(loginVo.getUserInfo().getAccount());
+        userInfoVo.setUroraTags(userService.getUroraTags(userInfoVo.getUid()));
+        userInfoVo.setImId(loginVo.getUserIm().getImId());
+        userInfoVo.setImPassword(loginVo.getUserIm().getPassword());
+        userInfoVo.setNickname(loginVo.getUserInfo().getNickName());
+        userInfoVo.setAvatarUrl(loginVo.getUserInfo().getAvatarThumbnail());
+        userInfoVo.setSex(loginVo.getUserInfo().getSex());
+        if (idCardRealInfo != null) {
+            userInfoVo.setRealName(idCardRealInfo.getIdCardName());
+            userInfoVo.setIdCard(idCardRealInfo.getIdCardNumber());
+        }
+        userInfoVo.setIsRealAuth(loginVo.getUserInfo().getIsAuthFace() ? 1 : 0);
+
+        UserAuthVo userAuthVo = new UserAuthVo();
+        userAuthVo.setToken(loginVo.getToken().getToken());
+        userAuthVo.setExpiredTime(LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime(), 0, ZoneOffset.ofHours(8)));
+        userAuthVo.setUserInfo(userInfoVo);
+
+        /*UserInfoVo infoVo = userService.login(qo);
         infoVo.setIdCard(null);
         //生成带token和用户信息的的UserAuthVo
-        UserAuthVo userAuthVo = userService.createAuthVoWithToken(infoVo);
+        UserAuthVo userAuthVo = userService.createAuthVoWithToken(infoVo);*/
         return CommonResult.ok(userAuthVo);
     }
 
@@ -151,21 +243,6 @@ public class UserAuthController {
             return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "手机和验证码不能为空");
         }
         return CommonResult.ok(userService.bindThirdPlatform(userThirdPlatformQO), "绑定成功");
-    }
-
-    @ApiOperation("注册")
-    @PostMapping("/register")
-    public CommonResult<UserAuthVo> register(@RequestBody RegisterQO qo) {
-        ValidatorUtils.validateEntity(qo);
-        //验证码验证
-//		commonService.checkVerifyCode(qo.getAccount(), qo.getCode());
-        String uid = userService.register(qo);
-        UserInfoVo userInfoVo = new UserInfoVo();
-        userInfoVo.setUid(uid);
-
-        //生成带token和用户信息的的UserAuthVo(注册后设置密码用)
-        UserAuthVo userAuthVo = userService.createAuthVoWithToken(userInfoVo);
-        return CommonResult.ok(userAuthVo, "注册成功");
     }
 
     @ApiOperation(value = "注册后设置密码", notes = "需要登录")

@@ -12,33 +12,20 @@ import java.io.Serializable;
  **/
 @Data
 public class CebBillQueryResultDataModelQO implements Serializable {
-    // 合同号
     private String contractNo;
-
-    // 客户名称
     private String customerName;
-
-    // 余额
+    private String originalCustomerName;
     private String balance;
-
-    // 开始时间
+    private String payAmount;
     private String beginDate;
-
-    // 结束时间
     private String endDate;
-
-    // 备用字段
     private String filed1;
-
-    // 备用字段
     private String filed2;
-
-    // 备用字段
     private String filed3;
-
-    // 备用字段
     private String filed4;
-
-    // 备用字段
     private String filed5;
+    private String payBeginDate;
+    private String payEndDate;
+    private String serialNumber;
+    private String account;
 }

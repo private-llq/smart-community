@@ -14,44 +14,35 @@ import java.math.BigDecimal;
 @Data
 public class CebContributionRecordDetailVO implements Serializable {
     // 数据模型
-    private String hkPaymentRecordsInfo;
+    private CebContributionRecordDetailVO hkPaymentRecordsInfo;
 
-    // 缴费项目
     private String paymentItemName;
-
-    // 交易时间
-    private String payDate;
-
-    // 订单号
-    private String orderNo;
-
-    // 支付金额（单位元）
-    private BigDecimal payAmount;
-
-    // 缴费状态
-    // 1、5：处理中
-    // 3：缴费成功
-    // 2、4、8：缴费失败
-    private Integer status;
-
-    // 收费单位
-    private String companyName;
-
-    // 缴费号码
+    private String tranDate;
     private String billKey;
-
-    // 用户名
+    private String billNo;
+    private String payDate;
+    private String filed1;
+    private String filed2;
+    private String filed3;
+    private String filed4;
     private String customerName;
-
-    // 支付方式
-    // 11：银联
-    // 21：微信
-    // 32：支付宝
-    private String payType;
-
-    // 发票提取码
+    private String payAccount;
+    private String pin;
+    private BigDecimal payAmount;
+    private String acType;
+    private String contractNo;
+    private String tranDesc;
+    private String bankBillNo;
+    private String acctDate;
+    private String userId;
+    private String companyName;
     private String invoiceCode;
-
-    // 发票提取信息
     private String invoiceInformation;
+    private String paymentDate;
+    private Integer status;
+    private String orderNo;
+    private String payBusinessCode;
+    private String paymentType;
+    private String pictureUrl;
+    private Integer payType;
 }

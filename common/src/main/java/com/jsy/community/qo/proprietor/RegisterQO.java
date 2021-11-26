@@ -27,5 +27,20 @@ public class RegisterQO implements Serializable {
 
 	@ApiModelProperty("业主添加家属时要用到的字段")
 	private String name;
-	
+
+	/**
+	 * 密码
+	 */
+	@NotEmpty(message = "密码不能为空")
+	private String password;
+
+	/**
+	 * 唯一标识
+	 */
+	private String uid;
+
+	/**
+	 * imId(聊天用户id)
+	 */
+	private String imId;
 }

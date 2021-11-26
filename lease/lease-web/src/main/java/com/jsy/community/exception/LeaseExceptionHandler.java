@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * @author ling
  * @since 2020-11-11 11:14
  */
-@RestControllerAdvice
+//@RestControllerAdvice
 @Slf4j
 public class LeaseExceptionHandler extends JSYExceptionHandler {
 

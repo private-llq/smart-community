@@ -14,7 +14,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
  * @author ling
  * @since 2020-11-11 11:14
  */
-@RestControllerAdvice
+//@RestControllerAdvice
 @Slf4j
 public class ProprietorExceptionHandler extends JSYExceptionHandler {
 	@ExceptionHandler(ProprietorException.class)

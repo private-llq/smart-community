@@ -13,13 +13,46 @@ import java.util.List;
  **/
 @Data
 public class CebQueryBillInfoVO implements Serializable {
-    // 账单查询跟踪码
-    private String queryAcqSsn;
+    private CebQueryBillInfoVO billQueryResultModel;
 
-    // 缴费项目编号
+    private String billKey;
+    private String companyId;
+    private String companyName;
+    private String item1;
+    private String item2;
+    private String item3;
+    private String item4;
+    private String item5;
+    private String item6;
+    private String item7;
+    private String totalNum;
+    private String printAddress;
+    private String paymentItemId;
+    private String isHiddenBillInfo;
+    private String isHiddenBillAmount;
+    private String payCostUnit;
+    private String isPayTrustship;
     private String paymentItemCode;
-
-    // 查询的账单结果
-    private CebBillQueryResultModelVO billQueryResultModel;
+    private String paymentItemName;
+    private String queryAcqSsn;
+    private String openid;
+    private String token;
+    private String categoryType;
+    private String categoryName;
+    private List<CebBillQueryResultDataModelVO> billQueryResultDataModelList;
+    private List<CebPaymentBillFieldsInfoModelListVO> paymentBillFieldsInfoModel;
+    private CebCreatePaymentBillParamsModelVO createPaymentBillParamsModel;
+    private String paymentName;
+    private String paymentNameIsShow;
+    private String companyNamePz;
+    private String companyNamePzShow;
+    private String isActivity;
+    private String cebPaymentName;
+    private String isPaymentWithhold;
+    private String aliDeductionId;
+    private String cardTip;
+    private String customerName;
+    private String itemCode;
+    private String qryAcqSsn;
 
 }

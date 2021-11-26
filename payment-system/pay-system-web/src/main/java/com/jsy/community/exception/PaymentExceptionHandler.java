@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * @Param:
  * @return:
  */
-@RestControllerAdvice
+//@RestControllerAdvice
 @Slf4j
 public class PaymentExceptionHandler extends JSYExceptionHandler {
 
