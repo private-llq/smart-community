@@ -1,12 +1,12 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ISelectCommunityFunService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityFunEntity;
 import com.jsy.community.qo.proprietor.SelectCommunityFunQO;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -37,11 +37,12 @@ public class SelectCommunityFunController {
      */
     @ApiOperation("分页查询社区趣事")
     @PostMapping("/findList")
-    @Login
+    @Permit("community:proprietor:communityfun:findList")
     public CommonResult<Map> list(@RequestBody SelectCommunityFunQO communityFunQO) {
         Map<String, Object> map = selectCommunityFunService.findList(communityFunQO);
         return CommonResult.ok(map);
     }
+    
     /**
      * @Description: 查询一条社区趣事详情，并添加浏览量
      * @author: Hu
@@ -51,6 +52,7 @@ public class SelectCommunityFunController {
      */
     @ApiOperation("查询一条社区趣事详情传入id")
     @GetMapping("/findFunOne")
+    @Permit("community:proprietor:communityfun:findFunOne")
     public CommonResult findOne(@RequestParam("id")Long id) {
         CommunityFunEntity communityFunEntity=selectCommunityFunService.findFunOne(id);
         if (communityFunEntity==null){

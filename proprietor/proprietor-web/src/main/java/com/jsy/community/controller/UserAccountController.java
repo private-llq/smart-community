@@ -1,9 +1,6 @@
 package com.jsy.community.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRedbagService;
 import com.jsy.community.api.IUserAccountRecordService;
 import com.jsy.community.api.IUserAccountService;
@@ -11,8 +8,6 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.PaymentEnum;
 import com.jsy.community.entity.UserAccountRecordEntity;
-import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.RedbagQO;
 import com.jsy.community.qo.UserAccountRecordQO;
@@ -26,10 +21,10 @@ import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAccountVO;
 import com.jsy.community.vo.WithdrawalResulrVO;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -46,7 +41,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("user/account")
 @ApiJSYController
-@Login
 public class UserAccountController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
@@ -69,6 +63,7 @@ public class UserAccountController {
      **/
     @ApiOperation("【用户账户】查询余额")
     @GetMapping("balance")
+    @Permit("community:proprietor:user:account:balance")
     public CommonResult queryBalance() {
         UserAccountVO userAccountVO = userAccountService.queryBalance(UserUtils.getUserId());
         Map<String, Object> returnMap = new HashMap<>();
@@ -85,6 +80,7 @@ public class UserAccountController {
      **/
     @ApiOperation("【用户账户】账户交易")
     @PostMapping("trade")
+    @Permit("community:proprietor:user:account:trade")
     public CommonResult trade(@RequestBody UserAccountTradeQO userAccountTradeQO) {
         ValidatorUtils.validateEntity(userAccountTradeQO);
         userAccountTradeQO.setUid(UserUtils.getUserId());
@@ -101,6 +97,7 @@ public class UserAccountController {
      **/
     @ApiOperation("【用户账户】流水查询")
     @PostMapping("record")
+    @Permit("community:proprietor:user:account:record")
     public CommonResult<PageInfo<UserAccountRecordEntity>> queryAccountRecord(@RequestBody BaseQO<UserAccountRecordQO> baseQO) {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new UserAccountRecordQO());
@@ -111,6 +108,7 @@ public class UserAccountController {
 
     @ApiOperation(value = "验证支付密码", notes = "需要登录")
     @GetMapping("/password/pay/check")
+    @Permit("community:proprietor:user:account:password:pay:check")
     public CommonResult<Boolean> checkPayPassword(@RequestParam String payPassword) {
         String uid = UserUtils.getUserId();
         return CommonResult.ok(userAccountService.checkPayPassword(uid, payPassword));
@@ -118,6 +116,7 @@ public class UserAccountController {
 
     @ApiOperation(value = "用户余额提现至微信", notes = "需要登录")
     @PostMapping("/wechat/withdrawal")
+    @Permit("community:proprietor:user:account:wechat:withdrawal")
     public CommonResult<WithdrawalResulrVO> wechatWithdrawal(@RequestBody UserWithdrawalQ0 userWithdrawalQ0) {
         String uid = UserUtils.getUserId();
         return CommonResult.ok(userAccountService.wechatWithdrawal(userWithdrawalQ0, uid));
@@ -125,6 +124,7 @@ public class UserAccountController {
 
     @ApiOperation(value = "用户余额提现至支付宝", notes = "需要登录")
     @PostMapping("/zhifubao/withdrawal")
+    @Permit("community:proprietor:user:account:zhifubao:withdrawal")
     public CommonResult<WithdrawalResulrVO> zhifubaoWithdrawal(@RequestBody UserWithdrawalQ0 userWithdrawalQ0) {
         String uid = UserUtils.getUserId();
         return CommonResult.ok(userAccountService.zhiFuBaoWithdrawal(userWithdrawalQ0, uid));
@@ -132,12 +132,14 @@ public class UserAccountController {
 
     @ApiOperation(value = "查询已绑定支付宝账户", notes = "需要登录")
     @GetMapping("/zhifubao/account/query")
+    @Permit("community:proprietor:user:account:zhifubao:account:query")
     public CommonResult<ZhiFuBaoAccountBindingQO> queryZhiFuBaoAccount() {
         return CommonResult.ok(userAccountService.queryZhiFuBaoAccount(UserUtils.getUserId()));
     }
 
     @ApiOperation(value = "绑定(修改)支付宝账户", notes = "需要登录")
     @PostMapping("/zhifubao/account/binding")
+    @Permit("community:proprietor:user:account:zhifubao:account:binding")
     public CommonResult<Boolean> bindingZhiFuBaoAccount(@RequestBody ZhiFuBaoAccountBindingQO accountBindingQO) {
         String uid = UserUtils.getUserId();
         userAccountService.bindingZhiFuBaoAccount(uid, accountBindingQO);
@@ -146,6 +148,7 @@ public class UserAccountController {
 
     @ApiOperation(value = "解绑支付宝账户", notes = "需要登录")
     @GetMapping("/zhifubao/account/unbundling")
+    @Permit("community:proprietor:user:account:zhifubao:account:unbundling")
     public CommonResult<Boolean> unbundlingZhiFuBaoAccount() {
         String uid = UserUtils.getUserId();
         userAccountService.unbundlingZhiFuBaoAccount(uid);
@@ -161,9 +164,9 @@ public class UserAccountController {
      * @Author: chq459799974
      * @Date: 2021/1/18
      **/
-    @Login
     @ApiOperation("【红包/转账】单发")
     @PostMapping("redbag/send/single")
+    @Permit("community:proprietor:user:account:redbag:send:single")
     public CommonResult sendSingleRedbag(@RequestBody RedbagQO redbagQO) {
         ValidatorUtils.validateEntity(redbagQO, RedbagQO.singleRedbagValidated.class);
         if (BusinessConst.BUSINESS_TYPE_GROUP_REDBAG.equals(redbagQO.getBusinessType())) {
@@ -193,9 +196,9 @@ public class UserAccountController {
      * @Author: chq459799974
      * @Date: 2021/1/18
      **/
-    @Login
     @ApiOperation("【红包】群发红包")
     @PostMapping("redbag/send/group")
+    @Permit("community:proprietor:user:account:redbag:send:group")
     public CommonResult sendGroupRedbag(@RequestBody RedbagQO redbagQO) {
         ValidatorUtils.validateEntity(redbagQO, RedbagQO.groupRedbagValidated.class);
         if (redbagQO.getMoney().doubleValue() / redbagQO.getNumber() < 0.01) {
@@ -220,6 +223,7 @@ public class UserAccountController {
      **/
     @ApiOperation("【红包/转账】领取")
     @PostMapping("redbag/receive/single")
+    @Permit("community:proprietor:user:account:redbag:receive:single")
     public CommonResult receiveSingleRedbag(@RequestBody RedbagQO redbagQO) {
         ValidatorUtils.validateEntity(redbagQO, RedbagQO.receiveSingleValidated.class);
         if (!BusinessConst.BUSINESS_TYPE_PRIVATE_REDBAG.equals(redbagQO.getBusinessType())
@@ -239,6 +243,7 @@ public class UserAccountController {
      **/
     @ApiOperation("【群红包】领取")
     @PostMapping("redbag/receive/group")
+    @Permit("community:proprietor:user:account:redbag:receive:group")
     public CommonResult receiveGroupRedbag(@RequestBody RedbagQO redbagQO) {
         ValidatorUtils.validateEntity(redbagQO, RedbagQO.receiveSingleValidated.class);
         redbagQO.setBusinessType(BusinessConst.BUSINESS_TYPE_GROUP_REDBAG);
@@ -257,6 +262,7 @@ public class UserAccountController {
      **/
     @ApiOperation("【全平台抵用券】统计可用张数")
     @GetMapping("tickets/count")
+    @Permit("community:proprietor:user:account:tickets:count")
     public CommonResult countAvailableTickets() {
         return CommonResult.ok(userAccountService.countTicketByUid(UserUtils.getUserId()));
     }
@@ -270,6 +276,7 @@ public class UserAccountController {
      **/
     @ApiOperation("【全平台抵用券】查询")
     @PostMapping("tickets")
+    @Permit("community:proprietor:user:account:tickets")
     public CommonResult queryTickets(@RequestBody BaseQO<UserTicketQO> baseQO) {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new UserTicketQO());
@@ -287,6 +294,7 @@ public class UserAccountController {
      **/
     @ApiOperation("【全平台抵用券】id单查")
     @GetMapping("ticket")
+    @Permit("community:proprietor:user:account:ticket")
     public CommonResult queryTicketById(@RequestParam Long id) {
         return CommonResult.ok(userAccountService.queryTicketById(id, UserUtils.getUserId()), "查询成功");
     }
@@ -300,6 +308,7 @@ public class UserAccountController {
      **/
     @ApiOperation("【全平台抵用券】使用")
     @PutMapping("ticket/use")
+    @Permit("community:proprietor:user:account:ticket:use")
     public CommonResult useTicket(@RequestParam Long id) {
         boolean b = userAccountService.useTicket(id, UserUtils.getUserId());
         return b ? CommonResult.ok("使用成功") : CommonResult.error("使用失败");
@@ -314,6 +323,7 @@ public class UserAccountController {
      **/
     @ApiOperation("【全平台抵用券】退回")
     @PutMapping("ticket/rollback")
+    @Permit("community:proprietor:user:account:ticket:rollback")
     public CommonResult rollbackTicket(@RequestParam Long id) {
         boolean b = userAccountService.rollbackTicket(id, UserUtils.getUserId());
         return b ? CommonResult.ok("退回成功") : CommonResult.error("退回失败");
@@ -322,6 +332,7 @@ public class UserAccountController {
     //============================= 查询整合接口 ==================================
     @ApiOperation("【整合查询】(个人中心)")
     @GetMapping("all")
+    @Permit("community:proprietor:user:account:all")
     public CommonResult queryAll() {
         Map<String, Object> returnMap = new HashMap<>();
         String uid = UserUtils.getUserId();

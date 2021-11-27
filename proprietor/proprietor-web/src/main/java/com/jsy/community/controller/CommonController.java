@@ -1,20 +1,19 @@
 package com.jsy.community.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ICommonService;
 import com.jsy.community.api.IUserSearchService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.CommunityType;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -23,10 +22,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author 公共
@@ -44,7 +44,9 @@ public class CommonController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserSearchService userSearchService;
 
+    @LoginIgnore
     @GetMapping("community2")
+    @Permit("community:proprietor:common:community2")
     public CommonResult test(@RequestParam Long id,@RequestParam Integer queryType){
         Integer page = 0;
         Integer size = 10;
@@ -66,7 +68,7 @@ public class CommonController {
     @ApiOperation("社区区域查询接口 社区~楼层")
     @GetMapping("/community")
 	@SuppressWarnings("unchecked")
-    @Login
+    @Permit("community:proprietor:common:community")
     public CommonResult<?> queryZone(@RequestParam Long id,
                                      @RequestParam Integer queryType,
                                      @RequestParam(required = false, defaultValue = "1")Integer page,
@@ -97,12 +99,12 @@ public class CommonController {
         }
     }
 
-    @Login
     @GetMapping("/getHouse")
     @ApiImplicitParams(
             value = {@ApiImplicitParam(name = "floor", value = "楼层文本"),@ApiImplicitParam( name = "id", value = "单元或楼栋id")}
     )
     @ApiOperation("通过楼层文本查下面所有房屋")
+    @Permit("community:proprietor:common:getHouse")
     public CommonResult<List<Map<String, Object>>> getHouseByFloor(@RequestParam Long id, @RequestParam String floor){
         return CommonResult.ok(commonService.getHouseByFloor( id, floor ));
     }
@@ -111,9 +113,9 @@ public class CommonController {
      * @author YuLF
      * @since  2021/3/10 14:46
      */
-    @Login
     @ApiOperation("App全文搜索热词推荐 热搜榜")
     @GetMapping("/hotKey")
+    @Permit("community:proprietor:common:hotKey")
     public Set<Object> getHotKey(@RequestParam( required = false, defaultValue = "10")Integer num ){
         if( num < 1 || num > BusinessConst.HOT_KEY_MAX_NUM){
             num = 20;
@@ -128,9 +130,9 @@ public class CommonController {
      * @Param:
      * @return:
      */
-    @Login
     @ApiOperation("App全文搜索个人词汇")
     @GetMapping("/getUserKey")
+    @Permit("community:proprietor:common:getUserKey")
     public CommonResult getUserKey(@RequestParam("num")Integer num ){
         if (num==0||num==null){
             num=10;
@@ -146,18 +148,19 @@ public class CommonController {
      * @Param:
      * @return:
      */
-    @Login
     @ApiOperation("App删除全文搜索个人词汇")
     @DeleteMapping("/deleteUserKey")
+    @Permit("community:proprietor:common:deleteUserKey")
     public CommonResult deleteUserKey(){
         String userId = UserUtils.getUserId();
         userSearchService.deleteUserKey(userId);
         return CommonResult.ok();
     }
 
-
+    @LoginIgnore
 	@ApiOperation("查询下级省市区、查询城市等")
     @GetMapping("/region")
+    @Permit("community:proprietor:common:region")
     public CommonResult<?> queryRegion(@RequestParam Integer queryType,Integer regionNumber,String searchStr) {
         String queryMethodName = BusinessEnum.RegionQueryTypeEnum.regionQueryNameMap.get(queryType);
         if(queryMethodName == null){
@@ -196,9 +199,11 @@ public class CommonController {
         }
     }
     
+    @LoginIgnore
     //    @IpLimit(prefix = "weatherNow", second = 30, count = 1, desc = "获取首页天气，调用限制用于经纬度接口，经纬度方式做不了缓存，由前端做缓存")
     @ApiOperation("首页天气")
     @GetMapping("weatherNow")
+    @Permit("community:proprietor:common:weatherNow")
     public CommonResult<JSONObject> getWeatherNow(@RequestParam String cityName){
         //真实数据
         JSONObject weather = commonService.getWeather(cityName);
@@ -207,9 +212,11 @@ public class CommonController {
         return CommonResult.ok(weather);
     }
     
+    @LoginIgnore
     //    @IpLimit(prefix = "weatherDetails", second = 30, count = 1, desc = "获取天气详情，调用限制用于经纬度接口，经纬度方式做不了缓存，由前端做缓存")
     @ApiOperation("天气详情")
     @GetMapping("weatherDetails")
+    @Permit("community:proprietor:common:weatherDetails")
     public CommonResult<JSONObject> getWeatherNowDetails(@RequestParam String cityName){
         //真实数据
         JSONObject weather = commonService.getWeatherDetails(cityName);

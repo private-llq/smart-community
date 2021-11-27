@@ -10,6 +10,8 @@ import com.jsy.community.utils.ios.AppleUtil;
 import com.jsy.community.utils.ios.IOSUtil;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +34,9 @@ public class IosLoginController {
      * @Param: [code]
      * @return: com.jsy.community.vo.CommonResult
      */
+    @LoginIgnore
     @PostMapping("/login")
+    @Permit("community:proprietor:Ios:login")
     public CommonResult login(@RequestParam String identityToken){
         String[] split = identityToken.split("\\.");
         AppleTokenVo userInfo = AppleUtil.getAppleUserInfo(split[1]);
@@ -44,6 +48,7 @@ public class IosLoginController {
         }
         return CommonResult.error("服务器繁忙，请稍后再试！");
     }
+    
     /**
      * @Description: 苹果三方登录接口(不绑定手机)
      * @author: Hu
@@ -51,7 +56,9 @@ public class IosLoginController {
      * @Param: [code]
      * @return: com.jsy.community.vo.CommonResult
      */
+    @LoginIgnore
     @PostMapping("/loginNotMobile")
+    @Permit("community:proprietor:Ios:loginNotMobile")
     public CommonResult loginNotMobile(@RequestParam String identityToken){
         String[] split = identityToken.split("\\.");
         AppleTokenVo userInfo = AppleUtil.getAppleUserInfo(split[1]);
@@ -71,7 +78,9 @@ public class IosLoginController {
      * @Param: [bindingMobileQO]
      * @return: com.jsy.community.vo.CommonResult
      */
+    @LoginIgnore
     @PostMapping("/bindingMobile")
+    @Permit("community:proprietor:Ios:bindingMobile")
     public CommonResult bindingMobile(@RequestBody BindingMobileQO bindingMobileQO){
         ValidatorUtils.validateEntity(bindingMobileQO, BindingMobileQO.BindingMobileValidated.class);
         UserAuthVo userAuthVo=weChatLoginService.bindingMobile(bindingMobileQO);

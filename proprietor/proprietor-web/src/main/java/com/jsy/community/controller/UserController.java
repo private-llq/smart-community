@@ -21,6 +21,7 @@ import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.ControlVO;
 import com.jsy.community.vo.UserInfoVo;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -72,8 +73,8 @@ public class UserController {
     private RedisTemplate redisTemplate;
     
     @ApiOperation("更新极光regId")
-    @Login
     @PutMapping("regId")
+    @Permit("community:proprietor:user:regId")
     public CommonResult updateUserRegId(@RequestParam String regId){
         //TODO 苹果过审用 防止报错暂时生成随机串
         regId = UUID.randomUUID().toString().replace("-","");
@@ -90,7 +91,7 @@ public class UserController {
     **/
     @GetMapping("longAccess")
     @ApiOperation("业主或亲属 获取/刷新 门禁权限")
-    @Login
+    @Permit("community:proprietor:user:longAccess")
     public CommonResult getLongAccess(@RequestParam("communityId") Long communityId){
         Map<String, String> returnMap = userService.getAccess(UserUtils.getUserId(), communityId);
         return returnMap.get("access") != null ? CommonResult.ok(returnMap,"获取成功") : CommonResult.error(JSYError.INTERNAL.getCode(),returnMap.get("msg"));
@@ -101,9 +102,9 @@ public class UserController {
      * @author YuLF
      * @since  2021/2/23 17:22
      */
-    @Login
     @ApiOperation("我的房屋")
     @GetMapping("/info")
+    @Permit("community:proprietor:user:info")
     public CommonResult<?> userInfo(@RequestParam(required = false) Long houseId){
         String uid = UserUtils.getUserId();
         if( Objects.nonNull(houseId) ){
@@ -128,9 +129,9 @@ public class UserController {
      * @author YuLF
      * @since  2021/3/15 14:34
      */
-    @Login
     @ApiOperation("切换房屋选择房屋业主信息及业主家属信息查询接口")
     @GetMapping("switchHouse")
+    @Permit("community:proprietor:user:switchHouse")
     public CommonResult<UserInfoVo> switchHouse(@RequestParam Long houseId) {
         return CommonResult.ok(userService.proprietorQuery(UserUtils.getUserId(), houseId));
     }
@@ -144,9 +145,9 @@ public class UserController {
      * @Param: [houseId]
      * @return: com.jsy.community.vo.CommonResult<com.jsy.community.vo.UserInfoVo>
      */
-    @Login
     @ApiOperation("切换房屋选择房屋业主信息及业主家属信息查询接口")
     @DeleteMapping("delCar")
+    @Permit("community:proprietor:user:delCar")
     public CommonResult deleteCar(@RequestParam Long id) {
         userService.deleteCar(UserUtils.getUserId(), id);
         return CommonResult.ok();
@@ -202,11 +203,10 @@ public class UserController {
 //        qo.getHouses().forEach( house -> ValidatorUtils.validateEntity( house, UserHouseQo.UpdateHouse.class ));
 //        return userService.proprietorUpdate(qo) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
 //    }
-
-
-    @Login
+    
     @ApiOperation("业主信息更新")
     @PutMapping("/info/update")
+    @Permit("community:proprietor:user:info:update")
     public CommonResult<Boolean> updateImprover(@RequestBody ProprietorQO qo) {
         //3.更新业主房屋信息和车辆信息
         qo.setUid(UserUtils.getUserId());
@@ -230,9 +230,9 @@ public class UserController {
      * @author YuLF
      * @since  2021/2/25 11:42
      */
-    @Login
     @ApiOperation("证件类型常量")
     @GetMapping("/identificationType")
+    @Permit("community:proprietor:user:identificationType")
     public CommonResult<Map<Integer, String>> getIdentificationType(){
         return CommonResult.ok(BusinessEnum.IdentificationType.getKv());
     }
@@ -241,9 +241,9 @@ public class UserController {
      * @author YuLF
      * @since  2021/2/23 17:23
      */
-    @Login
     @ApiOperation("业主头像上传")
     @PostMapping("uploadAvatar")
+    @Permit("community:proprietor:user:uploadAvatar")
     public CommonResult<String> uploadAvatar(MultipartFile avatar) {
         PicUtil.imageQualified(avatar);
         return CommonResult.ok(MinioUtils.upload(avatar, BusinessConst.AVATAR_BUCKET_NAME));
@@ -254,32 +254,33 @@ public class UserController {
      * @author YuLF
      * @since  2021/2/23 17:23
      */
-    @Login
     @ApiOperation("业主头人脸像上传")
     @PostMapping("uploadFaceAvatar")
+    @Permit("community:proprietor:user:uploadFaceAvatar")
     public CommonResult<String> uploadFaceAvatar(MultipartFile faceAvatar) {
         PicUtil.imageQualified(faceAvatar);
         return CommonResult.ok(MinioUtils.upload(faceAvatar, BusinessConst.FAVE_AVATAR_BUCKET_NAME), "上传成功!");
     }
 
-    @Login
     @ApiOperation("业主人脸上传")
     @PostMapping("uploadFace")
+    @Permit("community:proprietor:user:uploadFace")
     public CommonResult<String> uploadFace(MultipartFile file) {
         PicUtil.imageQualified(file);
         return CommonResult.ok(MinioUtils.upload(file,"user-face"), "上传成功!");
     }
-    @Login
+    
     @ApiOperation("查询上传的人脸")
     @GetMapping("getFace")
+    @Permit("community:proprietor:user:getFace")
     public CommonResult<String> getFace() {
         String face = userService.getFace(UserUtils.getUserId());
         return CommonResult.ok(face,"查询成功！");
     }
 
-    @Login
     @ApiOperation("修改用户人脸接口")
     @PutMapping("saveFace")
+    @Permit("community:proprietor:user:saveFace")
     public CommonResult saveFace(@RequestParam String faceUrl) {
         userService.saveFace(UserUtils.getUserId(),faceUrl);
         return CommonResult.ok();
@@ -292,6 +293,7 @@ public class UserController {
      */
     @ApiOperation("业主信息及业主家属信息查询接口")
     @GetMapping("query")
+    @Permit("community:proprietor:user:query")
     public CommonResult<UserInfoVo> proprietorQuery(@RequestParam Long houseId) {
         return CommonResult.ok(userService.proprietorQuery( UserUtils.getUserId(), houseId), "查询成功!");
     }
@@ -302,9 +304,9 @@ public class UserController {
      * @author YuLF
      * @since  2020/12/18 11:39
      */
-    @Login
     @ApiOperation("业主信息详情查询接口")
     @GetMapping("details")
+    @Permit("community:proprietor:user:details")
     public CommonResult<UserInfoVo> details() {
         return CommonResult.ok(userService.proprietorDetails(UserUtils.getUserId()));
     }
@@ -317,9 +319,9 @@ public class UserController {
      * @Author: chq459799974
      * @Date: 2021/3/31
     **/
-    @Login
     @ApiOperation("查询用户所有社区(房屋已认证的)")
     @GetMapping("communityList")
+    @Permit("community:proprietor:user:communityList")
     public CommonResult<Collection<Map<String, Object>>> queryUserHousesOfCommunity(){
         String uid = UserUtils.getUserId();
         return CommonResult.ok(userService.queryRelationHousesOfCommunity(uid));
@@ -332,9 +334,9 @@ public class UserController {
      * @Author: chq459799974
      * @Date: 2021/3/31
     **/
-    @Login
     @ApiOperation("查询用户是业主身份的社区(房屋已认证的)")
     @GetMapping("communityUserList")
+    @Permit("community:proprietor:user:communityUserList")
     public CommonResult<Collection<Map<String, Object>>> queryCommunityUserList(){
         String uid = UserUtils.getUserId();
         return CommonResult.ok(userService.queryCommunityUserList(uid));
@@ -347,9 +349,9 @@ public class UserController {
      * @Author: chq459799974
      * @Date: 2020/12/16
     **/
-    @Login
     @ApiOperation("查询业主所有社区的房屋")
     @GetMapping("houseList")
+    @Permit("community:proprietor:user:houseList")
     public CommonResult<List<HouseEntity>> queryUserHouseList(){
         return CommonResult.ok(userService.queryUserHouseList(UserUtils.getUserId()));
     }
@@ -361,9 +363,9 @@ public class UserController {
      * @Author: chq459799974
      * @Date: 2020/12/16
     **/
-    @Login
     @ApiOperation("查询业主所有社区的房屋")
     @GetMapping("houseListAll")
+    @Permit("community:proprietor:user:houseListAll")
     public CommonResult<List<HouseEntity>> queryUserHouseListAll(){
         return CommonResult.ok(userService.queryUserHouseListAll(UserUtils.getUserId()));
     }
@@ -375,9 +377,9 @@ public class UserController {
      * @Author: chq459799974
      * @Date: 2021/1/14
     **/
-    @Login
     @ApiOperation("查询用户极光推送tags")
     @GetMapping("urora/tags")
+    @Permit("community:proprietor:user:urora:tags")
     public CommonResult queryUroraTags(){
         return CommonResult.ok(userUroraTagsService.queryUroraTags(UserUtils.getUserId()));
     }
@@ -387,9 +389,9 @@ public class UserController {
      * @author YuLF
      * @since  2021/2/23 17:23
      */
-    @Login
     @ApiOperation("删除业主人脸接口")
     @DeleteMapping("deleteFaceAvatar")
+    @Permit("community:proprietor:user:deleteFaceAvatar")
     public CommonResult deleteFaceAvatar() {
         userService.deleteFaceAvatar(UserUtils.getUserId());
         return CommonResult.ok();
@@ -402,9 +404,9 @@ public class UserController {
      * @Author: chq459799974
      * @Date: 2021/3/2
     **/
-    @Login
     @ApiOperation("身份证照片识别")
     @PostMapping("idCard/distinguish")
+    @Permit("community:proprietor:user:idCard:distinguish")
     public CommonResult distinguishIdCard(MultipartFile file,@RequestParam String type){
         PicUtil.imageQualified(file);
     	if(PicContentUtil.ID_CARD_PIC_SIDE_FACE.equals(type) || PicContentUtil.ID_CARD_PIC_SIDE_BACK.equals(type)){
@@ -430,9 +432,9 @@ public class UserController {
      * @Author: chq459799974
      * @Date: 2021/3/2
     **/
-    @Login
     @ApiOperation("眨眼版实人验证初始化")
     @PostMapping("realName/blink/init")
+    @Permit("community:proprietor:user:realName:blink:init")
     public JSONObject initBlink(@RequestBody RealnameBlinkInitQO realnameBlinkInitQO){
         ValidatorUtils.validateEntity(realnameBlinkInitQO);
         System.out.println(realnameBlinkInitQO);
@@ -450,9 +452,9 @@ public class UserController {
      * @Author: chq459799974
      * @Date: 2021/3/2
     **/
-    @Login
     @ApiOperation("眨眼版实人查询结果")
     @PostMapping("realName/blink/result")
+    @Permit("community:proprietor:user:realName:blink:result")
     public CommonResult getBlinkResult(@RequestBody RealnameBlinkQueryQO realnameBlinkQueryQO){
         ValidatorUtils.validateEntity(realnameBlinkQueryQO);
         JSONObject blinkResult = RealnameAuthUtils.getBlinkResult(realnameBlinkQueryQO);
@@ -499,9 +501,9 @@ public class UserController {
      * @Author: chq459799974
      * @Date: 2021/5/10
     **/
-    @Login
     @ApiOperation("用户简单信息查询(快接口)")
     @GetMapping("info/simple")
+    @Permit("community:proprietor:user:info:simple")
     public CommonResult getSimpleInfo(){
         UserEntity userEntity = userService.queryUserDetailByUid(UserUtils.getUserId());
         if(userEntity == null){
@@ -519,18 +521,18 @@ public class UserController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/6/21 14:01
      **/
-    @Login
     @ApiOperation("业主解绑房屋")
     @PostMapping("/untieHouse")
+    @Permit("community:proprietor:user:untieHouse")
     public CommonResult untieHouse(@RequestBody UserHouseEntity userHouseEntity) {
         userHouseEntity.setUid(UserUtils.getUserId());
         ValidatorUtils.validateEntity(userHouseEntity, UserHouseEntity.UntieHouse.class);
         return userHouseService.untieHouse(userHouseEntity) ? CommonResult.ok("解绑成功!") : CommonResult.error("解绑失败!");
     }
 
-    @Login
     @ApiOperation("获取权限")
     @GetMapping("/control")
+    @Permit("community:proprietor:user:control")
     public CommonResult control(@RequestParam("communityId") Long communityId) {
         ControlVO control = userService.control(communityId, UserUtils.getUserId());
         savePermissions(UserUtils.getUserId(),control);

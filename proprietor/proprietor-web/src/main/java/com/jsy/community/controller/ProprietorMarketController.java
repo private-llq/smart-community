@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IProprietorMarketCategoryService;
 import com.jsy.community.api.IProprietorMarketService;
 import com.jsy.community.constant.Const;
@@ -14,10 +13,9 @@ import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.proprietor.ProprietorMarketVO;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,7 +49,7 @@ public class ProprietorMarketController {
      **/
     @PostMapping("/addMarket")
     @ApiOperation("社区集市发布商品")
-    @Login
+    @Permit("community:proprietor:market:addMarket")
     public CommonResult addMarket(@RequestBody ProprietorMarketQO marketQO){
         String userId = UserUtils.getUserId();
         if (marketQO.getNegotiable()==0){   //选择不面议  价格不能小于0
@@ -68,6 +66,7 @@ public class ProprietorMarketController {
         boolean b = marketService.addMarket(marketQO,userId);
         return CommonResult.ok("发布成功");
     }
+    
    /**
     * @Description: 修改发布是商品
     * @Param: [marketQO]
@@ -77,7 +76,7 @@ public class ProprietorMarketController {
     **/
    @PostMapping("/updateMarket")
     @ApiOperation("社区集市修改商品")
-    @Login
+   @Permit("community:proprietor:market:updateMarket")
     public CommonResult updateMarket(@RequestBody ProprietorMarketQO marketQO){
         String userId = UserUtils.getUserId();
        if (marketQO.getNegotiable()==0){   //选择不面议  价格不能小于0
@@ -94,6 +93,7 @@ public class ProprietorMarketController {
         boolean b = marketService.updateMarket(marketQO,userId);
         return CommonResult.ok("修改成功");
     }
+    
     /**
      * @Description: 删除发布的商品
      * @Param: [id]
@@ -103,12 +103,13 @@ public class ProprietorMarketController {
      **/
     @DeleteMapping("/deleteMarket")
     @ApiOperation("社区集市删除商品")
-    @Login
+    @Permit("community:proprietor:market:deleteMarket")
     public CommonResult deleteMarket(@RequestParam("id") Long id){
 
         boolean b = marketService.deleteMarket(id);
         return CommonResult.ok("删除成功");
     }
+    
     /**
      * @Description: 查询用户已发布或已下架的商品
      * @Param: [id]
@@ -118,7 +119,7 @@ public class ProprietorMarketController {
      **/
     @PostMapping("/selectMarketPage")
     @ApiOperation("查询用户已发布或已下架的商品")
-    @Login
+    @Permit("community:proprietor:market:selectMarketPage")
     public CommonResult selectMarketPage(@RequestBody  BaseQO<ProprietorMarketEntity> baseQO){
         String userId = UserUtils.getUserId();
         ValidatorUtils.validatePageParam(baseQO);
@@ -128,6 +129,7 @@ public class ProprietorMarketController {
         Map<String,Object> map = marketService.selectMarketPage(baseQO,userId);
         return CommonResult.ok(map,"查询成功");
     }
+    
     /**
      * @Description: 查询单条商品详情
      * @Param: [id]
@@ -137,13 +139,12 @@ public class ProprietorMarketController {
      **/
     @GetMapping("/SelectOneMarket")
     @ApiOperation("查询用户已发布或已下架的商品")
-    @Login
+    @Permit("community:proprietor:market:SelectOneMarket")
     public CommonResult SelectOneMarket(@RequestParam("id") Long id){
         ProprietorMarketEntity marketVO =  marketService.findOne(id);
         return CommonResult.ok(marketVO,"查询成功");
     }
-
-
+    
     /**
      * @Description: 查询所有已发布的商品
      * @Param: [id]
@@ -153,7 +154,7 @@ public class ProprietorMarketController {
      **/
     @PostMapping("/selectMarketAllPage")
     @ApiOperation("社区集市所有已发布商品")
-    @Login
+    @Permit("community:proprietor:market:selectMarketAllPage")
     public CommonResult selectMarketAllPage(@RequestBody  BaseQO<ProprietorMarketQO> baseQO){
         ValidatorUtils.validatePageParam(baseQO);
         if (baseQO.getQuery()==null){
@@ -184,11 +185,12 @@ public class ProprietorMarketController {
      **/
     @PostMapping("/updateState")
     @ApiOperation("社区集市发布商品")
-    @Login
+    @Permit("community:proprietor:market:updateState")
     public CommonResult updateState(@RequestParam("id")Long id,@RequestParam("state") Integer state){
         boolean b = marketService.updateState(id,state);
         return CommonResult.ok("修改成功");
     }
+    
     /**
      * @Description: 商品图片批量上传
      * @author: Tian
@@ -196,9 +198,9 @@ public class ProprietorMarketController {
      * @Param:
      * @return:
      */
-    @Login
     @ApiOperation("社区集市商品图片上传")
     @PostMapping(value = "/uploadMarketImages")
+    @Permit("community:proprietor:market:uploadMarketImages")
     public CommonResult uploadMarketImages(@RequestParam("images") MultipartFile[] images, HttpServletRequest request)  {
         for (MultipartFile imag : images) {
             //获取文件名
@@ -229,9 +231,9 @@ public class ProprietorMarketController {
         return CommonResult.ok(split,"上传成功");
     }
 
-    @Login
     @ApiOperation("社区集市商品图片删除")
     @DeleteMapping(value = "/deleteMarketImages")
+    @Permit("community:proprietor:market:deleteMarketImages")
     public CommonResult deleteMarketImages(@RequestParam("images") String images) throws Exception {
         //返回文件上传地址
         MinioUtils.removeFile(images);

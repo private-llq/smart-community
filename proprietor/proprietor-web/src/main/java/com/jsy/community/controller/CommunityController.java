@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ProprietorCommunityService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
@@ -10,6 +9,7 @@ import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,6 @@ import java.util.Map;
  **/
 @RequestMapping("community")
 @Api(tags = "社区控制器")
-@Login( allowAnonymous = true)
 @Slf4j
 @ApiJSYController
 @RestController
@@ -50,7 +49,7 @@ public class CommunityController {
 	 */
 	@ApiOperation("社区模糊搜索接口")
 	@PostMapping()
-	@Login
+	@Permit("community:proprietor:community")
 	public CommonResult<List<CommunityEntity>> getCommunityByName(@RequestBody CommunityQO communityQO){
 		//验证请求参数
 		ValidatorUtils.validateEntity(communityQO, CommunityQO.GetCommunityByName.class);
@@ -66,14 +65,14 @@ public class CommunityController {
 	**/
 	@ApiOperation("社区定位")
 	@PostMapping("locate")
-	@Login(allowAnonymous = true)
+	@Permit("community:proprietor:community:locate")
 	public CommonResult<CommunityEntity> locate(@RequestBody Map<String,Double> location){
 		return CommonResult.ok(iCommunityService.locateCommunityV2(UserUtils.getUserId(),location));
 	}
 
 	@ApiOperation("获取当前小区的物业公司信息")
 	@GetMapping("company")
-	@Login(allowAnonymous = true)
+	@Permit("community:proprietor:community:company")
 	public CommonResult<PropertyCompanyEntity> getCompany(@RequestParam Long communityId){
 		return CommonResult.ok(iCommunityService.getCompany(communityId));
 	}

@@ -3,7 +3,6 @@ package com.jsy.community.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IUserAccountService;
 import com.jsy.community.api.IUserDataService;
 import com.jsy.community.constant.Const;
@@ -14,6 +13,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAccountVO;
 import com.jsy.community.vo.UserDataVO;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -49,7 +49,7 @@ public class UserDataController {
 
     @GetMapping("/selectUserDataOne")
     @ApiOperation("查询个人信息")
-    @Login
+    @Permit("community:proprietor:userdata:selectUserDataOne")
     public CommonResult selectUserDataOne(){
         String userId = UserUtils.getUserId();
         UserDataVO userDataVO = userDataService.selectUserDataOne(userId);
@@ -60,9 +60,10 @@ public class UserDataController {
         jsonObject.put("tickets",tickets);
         return CommonResult.ok(jsonObject,"查询成功");
     }
+    
     @PostMapping("/addAvatar")
     @ApiOperation("上传头像")
-    @Login
+    @Permit("community:proprietor:userdata:addAvatar")
     public CommonResult avatarUrl(@RequestParam("file") MultipartFile file){
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -72,18 +73,20 @@ public class UserDataController {
         String upload = MinioUtils.upload(file, "avatar");
         return CommonResult.ok(upload,"上传成功");
     }
+    
     @PutMapping("/updateUserData")
     @ApiOperation("修改个人信息(头像、生日)")
-    @Login
+    @Permit("community:proprietor:userdata:updateUserData")
     public CommonResult updateUserData(@RequestBody UserDataQO userDataQO){
         String userId = UserUtils.getUserId();
         userDataQO.setNickname(null);
         userDataService.updateUserData(userDataQO,userId);
         return CommonResult.ok();
     }
+    
     @PutMapping("/updateUserNickName")
     @ApiOperation("修改个人名称")
-    @Login
+    @Permit("community:proprietor:userdata:updateUserNickName")
     public CommonResult updateUserNickName(@RequestParam("nickname") String nickname){
         try {
             String s = new String(nickname.getBytes("GBK"));
@@ -121,7 +124,7 @@ public class UserDataController {
     **/
     @GetMapping("/safeStatus")
     @ApiOperation("账号安全状态查询")
-    @Login
+    @Permit("community:proprietor:userdata:safeStatus")
     public CommonResult querySafeStatus(){
         return CommonResult.ok(userDataService.querySafeStatus(UserUtils.getUserId()));
     }

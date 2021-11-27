@@ -2,7 +2,6 @@ package com.jsy.community.controller;
 
 import cn.hutool.core.util.IdUtil;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.api.ProprietorUserService;
 import com.jsy.community.constant.Const;
@@ -14,6 +13,7 @@ import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.ControlVO;
 import com.jsy.community.vo.UserHouseVO;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
@@ -36,7 +36,6 @@ import java.util.List;
 @Api(tags = "用户房屋")
 @RestController
 @ApiJSYController
-@Login
 public class UserHouseController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
@@ -57,6 +56,7 @@ public class UserHouseController {
      */
     @ApiOperation("我的房屋")
     @PostMapping("details")
+    @Permit("community:proprietor:user:house:details")
     public CommonResult details(@RequestBody UserHouseQO userHouseQO){
         Integer status = userService.userIsRealAuth(UserUtils.getUserId());
         if (status!=null){
@@ -98,6 +98,7 @@ public class UserHouseController {
      */
     @ApiOperation("房屋认证")
     @PostMapping("attestation")
+    @Permit("community:proprietor:user:house:attestation")
     public CommonResult attestation(@RequestBody UserHouseQO userHouseQO){
         if ("".equals(userHouseQO.getName())||userHouseQO.getName()==null){
             return CommonResult.error("认证姓名或电话不能为空！");
@@ -118,6 +119,7 @@ public class UserHouseController {
      */
     @ApiOperation("我的房屋")
     @GetMapping("selectHouse")
+    @Permit("community:proprietor:user:house:selectHouse")
     public CommonResult meHouse(){
         List<UserHouseVO> houseMemberVOS = userHouseService.meHouse(UserUtils.getUserId());
         return CommonResult.ok(houseMemberVOS);
@@ -132,6 +134,7 @@ public class UserHouseController {
      */
     @ApiOperation("切换房屋")
     @GetMapping("switchoverHouse")
+    @Permit("community:proprietor:user:house:switchoverHouse")
     public CommonResult switchoverHouse(){
         List<UserHouseVO> houseMemberVOS = userHouseService.selectHouse(UserUtils.getUserId());
         return CommonResult.ok(houseMemberVOS);
@@ -146,6 +149,7 @@ public class UserHouseController {
      */
     @ApiOperation("家属或者租客更新")
     @PutMapping("members/save")
+    @Permit("community:proprietor:user:house:members:save")
     public CommonResult membersUpdate(@RequestBody MembersQO membersQO){
         ValidatorUtils.validateEntity(membersQO,MembersQO.MembersVerify.class);
         return CommonResult.ok(userHouseService.membersSave(membersQO, UserUtils.getUserId()),"操作成功");
@@ -159,6 +163,7 @@ public class UserHouseController {
      */
     @ApiOperation("业主家属删除接口")
     @DeleteMapping("members/delete")
+    @Permit("community:proprietor:user:house:members:delete")
     public CommonResult membersDelete(@RequestParam String ids){
         userHouseService.membersDelete(ids, UserUtils.getUserId());
         return CommonResult.ok();
@@ -173,6 +178,7 @@ public class UserHouseController {
      */
     @ApiOperation("获取公共常量接口")
     @GetMapping("getSource")
+    @Permit("community:proprietor:user:house:getSource")
     public CommonResult getSource(@RequestParam Long houseId){
         LinkedList<Relation> list = new LinkedList<>();
         Relation relation;
