@@ -27,6 +27,12 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.zhsj</groupId>
+			<artifactId>base_api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- cloud 服务发现 -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>

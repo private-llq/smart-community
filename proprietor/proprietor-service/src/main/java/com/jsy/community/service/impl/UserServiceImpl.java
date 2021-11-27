@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -29,6 +30,12 @@ import com.jsy.community.utils.hardware.xu.XUFaceUtil;
 import com.jsy.community.utils.CallUtil;
 import com.jsy.community.utils.imutils.entity.ImResponseEntity;
 import com.jsy.community.vo.*;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
+import com.zhsj.base.api.rpc.IBaseAuthRpcService;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.LoginVo;
+import com.zhsj.base.api.vo.ThirdBindStatusVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -46,6 +53,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -130,6 +138,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Autowired
     private ISignatureService signatureService;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    private IBaseAuthRpcService baseAuthRpcService;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
 
     private long expire = 60 * 60 * 24 * 7; //暂时
 
@@ -252,6 +266,56 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userInfoVo.setIsBindAlipay(0);
         }
         return userInfoVo;
+    }
+
+    /**
+     * @param qo :
+     * @author: Pipi
+     * @description: 查询用户信息
+     * @return: {@link UserAuthVo}
+     * @date: 2021/11/27 9:43
+     **/
+    @Override
+    public UserAuthVo queryUserInfoV2(LoginQO qo) {
+        LoginVo loginVo;
+        // 调用基础用户模块登录
+        if (StrUtil.isEmpty(qo.getCode())) {
+            loginVo = baseAuthRpcService.loginEHome(qo.getAccount(), qo.getPassword(), "PHONE_PWD");
+        } else {
+            loginVo = baseAuthRpcService.loginEHome(qo.getAccount(), qo.getCode(), "PHONE_CODE");
+        }
+        // 调用基础用户模块获取三方绑定状态
+        ThirdBindStatusVo thirdBindStatus = baseUserInfoRpcService.getThirdBindStatus(loginVo.getUserInfo().getId());
+        // 调用基础用户模块获取支付密码设置状态
+        Boolean payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(loginVo.getUserInfo().getId(), loginVo.getUserInfo().getAccount());
+        // 调用基础用户模块获取实名信息
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(loginVo.getUserInfo().getId());
+        UserInfoVo userInfoVo = new UserInfoVo();
+        userInfoVo.setIsBindMobile(loginVo.getUserInfo().getIsBindPhone() ? 1 : 0);
+        if (thirdBindStatus != null) {
+            userInfoVo.setIsBindWechat(thirdBindStatus.getWeChatBind() ? 1 : 0);
+            userInfoVo.setIsBindAlipay(thirdBindStatus.getAliPayBind() ? 1 : 0);
+        }
+        userInfoVo.setIsBindPayPassword(payPasswordStatus != null && payPasswordStatus ? 1 : 0);
+        userInfoVo.setMobile(loginVo.getUserInfo().getPhone());
+        userInfoVo.setUid(loginVo.getUserInfo().getAccount());
+        userInfoVo.setUroraTags(getUroraTags(userInfoVo.getUid()));
+        userInfoVo.setImId(loginVo.getUserIm().getImId());
+        userInfoVo.setImPassword(loginVo.getUserIm().getPassword());
+        userInfoVo.setNickname(loginVo.getUserInfo().getNickName());
+        userInfoVo.setAvatarUrl(loginVo.getUserInfo().getAvatarThumbnail());
+        userInfoVo.setSex(loginVo.getUserInfo().getSex());
+        if (idCardRealInfo != null) {
+            userInfoVo.setRealName(idCardRealInfo.getIdCardName());
+            userInfoVo.setIdCard(idCardRealInfo.getIdCardNumber());
+        }
+        userInfoVo.setIsRealAuth(loginVo.getUserInfo().getIsAuthFace() ? 1 : 0);
+
+        UserAuthVo userAuthVo = new UserAuthVo();
+        userAuthVo.setToken(loginVo.getToken().getToken());
+        userAuthVo.setExpiredTime(LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime(), 0, ZoneOffset.ofHours(8)));
+        userAuthVo.setUserInfo(userInfoVo);
+        return userAuthVo;
     }
 
     /**
@@ -505,10 +569,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      **/
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void registerV3(RegisterQO qo) {
+    public UserAuthVo registerV3(RegisterQO qo) {
+        //调用基础用户模块注册
+        LoginVo loginVo = baseAuthRpcService.eHomeUserPhoneRegister(qo.getAccount(), qo.getPassword(), qo.getCode());
+        String uid = loginVo.getUserInfo().getAccount();
+        String imId = loginVo.getUserIm().getImId();
         //创建极光推送tags(t_user_urora_tags表)
         UserUroraTagsEntity userUroraTagsEntity = new UserUroraTagsEntity();
-        userUroraTagsEntity.setUid(qo.getUid());
+        userUroraTagsEntity.setUid(uid);
         userUroraTagsEntity.setCommunityTags("all"); //给所有用户加一个通用tag，用于全体消息推送
         boolean uroraTagsResult = userUroraTagsService.createUroraTags(userUroraTagsEntity);
         if (!uroraTagsResult) {
@@ -524,7 +592,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             for (HouseInfoEntity houseInfoEntity : houseInfoEntities) {
                 //推送消息
                 PushInfoUtil.PushPublicMsg(
-                        qo.getImId(),
+                        imId,
                         "房屋管理",
                         houseInfoEntity.getTitle(),
                         H5Url + "?id=" + houseInfoEntity.getId() + "mobile=" + qo.getAccount(),
@@ -545,16 +613,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 ids.add(houseMemberEntity.getId());
                 houseIds.add(houseMemberEntity.getHouseId());
             }
-            houseMemberMapper.updateByMobile(ids, qo.getUid());
-            userHouseService.updateMobile(houseIds, qo.getUid());
+            houseMemberMapper.updateByMobile(ids, uid);
+            userHouseService.updateMobile(houseIds, uid);
         }
 
         //创建金钱账户(t_user_account表)
-        boolean userAccountResult = userAccountService.createUserAccount(qo.getUid());
+        boolean userAccountResult = userAccountService.createUserAccount(uid);
         if (!userAccountResult) {
             log.error("用户账户创建失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
         }
+
+        UserInfoVo userInfoVo = new UserInfoVo();
+        userInfoVo.setUid(uid);
+        userInfoVo.setIsBindMobile(1);
+
+        UserAuthVo userAuthVo = new UserAuthVo();
+        userAuthVo.setToken(loginVo.getToken().getToken());
+        userAuthVo.setExpiredTime(LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime(), 0, ZoneOffset.ofHours(8)));
+        userAuthVo.setUserInfo(userInfoVo);
+        return userAuthVo;
     }
 
     /**

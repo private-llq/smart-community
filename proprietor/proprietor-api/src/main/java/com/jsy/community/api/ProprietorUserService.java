@@ -41,6 +41,15 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 **/
 	UserInfoVo queryUserInfo(String uid);
 
+	/**
+	 * @author: Pipi
+	 * @description: 查询用户信息
+	 * @param qo:
+	 * @return: {@link UserAuthVo}
+	 * @date: 2021/11/27 9:43
+	 **/
+	UserAuthVo queryUserInfoV2(LoginQO qo);
+
 	/***
 	 * @author: Pipi
 	 * @description: 查询极光推送标签
@@ -91,7 +100,7 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @return: {@link String}
 	 * @date: 2021/11/23 10:55
 	 **/
-	void registerV3(RegisterQO qo);
+	UserAuthVo registerV3(RegisterQO qo);
 
 	/**
 	* @Description: 三方登录

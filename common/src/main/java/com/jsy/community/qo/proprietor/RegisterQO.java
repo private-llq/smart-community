@@ -33,14 +33,4 @@ public class RegisterQO implements Serializable {
 	 */
 	@NotEmpty(message = "密码不能为空")
 	private String password;
-
-	/**
-	 * 唯一标识
-	 */
-	private String uid;
-
-	/**
-	 * imId(聊天用户id)
-	 */
-	private String imId;
 }

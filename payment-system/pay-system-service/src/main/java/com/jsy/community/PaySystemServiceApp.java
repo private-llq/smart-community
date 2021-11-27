@@ -19,7 +19,7 @@ import org.springframework.context.annotation.PropertySource;
 @EnableDiscoveryClient
 @MapperScan("com.jsy.community.mapper")
 @PropertySource(value = "classpath:common-service.properties")
-// @EnableDistributedTransaction
+ @EnableDistributedTransaction
 public class PaySystemServiceApp {
     public static void main(String[] args) {
         SpringApplication.run(PaySystemServiceApp.class, args);

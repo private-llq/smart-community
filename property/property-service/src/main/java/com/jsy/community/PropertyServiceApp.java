@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @MapperScan("com.jsy.community.mapper")
 @PropertySource(value = "classpath:common-service.properties")
-// @EnableDistributedTransaction
+ @EnableDistributedTransaction
 @EnableDiscoveryClient
 public class 	PropertyServiceApp {
 	public static void main(String[] args) {
