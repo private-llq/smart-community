@@ -24,7 +24,7 @@ import javax.annotation.Resource;
 @Api(tags = "物业意见反馈")
 @RestController
 @RequestMapping("/complain")
-@ApiJSYController
+// @ApiJSYController
 public class ComplainController {
 
     @Resource

@@ -16,7 +16,7 @@ import java.util.List;
 @Api(tags = "社区集市-商品标签")
 @RestController
 @RequestMapping("/marketLabel")
-@ApiJSYController
+// @ApiJSYController
 public class ProprietorMarketLabelController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IProprietorMarketLabelService labelService;

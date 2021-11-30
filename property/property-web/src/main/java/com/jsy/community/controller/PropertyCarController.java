@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "车辆信息")
 @RestController
 @RequestMapping("/car")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyCarController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

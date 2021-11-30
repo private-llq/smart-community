@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
  **/
 @RestController
 @RequestMapping("/activity")
-@ApiJSYController
+// @ApiJSYController
 public class ActivityController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IActivityService activityService;

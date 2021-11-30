@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api("物业财务-结算单操作记录控制器")
 @RequestMapping("/statementRecord")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyFinanceStatementRecordController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

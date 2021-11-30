@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Api(tags = "组织机构控制器")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/organization")
 public class OrganizationController {
 	

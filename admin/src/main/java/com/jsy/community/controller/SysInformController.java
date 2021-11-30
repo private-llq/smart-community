@@ -30,7 +30,7 @@ import javax.annotation.Resource;
 @Api(tags = "系统消息控制器")
 @RestController
 @RequestMapping("sys/inform")
-@ApiJSYController
+// @ApiJSYController
 public class SysInformController {
     
     @Resource

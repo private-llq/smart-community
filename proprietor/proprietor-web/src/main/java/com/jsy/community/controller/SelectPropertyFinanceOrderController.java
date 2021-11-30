@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "物业账单")
 @RestController
 @RequestMapping("/FinanceOrder")
-@ApiJSYController
+// @ApiJSYController
 public class SelectPropertyFinanceOrderController {
     
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
@@ -40,7 +40,7 @@ public class SelectPropertyFinanceOrderController {
         qo.setOrderStatus(orderStatus);
         return CommonResult.ok(selectPropertyFinanceOrderService.listV2(qo),"查询成功");
     }
-    
+
     @ApiOperation("查询物业账单（详情）")
     @GetMapping("/findOne")
     @Permit("community:proprietor:FinanceOrder:findOne")

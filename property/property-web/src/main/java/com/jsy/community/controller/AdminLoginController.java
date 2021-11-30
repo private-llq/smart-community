@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class AdminLoginController {
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminUserService adminUserService;

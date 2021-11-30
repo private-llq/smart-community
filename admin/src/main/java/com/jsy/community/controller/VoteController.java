@@ -25,7 +25,7 @@ import java.util.Map;
  **/
 @RestController
 @RequestMapping("/vote")
-@ApiJSYController
+// @ApiJSYController
 @Login
 public class VoteController {
 

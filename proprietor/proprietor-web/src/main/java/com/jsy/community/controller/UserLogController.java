@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "用户日志控制器")
 @RestController
 @RequestMapping("user/log")
-@ApiJSYController
+// @ApiJSYController
 public class UserLogController {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)

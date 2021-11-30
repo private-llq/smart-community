@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 @RestController
 @RequestMapping("callBack")
 public class AliAppPayCallbackController {

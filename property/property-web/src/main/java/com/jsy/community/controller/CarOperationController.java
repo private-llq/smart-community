@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/CarOperation")
 @RestController
 @Api(tags = "车辆日志模块")

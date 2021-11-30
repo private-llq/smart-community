@@ -42,7 +42,7 @@ import java.util.List;
 @RestController
 @Api("物业财务-结算单控制器")
 @RequestMapping("/statement")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyFinanceStatementController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

@@ -26,7 +26,7 @@ import java.util.List;
 @RestController
 @Api("票据模板与字段关联控制器")
 @RequestMapping("/ticketTemplateField")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyFinanceTicketTemplateFieldController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceTicketTemplateFieldService ticketTemplateFieldService;

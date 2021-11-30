@@ -31,7 +31,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/menu")
-@ApiJSYController
+// @ApiJSYController
 public class AppMenuController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)

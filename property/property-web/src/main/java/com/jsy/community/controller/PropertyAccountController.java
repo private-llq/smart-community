@@ -26,7 +26,7 @@ import java.util.Map;
 @Api(tags = "社区账户信息")
 @RestController
 @RequestMapping("/account")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyAccountController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)

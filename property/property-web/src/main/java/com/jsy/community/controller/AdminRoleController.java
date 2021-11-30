@@ -22,7 +22,7 @@ import java.util.List;
  * @description 角色管理
  * @since 2020-12-14 15:37
  **/
-@ApiJSYController
+// @ApiJSYController
 @RestController
 @RequestMapping("role")
 public class AdminRoleController {

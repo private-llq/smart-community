@@ -29,7 +29,7 @@ import java.util.List;
 @Login( allowAnonymous = true)
 @Slf4j
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class AppContentController {
 	
 	@Autowired

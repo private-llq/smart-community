@@ -31,7 +31,7 @@ import java.util.Arrays;
 @Api(tags = "添加家属信息")
 @RestController
 @RequestMapping("/relation")
-@ApiJSYController
+// @ApiJSYController
 public class RelationController {
     //图片上传验证
     private final String[] img ={"jpg","png","jpeg"};

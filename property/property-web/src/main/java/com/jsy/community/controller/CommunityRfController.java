@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @Version: 1.0
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/rf")
 public class CommunityRfController {
 

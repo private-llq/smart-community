@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "物业公司控制器")
 @Slf4j
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class PropertyCompanyController {
 	
 	@Autowired

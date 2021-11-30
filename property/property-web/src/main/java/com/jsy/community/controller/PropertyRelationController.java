@@ -55,7 +55,7 @@ import java.util.Map;
 @Api(tags = "物业家属查询")
 @RestController
 @RequestMapping("/members")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyRelationController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

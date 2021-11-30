@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "车道管理")
 @RestController
 @RequestMapping("carLane")
-@ApiJSYController
+// @ApiJSYController
 public class CarLaneController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

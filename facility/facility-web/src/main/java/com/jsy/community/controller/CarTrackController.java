@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "车辆轨迹")
 @RestController
 @RequestMapping("/carTrack")
-@ApiJSYController
+// @ApiJSYController
 @Login
 public class CarTrackController {
 	

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @Version: 1.0
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/strangerRecord")
 public class StrangerRecordController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

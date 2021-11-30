@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * @Version: 1.0
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/hardWare")
 public class CommunityHardWareController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
