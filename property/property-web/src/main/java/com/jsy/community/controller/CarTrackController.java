@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "车辆轨迹")
 @RestController
 @RequestMapping("/carTrack")
-@ApiJSYController
+// @ApiJSYController
 public class CarTrackController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)

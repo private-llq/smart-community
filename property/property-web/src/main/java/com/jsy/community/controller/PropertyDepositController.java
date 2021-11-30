@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "物业押金账单")
 @RestController
 @RequestMapping("/deposit")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyDepositController {
     
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

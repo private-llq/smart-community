@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/const")
-@ApiJSYController
+// @ApiJSYController
 public class CommonConstController {
 	
 	@Autowired

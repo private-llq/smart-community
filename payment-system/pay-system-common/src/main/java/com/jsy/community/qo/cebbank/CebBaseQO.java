@@ -2,6 +2,7 @@ package com.jsy.community.qo.cebbank;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**
@@ -16,5 +17,6 @@ public class CebBaseQO implements Serializable {
     private String canal;
 
     // 1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序-部分接口必填
+    @NotBlank(message = "终端类型不能为空;1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序")
     private String deviceType;
 }

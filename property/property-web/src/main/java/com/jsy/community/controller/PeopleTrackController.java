@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Api(tags = "人员轨迹")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/peopleTrack")
 public class PeopleTrackController {
 	

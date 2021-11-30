@@ -34,7 +34,7 @@ import java.util.Map;
 @Api(tags = "设备控制器")
 @RestController
 @RequestMapping("/facility")
-@ApiJSYController
+// @ApiJSYController
 public class FacilityController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)

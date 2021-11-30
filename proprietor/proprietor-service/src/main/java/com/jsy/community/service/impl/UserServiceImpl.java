@@ -291,7 +291,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         // 调用基础用户模块获取实名信息
         RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(loginVo.getUserInfo().getId());
         UserInfoVo userInfoVo = new UserInfoVo();
-        userInfoVo.setIsBindMobile(loginVo.getUserInfo().getIsBindPhone() ? 1 : 0);
+        userInfoVo.setIsBindMobile(loginVo.getUserInfo().getPhone() != null ? 1 : 0);
         if (thirdBindStatus != null) {
             userInfoVo.setIsBindWechat(thirdBindStatus.getWeChatBind() ? 1 : 0);
             userInfoVo.setIsBindAlipay(thirdBindStatus.getAliPayBind() ? 1 : 0);

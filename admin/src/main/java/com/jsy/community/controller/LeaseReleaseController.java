@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/application/lease")
 public class LeaseReleaseController {
 

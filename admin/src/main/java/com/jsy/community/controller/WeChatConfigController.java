@@ -20,7 +20,7 @@ import java.util.Map;
  * @create: 2021-11-10 14:02
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/weChat/config")
 public class WeChatConfigController {
 

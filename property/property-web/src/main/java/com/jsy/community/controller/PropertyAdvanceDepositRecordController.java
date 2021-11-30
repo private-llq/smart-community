@@ -43,7 +43,7 @@ import java.util.List;
 @Api(tags = "物业预存款余额明细记录表")
 @RestController
 @RequestMapping("/advance/deposit/record")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyAdvanceDepositRecordController {
     
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

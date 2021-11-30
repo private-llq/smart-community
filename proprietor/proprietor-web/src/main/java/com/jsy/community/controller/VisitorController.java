@@ -41,7 +41,7 @@ import java.util.List;
 @Api(tags = "访客控制器")
 @RestController
 @Login
-@ApiJSYController
+// @ApiJSYController
 public class VisitorController {
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IVisitorService visitorService;

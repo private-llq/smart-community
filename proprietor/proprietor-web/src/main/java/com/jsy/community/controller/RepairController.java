@@ -40,7 +40,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @Login
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/repair")
 public class RepairController {
 	

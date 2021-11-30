@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "用户日志控制器")
 @RestController
 @RequestMapping("user/log")
-@ApiJSYController
+// @ApiJSYController
 @Login
 public class UserLogController {
 	

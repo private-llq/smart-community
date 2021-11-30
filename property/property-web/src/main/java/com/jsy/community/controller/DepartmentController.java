@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "社区通讯录(部门控制器)")
 @RestController
 @RequestMapping("/department")
-@ApiJSYController
+// @ApiJSYController
 public class DepartmentController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)

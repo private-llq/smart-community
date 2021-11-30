@@ -25,7 +25,7 @@ import javax.annotation.Resource;
 @Api(tags = "操作日志控制器")
 @RestController
 @RequestMapping("/op/log")
-@ApiJSYController
+// @ApiJSYController
 public class SysOpLogController {
 	
 	@Resource

@@ -26,7 +26,7 @@ import java.util.List;
  * @since 2020-12-29 17:06
  */
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 @RestController
 @RequestMapping("/favorite")
 @Api(tags = "房屋租售收藏控制器")

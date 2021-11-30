@@ -45,7 +45,7 @@ import java.util.Map;
 @Api(tags = "系统用户控制器")
 @Slf4j
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class SysUserController {
 	
 	@Autowired

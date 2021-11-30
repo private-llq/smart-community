@@ -31,7 +31,7 @@ import java.util.List;
 @Api(tags = "投诉建议前端控制器")
 @RestController
 @RequestMapping("/complain")
-@ApiJSYController
+// @ApiJSYController
 @Login(allowAnonymous = true)
 public class ComplainController {
 

@@ -45,7 +45,7 @@ import java.util.Map;
 @Api(tags = "用户金钱账户控制器")
 @RestController
 @RequestMapping("user/account")
-@ApiJSYController
+// @ApiJSYController
 @Login
 public class UserAccountController {
 

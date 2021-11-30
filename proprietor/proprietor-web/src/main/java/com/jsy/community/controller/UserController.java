@@ -45,7 +45,7 @@ import java.util.*;
 @RequestMapping("user")
 @Api(tags = "用户控制器")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class UserController {
     @DubboReference(version = Const.version, group = Const.group, check = false, timeout = 10000)
     private IUserAuthService userAuthService;

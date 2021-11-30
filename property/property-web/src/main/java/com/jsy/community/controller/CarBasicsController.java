@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
  @Api(tags = "基础设备")
  @RestController
  @RequestMapping("/carBasics")
- @ApiJSYController
+ // @ApiJSYController
 public class CarBasicsController {
 
      @DubboReference(version = Const.version,group = Const.group_property,check = false)

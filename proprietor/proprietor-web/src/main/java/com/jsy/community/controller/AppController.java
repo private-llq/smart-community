@@ -30,7 +30,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/app")
 @Login(allowAnonymous = true)
-@ApiJSYController
+// @ApiJSYController
 public class AppController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)

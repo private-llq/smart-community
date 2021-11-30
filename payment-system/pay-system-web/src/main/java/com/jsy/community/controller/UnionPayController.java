@@ -40,7 +40,7 @@ import java.util.List;
  **/
 @Api(tags = "银联支付控制器")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/unionPay")
 @Slf4j
 public class UnionPayController {

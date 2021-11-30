@@ -20,7 +20,7 @@ import java.util.*;
  * @since 2020-12-16 14:28
  */
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 @RestController
 @RequestMapping("/const")
 @Api(tags = "房屋租售常量查询控制器")

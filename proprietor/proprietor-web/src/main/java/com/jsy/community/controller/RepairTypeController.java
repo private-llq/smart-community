@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Api(tags = "报修类别控制器")
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 @RestController
 @RequestMapping("/repairType")
 @Deprecated

@@ -32,7 +32,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/menu")
 @Login(allowAnonymous = true)
-@ApiJSYController
+// @ApiJSYController
 public class AppMenuController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)

@@ -33,7 +33,7 @@ import java.util.Set;
 @Api(tags = "房间成员控制器")
 @RestController
 @RequestMapping("houseMember")
-@ApiJSYController
+// @ApiJSYController
 @Login
 public class HouseMemberController {
 	

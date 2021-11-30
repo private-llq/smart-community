@@ -28,7 +28,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/app")
 @Login(allowAnonymous = true)
-@ApiJSYController
+// @ApiJSYController
 public class AppController {
 	
 	@Resource

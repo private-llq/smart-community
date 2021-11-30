@@ -18,7 +18,7 @@ import java.util.Map;
 @Api(tags = "社区集市")
 @RestController
 @RequestMapping("/market")
-@ApiJSYController
+// @ApiJSYController
 public class MarketController {
     @Resource
     private IMarketService marketService;

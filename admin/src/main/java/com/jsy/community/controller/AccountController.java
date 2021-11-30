@@ -23,7 +23,7 @@
 // **/
 //@RequestMapping("/account")
 //@Api(tags = "账号管理控制器")
-//@ApiJSYController
+//// @ApiJSYController
 //@Slf4j
 //@Login
 //@RestController

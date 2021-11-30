@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("vote")
 @RestController
 @Login
-@ApiJSYController
+// @ApiJSYController
 public class VoteController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)

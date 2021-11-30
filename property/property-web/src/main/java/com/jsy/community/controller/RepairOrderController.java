@@ -36,7 +36,7 @@ import java.util.Map;
 @Api(tags = "报修订单控制器")
 @Slf4j
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/repairOrder")
 public class RepairOrderController {
 	

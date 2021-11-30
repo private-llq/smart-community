@@ -19,7 +19,7 @@ import java.io.Serializable;
  * @Version: 1.0
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping(value = "/permit")
 public class PermitController {
 

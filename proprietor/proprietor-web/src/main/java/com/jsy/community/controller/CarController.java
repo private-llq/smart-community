@@ -42,7 +42,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/car")
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 public class CarController {
 	
 	

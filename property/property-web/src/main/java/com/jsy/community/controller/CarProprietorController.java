@@ -20,7 +20,7 @@ import java.util.List;
 @Api("业主车辆")
 @RestController
 @RequestMapping("/carProprietor")
-@ApiJSYController
+// @ApiJSYController
 public class CarProprietorController {
 
     @DubboReference(version = Const.version,group = Const.group_property,check = false)

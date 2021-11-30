@@ -57,7 +57,7 @@ import java.util.Map;
  * @since 2020-12-17
  */
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 @RestController
 @RequestMapping("/shop")
 @Api(tags = "商铺租售控制器")

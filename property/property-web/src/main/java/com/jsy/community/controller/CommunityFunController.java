@@ -38,7 +38,7 @@ import java.util.Map;
 @Api(tags = "社区趣事控制器")
 @RestController
 @RequestMapping("/communityfun")
-@ApiJSYController
+// @ApiJSYController
 public class CommunityFunController {
 
     private final String[] img ={"jpg","png","jpeg"};

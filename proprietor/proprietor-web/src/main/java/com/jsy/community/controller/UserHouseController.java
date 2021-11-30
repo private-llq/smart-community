@@ -35,7 +35,7 @@ import java.util.List;
 @RequestMapping("/user/house")
 @Api(tags = "用户房屋")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @Login
 public class UserHouseController {
 

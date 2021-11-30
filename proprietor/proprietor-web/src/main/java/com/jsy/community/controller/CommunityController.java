@@ -31,7 +31,7 @@ import java.util.Map;
 @Api(tags = "社区控制器")
 @Login( allowAnonymous = true)
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 @RestController
 public class CommunityController {
 	

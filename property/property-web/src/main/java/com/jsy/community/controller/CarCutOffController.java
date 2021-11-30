@@ -26,7 +26,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/cutOff")
-@ApiJSYController
+// @ApiJSYController
 @Api("开闸记录")
 public class CarCutOffController{
     @DubboReference(version = Const.version,group = Const.group_property,check = false)

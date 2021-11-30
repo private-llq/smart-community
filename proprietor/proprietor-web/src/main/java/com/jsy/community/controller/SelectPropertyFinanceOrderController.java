@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "物业账单")
 @RestController
 @RequestMapping("/FinanceOrder")
-@ApiJSYController
+// @ApiJSYController
 @Login
 public class SelectPropertyFinanceOrderController {
     

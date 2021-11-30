@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "微信登录控制器")
 @RestController
 @RequestMapping("/WeChat")
-@ApiJSYController
+// @ApiJSYController
 public class WeChatLoginController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)

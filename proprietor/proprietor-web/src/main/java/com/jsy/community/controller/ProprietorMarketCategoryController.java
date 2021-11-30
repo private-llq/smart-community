@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Api(tags = "社区集市-商品分类")
 @RestController
 @RequestMapping("/marketCategory")
-@ApiJSYController
+// @ApiJSYController
 public class ProprietorMarketCategoryController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IProprietorMarketCategoryService categoryService;

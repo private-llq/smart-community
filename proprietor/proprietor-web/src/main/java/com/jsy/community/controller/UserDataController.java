@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 @Api(tags = "用户个人信息(个人中心)")
 @RestController
 @RequestMapping("/userdata")
-@ApiJSYController
+// @ApiJSYController
 public class UserDataController {
 
     private final String[] img ={"jpg","png","jpeg"};

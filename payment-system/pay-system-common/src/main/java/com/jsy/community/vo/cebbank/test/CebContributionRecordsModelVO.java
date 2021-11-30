@@ -1,4 +1,4 @@
-package com.jsy.community.vo.cebbank;
+package com.jsy.community.vo.cebbank.test;
 
 import lombok.Data;
 

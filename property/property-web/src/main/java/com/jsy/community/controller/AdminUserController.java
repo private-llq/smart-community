@@ -47,7 +47,7 @@ import java.util.Map;
  **/
 @RequestMapping("sys/user")
 @Api(tags = "系统用户控制器")
-@ApiJSYController
+// @ApiJSYController
 @Slf4j
 //@Login
 @RestController

@@ -34,7 +34,7 @@ import java.util.Map;
 @Api(tags = "社区通讯录控制器")
 @RestController
 @RequestMapping("/department")
-@ApiJSYController
+// @ApiJSYController
 @Login(allowAnonymous = true)
 public class DepartmentController {
 	

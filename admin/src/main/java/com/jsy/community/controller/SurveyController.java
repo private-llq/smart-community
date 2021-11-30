@@ -21,7 +21,7 @@ import javax.annotation.Resource;
  */
 @Api(tags = "概况控制器")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/survey")
 @Login
 public class SurveyController {

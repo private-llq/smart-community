@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "收到推送消息用户接口")
 @RestController
 @RequestMapping("/inform")
-@ApiJSYController
+// @ApiJSYController
 public class InformIdsController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)

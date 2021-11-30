@@ -29,7 +29,7 @@ import java.util.List;
 @RequestMapping("/community/inform")
 @Slf4j
 @Login
-@ApiJSYController
+// @ApiJSYController
 public class CommunityInformController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)

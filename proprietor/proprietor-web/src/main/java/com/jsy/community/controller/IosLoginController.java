@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * @create: 2021-05-31 16:02
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/Ios")
 public class IosLoginController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
