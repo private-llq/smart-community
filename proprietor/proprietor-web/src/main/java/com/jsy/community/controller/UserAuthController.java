@@ -1,9 +1,7 @@
 package com.jsy.community.controller;
-import java.time.LocalDateTime;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.*;
@@ -16,12 +14,8 @@ import com.jsy.community.qo.proprietor.*;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
-import com.jsy.community.vo.UserInfoVo;
 import com.zhsj.base.api.constant.RpcConst;
-import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import com.zhsj.base.api.rpc.IBaseSmsRpcService;
-import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
-import com.zhsj.base.api.vo.LoginVo;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -68,12 +62,6 @@ public class UserAuthController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     @SuppressWarnings("unused")
     private ICommonService commonService;
-
-    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
-    private IBaseAuthRpcService baseAuthRpcService;
-
-    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
-    private IBaseUserInfoRpcService baseUserInfoRpcService;
 
     @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
     private IBaseSmsRpcService baseSmsRpcService;

@@ -4,6 +4,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.qo.PermitQO;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBasePermissionRpcService;
 import com.zhsj.base.api.rpc.IBaseRoleRpcService;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import lombok.Data;
@@ -24,7 +25,7 @@ import java.io.Serializable;
 public class PermitController {
 
     @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
-    private IBaseRoleRpcService roleRpcService;
+    private IBasePermissionRpcService permissionRpcService;
 
     /***
      * @author: Pipi
@@ -40,7 +41,7 @@ public class PermitController {
     @PostMapping("/addPermit")
     @LoginIgnore
     public CommonResult addPermit(@RequestBody PermitQO permitQO) {
-        roleRpcService.createPermission(permitQO.getName(), permitQO.getPermit(), permitQO.getScope(), permitQO.getDescription(), permitQO.getCreateUid());
+        permissionRpcService.createPermission(permitQO.getName(), permitQO.getPermit(), permitQO.getScope(), permitQO.getDescription(), permitQO.getCreateUid());
         return CommonResult.ok();
     }
 }

@@ -3,6 +3,8 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.CebBankService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.cebbank.*;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
@@ -10,12 +12,10 @@ import com.zhsj.baseweb.annotation.LoginIgnore;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 
 /**
  * @Author: Pipi
@@ -35,9 +35,9 @@ public class CebBankController {
     private RedisTemplate<String, String> redisTemplate;
 
     /**
+     * @param categoryQO:
      * @author: Pipi
      * @description: 查询城市下缴费类别
-     * @param categoryQO:
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/11/17 17:47
      **/
@@ -50,9 +50,9 @@ public class CebBankController {
     }
 
     /**
+     * @param projectQO:
      * @author: Pipi
      * @description: 查询缴费项目
-     * @param projectQO:
      * @return: {@link CommonResult}
      * @date: 2021/11/23 15:33
      **/
@@ -65,12 +65,29 @@ public class CebBankController {
         return CommonResult.ok(cebBankService.queryContributionProject(projectQO));
     }
 
-
+    /**
+     * @param billInfoQO:
+     * @author: Pipi
+     * @description: 查询缴费账单信息(作用同查询手机充值缴费账单, 但是适用于生活缴费, 不适用于手机话费)
+     * @return: {@link CommonResult}
+     * @date: 2021/11/23 17:14
+     **/
+    @LoginIgnore
+    @PostMapping("/v2/queryBillInfo")
+    public CommonResult queryBillInfo(@RequestBody CebQueryBillInfoQO billInfoQO) {
+        ValidatorUtils.validateEntity(billInfoQO);
+        if (billInfoQO.getBusinessFlow() == 1) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "直接缴费业务,请查询直缴接口");
+        }
+        String sessionId = getCebBankSessionId();
+        billInfoQO.setSessionId(sessionId);
+        return CommonResult.ok(cebBankService.queryBillInfo(billInfoQO));
+    }
 
     /**
+     * @param :
      * @author: Pipi
      * @description: 获取cebBankSession
-     * @param :
      * @return: {@link String}
      * @date: 2021/11/23 14:59
      **/
