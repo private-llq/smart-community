@@ -19,7 +19,6 @@ public interface IHouseRecentService extends IService<HouseRecentEntity> {
 
     /**
      * 保存用户访问租赁最近浏览的 数据
-     *
      * @param result 租赁详情接口执行的结果
      * @param uid    用户id
      */

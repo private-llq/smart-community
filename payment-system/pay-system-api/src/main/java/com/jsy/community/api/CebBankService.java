@@ -45,7 +45,7 @@ public interface CebBankService {
      * @return: {@link CebQueryBillInfoVO}
      * @date: 2021/11/23 17:14
      **/
-//    CebQueryBillInfoVO queryBillInfo(CebQueryBillInfoQO billInfoQO);
+    CebQueryBillInfoVO queryBillInfo(CebQueryBillInfoQO billInfoQO);
 
     /**
      * @author: Pipi

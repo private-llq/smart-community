@@ -15,6 +15,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -92,33 +93,35 @@ public class CebBankServiceImpl implements CebBankService {
      * @return: java.lang.String
      * @date: 2021/11/17 10:37
      **/
-    /*@Override
+    @Override
     public CebQueryBillInfoVO queryBillInfo(CebQueryBillInfoQO billInfoQO) {
         HttpResponseModel responseModel = new HttpResponseModel();
-        billInfoQO.setPollingTimes("1");
-        billInfoQO.setFlag("2");
-        billInfoQO.setQryAcqSsn("n20211125180148-885Kz0");
-        responseModel = CebBankContributionUtil.queryBillInfo(billInfoQO);
-        *//*for (Integer i = 1; i <= 5; i++) {
-            billInfoQO.setPollingTimes(i.toString());
-            try {
-                if (i > 1) {
-                    Thread.sleep(i * 1000);
+        if (billInfoQO.getBusinessFlow() == 2) {
+            billInfoQO.setFlag("1");
+            Timer timer = new Timer();
+            for (Integer i = 1; i <= 5; i++) {
+                billInfoQO.setPollingTimes(i.toString());
+                try {
+                    if (i > 1) {
+                        Thread.sleep(i * 1000);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+                responseModel = CebBankContributionUtil.queryBillInfo(billInfoQO);
+                if (responseModel != null && CebBankEntity.successCode.equals(responseModel.getRespCode())) {
+                    break;
+                }
             }
+        } else {
             responseModel = CebBankContributionUtil.queryBillInfo(billInfoQO);
-            if (responseModel != null && CebBankEntity.successCode.equals(responseModel.getRespCode())) {
-                break;
-            }
-        }*//*
+        }
         if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
             throw new PaymentException("查询缴费账单信息失败");
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         return JSON.parseObject(respData, CebQueryBillInfoVO.class);
-    }*/
+    }
 
 
 
