@@ -64,6 +64,11 @@ public class UserInfoVo implements Serializable {
 	
 	@ApiModelProperty("真实姓名")
 	private String realName;
+
+	/**
+	 * 生日
+	 */
+	private String birthday;
 	
 	@ApiModelProperty("身份证")
 	private String idCard;
