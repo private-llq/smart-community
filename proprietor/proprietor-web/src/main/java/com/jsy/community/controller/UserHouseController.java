@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.api.ProprietorUserService;
 import com.jsy.community.constant.Const;
@@ -11,6 +10,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.ControlVO;
+import com.jsy.community.vo.HouseMembersQO;
 import com.jsy.community.vo.UserHouseVO;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
@@ -118,6 +118,13 @@ public class UserHouseController {
     public CommonResult meHouse(){
         List<UserHouseVO> houseMemberVOS = userHouseService.meHouse(UserUtils.getUserId());
         return CommonResult.ok(houseMemberVOS);
+    }
+
+    @ApiOperation("养老导入家属列表接口")
+    @GetMapping("selectMembers")
+    public CommonResult selectMembers(){
+        List<HouseMembersQO> list = userHouseService.selectMembers(UserUtils.getUserId());
+        return CommonResult.ok(list);
     }
 
     /**

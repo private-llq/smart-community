@@ -6,6 +6,7 @@ import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.qo.MembersQO;
 import com.jsy.community.qo.UserHouseQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
+import com.jsy.community.vo.HouseMembersQO;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.UserHouseVO;
 
@@ -227,4 +228,13 @@ public interface IUserHouseService extends IService<UserHouseEntity> {
 	 * @return:
 	 */
     HouseMemberEntity selectByUser(Long communityId, Long houseId, String userId);
+
+    /**
+     * @Description: 养老导入家人列表接口
+     * @author: Hu
+     * @since: 2021/12/2 15:33
+     * @Param:
+     * @return:
+     */
+	List<HouseMembersQO> selectMembers(String userId);
 }

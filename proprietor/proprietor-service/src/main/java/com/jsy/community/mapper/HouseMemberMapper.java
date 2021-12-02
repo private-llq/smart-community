@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.HouseMemberEntity;
+import com.jsy.community.vo.HouseMembersQO;
 import com.jsy.community.vo.MembersVO;
 import com.jsy.community.vo.UserHouseVO;
 import org.apache.ibatis.annotations.MapKey;
@@ -88,4 +89,13 @@ public interface HouseMemberMapper extends BaseMapper<HouseMemberEntity> {
 	 * @return:
 	 */
 	void updateByMobile(@Param("ids") Set<Long> ids,@Param("uid") String uid);
+
+	/**
+	 * @Description: 养老导入家人列表接口
+	 * @author: Hu
+	 * @since: 2021/12/2 15:34
+	 * @Param:
+	 * @return:
+	 */
+	List<HouseMembersQO> selectMembers(@Param("uid") String userId);
 }
