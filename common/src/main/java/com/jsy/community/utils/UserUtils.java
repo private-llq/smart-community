@@ -1,5 +1,4 @@
 package com.jsy.community.utils;
-
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
@@ -7,6 +6,8 @@ import com.jsy.community.vo.ControlVO;
 import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.sys.SysInfoVo;
+import com.zhsj.baseweb.support.ContextHolder;
+import com.zhsj.baseweb.support.LoginUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -121,9 +122,16 @@ public class UserUtils {
 	 * @Date: 2020/12/3
 	**/
 	public static UserInfoVo getUserInfo() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (UserInfoVo)request.getAttribute(USER_INFO);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+		LoginUser loginUser = ContextHolder.getContext().getLoginUser();
+		UserInfoVo userInfoVo = new UserInfoVo();
+
+		userInfoVo.setMobile(loginUser.getPhone());
+		userInfoVo.setUid(loginUser.getAccount());
+		userInfoVo.setImId(loginUser.getImId());
+		userInfoVo.setNickname(loginUser.getNickName());
+		return userInfoVo;
 	}
 
 
@@ -149,9 +157,9 @@ public class UserUtils {
 	 * @Date: 2020/12/3
 	**/
 	public static String getUserId() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (String) request.getAttribute(USER_KEY);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+		return ContextHolder.getContext().getLoginUser().getAccount();
 	}
 	
 	/**
