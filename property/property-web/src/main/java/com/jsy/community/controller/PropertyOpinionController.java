@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Api(tags = "物业意见反馈")
 @RestController
 @RequestMapping("/propertyOpinion")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyOpinionController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

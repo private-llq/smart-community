@@ -24,7 +24,7 @@ import java.util.List;
 @Api(tags = "轮播图控制器")
 @RestController
 @RequestMapping("banner")
-@ApiJSYController
+// @ApiJSYController
 public class BannerController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)

@@ -35,7 +35,7 @@ import java.util.List;
  * @description 巡检接口
  * @since 2021-07-23 09:15
  **/
-@ApiJSYController
+// @ApiJSYController
 @RestController
 @RequestMapping("/patrol")
 public class PatrolController {

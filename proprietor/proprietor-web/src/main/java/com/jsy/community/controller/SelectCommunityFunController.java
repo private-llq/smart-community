@@ -23,7 +23,7 @@ import java.util.Map;
 @Api(tags = "社区趣事控制器")
 @RestController
 @RequestMapping("/communityfun")
-@ApiJSYController
+// @ApiJSYController
 public class SelectCommunityFunController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ISelectCommunityFunService selectCommunityFunService;

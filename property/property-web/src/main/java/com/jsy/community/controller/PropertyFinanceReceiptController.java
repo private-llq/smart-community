@@ -39,7 +39,7 @@ import java.util.List;
 @Api(tags = "财务板块 - 收款单")
 @RestController
 @RequestMapping("/finance/receipt")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyFinanceReceiptController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)

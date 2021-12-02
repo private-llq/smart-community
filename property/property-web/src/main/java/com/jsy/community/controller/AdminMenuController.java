@@ -25,7 +25,7 @@ import java.util.Map;
  **/
 @RestController
 @RequestMapping("menu")
-@ApiJSYController
+// @ApiJSYController
 public class AdminMenuController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)

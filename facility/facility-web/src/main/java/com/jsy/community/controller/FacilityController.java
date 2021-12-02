@@ -35,7 +35,7 @@ import java.util.Map;
 @Api(tags = "设备控制器")
 @RestController
 @RequestMapping("/facility")
-@ApiJSYController
+// @ApiJSYController
 @Login
 public class FacilityController {
 	

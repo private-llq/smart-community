@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api(tags = "文件控制器")
 @RequestMapping("/file")
-@ApiJSYController
+// @ApiJSYController
 @ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class FileController {
 	

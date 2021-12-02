@@ -28,7 +28,7 @@ import java.util.Map;
 @RequestMapping("/inform")
 @Api(tags = "查询通知消息已读未读")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class SelectInformController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)

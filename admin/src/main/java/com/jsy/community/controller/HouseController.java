@@ -40,7 +40,7 @@ import java.util.List;
 @Api(tags = "房屋信息控制器")
 @RestController
 @RequestMapping("house")
-@ApiJSYController
+// @ApiJSYController
 public class HouseController {
 
 	@Resource

@@ -39,7 +39,7 @@ import java.util.List;
 @Api(tags = "车辆管理控制器")
 @RestController
 @RequestMapping("/car")
-@ApiJSYController
+// @ApiJSYController
 public class CarController {
 
 	@Resource

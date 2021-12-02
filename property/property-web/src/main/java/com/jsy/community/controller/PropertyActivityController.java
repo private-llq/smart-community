@@ -25,7 +25,7 @@ import java.util.Map;
  **/
 @RestController
 @RequestMapping("/activity")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyActivityController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

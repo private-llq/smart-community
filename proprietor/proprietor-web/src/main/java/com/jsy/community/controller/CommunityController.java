@@ -30,7 +30,7 @@ import java.util.Map;
 @RequestMapping("community")
 @Api(tags = "社区控制器")
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 @RestController
 public class CommunityController {
 	

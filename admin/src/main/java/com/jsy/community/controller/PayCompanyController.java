@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/payCompany")
-@ApiJSYController
+// @ApiJSYController
 public class PayCompanyController {
 	
 	@Autowired

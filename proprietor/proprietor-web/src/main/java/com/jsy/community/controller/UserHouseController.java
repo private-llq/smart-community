@@ -34,7 +34,7 @@ import java.util.List;
 @RequestMapping("/user/house")
 @Api(tags = "用户房屋")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class UserHouseController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)

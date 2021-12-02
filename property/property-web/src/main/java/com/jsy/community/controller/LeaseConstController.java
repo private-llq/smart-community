@@ -23,7 +23,7 @@ import java.util.List;
 @Api(tags = "物业端房屋租赁常量接口")
 @RestController
 @RequestMapping("lease/const")
-@ApiJSYController
+// @ApiJSYController
 public class LeaseConstController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

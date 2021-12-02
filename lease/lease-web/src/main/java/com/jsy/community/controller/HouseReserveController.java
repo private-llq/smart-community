@@ -30,7 +30,7 @@ import java.util.stream.IntStream;
  * @since 2020-12-26 13:55
  */
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 @RestController
 @Api(tags = "出租房屋预约控制器")
 @RequestMapping("/house/reserve")

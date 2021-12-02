@@ -23,7 +23,7 @@ import java.util.List;
 @Api(tags = "收费设置")
 @RestController
 @RequestMapping("/carCharge")
-@ApiJSYController
+// @ApiJSYController
 public class CarChargeController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

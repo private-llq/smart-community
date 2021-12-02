@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 /**
  * @Author: Pipi
- * @Description:
+ * @Description: 缴费类别VO
  * @Date: 2021/11/12 17:40
  * @Version: 1.0
  **/
@@ -18,12 +18,5 @@ public class CebCategoryVO implements Serializable {
     private String cityName;
     private String sort;
     private String picUrlClient;
-    private String version;
-    private String picName;
     private String paymentType;
-    private String pictureUrl;
-    private String paymentWay;
-    private String CebPaymentItemsList;
-    private String cornerMarker;
-    private String howView;
 }

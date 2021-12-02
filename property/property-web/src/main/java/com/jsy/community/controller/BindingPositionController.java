@@ -17,7 +17,7 @@ import java.util.List;
 @Api(tags = "车辆绑定车位")
 @RestController
 @RequestMapping("BindingPosition")
-@ApiJSYController
+// @ApiJSYController
 public class BindingPositionController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

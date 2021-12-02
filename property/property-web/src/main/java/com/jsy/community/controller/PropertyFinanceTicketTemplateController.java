@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Api("票据打印模板信息控制器")
 @RequestMapping("/ticketTemplate")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyFinanceTicketTemplateController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceTicketTemplateService ticketTemplateService;

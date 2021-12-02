@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
  **/
 @RestController
 @RequestMapping("/propertyFace")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyFaceController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private PropertyFaceService propertyFaceService;

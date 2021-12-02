@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-@ApiJSYController
+// @ApiJSYController
 @RestController
 @RequestMapping("/AlipayPhoneH5")
 public class AlipayPhoneH5Controller {

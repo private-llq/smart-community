@@ -34,7 +34,7 @@ import java.util.Map;
 @Api(tags = "社区通讯录控制器")
 @RestController
 @RequestMapping("/department")
-@ApiJSYController
+// @ApiJSYController
 public class DepartmentController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)

@@ -1,5 +1,6 @@
 package com.jsy.community.vo.cebbank;
 
+import com.jsy.community.vo.cebbank.test.CebCityModelVO;
 import lombok.Data;
 
 import java.io.Serializable;

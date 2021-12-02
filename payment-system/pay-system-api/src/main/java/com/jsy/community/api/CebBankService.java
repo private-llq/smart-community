@@ -29,16 +29,7 @@ public interface CebBankService {
      **/
     CebQueryCityContributionCategoryVO queryCityContributionCategory(CebQueryCityContributionCategoryQO categoryQO);
 
-    /***
-     * @author: Pipi
-     * @description: 查询城市
-     * @param cebQueryCityQO:
-     * @return: {@link CebCityVO}
-     * @date: 2021/11/23 15:05
-     **/
-    CebCityModelListVO queryCity(CebQueryCityQO cebQueryCityQO);
-
-    /***
+    /**
      * @author: Pipi
      * @description: 查询缴费项目
      * @param projectQO:
@@ -47,48 +38,48 @@ public interface CebBankService {
      **/
     CebQueryContributionProjectVO queryContributionProject(CebQueryContributionProjectQO projectQO);
 
-    /***
+    /**
      * @author: Pipi
      * @description: 查询缴费账单信息
      * @param billInfoQO:
      * @return: {@link CebQueryBillInfoVO}
      * @date: 2021/11/23 17:14
      **/
-    CebQueryBillInfoVO queryBillInfo(CebQueryBillInfoQO billInfoQO);
+//    CebQueryBillInfoVO queryBillInfo(CebQueryBillInfoQO billInfoQO);
 
-    /***
+    /**
      * @author: Pipi
      * @description: 查询手机充值缴费账单
      * @param cebQueryMobileBillQO:
      * @return: {@link CebQueryMobileBillVO}
      * @date: 2021/11/23 18:06
      **/
-    CebQueryMobileBillVO queryMobileBill(CebQueryMobileBillQO cebQueryMobileBillQO);
+//    CebQueryMobileBillVO queryMobileBill(CebQueryMobileBillQO cebQueryMobileBillQO);
 
-    /***
+    /**
      * @author: Pipi
      * @description: 查询缴费记录
      * @param recordQO:
      * @return: {@link CebQueryContributionRecordVO}
      * @date: 2021/11/23 18:11
      **/
-    CebQueryContributionRecordVO queryContributionRecord(CebQueryContributionRecordQO recordQO);
+//    CebQueryContributionRecordVO queryContributionRecord(CebQueryContributionRecordQO recordQO);
 
-    /***
+    /**
      * @author: Pipi
      * @description: 查询缴费记录详情
      * @param infoQO:
      * @return: {@link CebContributionRecordDetailVO}
      * @date: 2021/11/23 18:14
      **/
-    CebContributionRecordDetailVO queryContributionRecordInfo(CebQueryContributionRecordInfoQO infoQO);
+//    CebContributionRecordDetailVO queryContributionRecordInfo(CebQueryContributionRecordInfoQO infoQO);
 
-    /***
+    /**
      * @author: Pipi
      * @description: 创建收银台
      * @param deskQO:
      * @return: {@link CebCashierDeskVO}
      * @date: 2021/11/23 18:21
      **/
-    CebCashierDeskVO createCashierDesk(CebCreateCashierDeskQO deskQO);
+//    CebCashierDeskVO createCashierDesk(CebCreateCashierDeskQO deskQO);
 }

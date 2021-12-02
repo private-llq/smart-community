@@ -27,7 +27,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/payType")
-@ApiJSYController
+// @ApiJSYController
 public class PayTypeController {
 	
 	@Autowired

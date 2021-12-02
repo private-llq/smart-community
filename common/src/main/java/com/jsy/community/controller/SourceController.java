@@ -25,7 +25,7 @@ import java.util.Map;
 @RestController
 @Api(tags = "字典资源控制器")
 @RequestMapping("source")
-@ApiJSYController
+// @ApiJSYController
 //@ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class SourceController {
 	

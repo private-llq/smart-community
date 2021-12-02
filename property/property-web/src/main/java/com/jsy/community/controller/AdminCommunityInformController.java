@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "社区消息控制器")
 @RestController
 @RequestMapping("/community/inform")
-@ApiJSYController
+// @ApiJSYController
 public class AdminCommunityInformController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

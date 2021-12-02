@@ -1,5 +1,4 @@
 package com.jsy.community.vo.cebbank;
-
 import lombok.Data;
 
 import java.io.Serializable;
