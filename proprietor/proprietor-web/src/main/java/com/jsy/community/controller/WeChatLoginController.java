@@ -34,7 +34,7 @@ public class WeChatLoginController {
     @LoginIgnore
     @ApiOperation("登录")
     @PostMapping("/login")
-    @Permit("community:proprietor:WeChat:login")
+    // @Permit("community:proprietor:WeChat:login")
     public CommonResult login(@RequestParam("code")String code) {
         JSONObject object = WeCharUtil.getAccessToken(code);
         if ("".equals(object)||object==null){
@@ -47,7 +47,7 @@ public class WeChatLoginController {
 
     @LoginIgnore
     @PostMapping("/bindingMobile")
-    @Permit("community:proprietor:WeChat:bindingMobile")
+    // @Permit("community:proprietor:WeChat:bindingMobile")
     public CommonResult bindingMobile(@RequestBody BindingMobileQO bindingMobileQO){
         ValidatorUtils.validateEntity(bindingMobileQO, BindingMobileQO.BindingMobileValidated.class);
         UserAuthVo userAuthVo=weChatLoginService.bindingMobile(bindingMobileQO);

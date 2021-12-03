@@ -31,7 +31,7 @@ public class AliAppPayCallbackController {
 	@RequestMapping("pay")
 	@Transactional(rollbackFor=Exception.class,timeout=3)
 	@LoginIgnore
-	@Permit("community:payment:callBack:pay")
+	// @Permit("community:payment:callBack:pay")
 	public String test(HttpServletRequest req){
 		Map<String, String> paramsMap = new HashMap<>();
 		Enumeration<String> paramNames = req.getParameterNames();

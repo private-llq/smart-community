@@ -38,7 +38,7 @@ public class RepairTypeController {
 	
 	@ApiOperation("报修类别查询")
 	@GetMapping("/getType")
-	@Permit("community:proprietor:repairType:getType")
+	// @Permit("community:proprietor:repairType:getType")
 	public CommonResult getType() {
 		List<RepairTypeEntity> list = repairTypeService.getType();
 		return CommonResult.ok(list);

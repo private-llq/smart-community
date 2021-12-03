@@ -31,7 +31,7 @@ public class ProprietorMarketCategoryController {
      **/
     @PostMapping("/addMarketCategory")
     @ApiOperation("新增社区集市商品类别")
-    @Permit("community:proprietor:marketCategory:addMarketCategory")
+    // @Permit("community:proprietor:marketCategory:addMarketCategory")
     public CommonResult addMarketCategory(@RequestBody ProprietorMarketCategoryEntity  categoryEntity){
         boolean b = categoryService.addMarketCategory(categoryEntity);
         return CommonResult.ok("添加成功");
@@ -46,7 +46,7 @@ public class ProprietorMarketCategoryController {
      **/
     @PostMapping("/updateMarketCategory")
     @ApiOperation("修改社区集市商品类别")
-    @Permit("community:proprietor:marketCategory:updateMarketCategory")
+    // @Permit("community:proprietor:marketCategory:updateMarketCategory")
     public CommonResult updateMarketCategory(@RequestBody ProprietorMarketCategoryEntity categoryEntity){
         boolean b = categoryService.updateMarketCategory(categoryEntity);
         return CommonResult.ok("修改成功");
@@ -60,7 +60,7 @@ public class ProprietorMarketCategoryController {
      **/
     @DeleteMapping("/deleteMarketCategory")
     @ApiOperation("删除社区集市商品类别")
-    @Permit("community:proprietor:marketCategory:deleteMarketCategory")
+    // @Permit("community:proprietor:marketCategory:deleteMarketCategory")
     public CommonResult deleteMarketCategory(@RequestParam("id")Long id){
         boolean b = categoryService.deleteMarketCategory(id);
         return CommonResult.ok("删除成功");
@@ -75,7 +75,7 @@ public class ProprietorMarketCategoryController {
      **/
     @GetMapping("/selectMarketCategory")
     @ApiOperation("查询社区集市商品类别")
-    @Permit("community:proprietor:marketCategory:selectMarketCategory")
+    // @Permit("community:proprietor:marketCategory:selectMarketCategory")
     public CommonResult selectMarketcategory(){
         List<ProprietorMarketCategoryEntity> list = categoryService.selectMarketCategory();
 
@@ -91,7 +91,7 @@ public class ProprietorMarketCategoryController {
      **/
     @GetMapping("/selectMarketcategoryList")
     @ApiOperation("查询社区集市商品类别")
-    @Permit("community:proprietor:marketCategory:selectMarketcategoryList")
+    // @Permit("community:proprietor:marketCategory:selectMarketcategoryList")
     public CommonResult selectMarketcategoryList(){
         List<ProprietorMarketCategoryEntity> list = categoryService.selectMarketCategory();
         List<ProprietorMarketCategoryEntity> list1 = list.stream().filter(s->s.getId()!=94113194666233856l).collect(Collectors.toList());

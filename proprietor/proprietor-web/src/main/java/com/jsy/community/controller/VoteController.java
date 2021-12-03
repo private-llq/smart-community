@@ -32,14 +32,14 @@ public class VoteController {
 
     @ApiOperation("分页查询")
     @PostMapping("/list")
-    @Permit("community:proprietor:vote:list")
+    // @Permit("community:proprietor:vote:list")
     public CommonResult list(@RequestBody BaseQO<VoteEntity> baseQO){
         return CommonResult.ok(voteService.list(baseQO));
     }
 
     @ApiOperation("分页查询")
     @PostMapping("/file")
-    @Permit("community:proprietor:vote:file")
+    // @Permit("community:proprietor:vote:file")
     public CommonResult list(@RequestParam MultipartFile file){
         String upload = MinioUtils.upload(file, "vote");
         return CommonResult.ok(upload);
@@ -47,7 +47,7 @@ public class VoteController {
 
     @ApiOperation("查询详情")
     @GetMapping("/getVote")
-    @Permit("community:proprietor:vote:getVote")
+    // @Permit("community:proprietor:vote:getVote")
     public CommonResult getVote(@RequestParam Long id){
         return CommonResult.ok(voteService.getVote(id,UserUtils.getUserId()));
     }
@@ -55,14 +55,14 @@ public class VoteController {
 
     @ApiOperation("投票进度")
     @GetMapping("/getPlan")
-    @Permit("community:proprietor:vote:getPlan")
+    // @Permit("community:proprietor:vote:getPlan")
     public CommonResult getPlan(@RequestParam Long id){
         return CommonResult.ok(voteService.getPlan(id));
     }
 
     @ApiOperation("业主投票")
     @PostMapping("/userVote")
-    @Permit("community:proprietor:vote:userVote")
+    // @Permit("community:proprietor:vote:userVote")
     public CommonResult userVote(@RequestBody VoteQO voteQO){
         if (voteQO.getChoose()==1){
             if (voteQO.getOptions().size()>1){

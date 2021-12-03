@@ -49,7 +49,7 @@ public class CommunityController {
 	 */
 	@ApiOperation("社区模糊搜索接口")
 	@PostMapping()
-	@Permit("community:proprietor:community")
+	// @Permit("community:proprietor:community")
 	public CommonResult<List<CommunityEntity>> getCommunityByName(@RequestBody CommunityQO communityQO){
 		//验证请求参数
 		ValidatorUtils.validateEntity(communityQO, CommunityQO.GetCommunityByName.class);
@@ -65,14 +65,14 @@ public class CommunityController {
 	**/
 	@ApiOperation("社区定位")
 	@PostMapping("locate")
-	@Permit("community:proprietor:community:locate")
+	// @Permit("community:proprietor:community:locate")
 	public CommonResult<CommunityEntity> locate(@RequestBody Map<String,Double> location){
 		return CommonResult.ok(iCommunityService.locateCommunityV2(UserUtils.getUserId(),location));
 	}
 
 	@ApiOperation("获取当前小区的物业公司信息")
 	@GetMapping("company")
-	@Permit("community:proprietor:community:company")
+	// @Permit("community:proprietor:community:company")
 	public CommonResult<PropertyCompanyEntity> getCompany(@RequestParam Long communityId){
 		return CommonResult.ok(iCommunityService.getCompany(communityId));
 	}

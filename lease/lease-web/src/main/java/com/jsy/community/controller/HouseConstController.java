@@ -47,7 +47,7 @@ public class HouseConstController {
     @PostMapping()
     @ApiOperation("房屋常量查询根据id")
     @LoginIgnore
-    @Permit("community:lease:const")
+    // @Permit("community:lease:const")
     public CommonResult<Map<String, List<HouseLeaseConstEntity>>> all(@RequestBody Long[] ids) {
         Map<String, List<HouseLeaseConstEntity>> map = new HashMap<>();
         for (Long id : ids) {
@@ -71,7 +71,7 @@ public class HouseConstController {
     @GetMapping("/getTag")
     @ApiOperation("查询商铺标签")
     @LoginIgnore
-    @Permit("community:lease:const:getTag")
+    // @Permit("community:lease:const:getTag")
     public CommonResult getTag() {
         Map<String, Object> list = houseConstService.getTag();
         return CommonResult.ok(list);
@@ -81,7 +81,7 @@ public class HouseConstController {
     @ApiOperation("商铺类型标签查询")
     @GetMapping("/getShopType")
     @LoginIgnore
-    @Permit("community:lease:const:getShopType")
+    // @Permit("community:lease:const:getShopType")
     public CommonResult getShopType() {
         String type = "7";
         List<HouseLeaseConstEntity> constEntityList = houseConstService.getHouseConstListByType(type);
@@ -91,7 +91,7 @@ public class HouseConstController {
     @ApiOperation("商铺行业标签查询")
     @GetMapping("/getShopBusiness")
     @LoginIgnore
-    @Permit("community:lease:const:getShopBusiness")
+    // @Permit("community:lease:const:getShopBusiness")
     public CommonResult getShopBusiness() {
         String type = "8";
         List<HouseLeaseConstEntity> constEntityList = houseConstService.getHouseConstListByType(type);
@@ -101,7 +101,7 @@ public class HouseConstController {
     @ApiOperation("商铺发布时的配套设施和客流人群选项")
     @GetMapping("/getShopTags")
     @LoginIgnore
-    @Permit("community:lease:const:getShopTags")
+    // @Permit("community:lease:const:getShopTags")
     public CommonResult getAddShopTags() {
         Map<String, Object> map = houseConstService.getAddShopTags(FACILITY_TYPE, PEOPLE_TYPE);
         return CommonResult.ok(map);

@@ -113,7 +113,7 @@ public class ShopLeaseController {
 
     @ApiOperation("商铺头图上传")
     @PostMapping("/uploadHeadImg")
-    @Permit("community:lease:shop:uploadHeadImg")
+    // @Permit("community:lease:shop:uploadHeadImg")
     public CommonResult uploadHeadImg(@RequestParam("file") MultipartFile[] files) {
         if (files.length > HEAD_MAX) {
             return CommonResult.error("头图最多上传3张图");
@@ -127,7 +127,7 @@ public class ShopLeaseController {
 
     @ApiOperation("商铺室内图上传")
     @PostMapping("/uploadMiddleImg")
-    @Permit("community:lease:shop:uploadMiddleImg")
+    // @Permit("community:lease:shop:uploadMiddleImg")
     public CommonResult uploadMiddleImg(@RequestParam("file") MultipartFile[] files) {
         if (files.length > MIDDLE_MAX) {
             return CommonResult.error("室内图最多上传8张图");
@@ -141,7 +141,7 @@ public class ShopLeaseController {
 
     @ApiOperation("商铺其他图上传")
     @PostMapping("/uploadOtherImg")
-    @Permit("community:lease:shop:uploadOtherImg")
+    // @Permit("community:lease:shop:uploadOtherImg")
     public CommonResult uploadOtherImg(@RequestParam("file") MultipartFile[] files) {
         if (files.length > OTHER_MAX) {
             return CommonResult.error("其他图最多上传8张图");
@@ -157,7 +157,7 @@ public class ShopLeaseController {
     @ApiOperation("商铺发布")
     @PostMapping("/addShop")
     @Log(operationType = LogTypeConst.INSERT, module = LogModule.LEASE, isSaveRequestData = true)
-    @Permit("community:lease:shop:addShop")
+    // @Permit("community:lease:shop:addShop")
     public CommonResult addShop(@RequestBody ShopQO shop) {
         String[] imgPath = shop.getImgPath();
         if (imgPath == null || imgPath.length <= 0) {
@@ -232,7 +232,7 @@ public class ShopLeaseController {
     @ApiOperation("查询店铺详情")
     @RequireRecentBrowse
     @GetMapping("/getShop")
-    @Permit("community:lease:shop:getShop")
+    // @Permit("community:lease:shop:getShop")
     public CommonResult getShop(@ApiParam("店铺id") @RequestParam Long shopId) {
         Map<String, Object> map = shopLeaseService.getShop(shopId, UserUtils.getUserId());
         if (map == null) {
@@ -280,7 +280,7 @@ public class ShopLeaseController {
 
     @ApiOperation("根据商铺id查询商铺详情（用于修改）")
     @GetMapping("/getShopForUpdate")
-    @Permit("community:lease:shop:getShopForUpdate")
+    // @Permit("community:lease:shop:getShopForUpdate")
     public CommonResult getShopForUpdate(@ApiParam("店铺id") @RequestParam Long shopId) {
         ShopDetailsVO detailsVO = shopLeaseService.getShopForUpdate(shopId);
         return CommonResult.ok(detailsVO);
@@ -288,7 +288,7 @@ public class ShopLeaseController {
 
     @ApiOperation("商铺修改")
     @PostMapping("/updateShop")
-    @Permit("community:lease:shop:updateShop")
+    // @Permit("community:lease:shop:updateShop")
 //	@Log(operationType = LogTypeConst.UPDATE, module = LogModule.LEASE, isSaveRequestData = true)
     public CommonResult updateShop(@RequestBody ShopQO shop) {
         String[] imgPath = shop.getImgPath();
@@ -333,7 +333,7 @@ public class ShopLeaseController {
 
     @ApiOperation("下架商铺")
     @DeleteMapping("/cancelShop")
-    @Permit("community:lease:shop:cancelShop")
+    // @Permit("community:lease:shop:cancelShop")
     public CommonResult cancelShop(@ApiParam("店铺id") @RequestParam Long shopId) {
         String userId = UserUtils.getUserId();
         shopLeaseService.cancelShop(userId, shopId);
@@ -342,7 +342,7 @@ public class ShopLeaseController {
 
     @ApiOperation("查询业主发布的房源列表")
     @GetMapping("/listShop")
-    @Permit("community:lease:shop:listShop")
+    // @Permit("community:lease:shop:listShop")
     public CommonResult listShop() {
         String userId = UserUtils.getUserId();
         List<UserShopLeaseVO> shops = shopLeaseService.listUserShop(userId);
@@ -351,7 +351,7 @@ public class ShopLeaseController {
 
     @ApiOperation("测试分布式事物---暂时先不删。用于测试")
     @GetMapping("/testTransaction")
-    @Permit("community:lease:shop:testTransaction")
+    // @Permit("community:lease:shop:testTransaction")
     public CommonResult testTransaction() {
         shopLeaseService.testTransaction();
         return CommonResult.ok();
@@ -359,7 +359,7 @@ public class ShopLeaseController {
 
     @ApiOperation("更多筛选")
     @GetMapping("/moreOption")
-    @Permit("community:lease:shop:moreOption")
+    // @Permit("community:lease:shop:moreOption")
     public CommonResult moreOption() {
         Map<String, Object> map = shopLeaseService.moreOption();
         return CommonResult.ok(map);
@@ -367,7 +367,7 @@ public class ShopLeaseController {
 
     @ApiOperation("查询商铺类型和行业[发布的时候添加]")
     @GetMapping("/getPublishTags")
-    @Permit("community:lease:shop:getPublishTags")
+    // @Permit("community:lease:shop:getPublishTags")
     public CommonResult getPublishTags() {
         Map<String, Object> map = shopLeaseService.getPublishTags();
         return CommonResult.ok(map);
@@ -375,7 +375,7 @@ public class ShopLeaseController {
 
     @ApiOperation("根据区域id查询小区列表")
     @GetMapping("/getCommunity")
-    @Permit("community:lease:shop:getCommunity")
+    // @Permit("community:lease:shop:getCommunity")
     public CommonResult getCommunity(Long areaId) {
         List<CommunityEntity> communityList = shopLeaseService.getCommunity(areaId);
         return CommonResult.ok(communityList);
@@ -383,7 +383,7 @@ public class ShopLeaseController {
 
     @ApiOperation("测试httpclient")
     @PostMapping("/httpclient")
-    @Permit("community:lease:shop:httpclient")
+    // @Permit("community:lease:shop:httpclient")
     public CommonResult getHttpclient(@RequestBody ProprietorLog log) {
         System.out.println(log);
         System.out.println("1");
@@ -449,7 +449,7 @@ public class ShopLeaseController {
 
     @ApiOperation("根据筛选条件查询商铺列表")
     @PostMapping("/getShopByCondition")
-    @Permit("community:lease:shop:getShopByCondition")
+    // @Permit("community:lease:shop:getShopByCondition")
     public CommonResult<PageInfo> getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO) {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new HouseLeaseQO());

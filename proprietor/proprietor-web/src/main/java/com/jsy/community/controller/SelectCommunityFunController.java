@@ -37,7 +37,7 @@ public class SelectCommunityFunController {
      */
     @ApiOperation("分页查询社区趣事")
     @PostMapping("/findList")
-    @Permit("community:proprietor:communityfun:findList")
+    // @Permit("community:proprietor:communityfun:findList")
     public CommonResult<Map> list(@RequestBody SelectCommunityFunQO communityFunQO) {
         Map<String, Object> map = selectCommunityFunService.findList(communityFunQO);
         return CommonResult.ok(map);
@@ -52,7 +52,7 @@ public class SelectCommunityFunController {
      */
     @ApiOperation("查询一条社区趣事详情传入id")
     @GetMapping("/findFunOne")
-    @Permit("community:proprietor:communityfun:findFunOne")
+    // @Permit("community:proprietor:communityfun:findFunOne")
     public CommonResult findOne(@RequestParam("id")Long id) {
         CommunityFunEntity communityFunEntity=selectCommunityFunService.findFunOne(id);
         if (communityFunEntity==null){

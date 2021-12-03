@@ -36,7 +36,7 @@ public class IosLoginController {
      */
     @LoginIgnore
     @PostMapping("/login")
-    @Permit("community:proprietor:Ios:login")
+    // @Permit("community:proprietor:Ios:login")
     public CommonResult login(@RequestParam String identityToken){
         String[] split = identityToken.split("\\.");
         AppleTokenVo userInfo = AppleUtil.getAppleUserInfo(split[1]);
@@ -58,7 +58,7 @@ public class IosLoginController {
      */
     @LoginIgnore
     @PostMapping("/loginNotMobile")
-    @Permit("community:proprietor:Ios:loginNotMobile")
+    // @Permit("community:proprietor:Ios:loginNotMobile")
     public CommonResult loginNotMobile(@RequestParam String identityToken){
         String[] split = identityToken.split("\\.");
         AppleTokenVo userInfo = AppleUtil.getAppleUserInfo(split[1]);
@@ -80,7 +80,7 @@ public class IosLoginController {
      */
     @LoginIgnore
     @PostMapping("/bindingMobile")
-    @Permit("community:proprietor:Ios:bindingMobile")
+    // @Permit("community:proprietor:Ios:bindingMobile")
     public CommonResult bindingMobile(@RequestBody BindingMobileQO bindingMobileQO){
         ValidatorUtils.validateEntity(bindingMobileQO, BindingMobileQO.BindingMobileValidated.class);
         UserAuthVo userAuthVo=weChatLoginService.bindingMobile(bindingMobileQO);

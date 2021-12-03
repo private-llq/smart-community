@@ -34,7 +34,7 @@ public class HouseRecentController {
 
     @GetMapping()
     @ApiOperation("房屋最近浏览")
-    @Permit("community:lease:house:browses")
+    // @Permit("community:lease:house:browses")
     public CommonResult<List<HouseRecentEntity>> recentBrowse(@RequestParam(required = false, defaultValue = "0") Integer type,
                                                               @RequestParam(required = false, defaultValue = "1") Long page,
                                                               @RequestParam(required = false, defaultValue = "10") Long size) {
@@ -47,7 +47,7 @@ public class HouseRecentController {
 
     @DeleteMapping()
     @ApiOperation("清空房屋最近浏览")
-    @Permit("community:lease:house:browses")
+    // @Permit("community:lease:house:browses")
     public CommonResult<Boolean> clearRecentBrowse(@RequestParam Integer type) {
         return houseRecentService.clearRecentBrowse(type, UserUtils.getUserId()) ? CommonResult.ok("清空成功!") : CommonResult.error("清空失败!");
     }
