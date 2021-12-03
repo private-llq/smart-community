@@ -127,6 +127,15 @@ public interface ISysUserService extends IService<SysUserEntity> {
 	SysUserEntity queryUserByMobile(String mobile, Long communityId);
 	
 	/**
+	 * @Description: 根据uid查询用户信息
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.entity.sys.SysUserEntity
+	 * @Author: DKS
+	 * @Date: 2021/11/30
+	 **/
+	SysUserEntity queryByUid(String id);
+	
+	/**
 	 * @Description: 操作员条件查询
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.utils.PageInfo

@@ -8,7 +8,6 @@ import com.jsy.community.qo.proprietor.BannerQO;
 import com.jsy.community.vo.BannerVO;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.LoginIgnore;
-import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;

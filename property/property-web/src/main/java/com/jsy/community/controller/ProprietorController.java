@@ -81,7 +81,6 @@ public class ProprietorController {
     @IpLimit(prefix = "excel", second = 60, count = 5, desc = "下载业主信息录入Excel")
     @GetMapping(params = {"downloadExcel"})
     @ApiOperation("下载业主信息录入Excel")
-    @Permit("community:property:proprietor")
     public ResponseEntity<byte[]> downloadExcel(HttpServletResponse response, @RequestParam long communityId) {
         //1. 设置响应头
         MultiValueMap<String, String> multiValueMap = ExcelUtil.setHeader("业主导入模板.xls");

@@ -61,7 +61,6 @@ public class CarTemporaryOrderController {
     @PostMapping("/carTemporaryOrderExport")
     @ResponseBody
     @CarOperation(operation = "导出模板【订单管理】")
-    @Permit("community:property:carTemporaryOrder:carTemporaryOrderExport")
     public void downLoadFile(@RequestBody CarOrderQO carOrderQO, HttpServletResponse response) throws IOException {
         Long communityId = UserUtils.getAdminCommunityId();
 

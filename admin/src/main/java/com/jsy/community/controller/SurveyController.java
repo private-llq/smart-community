@@ -1,9 +1,9 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.service.ISurveyService;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +23,6 @@ import javax.annotation.Resource;
 @RestController
 // @ApiJSYController
 @RequestMapping("/survey")
-@Login
 public class SurveyController {
 
     @Resource
@@ -36,8 +35,8 @@ public class SurveyController {
      * @Param: []
      * @return: com.jsy.community.vo.CommonResult
      */
-    @Login
     @GetMapping("/getSurvey")
+    @Permit("community:admin:survey:getSurvey")
     public CommonResult getSurvey() {
         return CommonResult.ok(surveyService.getSurvey());
     }

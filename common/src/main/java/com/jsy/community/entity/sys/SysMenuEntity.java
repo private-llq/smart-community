@@ -1,5 +1,6 @@
 package com.jsy.community.entity.sys;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jsy.community.entity.BaseEntity;
@@ -27,6 +28,8 @@ public class SysMenuEntity extends BaseEntity {
 	@JsonIgnore
 	private Long belongTo;//顶级菜单id
 	private Integer type;//类型 1.目录 2.菜单 3.按钮
+	
+	@TableField(exist = false)
 	private List<SysMenuEntity> childrenList;//子菜单
 	
 	private Long createBy;//创建人

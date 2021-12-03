@@ -1,5 +1,4 @@
 package com.jsy.community.controller;
-
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.auth.Auth;

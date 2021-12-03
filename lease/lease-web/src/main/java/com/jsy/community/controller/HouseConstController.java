@@ -1,19 +1,20 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.api.IHouseConstService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.api.IHouseConstService;
 import com.zhsj.baseweb.annotation.LoginIgnore;
-import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author YuLF

@@ -1,13 +1,13 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyMarketQO;
 import com.jsy.community.service.IMarketService;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.proprietor.ProprietorMarketVO;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +32,7 @@ public class MarketController {
      **/
     @DeleteMapping("/deleteBlacklist")
     @ApiOperation("社区集市删除商品")
-    @Login
+    @Permit("community:admin:market:deleteBlacklist")
     public CommonResult deleteBlacklist(@RequestParam("id") Long id){
 
         boolean b = marketService.deleteBlacklist(id);
@@ -48,7 +48,7 @@ public class MarketController {
      **/
     @GetMapping("/SelectOneMarket")
     @ApiOperation("查询单条商品详情")
-    @Login
+    @Permit("community:admin:market:SelectOneMarket")
     public CommonResult SelectOneMarket(@RequestParam("id") Long id){
       ProprietorMarketVO marketVO =  marketService.findOne(id);
         return CommonResult.ok(marketVO,"查询成功");
@@ -64,7 +64,7 @@ public class MarketController {
      **/
     @PostMapping("/selectMarketAllPage")
     @ApiOperation("社区集市所有已发布商品")
-    @Login
+    @Permit("community:admin:market:selectMarketAllPage")
     public CommonResult selectMarketAllPage(@RequestBody  BaseQO<PropertyMarketQO> baseQO){
         ValidatorUtils.validatePageParam(baseQO);
         if (baseQO.getQuery() == null){
@@ -86,7 +86,7 @@ public class MarketController {
      **/
     @PostMapping("/selectMarketBlacklist")
     @ApiOperation("查询黑名单的商品")
-    @Login
+    @Permit("community:admin:market:selectMarketBlacklist")
     public CommonResult selectMarketBlacklist(@RequestBody  BaseQO baseQO){
         ValidatorUtils.validatePageParam(baseQO);
         Map<String,Object> map =  marketService.selectMarketBlacklist(baseQO);
@@ -102,7 +102,7 @@ public class MarketController {
      **/
     @PostMapping("/updateShield")
     @ApiOperation("修改屏蔽商品")
-    @Login
+    @Permit("community:admin:market:updateShield")
     public CommonResult updateShield(@RequestParam("id")Long id,@RequestParam("shield") Integer shield){
         boolean b = marketService.updateShield(id,shield);
         return CommonResult.ok("修改成功");

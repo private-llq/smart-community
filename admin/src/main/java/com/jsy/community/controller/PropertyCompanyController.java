@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.qo.BaseQO;
@@ -9,10 +8,12 @@ import com.jsy.community.qo.PropertyCompanyQO;
 import com.jsy.community.service.IPropertyCompanyService;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
 
 /**
  * @author DKS
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 // @ApiJSYController
 public class PropertyCompanyController {
 	
-	@Autowired
+	@Resource
 	private IPropertyCompanyService propertyCompanyService;
 	
 	/**
@@ -36,8 +37,8 @@ public class PropertyCompanyController {
 	 * @Author: DKS
 	 * @Date: 2021/10/15
 	 **/
-	@Login
 	@PostMapping("query")
+	@Permit("community:admin:property:company:query")
 	public CommonResult queryCompany(@RequestBody BaseQO<PropertyCompanyQO> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new PropertyCompanyQO());
@@ -52,9 +53,9 @@ public class PropertyCompanyController {
 	 * @Author: DKS
 	 * @Date: 2021/10/15
 	 **/
-	@Login
 	@PostMapping("add")
 	@businessLog(operation = "新增",content = "新增了【物业公司】")
+	@Permit("community:admin:property:company:add")
 	public CommonResult addCompany(@RequestBody PropertyCompanyEntity propertyCompanyEntity){
 		ValidatorUtils.validateEntity(propertyCompanyEntity);
 		return CommonResult.ok(propertyCompanyService.addCompany(propertyCompanyEntity) ? "添加成功" : "添加失败");
@@ -67,9 +68,9 @@ public class PropertyCompanyController {
 	 * @Author: DKS
 	 * @Date: 2021/10/15
 	 **/
-	@Login
 	@PutMapping("update")
 	@businessLog(operation = "编辑",content = "更新了【物业公司】")
+	@Permit("community:admin:property:company:update")
 	public CommonResult updateCompany(@RequestBody PropertyCompanyEntity propertyCompanyEntity){
 		ValidatorUtils.validateEntity(propertyCompanyEntity);
 		return CommonResult.ok(propertyCompanyService.updateCompany(propertyCompanyEntity) ? "操作成功" : "操作失败");
@@ -82,9 +83,9 @@ public class PropertyCompanyController {
 	 * @Author: DKS
 	 * @Date: 2021/10/15
 	 **/
-	@Login
 	@DeleteMapping("delete")
 	@businessLog(operation = "删除",content = "删除了【物业公司】")
+	@Permit("community:admin:property:company:delete")
 	public CommonResult deleteCompany(Long id){
 		propertyCompanyService.deleteCompany(id);
 		return CommonResult.ok("删除成功");
@@ -97,8 +98,8 @@ public class PropertyCompanyController {
 	 * @Author: DKS
 	 * @Date: 2021/10/19
 	 **/
-	@Login
 	@GetMapping("list")
+	@Permit("community:admin:property:company:list")
 	public CommonResult queryCompanyList(){
 		return CommonResult.ok(propertyCompanyService.queryCompanyList());
 	}

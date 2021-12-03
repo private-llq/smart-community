@@ -9,7 +9,6 @@ import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.unionpay.OpenApiResponseVO;
 import com.zhsj.baseweb.annotation.LoginIgnore;
-import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

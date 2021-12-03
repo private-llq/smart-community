@@ -1,13 +1,13 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.SysOpLogEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.OpLogQO;
 import com.jsy.community.service.ISysOpLogService;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,9 +38,9 @@ public class SysOpLogController {
 	 * @Author: DKS
 	 * @Date: 2021/08/05
 	 **/
-	@Login
 	@ApiOperation("操作日志分页查询")
 	@PostMapping("/query")
+	@Permit("community:admin:op:log:query")
 	public CommonResult<PageInfo<SysOpLogEntity>> queryOpLogPage(@RequestBody BaseQO<OpLogQO> baseQO) {
 		return CommonResult.ok(sysOpLogService.queryOpLogPage(baseQO));
 	}

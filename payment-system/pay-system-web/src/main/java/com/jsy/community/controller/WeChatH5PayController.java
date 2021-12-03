@@ -16,7 +16,6 @@ import com.jsy.community.untils.wechat.PublicConfig;
 import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.LoginIgnore;
-import com.zhsj.baseweb.annotation.Permit;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.apache.dubbo.config.annotation.DubboReference;

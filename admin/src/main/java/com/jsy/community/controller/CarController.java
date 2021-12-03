@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.CarEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.sys.CarQO;
@@ -10,6 +9,7 @@ import com.jsy.community.service.ICarService;
 import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -55,9 +55,9 @@ public class CarController {
 	 * @Author: DKS
 	 * @Date: 2021/10/26
 	**/
-	@Login
 	@ApiOperation("【车辆】条件查询")
 	@PostMapping("query")
+	@Permit("community:admin:car:query")
 	public CommonResult<PageInfo<CarEntity>> queryCar(@RequestBody BaseQO<CarQO> baseQO){
 		return CommonResult.ok(carService.queryCar(baseQO));
 	}
@@ -69,9 +69,9 @@ public class CarController {
 	 *@Return: com.jsy.community.vo.CommonResult
 	 *@Date: 2021/10/26 10:29
 	 **/
-	@Login
 	@ApiOperation("导出车辆管理")
 	@PostMapping("/downloadCarList")
+	@Permit("community:admin:car:downloadCarList")
 	public ResponseEntity<byte[]> downloadOrderList(@RequestBody CarQO carQO) {
 		List<CarEntity> carEntities = carService.queryExportCarExcel(carQO);
 		//设置excel 响应头信息

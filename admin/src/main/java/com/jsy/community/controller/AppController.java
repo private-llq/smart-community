@@ -1,13 +1,13 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.AppVersionEntity;
 import com.jsy.community.service.IAppVersionService;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,6 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/app")
-@Login(allowAnonymous = true)
 // @ApiJSYController
 public class AppController {
 	
@@ -43,6 +42,7 @@ public class AppController {
 	 */
 	@ApiOperation("ANDROID-APP上传到服务器")
 	@PostMapping("/uploadApp")
+	@Permit("community:admin:app:uploadApp")
 	public CommonResult uploadApp(@RequestParam("file") MultipartFile file) {
 		String app = MinioUtils.upload(file, "sys-android");
 		return CommonResult.ok(app);
@@ -57,6 +57,7 @@ public class AppController {
 	 */
 	@ApiOperation("IOS-APP上传到服务器")
 	@PostMapping("/uploadIos")
+	@Permit("community:admin:app:uploadIos")
 	public CommonResult uploadIos(@RequestParam("file") MultipartFile file) {
 		String app = MinioUtils.upload(file, "sys-ios");
 		return CommonResult.ok(app);
@@ -71,6 +72,7 @@ public class AppController {
 	 */
 	@ApiOperation("查询APP版本列表")
 	@GetMapping("/list/version")
+	@Permit("community:admin:app:list:version")
 	public CommonResult queryAppVersionList(Integer sysType, String sysVersion){
 		if(!BusinessConst.SYS_TYPE_ANDROID.equals(sysType) && !BusinessConst.SYS_TYPE_IOS.equals(sysType)){
 			sysType = null;
@@ -87,6 +89,7 @@ public class AppController {
 	 */
 	@ApiOperation("添加APP版本")
 	@PostMapping("/version/insert")
+	@Permit("community:admin:app:version:insert")
 	public CommonResult addAppVersion(@RequestBody AppVersionEntity appVersionEntity){
 		ValidatorUtils.validateEntity(appVersionEntity);
 		appVersionService.addAppVersion(appVersionEntity);
@@ -102,6 +105,7 @@ public class AppController {
 	 */
 	@ApiOperation("修改APP版本信息")
 	@PutMapping("/version/update")
+	@Permit("community:admin:app:version:update")
 	public CommonResult updateAppVersion(@RequestBody AppVersionEntity appVersionEntity){
 		if(appVersionEntity.getId() == null){
 			return CommonResult.error("请传入id");
@@ -120,6 +124,7 @@ public class AppController {
 	 */
 	@ApiOperation("删除APP版本")
 	@DeleteMapping("/version/delete")
+	@Permit("community:admin:app:version:delete")
 	public CommonResult delAppVersion(@RequestParam Long id){
 		if(id == null){
 			return CommonResult.error("请传入id");
@@ -136,6 +141,7 @@ public class AppController {
 	 */
 	@ApiOperation("查询APP版本详情")
 	@GetMapping("/version/detail")
+	@Permit("community:admin:app:version:detail")
 	public CommonResult queryAppVersion(Integer sysType, String sysVersion){
 		if(!BusinessConst.SYS_TYPE_ANDROID.equals(sysType) && !BusinessConst.SYS_TYPE_IOS.equals(sysType)){
 			return CommonResult.error("请传入正确的系统类型");

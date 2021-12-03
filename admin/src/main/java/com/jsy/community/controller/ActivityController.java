@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.property.ActivityUserEntity;
 import com.jsy.community.entity.proprietor.ActivityEntity;
 import com.jsy.community.qo.BaseQO;
@@ -9,6 +8,7 @@ import com.jsy.community.service.IActivityService;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +24,6 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/activity")
 // @ApiJSYController
-@Login
 public class ActivityController {
 
     @Resource
@@ -39,6 +38,7 @@ public class ActivityController {
      */
     @ApiOperation("查询列表")
     @PostMapping("/list")
+    @Permit("community:admin:activity:list")
     public CommonResult<PageInfo<ActivityEntity>> list(@RequestBody BaseQO<ActivityEntity> baseQO){
         return CommonResult.ok(propertyActivityService.list(baseQO));
     }
@@ -52,6 +52,7 @@ public class ActivityController {
      */
     @ApiOperation("新增")
     @PostMapping("/save")
+    @Permit("community:admin:activity:save")
     public CommonResult save(@RequestBody ActivityEntity activityEntity){
         return CommonResult.ok(propertyActivityService.saveBy(activityEntity) ? "新增成功" : "新增失败");
     }
@@ -65,6 +66,7 @@ public class ActivityController {
      */
     @ApiOperation("活动管理查询详情")
     @GetMapping("/getOne")
+    @Permit("community:admin:activity:getOne")
     public CommonResult getOne(@RequestParam Long id){
         return CommonResult.ok(propertyActivityService.getOne(id));
     }
@@ -78,6 +80,7 @@ public class ActivityController {
      */
     @ApiOperation("编辑")
     @PutMapping("/update")
+    @Permit("community:admin:activity:update")
     public CommonResult update(@RequestBody ActivityEntity activityEntity){
         return CommonResult.ok(propertyActivityService.update(activityEntity) ? "编辑成功" : "编辑失败");
     }
@@ -91,6 +94,7 @@ public class ActivityController {
      */
     @ApiOperation("报名详情分页查询")
     @PostMapping("/detail/page")
+    @Permit("community:admin:activity:detail:page")
     public CommonResult<PageInfo<ActivityUserEntity>> detailPage(@RequestBody BaseQO<ActivityUserEntity> baseQO){
         return CommonResult.ok(propertyActivityService.detailPage(baseQO));
     }
@@ -104,6 +108,7 @@ public class ActivityController {
      */
     @ApiOperation("上传图片")
     @PostMapping("/file")
+    @Permit("community:admin:activity:file")
     public CommonResult file(@RequestParam MultipartFile[] file){
         String[] votes = MinioUtils.uploadForBatch(file, "sys-activity");
         return CommonResult.ok(votes);

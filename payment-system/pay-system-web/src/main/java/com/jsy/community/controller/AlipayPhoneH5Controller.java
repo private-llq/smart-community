@@ -20,7 +20,6 @@ import com.jsy.community.qo.payment.AliOrderContentQO;
 import com.jsy.community.qo.payment.RefundQO;
 import com.jsy.community.utils.AlipayUtils;
 import com.zhsj.baseweb.annotation.LoginIgnore;
-import com.zhsj.baseweb.annotation.Permit;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;

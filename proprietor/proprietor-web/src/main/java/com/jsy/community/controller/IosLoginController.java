@@ -11,7 +11,6 @@ import com.jsy.community.utils.ios.IOSUtil;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
 import com.zhsj.baseweb.annotation.LoginIgnore;
-import com.zhsj.baseweb.annotation.Permit;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
