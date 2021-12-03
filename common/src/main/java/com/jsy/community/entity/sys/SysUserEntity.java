@@ -3,6 +3,7 @@ package com.jsy.community.entity.sys;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
+import com.zhsj.base.api.domain.PermitMenu;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -65,7 +66,7 @@ public class SysUserEntity extends BaseEntity {
 	 * 用户菜单列表
 	 */
 	@TableField(exist = false)
-	private List<SysMenuEntity> menuList;
+	private List<PermitMenu> menuList;
 	
 	/**
 	 * 创建者ID

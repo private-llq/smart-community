@@ -148,7 +148,6 @@ public class HouseLeaseController {
     @LoginIgnore
     @GetMapping("/latest")
     @ApiOperation("最新房屋详情")
-    @Permit("community:lease:house:latest")
     public CommonResult<?> leaseDetails(@RequestParam Long id, @RequestParam Boolean leaseHouse) {
         if (id == null || leaseHouse == null) {
             throw new JSYException(JSYError.BAD_REQUEST);
@@ -335,7 +334,6 @@ public class HouseLeaseController {
      **/
     @LoginIgnore
     @PostMapping("/v2/signatureOperationContract")
-    @Permit("community:lease:house:v2:signatureOperationContract")
     public CommonResult signatureOperationContract(@RequestBody AssetLeaseRecordEntity assetLeaseRecordEntity) {
         if (assetLeaseRecordEntity.getOperationType() == null ||
                 (assetLeaseRecordEntity.getOperationType() != BusinessEnum.ContractingProcessStatusEnum.LANDLORD_INITIATED_CONTRACT.getCode()

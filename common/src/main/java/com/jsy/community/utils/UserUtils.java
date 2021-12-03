@@ -126,7 +126,8 @@ public class UserUtils {
 //			.getRequest();
 		LoginUser loginUser = ContextHolder.getContext().getLoginUser();
 		UserInfoVo userInfoVo = new UserInfoVo();
-
+		
+		userInfoVo.setId(loginUser.getId());
 		userInfoVo.setMobile(loginUser.getPhone());
 		userInfoVo.setUid(loginUser.getAccount());
 		userInfoVo.setImId(loginUser.getImId());

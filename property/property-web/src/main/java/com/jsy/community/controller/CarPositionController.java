@@ -152,7 +152,6 @@ public class CarPositionController {
     @GetMapping("/carPositionExport")
     @ResponseBody
     @CarOperation(operation = "导出模板")
-    @Permit("community:property:car-position:carPositionExport")
     public void downLoadFile(HttpServletResponse response) throws IOException {
 
         ExcelUtils.exportModule("车位信息表", response, CarPositionEntity.class, null, 2);
@@ -296,7 +295,6 @@ public class CarPositionController {
     @LoginIgnore
     @ApiOperation("过车记录")
     @RequestMapping(value = "/test", method = RequestMethod.POST)
-    @Permit("community:property:car-position:test")
     public void carBeforeRecord(@RequestParam Map<String, Object> body,
                                 HttpServletResponse response) throws IOException {
 

@@ -1,5 +1,4 @@
 package com.jsy.community.controller;
-
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.auth.Auth;
@@ -15,7 +14,6 @@ import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.rpc.IBaseSmsRpcService;
-import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
@@ -69,6 +67,7 @@ public class UserAuthController {
     /**
      * 发送验证码
      */
+    @LoginIgnore
     @ApiOperation("发送验证码，手机或邮箱，参数不可同时为空")
     @GetMapping("/send/code")
     @ApiImplicitParams({
@@ -76,7 +75,6 @@ public class UserAuthController {
             @ApiImplicitParam(name = "type", value = UserAuthEntity.CODE_TYPE_NOTE, required = true,
                     allowableValues = "1,2,3,4,5", paramType = "query")
     })
-    @LoginIgnore
     public CommonResult<Boolean> sendCode(@RequestParam String account, @RequestParam Integer type) {
         if (RegexUtils.isMobile(account)) {
             baseSmsRpcService.sendVerificationCode(account);
@@ -138,7 +136,6 @@ public class UserAuthController {
     @LoginIgnore
     @ApiOperation("游客登录")
     @GetMapping("/login/tourist")
-    @Permit("community:proprietor:user:auth:login:tourist")
     public CommonResult getTouristToken() {
         return CommonResult.ok("00000tourist", "登录成功");
     }
@@ -146,7 +143,6 @@ public class UserAuthController {
     @LoginIgnore
     @ApiOperation("登录")
     @PostMapping("/login")
-    @Permit("community:proprietor:user:auth:login")
     public CommonResult<UserAuthVo> login(@RequestBody LoginQO qo) {
         ValidatorUtils.validateEntity(qo);
         if (StrUtil.isEmpty(qo.getCode()) && StrUtil.isEmpty(qo.getPassword())) {
@@ -174,7 +170,6 @@ public class UserAuthController {
     @LoginIgnore
     @ApiOperation("三方登录 - 获取支付宝authInfo")
     @GetMapping("/third/authInfo")
-    @Permit("community:proprietor:user:auth:third:authInfo")
     public CommonResult getAuthInfo() {
         String targetID = "zhsjCommunity";
 //		targetID = UUID.randomUUID().toString().replace("-","");
@@ -188,7 +183,6 @@ public class UserAuthController {
     @LoginIgnore
     @ApiOperation("三方登录")
     @PostMapping("/third/login")
-    @Permit("community:proprietor:user:auth:third:login")
     public CommonResult thirdPlatformLogin(@RequestBody UserThirdPlatformQO userThirdPlatformQO) {
         ValidatorUtils.validateEntity(userThirdPlatformQO);
         if (StringUtils.isEmpty(userThirdPlatformQO.getAccessToken())
@@ -201,7 +195,6 @@ public class UserAuthController {
     @LoginIgnore
     @ApiOperation("三方平台绑定手机")
     @PostMapping("/third/binding")
-    @Permit("community:proprietor:user:auth:third:binding")
     public CommonResult bindingThirdPlatform(@RequestBody UserThirdPlatformQO userThirdPlatformQO) {
         ValidatorUtils.validateEntity(userThirdPlatformQO);
         if (StringUtils.isEmpty(userThirdPlatformQO.getThirdPlatformId())) {
@@ -267,7 +260,6 @@ public class UserAuthController {
     @LoginIgnore
     @ApiOperation(value = "敏感操作短信验证", notes = "忘记密码等")
     @GetMapping("/check/code")
-    @Permit("community:proprietor:user:auth:check:code")
     public CommonResult<Map<String, Object>> checkCode(@RequestParam String account, @RequestParam String code) {
         commonService.checkVerifyCode(account, code);
         String token = UserUtils.setRedisTokenWithTime("Auth", account, 1, TimeUnit.HOURS);
@@ -277,11 +269,9 @@ public class UserAuthController {
         return CommonResult.ok(map);
     }
 
-    @LoginIgnore
     @ApiOperation("重置密码")
     @PostMapping("/reset/password")
     @Auth
-    @Permit("community:proprietor:user:auth:reset:password")
     public CommonResult<Boolean> resetPassword(@RequestAttribute(value = "body") String body) {
         ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
         ValidatorUtils.validateEntity(qo, ResetPasswordQO.forgetPassVGroup.class);

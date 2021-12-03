@@ -237,7 +237,6 @@ public class WeChatPayController {
      */
     @LoginIgnore
     @RequestMapping(value = "/callback/{companyId}", method = {RequestMethod.POST,RequestMethod.GET})
-    @Permit("community:payment:callback")
     public void callback(HttpServletRequest request, HttpServletResponse response,@PathVariable("companyId") Long companyId) throws Exception {
         log.info("回调成功");
         log.info(String.valueOf(companyId));

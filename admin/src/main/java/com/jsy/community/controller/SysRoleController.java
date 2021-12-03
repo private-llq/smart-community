@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.sys.SysRoleEntity;
 import com.jsy.community.entity.sys.SysRoleMenuEntity;
@@ -11,10 +10,12 @@ import com.jsy.community.qo.sys.SysRoleQO;
 import com.jsy.community.service.ISysConfigService;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ import java.util.List;
 // @ApiJSYController
 public class SysRoleController {
 	
-	@Autowired
+	@Resource
 	private ISysConfigService sysConfigService;
 	
 	/**
@@ -37,6 +38,7 @@ public class SysRoleController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
+	@LoginIgnore
 	@PostMapping("add")
 	@Transactional(rollbackFor = Exception.class)
 	@businessLog(operation = "新增",content = "新增了【系统角色】")
@@ -53,6 +55,7 @@ public class SysRoleController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
+	@LoginIgnore
 	@DeleteMapping("delete")
 	@businessLog(operation = "删除",content = "删除了【系统角色】")
 	public CommonResult delMenu(@RequestParam("id") Long id){
@@ -67,6 +70,7 @@ public class SysRoleController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
+	@LoginIgnore
 	@PutMapping("update")
 	@Transactional(rollbackFor = Exception.class)
 	@businessLog(operation = "编辑",content = "更新了【系统角色】")
@@ -82,6 +86,7 @@ public class SysRoleController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
+	@LoginIgnore
 	@GetMapping("list")
 	public CommonResult<List<SysRoleEntity>> listOfMenu(){
 		return CommonResult.ok(sysConfigService.listOfRole());
@@ -94,8 +99,8 @@ public class SysRoleController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
-	@Login
 	@PostMapping("/page")
+	@Permit("community:admin:role:page")
 	public CommonResult queryPage(@RequestBody BaseQO<SysRoleEntity> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new SysRoleEntity());
@@ -110,6 +115,7 @@ public class SysRoleController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
+	@LoginIgnore
 	@Transactional(rollbackFor = Exception.class)
 	@PostMapping("menus")
 	public CommonResult setUserRoles(@RequestBody SysRoleMenuEntity sysRoleMenuEntity){
@@ -124,8 +130,8 @@ public class SysRoleController {
 	 * @return: com.jsy.community.vo.CommonResult
 	 * @date: 2021/10/18 16:10
 	 **/
-	@Login
 	@GetMapping("/roleDetail")
+	@Permit("community:admin:role:roleDetail")
 	public CommonResult roleDetail(@RequestParam("roleId") Long roleId) {
 		return CommonResult.ok(sysConfigService.queryRoleDetail(roleId));
 	}

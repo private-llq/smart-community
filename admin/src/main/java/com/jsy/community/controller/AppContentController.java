@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.exception.JSYError;
@@ -9,6 +8,7 @@ import com.jsy.community.service.AppContentService;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.PicUtil;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,6 @@ import java.util.List;
  **/
 @RequestMapping("content")
 @Api(tags = "APP内容控制器")
-@Login( allowAnonymous = true)
 @Slf4j
 @RestController
 // @ApiJSYController
@@ -45,6 +44,7 @@ public class AppContentController {
 	@ApiOperation("【推荐城市】设置")
 	@PostMapping("hotCity")
 	@Transactional(rollbackFor = Exception.class)
+	@Permit("community:admin:content:hotCity")
 	public CommonResult setHotCity(@RequestBody List<RegionEntity> regionList){
 		boolean result = appContentService.setHotCity(regionList);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"设置失败");
@@ -59,6 +59,7 @@ public class AppContentController {
 	**/
 	@ApiOperation("用户默认头像上传")
 	@PostMapping("defaultAvatar/upload")
+	@Permit("community:admin:content:defaultAvatar:upload")
 	public CommonResult uploadDefaultAvatar(MultipartFile avatar) {
 		PicUtil.imageQualified(avatar);
 		String url = MinioUtils.upload(avatar, BusinessConst.APP_SYS_DEFAULT_AVATAR_BUCKET_NAME);
@@ -71,6 +72,7 @@ public class AppContentController {
 	
 	@ApiOperation("天气图标上传")
 	@PostMapping("weatherIcon/upload")
+	@Permit("community:admin:content:weatherIcon:upload")
 	public CommonResult uploadWeatherIcon(MultipartFile file){
 		PicUtil.imageQualified(file);
 		String url = MinioUtils.upload(file, "weather-icon");
@@ -82,6 +84,7 @@ public class AppContentController {
 	
 	@ApiOperation("天气图标批量上传并写库(文件名需要为数字需要，且与天气接口对应，详见天气接口文档)")
 	@PostMapping("weatherIcon/upload/batch")
+	@Permit("community:admin:content:weatherIcon:upload:batch")
 	public CommonResult uploadWeatherIconAndSave(@RequestParam String dirPath){
 		int result = appContentService.addWeatherIconFromFileDirectory(dirPath);
 		return CommonResult.ok("已添加" + result + "个天气图标");

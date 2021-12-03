@@ -169,7 +169,6 @@ public class PropertyFeeRuleController {
     @LoginIgnore
     @ApiOperation("查询公共常量")
     @GetMapping("/get")
-    @Permit("community:property:feeRule:get")
     public CommonResult get(){
         financeBillService.updateAnnual();
         financeBillService.updateTemporary();

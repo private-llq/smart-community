@@ -42,7 +42,6 @@ public class CarCutOffController{
      **/
     @LoginIgnore
     @PostMapping("/selectPage")
-    @Permit("community:property:cutOff:selectPage")
     public CommonResult selectPage(@RequestParam CarCutOffQO carCutOffQO){
         Long total = carCutOffService.selectPage(carCutOffQO);
         return CommonResult.ok(total,"查询成功");
@@ -91,7 +90,6 @@ public class CarCutOffController{
     @PostMapping("/carCutOFFExport")
     @ResponseBody
     @CarOperation(operation = "导出了【进出记录模板】")
-    @Permit("community:property:cutOff:carCutOFFExport")
     public void downLoadFile(@RequestBody CarCutOffQO carCutOffQO, HttpServletResponse response) throws IOException {
         Long communityId = UserUtils.getAdminCommunityId();
         if (carCutOffQO.getState()==0){

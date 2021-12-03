@@ -5,7 +5,6 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.AliAppPayCallbackService;
 import com.jsy.community.constant.Const;
 import com.zhsj.baseweb.annotation.LoginIgnore;
-import com.zhsj.baseweb.annotation.Permit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +30,6 @@ public class AliAppPayCallbackController {
 	@RequestMapping("pay")
 	@Transactional(rollbackFor=Exception.class,timeout=3)
 	@LoginIgnore
-	@Permit("community:payment:callBack:pay")
 	public String test(HttpServletRequest req){
 		Map<String, String> paramsMap = new HashMap<>();
 		Enumeration<String> paramNames = req.getParameterNames();

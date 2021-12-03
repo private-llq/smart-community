@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.exception.JSYError;
@@ -12,6 +11,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -52,9 +52,9 @@ public class SysInformController {
 	 * @Param: [baseQO]
 	 * @return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo<com.jsy.community.entity.PushInformEntity>>
 	 */
-	@Login
 	@ApiOperation("大后台推送消息分页查询")
 	@PostMapping("/query")
+	@Permit("community:admin:sys:inform:query")
 	public CommonResult<PageInfo<PushInformEntity>> querySysInform(@RequestBody BaseQO<PushInformQO> baseQO) {
 		return CommonResult.ok(iSysInformService.querySysInform(baseQO));
 	}
@@ -66,10 +66,10 @@ public class SysInformController {
 	 * @Param: [qo]
 	 * @return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
 	 */
-    @Login
     @PostMapping("/add")
     @ApiOperation("添加推送通知消息")
     @businessLog(operation = "新增",content = "新增了【推送通知消息】")
+    @Permit("community:admin:sys:inform:add")
     public CommonResult<Boolean> addPushInform(@RequestBody PushInformQO qo) {
         qo.setPushTarget(0);
         // 大后台默认开启推送
@@ -86,10 +86,10 @@ public class SysInformController {
 	 * @Param: [id]
 	 * @return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
 	 */
-	@Login
 	@DeleteMapping("/delete")
 	@ApiOperation("删除推送通知消息")
 	@businessLog(operation = "删除",content = "删除了【推送通知消息】")
+	@Permit("community:admin:sys:inform:delete")
 	public CommonResult<Boolean> deletePushInform(@RequestParam Long id) {
 		return iSysInformService.deletePushInform(id, UserUtils.getId()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
 	}
@@ -101,9 +101,9 @@ public class SysInformController {
 	 * @Param: [id]
 	 * @return: com.jsy.community.vo.CommonResult<?>
 	 */
-	@Login
 	@GetMapping("/getDetatil")
 	@ApiOperation("获取单条消息详情")
+	@Permit("community:admin:sys:inform:getDetatil")
 	public CommonResult<?> getDetatil(@RequestParam Long id) {
 		return CommonResult.ok(iSysInformService.getDetail(id));
 	}
