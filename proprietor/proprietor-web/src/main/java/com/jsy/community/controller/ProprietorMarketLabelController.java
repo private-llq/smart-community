@@ -30,7 +30,7 @@ public class ProprietorMarketLabelController {
      **/
     @PostMapping("/addMarketLabel")
     @ApiOperation("新增社区集市商品标签")
-    @Permit("community:proprietor:marketLabel:addMarketLabel")
+    // @Permit("community:proprietor:marketLabel:addMarketLabel")
     public CommonResult addMarketLable(@RequestBody ProprietorMarketLabelEntity labelEntity){
         System.out.println(labelEntity);
         boolean b = labelService.addMarketLabel(labelEntity);
@@ -46,7 +46,7 @@ public class ProprietorMarketLabelController {
      **/
     @PostMapping("/updateMarketLabel")
     @ApiOperation("修改社区集市商品标签")
-    @Permit("community:proprietor:marketLabel:updateMarketLabel")
+    // @Permit("community:proprietor:marketLabel:updateMarketLabel")
     public CommonResult updateMarketLabel(@RequestBody ProprietorMarketLabelEntity labelEntity){
         boolean b = labelService.updateMarketLabel(labelEntity);
         return CommonResult.ok("修改成功");
@@ -60,7 +60,7 @@ public class ProprietorMarketLabelController {
      **/
     @DeleteMapping("/deleteMarketLabel")
     @ApiOperation("删除社区集市商品标签")
-    @Permit("community:proprietor:marketLabel:deleteMarketLabel")
+    // @Permit("community:proprietor:marketLabel:deleteMarketLabel")
     public CommonResult deleteMarketLabel(@RequestParam("id")Long id){
         boolean b = labelService.deleteMarketLabel(id);
         return CommonResult.ok("删除成功");
@@ -75,7 +75,7 @@ public class ProprietorMarketLabelController {
      **/
     @GetMapping("/selectMarketLabel")
     @ApiOperation("查询社区集市商品标签")
-    @Permit("community:proprietor:marketLabel:selectMarketLabel")
+    // @Permit("community:proprietor:marketLabel:selectMarketLabel")
     public CommonResult selectMarketLabel(){
         List<ProprietorMarketLabelEntity> list = labelService.selectMarketLabel();
         return CommonResult.ok(list,"查询成功");

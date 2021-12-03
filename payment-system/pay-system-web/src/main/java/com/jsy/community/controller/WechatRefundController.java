@@ -59,7 +59,7 @@ public class WechatRefundController {
      * @return:
      */
     @PostMapping("/refund")
-    @Permit("community:payment:refund")
+    // @Permit("community:payment:refund")
     public CommonResult refund(@RequestBody WechatRefundQO wechatRefundQO) throws Exception {
         String body = null;
         CloseableHttpResponse execute=null;
@@ -133,6 +133,7 @@ public class WechatRefundController {
      */
     @LoginIgnore
     @RequestMapping(value = "/refund/callback/{companyId}", method = {RequestMethod.POST,RequestMethod.GET})
+    // @Permit("community:payment:refund:callback")
     public void callback(HttpServletRequest request, HttpServletResponse response, @PathVariable("companyId") Long companyId) throws Exception {
         log.info("退款回调成功");
         log.info(String.valueOf(companyId));

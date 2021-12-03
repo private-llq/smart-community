@@ -52,7 +52,7 @@ public class RelationController {
      */
     @ApiOperation("添加家属信息")
     @PostMapping("/add")
-    @Permit("community:proprietor:relation:add")
+    // @Permit("community:proprietor:relation:add")
     public CommonResult addRelation(@RequestBody RelationQO relationQo){
         ValidatorUtils.validateEntity(relationQo, RelationQO.RelationValidated.class);
         relationQo.getCars().forEach( car -> ValidatorUtils.validateEntity(car, RelationCarsQO.proprietorCarValidated.class) );
@@ -80,7 +80,7 @@ public class RelationController {
     
     @ApiOperation("删除家属信息及其车辆")
     @DeleteMapping("/delete")
-    @Permit("community:proprietor:relation:delete")
+    // @Permit("community:proprietor:relation:delete")
     public CommonResult delete(@RequestParam("id") Long id){
         String userId = UserUtils.getUserId();
         relationService.deleteHouseMemberCars(id,userId);
@@ -89,7 +89,7 @@ public class RelationController {
     
     @ApiOperation("保存行驶证图片")
     @PostMapping("/uploadDrivingLicenseUrl")
-    @Permit("community:proprietor:relation:uploadDrivingLicenseUrl")
+    // @Permit("community:proprietor:relation:uploadDrivingLicenseUrl")
     public CommonResult uploadDrivingLicenseUrl(@RequestParam("file") MultipartFile file){
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -102,7 +102,7 @@ public class RelationController {
     
     @ApiOperation("删除车辆")
     @DeleteMapping("/delCar")
-    @Permit("community:proprietor:relation:delCar")
+    // @Permit("community:proprietor:relation:delCar")
     public CommonResult delCar(@RequestParam("id") Long id){
         String userId = UserUtils.getUserId();
         relationService.delCar(userId, id);
@@ -111,7 +111,7 @@ public class RelationController {
     
     @ApiOperation("查询一个家属详情")
     @GetMapping("/selectUserRelationDetails")
-    @Permit("community:proprietor:relation:selectUserRelationDetails")
+    // @Permit("community:proprietor:relation:selectUserRelationDetails")
     public CommonResult selectRelationOne(@RequestParam("id") Long id){
         String userId = UserUtils.getUserId();
         RelationVO relationVO = relationService.selectOne(id, userId);
@@ -120,7 +120,7 @@ public class RelationController {
     
     @ApiOperation("修改家属信息加汽车信息")
     @PutMapping("/updateUserRelationDetails")
-    @Permit("community:proprietor:relation:updateUserRelationDetails")
+    // @Permit("community:proprietor:relation:updateUserRelationDetails")
     public CommonResult updateByRelationId(@RequestBody RelationQO relationQo){
         ValidatorUtils.validateEntity(relationQo, RelationQO.RelationValidated.class);
         relationQo.getCars().forEach( car -> ValidatorUtils.validateEntity(car,RelationCarsQO.proprietorCarValidated.class) );

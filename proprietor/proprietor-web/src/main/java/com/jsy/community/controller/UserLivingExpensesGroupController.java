@@ -35,6 +35,7 @@ public class UserLivingExpensesGroupController {
     public CommonResult addGroup(@RequestBody UserLivingExpensesGroupEntity groupEntity) {
         ValidatorUtils.validateEntity(groupEntity);
         groupEntity.setUid(UserUtils.getUserId());
-        return CommonResult.ok();
+        String id = groupService.addGroup(groupEntity);
+        return  id == null ? CommonResult.error("添加失败") : CommonResult.ok(id, "添加成功");
     }
 }

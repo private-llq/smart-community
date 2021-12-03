@@ -74,7 +74,7 @@ public class VisitorController {
 	 **/
 	@ApiOperation("【访客】新增")
 	@PostMapping("")
-	@Permit("community:proprietor:visitor")
+	// @Permit("community:proprietor:visitor")
 	public CommonResult<VisitorEntryVO> save(@RequestBody VisitorEntity visitorEntity) {
 		ValidatorUtils.validateEntity(visitorEntity);
 		if(LocalDate.now().isAfter(visitorEntity.getStartTime().toLocalDate())){
@@ -120,7 +120,7 @@ public class VisitorController {
 	 **/
 	@ApiOperation("【访客】根据ID单查详情")
 	@GetMapping("v2")
-	@Permit("community:proprietor:visitor:v2")
+	// @Permit("community:proprietor:visitor:v2")
 	public CommonResult<VisitorEntity> queryByIdv2(@RequestParam("id") Long id) {
 		VisitorEntity visitorEntity = visitorService.selectOneByIdv2(id);
 		if (visitorEntity == null) {
@@ -159,7 +159,7 @@ public class VisitorController {
 	 **/
 	@ApiOperation("【访客】删除")
 	@DeleteMapping("")
-	@Permit("community:proprietor:visitor")
+	// @Permit("community:proprietor:visitor")
 	public CommonResult delete(@RequestParam("id") Long id) {
 		boolean delResult = visitorService.deleteVisitorById(id);
 		return delResult ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "删除失败");
@@ -174,7 +174,7 @@ public class VisitorController {
 	**/
 	@ApiOperation("【访客】分页查询")
 	@PostMapping("page")
-	@Permit("community:proprietor:visitor:page")
+	// @Permit("community:proprietor:visitor:page")
 	public CommonResult<PageInfo> query(@RequestBody BaseQO<VisitorQO> baseQO) {
 		return CommonResult.ok(visitorService.queryByPage(baseQO,UserUtils.getUserId()));
 	}
@@ -188,7 +188,7 @@ public class VisitorController {
 	**/
 	@ApiOperation("【访客】根据ID单查详情")
 	@GetMapping("")
-	@Permit("community:proprietor:visitor")
+	// @Permit("community:proprietor:visitor")
 	public CommonResult<VisitorEntity> queryById(@RequestParam("id") Long id) {
 		VisitorEntity visitorEntity = visitorService.selectOneById(id);
 		if (visitorEntity == null) {
@@ -208,7 +208,7 @@ public class VisitorController {
 	 **/
 	@ApiOperation("【随行人员】添加")
 	@PostMapping("person")
-	@Permit("community:proprietor:visitor:person")
+	// @Permit("community:proprietor:visitor:person")
 	public CommonResult addPerson(@RequestBody VisitorPersonEntity visitorPersonEntity) {
 		ValidatorUtils.validateEntity(visitorPersonEntity,VisitorPersonEntity.addPersonValidatedGroup.class);
 		visitorPersonEntity.setUid(UserUtils.getUserId());
@@ -226,7 +226,7 @@ public class VisitorController {
 	 **/
 	@ApiOperation("【随行人员】修改")
 	@PutMapping("person")
-	@Permit("community:proprietor:visitor:person")
+	// @Permit("community:proprietor:visitor:person")
 	public CommonResult updatePerson(@RequestBody VisitorPersonQO visitorPersonQO) {
 		ValidatorUtils.validateEntity(visitorPersonQO);
 		boolean updateResult = visitorPersonService.updateVisitorPersonById(visitorPersonQO);
@@ -242,7 +242,7 @@ public class VisitorController {
 	 **/
 	@ApiOperation("【随行人员】批量删除")
 	@DeleteMapping("person")
-	@Permit("community:proprietor:visitor:person")
+	// @Permit("community:proprietor:visitor:person")
 	public CommonResult deletePerson(@RequestBody List<Long> ids) {
 		boolean result = visitorPersonService.deleteVisitorPersonById(ids);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "随行人员 批量删除失败");
@@ -257,7 +257,7 @@ public class VisitorController {
 	**/
 	@ApiOperation("【随行人员】分页查询")
 	@PostMapping("person/page")
-	@Permit("community:proprietor:visitor:person:page")
+	// @Permit("community:proprietor:visitor:person:page")
 	public CommonResult<PageInfo<VisitorPersonEntity>> queryPersonPage(@RequestBody BaseQO<String> baseQO){
 		baseQO.setQuery(UserUtils.getUserId());
 		return CommonResult.ok(visitorPersonService.queryVisitorPersonPage(baseQO));
@@ -272,7 +272,7 @@ public class VisitorController {
 	 **/
 	@ApiOperation("【随行车辆】添加")
 	@PostMapping("car")
-	@Permit("community:proprietor:visitor:car")
+	// @Permit("community:proprietor:visitor:car")
 	public CommonResult addCar(@RequestBody VisitingCarEntity visitingCarEntity) {
 		ValidatorUtils.validateEntity(visitingCarEntity,VisitingCarEntity.addCarValidatedGroup.class);
 		visitingCarEntity.setUid(UserUtils.getUserId());
@@ -290,7 +290,7 @@ public class VisitorController {
 	 **/
 	@ApiOperation("【随行车辆】修改")
 	@PutMapping("car")
-	@Permit("community:proprietor:visitor:car")
+	// @Permit("community:proprietor:visitor:car")
 	public CommonResult updateCar(@RequestBody VisitingCarQO visitingCarQO) {
 		ValidatorUtils.validateEntity(visitingCarQO);
 		boolean updateResult = visitingCarService.updateVisitingCarById(visitingCarQO);
@@ -306,7 +306,7 @@ public class VisitorController {
 	 **/
 	@ApiOperation("【随行车辆】批量删除")
 	@DeleteMapping("car")
-	@Permit("community:proprietor:visitor:car")
+	// @Permit("community:proprietor:visitor:car")
 	public CommonResult deleteCar(@RequestBody List<Long> ids) {
 		boolean result = visitingCarService.deleteVisitingCarById(ids);
 		return result ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(), "随行车辆 批量删除失败");
@@ -321,7 +321,7 @@ public class VisitorController {
 	 **/
 	@ApiOperation("【随行车辆】分页查询")
 	@PostMapping("car/page")
-	@Permit("community:proprietor:visitor:car:page")
+	// @Permit("community:proprietor:visitor:car:page")
 	public CommonResult<PageInfo<VisitingCarEntity>> queryCarPage(@RequestBody BaseQO<String> baseQO){
 		baseQO.setQuery(UserUtils.getUserId());
 		return CommonResult.ok(visitingCarService.queryVisitingCarPage(baseQO));
@@ -335,7 +335,7 @@ public class VisitorController {
 	 * @date: 2021/10/26 11:33
 	 **/
 	@PostMapping("/v2/visitorCarHistory")
-	@Permit("community:proprietor:visitor:v2:visitorCarHistory")
+	// @Permit("community:proprietor:visitor:v2:visitorCarHistory")
 	public CommonResult queryVisitorCar(@RequestBody VisitorEntity visitorEntity) {
 		ValidatorUtils.validateEntity(visitorEntity, VisitorEntity.queryVisitorCarValidate.class);
 		visitorEntity.setUid(UserUtils.getUserId());
@@ -350,7 +350,7 @@ public class VisitorController {
 	 * @date: 2021/10/26 16:19
 	 **/
 	@PostMapping("/v2/addTempCode")
-	@Permit("community:proprietor:visitor:v2:addTempCode")
+	// @Permit("community:proprietor:visitor:v2:addTempCode")
 	public CommonResult addTempCode(@RequestBody VisitorEntity visitorEntity) {
 		ValidatorUtils.validateEntity(visitorEntity, VisitorEntity.addTempCodeValidate.class);
 		visitorEntity.setUid(UserUtils.getUserId());

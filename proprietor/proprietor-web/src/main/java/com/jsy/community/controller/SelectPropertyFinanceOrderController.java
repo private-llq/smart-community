@@ -32,7 +32,7 @@ public class SelectPropertyFinanceOrderController {
 
     @ApiOperation("查询物业账单")
     @GetMapping("/list")
-    @Permit("community:proprietor:FinanceOrder:list")
+    // @Permit("community:proprietor:FinanceOrder:list")
     public CommonResult getFinanceOrder(@RequestParam Long communityId,Integer orderStatus){
         PropertyFinanceOrderEntity qo = new PropertyFinanceOrderEntity();
         qo.setUid(UserUtils.getUserId());
@@ -43,7 +43,7 @@ public class SelectPropertyFinanceOrderController {
 
     @ApiOperation("查询物业账单（详情）")
     @GetMapping("/findOne")
-    @Permit("community:proprietor:FinanceOrder:findOne")
+    // @Permit("community:proprietor:FinanceOrder:findOne")
     public CommonResult findOne(@RequestParam("id") String id,Integer orderStatus){
         return CommonResult.ok(selectPropertyFinanceOrderService.findOne(id,orderStatus),"查询成功");
     }

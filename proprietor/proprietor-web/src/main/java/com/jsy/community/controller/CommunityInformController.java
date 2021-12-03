@@ -47,7 +47,7 @@ public class CommunityInformController {
     @GetMapping("/rotation")
 //    @Cacheable(value = "inform:rotation", key = "#communityId", unless = "#result.data == null or #result.data.size() == 0", condition = "#communityId > 0", cacheManager = "redisCacheManager")
     @ApiOperation("社区轮播消息")
-    @Permit("community:proprietor:community:inform:rotation")
+    // @Permit("community:proprietor:community:inform:rotation")
     public CommonResult<List<PushInformEntity>> rotationCommunityInform(@RequestParam Long communityId) {
         return CommonResult.ok(communityInformService.rotationCommunityInform(informInitializeCount, communityId));
     }
@@ -58,7 +58,7 @@ public class CommunityInformController {
     @GetMapping("/latest")
 //    @Cacheable(value = "inform:latest",  unless = "#result.data == null or #result.data.size() == 0", cacheManager = "redisCacheManager")
     @ApiOperation("社区租赁最新消息")
-    @Permit("community:proprietor:community:inform:latest")
+    // @Permit("community:proprietor:community:inform:latest")
     public CommonResult<List<HouseLeaseVO>> leaseLatestInform() {
         return CommonResult.ok(communityInformService.leaseLatestInform(leaseInformInitializeCount));
     }
@@ -68,7 +68,7 @@ public class CommunityInformController {
      */
     @GetMapping("/details")
     @ApiOperation("社区推送消息详情查看")
-    @Permit("community:proprietor:community:inform:details")
+    // @Permit("community:proprietor:community:inform:details")
     public CommonResult<PushInformEntity> detailsCommunityInform(@RequestParam Long informId) {
         return CommonResult.ok(communityInformService.detailsCommunityInform(informId, UserUtils.getUserId()));
     }
@@ -83,7 +83,7 @@ public class CommunityInformController {
      */
     @PostMapping(value = "/page", produces = "application/json;charset=utf-8")
     @ApiOperation("查询社区通知消息")
-    @Permit("community:proprietor:community:inform:page")
+    // @Permit("community:proprietor:community:inform:page")
     public CommonResult<?> listCommunityInform(@RequestBody BaseQO<OldPushInformQO> qo) {
         ValidatorUtils.validatePageParam(qo);
         if (qo.getQuery() == null) {
@@ -104,7 +104,7 @@ public class CommunityInformController {
      */
     @DeleteMapping("/clear")
     @ApiOperation("社区推送消息推送号删除")
-    @Permit("community:proprietor:community:inform:clear")
+    // @Permit("community:proprietor:community:inform:clear")
     public CommonResult<Boolean> delPushInformAcct(@RequestParam Long acctId) {
         communityInformService.delPushInformAcct(acctId, UserUtils.getUserId());
         //在删除推送号消息时 不需要返回结果 同时即使删除失败 后端不会进行任何操作，也不会影响到前端，
@@ -118,7 +118,7 @@ public class CommunityInformController {
      */
     @PostMapping("/clear/unread")
     @ApiOperation("社区推送号清除未读")
-    @Permit("community:proprietor:community:inform:clear:unread")
+    // @Permit("community:proprietor:community:inform:clear:unread")
     public CommonResult<Boolean> clearUnreadInform(@RequestBody List<Long> acctIds) {
         communityInformService.clearUnreadInform(acctIds, UserUtils.getUserId());
         //失败的情况 只有在 数据访问层 出现错误，即交给ExceptionHandler处理

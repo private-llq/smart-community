@@ -39,6 +39,7 @@ public class BannerController {
 	@LoginIgnore
 	@ApiOperation("【轮播图】列表查询")
 	@PostMapping("list")
+	// @Permit("community:proprietor:banner:list")
 	public CommonResult<List<BannerVO>> list(@RequestBody BannerQO bannerQO){
 //		ValidatorUtils.validateEntity(bannerQO, BannerQO.queryBannerValidatedGroup.class);
 		List<BannerVO> returnList = bannerService.queryBannerList(bannerQO);
@@ -55,6 +56,7 @@ public class BannerController {
 	@LoginIgnore
 	@ApiOperation("【轮播图】点击量+1")
 	@PutMapping("clickUp")
+	// @Permit("community:proprietor:banner:clickUp")
 	public CommonResult clickUp(@RequestParam Long id){
 		bannerService.clickUp(id);
 		return CommonResult.ok();

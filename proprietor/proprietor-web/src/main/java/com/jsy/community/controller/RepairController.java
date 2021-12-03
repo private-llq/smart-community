@@ -54,7 +54,7 @@ public class RepairController {
 	 **/
 	@ApiOperation("房屋报修查询")
 	@GetMapping("/getRepair")
-	@Permit("community:proprietor:repair:getRepair")
+	// @Permit("community:proprietor:repair:getRepair")
 	public CommonResult getRepair(@ApiParam(value = "订单状态") @RequestParam(required = false) Integer status) {
 		String uid = UserUtils.getUserId();
 		List<RepairEntity> list = repairService.getRepair(uid, status);
@@ -63,7 +63,7 @@ public class RepairController {
 	
 	@ApiOperation("房屋取消报修")
 	@GetMapping("/cancelRepair")
-	@Permit("community:proprietor:repair:cancelRepair")
+	// @Permit("community:proprietor:repair:cancelRepair")
 	public CommonResult cancelRepair(@ApiParam(value = "房屋报修id") @RequestParam Long id) {
 		String uid = UserUtils.getUserId();
 		repairService.cancelRepair(id, uid);
@@ -72,7 +72,7 @@ public class RepairController {
 	
 	@ApiOperation("报修详情")
 	@GetMapping("/repairDetails")
-	@Permit("community:proprietor:repair:repairDetails")
+	// @Permit("community:proprietor:repair:repairDetails")
 	public CommonResult repairDetails(@ApiParam(value = "房屋报修id") @RequestParam Long id) {
 		String uid = UserUtils.getUserId();
 		RepairVO repairVO = repairService.repairDetails(id, uid);
@@ -81,7 +81,7 @@ public class RepairController {
 	
 	@ApiOperation("报修事项查询")
 	@GetMapping("/getRepairType")
-	@Permit("community:proprietor:repair:getRepairType")
+	// @Permit("community:proprietor:repair:getRepairType")
 	public CommonResult getRepairType(@ApiParam(value = "报修类别") @RequestParam int repairType) {
 		List<CommonConst> list = repairService.getRepairType(repairType);
 		return CommonResult.ok(list);
@@ -90,7 +90,7 @@ public class RepairController {
 	@ApiOperation("报修内容图片上传")
 	@PostMapping("/uploadRepairImg")
 	@UploadImg(bucketName = UploadBucketConst.REPAIR_BUCKET, redisKeyName = UploadRedisConst.REPAIR_IMG_PART)
-	@Permit("community:proprietor:repair:uploadRepairImg")
+	// @Permit("community:proprietor:repair:uploadRepairImg")
 	public CommonResult uploadRepairImg(@RequestParam("file") MultipartFile[] files, CommonResult commonResult) {
 		if (files.length > 3) {
 			throw new ProprietorException("只能上传3张图片");
@@ -109,7 +109,7 @@ public class RepairController {
 	
 	@ApiOperation("评价报修")
 	@PostMapping("/appraiseRepair")
-	@Permit("community:proprietor:repair:appraiseRepair")
+	// @Permit("community:proprietor:repair:appraiseRepair")
 	public CommonResult appraiseRepair(@RequestBody RepairCommentQO repairCommentQO) {
 		String uid = UserUtils.getUserId();
 		repairCommentQO.setUid(uid);
@@ -126,7 +126,7 @@ public class RepairController {
 	@ApiOperation("评价图片上传")
 	@PostMapping("/uploadCommentImg")
 	@UploadImg(bucketName = UploadBucketConst.REPAIR_BUCKET, redisKeyName = UploadRedisConst.REPAIR_COMMENT_IMG_PART)
-	@Permit("community:proprietor:repair:uploadCommentImg")
+	// @Permit("community:proprietor:repair:uploadCommentImg")
 	public CommonResult uploadCommentImg(@RequestParam("file") MultipartFile[] files, CommonResult commonResult) {
 		if (files.length > 3) {
 			throw new ProprietorException("只能上传3张图片");
@@ -145,7 +145,7 @@ public class RepairController {
 	
 	@ApiOperation("发起房屋报修")
 	@PostMapping("/addRepair")
-	@Permit("community:proprietor:repair:addRepair")
+	// @Permit("community:proprietor:repair:addRepair")
 	public CommonResult addRepair(@RequestBody RepairEntity repairEntity) {
 		String uid = UserUtils.getUserId();
 		repairEntity.setUserId(uid);
@@ -163,7 +163,7 @@ public class RepairController {
 
 	@ApiOperation("查看驳回原因")
 	@GetMapping("/getRejectReason")
-	@Permit("community:proprietor:repair:getRejectReason")
+	// @Permit("community:proprietor:repair:getRejectReason")
 	public CommonResult getRejectReason(@RequestParam() Long id) {
 		String reason = repairService.getRejectReason(id);
 		return CommonResult.ok(reason,"");

@@ -69,7 +69,7 @@ public class AliAppPayController {
 	
 	@ApiOperation("下单")
 	@PostMapping("order")
-	@Permit("community:payment:alipay:order")
+	// @Permit("community:payment:alipay:order")
 	public CommonResult getOrderStr(@RequestBody AliAppPayQO aliAppPayQO, HttpServletRequest req){
 		if (aliAppPayQO.getTradeFrom()==9){
 			aliAppPayQO.setCommunityId(1L);
@@ -159,6 +159,7 @@ public class AliAppPayController {
 	
 	@LoginIgnore
 	@PostMapping("close")
+	// @Permit("community:payment:alipay:close")
 	public void test(@RequestParam Long communityId,@RequestParam String orderId){
 		CommunityEntity entity = communityService.getCommunityNameById(communityId);
 		PayConfigureEntity serviceConfig;
@@ -184,6 +185,7 @@ public class AliAppPayController {
 	 **/
 	@LoginIgnore
 	@GetMapping("/v2/checkPayTradeStatus")
+	// @Permit("community:payment:alipay:v2:checkPayTradeStatus")
 	public CommonResult checkPayTradeStatus(@RequestParam("orderNo") String orderNo, @RequestParam("serviceOrderNo") String serviceOrderNo) {
 		Boolean aliStatus = ailiAppPayRecordService.checkPayTradeStatus(orderNo, serviceOrderNo);
 		Boolean wechatStatus = weChatService.checkPayStatus(orderNo, serviceOrderNo);

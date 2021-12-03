@@ -39,7 +39,7 @@ public class AppMenuController {
 	
 	@ApiOperation("查询首页展示的菜单选项")
 	@GetMapping("/listIndexMenu")
-	@Permit("community:proprietor:menu:listIndexMenu")
+	// @Permit("community:proprietor:menu:listIndexMenu")
 	public CommonResult listIndexMenu(@ApiParam(value = "社区id") @RequestParam Long communityId) {
 		List<AppMenuEntity> list = appMenuService.listIndexMenu(communityId);
 		return CommonResult.ok(list);
@@ -48,7 +48,7 @@ public class AppMenuController {
 	
 	@ApiOperation("更多菜单")
 	@GetMapping("/moreListMenu")
-	@Permit("community:proprietor:menu:moreListMenu")
+	// @Permit("community:proprietor:menu:moreListMenu")
 	public CommonResult moreListMenu(@ApiParam(value = "社区id") @RequestParam Long communityId) {
 		List<AppMenuEntity> list = appMenuService.moreIndexMenu(communityId);
 		return CommonResult.ok(list);
@@ -56,7 +56,7 @@ public class AppMenuController {
 
 	@ApiOperation("查询首页展示的菜单选项")
 	@GetMapping("/listIndexMenu/v2")
-	@Permit("community:proprietor:menu:listIndexMenu:v2")
+	// @Permit("community:proprietor:menu:listIndexMenu:v2")
 	public CommonResult listIndexMenu2(@ApiParam(value = "社区id") @RequestParam Long communityId) {
 		List<AppMenuEntity> list = appMenuService.listAppMenu(communityId);
 		return CommonResult.ok(list);
@@ -64,7 +64,7 @@ public class AppMenuController {
 	}
 	@ApiOperation("更多菜单")
 	@GetMapping("/moreListMenu/v2")
-	@Permit("community:proprietor:menu:moreListMenu:v2")
+	// @Permit("community:proprietor:menu:moreListMenu:v2")
 	public CommonResult moreListMenuV2(@ApiParam(value = "社区id") @RequestParam Long communityId) {
 		List<AppMenuEntity> list = appMenuService.listAppMenuAll(communityId);
 		return CommonResult.ok(list);
