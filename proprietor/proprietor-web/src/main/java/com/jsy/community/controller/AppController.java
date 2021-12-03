@@ -29,7 +29,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/app")
-@ApiJSYController
+// @ApiJSYController
 public class AppController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)

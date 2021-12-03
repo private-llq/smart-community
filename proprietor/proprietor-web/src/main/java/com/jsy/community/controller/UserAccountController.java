@@ -40,7 +40,7 @@ import java.util.Map;
 @Api(tags = "用户金钱账户控制器")
 @RestController
 @RequestMapping("user/account")
-@ApiJSYController
+// @ApiJSYController
 public class UserAccountController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "车辆黑名单")
 @RestController
 @RequestMapping("/carBlackList")
-@ApiJSYController
+// @ApiJSYController
 public class CarBlackListController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

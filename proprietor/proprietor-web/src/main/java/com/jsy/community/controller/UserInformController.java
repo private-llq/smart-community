@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping("/inform")
 @Api(tags = "社区通知消息")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class UserInformController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)

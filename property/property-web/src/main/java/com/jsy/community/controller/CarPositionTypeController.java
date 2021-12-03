@@ -29,7 +29,7 @@ import java.util.List;
 @RestController
 @Api(tags = "车位类型模块")
 @RequestMapping("/carPositionType")
-@ApiJSYController
+// @ApiJSYController
 public class CarPositionTypeController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

@@ -39,7 +39,7 @@ import java.util.List;
 @Api(tags = "房屋报修控制器")
 @Slf4j
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/repair")
 public class RepairController {
 	
@@ -160,7 +160,7 @@ public class RepairController {
 		}
 		return CommonResult.ok();
 	}
-	
+
 	@ApiOperation("查看驳回原因")
 	@GetMapping("/getRejectReason")
 	@Permit("community:proprietor:repair:getRejectReason")

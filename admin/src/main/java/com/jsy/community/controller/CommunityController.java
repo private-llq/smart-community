@@ -30,7 +30,7 @@ import java.util.List;
 @Api(tags = "社区控制器")
 @Slf4j
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class CommunityController {
 
     @Resource

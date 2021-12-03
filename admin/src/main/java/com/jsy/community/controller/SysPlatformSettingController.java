@@ -18,7 +18,7 @@ import javax.annotation.Resource;
  **/
 @RestController
 @RequestMapping("/platform")
-@ApiJSYController
+// @ApiJSYController
 public class SysPlatformSettingController {
 	
 	@Resource

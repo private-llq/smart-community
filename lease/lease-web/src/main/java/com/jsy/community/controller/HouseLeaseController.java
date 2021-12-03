@@ -40,7 +40,7 @@ import java.util.List;
  * @since 2021/1/13 17:33
  */
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 @RestController
 @Api(tags = "房屋租售控制器")
 @RequestMapping("/house")

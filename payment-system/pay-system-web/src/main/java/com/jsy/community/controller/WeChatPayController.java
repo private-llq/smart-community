@@ -55,7 +55,7 @@ import java.util.concurrent.TimeUnit;
  * @create: 2021-01-21 17:05
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @Slf4j
 public class WeChatPayController {
 

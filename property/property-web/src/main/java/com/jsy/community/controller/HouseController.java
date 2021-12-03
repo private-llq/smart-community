@@ -53,7 +53,7 @@ import java.util.*;
 @Api(tags = "楼栋控制器")
 @RestController
 @RequestMapping("house")
-@ApiJSYController
+// @ApiJSYController
 public class HouseController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)

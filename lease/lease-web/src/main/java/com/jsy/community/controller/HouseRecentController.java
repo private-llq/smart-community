@@ -23,7 +23,7 @@ import java.util.List;
  * @since 2020-12-26 13:55
  */
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 @RestController
 @Api(tags = "租赁最近浏览控制器")
 @RequestMapping("/house/browses")

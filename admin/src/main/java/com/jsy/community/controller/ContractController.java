@@ -25,7 +25,7 @@ import javax.annotation.Resource;
 @Api(tags = "合同管理控制器")
 @RestController
 @RequestMapping("contract")
-@ApiJSYController
+// @ApiJSYController
 public class ContractController {
 	
 	@Resource

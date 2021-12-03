@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "物业投诉受理")
 @RestController
 @RequestMapping("/propertyComplaints")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyComplaintsController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

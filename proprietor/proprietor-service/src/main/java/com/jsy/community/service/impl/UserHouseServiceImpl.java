@@ -12,6 +12,7 @@ import com.jsy.community.qo.UserHouseQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.HouseMembersQO;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.MembersVO;
 import com.jsy.community.vo.UserHouseVO;
@@ -699,5 +700,18 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	public List<UserHouseEntity> selectUserHouse(Long communityId, String uid) {
 		List<UserHouseEntity> list = userHouseMapper.selectList(new QueryWrapper<UserHouseEntity>().eq("community_id", communityId).eq("uid", uid));
 		return list;
+	}
+
+
+	/**
+	 * @Description: 养老导入家人列表接口
+	 * @author: Hu
+	 * @since: 2021/12/2 15:33
+	 * @Param: [userId]
+	 * @return: java.util.List<com.jsy.community.vo.HouseMembersQO>
+	 */
+	@Override
+	public List<HouseMembersQO> selectMembers(String userId) {
+		return houseMemberMapper.selectMembers(userId);
 	}
 }

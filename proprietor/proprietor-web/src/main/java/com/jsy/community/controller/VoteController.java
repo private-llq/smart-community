@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
  **/
 @RequestMapping("vote")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class VoteController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
@@ -44,7 +44,7 @@ public class VoteController {
         String upload = MinioUtils.upload(file, "vote");
         return CommonResult.ok(upload);
     }
-    
+
     @ApiOperation("查询详情")
     @GetMapping("/getVote")
     @Permit("community:proprietor:vote:getVote")

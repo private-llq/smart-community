@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Api(tags = "支付宝支付配置")
 @RestController
 @RequestMapping("/alipay/configure")
-@ApiJSYController
+// @ApiJSYController
 public class PayConfigureController {
     
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

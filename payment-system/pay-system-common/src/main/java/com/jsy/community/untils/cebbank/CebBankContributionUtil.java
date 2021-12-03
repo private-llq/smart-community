@@ -5,7 +5,7 @@ import com.jsy.community.config.service.CebBankEntity;
 import com.jsy.community.constant.CebBankConst;
 import com.jsy.community.qo.cebbank.*;
 import com.jsy.community.qo.unionpay.HttpResponseModel;
-import com.jsy.community.vo.cebbank.HttpRequestModel;
+import com.jsy.community.vo.cebbank.test.HttpRequestModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.methods.CloseableHttpResponse;

@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "房间成员控制器")
 @RestController
 @RequestMapping("houseMember")
-@ApiJSYController
+// @ApiJSYController
 public class HouseMemberController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)

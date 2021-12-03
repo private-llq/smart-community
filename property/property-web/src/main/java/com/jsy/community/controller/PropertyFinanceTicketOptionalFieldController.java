@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api("财务票据可选字段控制器")
 @RequestMapping("/ticketOptionalField")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyFinanceTicketOptionalFieldController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceTicketOptionalFieldService ticketOptionalFieldService;

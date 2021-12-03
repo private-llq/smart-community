@@ -15,6 +15,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -49,24 +50,6 @@ public class CebBankServiceImpl implements CebBankService {
         // 存入缓存,有效期2小时
         redisTemplate.opsForValue().set("cebBank-sessionId:" + cebLoginQO.getUserPhone(), cebLoginVO.getSessionId(), 2L, TimeUnit.HOURS);
         return cebLoginVO.getSessionId();
-    }
-
-    /**
-     * @author: Pipi
-     * @description: 查询城市
-     * @param :
-     * @return: java.lang.String
-     * @date: 2021/11/17 10:31
-     **/
-    @Override
-    public CebCityModelListVO queryCity(CebQueryCityQO cebQueryCityQO) {
-        HttpResponseModel responseModel = CebBankContributionUtil.queryCity(cebQueryCityQO);
-        if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
-            throw new PaymentException("查询城市失败");
-        }
-        String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
-        CebCityPagingModelVO cebCityPagingModelVO = JSON.parseObject(respData, CebCityPagingModelVO.class);
-        return cebCityPagingModelVO.getCityPagingModel();
     }
 
     /**
@@ -113,24 +96,26 @@ public class CebBankServiceImpl implements CebBankService {
     @Override
     public CebQueryBillInfoVO queryBillInfo(CebQueryBillInfoQO billInfoQO) {
         HttpResponseModel responseModel = new HttpResponseModel();
-        billInfoQO.setPollingTimes("1");
-        billInfoQO.setFlag("2");
-        billInfoQO.setQryAcqSsn("n20211125180148-885Kz0");
-        responseModel = CebBankContributionUtil.queryBillInfo(billInfoQO);
-        /*for (Integer i = 1; i <= 5; i++) {
-            billInfoQO.setPollingTimes(i.toString());
-            try {
-                if (i > 1) {
-                    Thread.sleep(i * 1000);
+        if (billInfoQO.getBusinessFlow() == 2) {
+            billInfoQO.setFlag("1");
+            Timer timer = new Timer();
+            for (Integer i = 1; i <= 5; i++) {
+                billInfoQO.setPollingTimes(i.toString());
+                try {
+                    if (i > 1) {
+                        Thread.sleep(i * 1000);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+                responseModel = CebBankContributionUtil.queryBillInfo(billInfoQO);
+                if (responseModel != null && CebBankEntity.successCode.equals(responseModel.getRespCode())) {
+                    break;
+                }
             }
+        } else {
             responseModel = CebBankContributionUtil.queryBillInfo(billInfoQO);
-            if (responseModel != null && CebBankEntity.successCode.equals(responseModel.getRespCode())) {
-                break;
-            }
-        }*/
+        }
         if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
             throw new PaymentException("查询缴费账单信息失败");
         }
@@ -147,7 +132,7 @@ public class CebBankServiceImpl implements CebBankService {
      * @return: java.lang.String
      * @date: 2021/11/17 10:37
      **/
-    @Override
+    /*@Override
     public CebQueryMobileBillVO queryMobileBill(CebQueryMobileBillQO cebQueryMobileBillQO) {
         HttpResponseModel responseModel = CebBankContributionUtil.queryMobileBill(cebQueryMobileBillQO);
         if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
@@ -155,7 +140,7 @@ public class CebBankServiceImpl implements CebBankService {
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         return JSON.parseObject(respData, CebQueryMobileBillVO.class);
-    }
+    }*/
 
     /**
      * @author: Pipi
@@ -164,7 +149,7 @@ public class CebBankServiceImpl implements CebBankService {
      * @return: java.lang.String
      * @date: 2021/11/17 10:39
      **/
-    @Override
+    /*@Override
     public CebQueryContributionRecordVO queryContributionRecord(CebQueryContributionRecordQO recordQO) {
         HttpResponseModel responseModel = CebBankContributionUtil.queryContributionRecord(recordQO);
         if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
@@ -172,7 +157,7 @@ public class CebBankServiceImpl implements CebBankService {
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         return JSON.parseObject(respData, CebQueryContributionRecordVO.class);
-    }
+    }*/
 
     /**
      * @author: Pipi
@@ -181,7 +166,7 @@ public class CebBankServiceImpl implements CebBankService {
      * @return: {@link CebContributionRecordDetailVO}
      * @date: 2021/11/23 18:14
      **/
-    @Override
+    /*@Override
     public CebContributionRecordDetailVO queryContributionRecordInfo(CebQueryContributionRecordInfoQO infoQO) {
         HttpResponseModel responseModel = CebBankContributionUtil.queryContributionRecordInfo(infoQO);
         if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
@@ -189,7 +174,7 @@ public class CebBankServiceImpl implements CebBankService {
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         return JSON.parseObject(respData, CebContributionRecordDetailVO.class);
-    }
+    }*/
 
     /***
      * @author: Pipi
@@ -198,7 +183,7 @@ public class CebBankServiceImpl implements CebBankService {
      * @return: {@link CebCashierDeskVO}
      * @date: 2021/11/23 18:21
      **/
-    @Override
+    /*@Override
     public CebCashierDeskVO createCashierDesk(CebCreateCashierDeskQO deskQO) {
         HttpResponseModel responseModel = CebBankContributionUtil.createCashierDesk(deskQO);
         if (responseModel == null || !"200".equals(responseModel.getRespCode())) {
@@ -206,5 +191,5 @@ public class CebBankServiceImpl implements CebBankService {
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         return JSON.parseObject(respData, CebCashierDeskVO.class);
-    }
+    }*/
 }

@@ -29,7 +29,7 @@ import java.util.Arrays;
 @Api(tags = "生活缴费前端控制器--增删改")
 @RestController
 @RequestMapping("/livingpaymentoperation")
-@ApiJSYController
+// @ApiJSYController
 public class LivingPaymentOperationController {
 
     private final String[] img ={"jpg","png","jpeg"};

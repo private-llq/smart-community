@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RequestMapping("/w-questionnaire")
-@ApiJSYController
+// @ApiJSYController
 @RestController
 @Api(tags = "调查问卷")
 public class WQuestionnaireController {

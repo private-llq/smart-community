@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 
 @RestController
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/application/lease")
 public class LeaseReleaseController {
 

@@ -37,7 +37,7 @@ import java.util.Map;
 @Api(tags = "小区物业收费规则")
 @RestController
 @RequestMapping("/feeRule")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyFeeRuleController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

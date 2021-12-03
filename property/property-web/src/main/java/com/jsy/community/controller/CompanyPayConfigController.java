@@ -23,7 +23,7 @@ import java.util.Map;
  * @create: 2021-09-10 14:23
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/company/config")
 public class CompanyPayConfigController {
 

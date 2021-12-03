@@ -1,7 +1,5 @@
 package com.jsy.community.controller;
 
-import cn.hutool.core.util.IdUtil;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IUserHouseService;
 import com.jsy.community.api.ProprietorUserService;
 import com.jsy.community.constant.Const;
@@ -12,6 +10,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.ControlVO;
+import com.jsy.community.vo.HouseMembersQO;
 import com.jsy.community.vo.UserHouseVO;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
@@ -35,7 +34,7 @@ import java.util.List;
 @RequestMapping("/user/house")
 @Api(tags = "用户房屋")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class UserHouseController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
@@ -85,10 +84,6 @@ public class UserHouseController {
         return CommonResult.error(1,"房间不存在");
     }
 
-    public static void main(String[] args) {
-        System.out.println( "0x" + IdUtil.fastSimpleUUID() + IdUtil.fastSimpleUUID());
-    }
-
     /**
      * @Description: 房屋认证
      * @author: Hu
@@ -123,6 +118,13 @@ public class UserHouseController {
     public CommonResult meHouse(){
         List<UserHouseVO> houseMemberVOS = userHouseService.meHouse(UserUtils.getUserId());
         return CommonResult.ok(houseMemberVOS);
+    }
+
+    @ApiOperation("养老导入家属列表接口")
+    @GetMapping("selectMembers")
+    public CommonResult selectMembers(){
+        List<HouseMembersQO> list = userHouseService.selectMembers(UserUtils.getUserId());
+        return CommonResult.ok(list);
     }
 
     /**

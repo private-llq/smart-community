@@ -38,7 +38,7 @@ import java.util.Objects;
  * @create: 2021-09-18 14:29
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @Slf4j
 public class WechatRefundController {
 

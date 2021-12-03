@@ -1,4 +1,4 @@
-package com.jsy.community.vo.cebbank;
+package com.jsy.community.vo.cebbank.test;
 
 import lombok.Data;
 
@@ -7,12 +7,12 @@ import java.util.List;
 
 /**
  * @Author: Pipi
- * @Description: 查询手机充值缴费信息缴费信息模型VO
- * @Date: 2021/11/13 10:59
+ * @Description: 缴费项目VO
+ * @Date: 2021/11/12 17:53
  * @Version: 1.0
  **/
 @Data
-public class CebMobilePaymentItemModelVO implements Serializable {
+public class CebPaymentItemModelVO implements Serializable {
     private String paymentItemId;
     private String merchantNo;
     private String categoryId;
@@ -53,7 +53,7 @@ public class CebMobilePaymentItemModelVO implements Serializable {
     private List<CebCreatePaymentBillParamsModelListVO> createPaymentBillParamsModelList;
     private List<CebPaymentNameModelListVO> cebPaymentNameModelList;
     private String cebPaymentName;
-    private List<CebCityModelVO> cityModelList;
+    private List<CebCityModelListVO> cityModelList;
     private String tempOffStatus;
     private String tempOffTips;
 }

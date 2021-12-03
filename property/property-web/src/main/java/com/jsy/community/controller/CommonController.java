@@ -26,7 +26,7 @@ import java.lang.reflect.Method;
 @Api(tags = "公共控制器")
 @Slf4j
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class CommonController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)

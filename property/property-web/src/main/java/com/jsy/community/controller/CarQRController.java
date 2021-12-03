@@ -27,7 +27,7 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.UUID;
 
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/CarQR")
 @RestController
 @Api(tags = "车辆支付")

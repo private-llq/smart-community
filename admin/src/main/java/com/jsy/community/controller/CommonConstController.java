@@ -30,7 +30,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/const")
-@ApiJSYController
+// @ApiJSYController
 public class CommonConstController {
 	
 	@Resource

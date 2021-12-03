@@ -31,7 +31,7 @@ import java.util.Map;
 @Api(tags = "订单查询")
 @RestController
 @RequestMapping("/carTemporaryOrder")
-@ApiJSYController
+// @ApiJSYController
 public class CarTemporaryOrderController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

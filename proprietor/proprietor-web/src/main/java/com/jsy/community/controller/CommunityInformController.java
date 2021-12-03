@@ -28,7 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/community/inform")
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 public class CommunityInformController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)

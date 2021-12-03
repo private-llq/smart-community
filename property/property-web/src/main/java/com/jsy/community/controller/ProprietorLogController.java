@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "业主操作日志控制器")
 @RestController
 @RequestMapping("/community/proprietorLog")
-@ApiJSYController
+// @ApiJSYController
 @Slf4j
 public class ProprietorLogController {
 	

@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
@@ -14,7 +13,7 @@ import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
 import com.zhsj.base.api.constant.RpcConst;
-import com.zhsj.base.api.rpc.IBaseAuthRpcService;
+import com.zhsj.base.api.rpc.IBaseSmsRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
@@ -43,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("user/auth")
 @Api(tags = "用户认证控制器")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @Slf4j
 public class UserAuthController {
 
@@ -64,10 +63,7 @@ public class UserAuthController {
     private ICommonService commonService;
 
     @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
-    private IBaseAuthRpcService baseAuthRpcService;
-
-    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
-    private IBaseUserInfoRpcService baseUserInfoRpcService;
+    private IBaseSmsRpcService baseSmsRpcService;
 
     /**
      * 发送验证码
@@ -80,6 +76,28 @@ public class UserAuthController {
             @ApiImplicitParam(name = "type", value = UserAuthEntity.CODE_TYPE_NOTE, required = true,
                     allowableValues = "1,2,3,4,5", paramType = "query")
     })
+    @LoginIgnore
+    public CommonResult<Boolean> sendCode(@RequestParam String account, @RequestParam Integer type) {
+        if (RegexUtils.isMobile(account)) {
+            baseSmsRpcService.sendVerificationCode(account);
+            return CommonResult.ok();
+        } else {
+            throw new ProprietorException(JSYError.REQUEST_PARAM);
+        }
+    }
+
+    /**
+     * 发送验证码
+     */
+    /*@ApiOperation("发送验证码，手机或邮箱，参数不可同时为空")
+    @GetMapping("/send/code")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "account", value = "账号，手机号或者邮箱地址", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "type", value = UserAuthEntity.CODE_TYPE_NOTE, required = true,
+                    allowableValues = "1,2,3,4,5", paramType = "query")
+    })
+    @Permit("community:proprietor:user:auth:send:code")
+    @LoginIgnore
     public CommonResult<Boolean> sendCode(@RequestParam String account,
                                           @RequestParam Integer type) {
         boolean b;
@@ -91,7 +109,7 @@ public class UserAuthController {
             throw new ProprietorException(JSYError.REQUEST_PARAM);
         }
         return b ? CommonResult.ok() : CommonResult.error("验证码发送失败");
-    }
+    }*/
 
     @ApiOperation("注册")
     @PostMapping("/register")

@@ -59,7 +59,7 @@ import java.util.*;
  * @since 2021-08-03
  */
 
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/car-position")
 @RestController
 @Api(tags = "车位模块")

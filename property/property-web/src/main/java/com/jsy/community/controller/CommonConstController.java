@@ -30,7 +30,7 @@ import java.util.Map;
  * @since 2020-12-25
  */
 @Api(tags = "公共常量控制器")
-@ApiJSYController
+// @ApiJSYController
 @Slf4j
 @RestController
 @RequestMapping("/const")

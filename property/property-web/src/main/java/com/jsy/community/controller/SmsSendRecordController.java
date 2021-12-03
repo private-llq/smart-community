@@ -31,7 +31,7 @@ import java.util.List;
 @Api(tags = "短信发送记录")
 @RestController
 @RequestMapping("/sms/send")
-@ApiJSYController
+// @ApiJSYController
 public class SmsSendRecordController {
     
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

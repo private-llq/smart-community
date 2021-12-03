@@ -4,12 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.CebBankService;
+import com.jsy.community.api.CebBankTestService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.cebbank.*;
 import com.jsy.community.untils.cebbank.CebBankContributionUtil;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.cebbank.*;
+import com.jsy.community.vo.cebbank.test.CebCallbackVO;
+import com.jsy.community.vo.cebbank.test.HttpRequestModel;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -33,12 +35,12 @@ import java.util.HashMap;
  * @Version: 1.0
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/cebBankTest")
 @Slf4j
 public class CebBankTestController {
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
-    private CebBankService cebBankService;
+    private CebBankTestService cebBankService;
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;

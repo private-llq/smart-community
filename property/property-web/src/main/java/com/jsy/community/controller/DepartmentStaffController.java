@@ -39,7 +39,7 @@ import java.util.Map;
  */
 @Api(tags = "社区通讯录(员工控制器)")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/staff")
 public class DepartmentStaffController {
 	

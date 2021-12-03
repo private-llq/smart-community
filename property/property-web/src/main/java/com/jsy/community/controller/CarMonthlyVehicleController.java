@@ -32,7 +32,7 @@ import java.util.Objects;
 @Api(tags = "包月车辆")
 @RestController
 @RequestMapping("CarMonthlyVehicle")
-@ApiJSYController
+// @ApiJSYController
 public class CarMonthlyVehicleController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)

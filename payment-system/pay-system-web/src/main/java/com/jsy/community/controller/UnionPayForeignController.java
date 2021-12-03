@@ -28,7 +28,7 @@ import java.time.Period;
 @Slf4j
 @RestController
 @RequestMapping("/unionPay/api")
-@ApiJSYController
+// @ApiJSYController
 public class UnionPayForeignController {
 
     @DubboReference(version = Const.version, group = Const.group_payment, check = false, timeout = 1200000)

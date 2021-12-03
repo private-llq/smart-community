@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.jsy.community.api.*;
 import com.jsy.community.config.ProprietorTopicNameEntity;
 import com.jsy.community.constant.BusinessEnum;
@@ -54,6 +55,7 @@ import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -291,7 +293,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         // 调用基础用户模块获取实名信息
         RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(loginVo.getUserInfo().getId());
         UserInfoVo userInfoVo = new UserInfoVo();
-        userInfoVo.setIsBindMobile(loginVo.getUserInfo().getIsBindPhone() ? 1 : 0);
+        userInfoVo.setIsBindMobile(loginVo.getUserInfo().getPhone() != null ? 1 : 0);
         if (thirdBindStatus != null) {
             userInfoVo.setIsBindWechat(thirdBindStatus.getWeChatBind() ? 1 : 0);
             userInfoVo.setIsBindAlipay(thirdBindStatus.getAliPayBind() ? 1 : 0);
@@ -302,6 +304,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userInfoVo.setUroraTags(getUroraTags(userInfoVo.getUid()));
         userInfoVo.setImId(loginVo.getUserIm().getImId());
         userInfoVo.setImPassword(loginVo.getUserIm().getPassword());
+        userInfoVo.setBirthday(idCardRealInfo.getIdCardBirthday());
         userInfoVo.setNickname(loginVo.getUserInfo().getNickName());
         userInfoVo.setAvatarUrl(loginVo.getUserInfo().getAvatarThumbnail());
         userInfoVo.setSex(loginVo.getUserInfo().getSex());
@@ -313,7 +316,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
         UserAuthVo userAuthVo = new UserAuthVo();
         userAuthVo.setToken(loginVo.getToken().getToken());
-        userAuthVo.setExpiredTime(LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime(), 0, ZoneOffset.ofHours(8)));
+        LocalDateTime localDateTime = LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime()/1000, 0, ZoneOffset.ofHours(8));
+        userAuthVo.setExpiredTime(localDateTime);
         userAuthVo.setUserInfo(userInfoVo);
         return userAuthVo;
     }
@@ -568,21 +572,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @date: 2021/11/23 10:55
      **/
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @LcnTransaction
     public UserAuthVo registerV3(RegisterQO qo) {
         //调用基础用户模块注册
         LoginVo loginVo = baseAuthRpcService.eHomeUserPhoneRegister(qo.getAccount(), qo.getPassword(), qo.getCode());
         String uid = loginVo.getUserInfo().getAccount();
         String imId = loginVo.getUserIm().getImId();
         //创建极光推送tags(t_user_urora_tags表)
-        UserUroraTagsEntity userUroraTagsEntity = new UserUroraTagsEntity();
+       /* UserUroraTagsEntity userUroraTagsEntity = new UserUroraTagsEntity();
         userUroraTagsEntity.setUid(uid);
         userUroraTagsEntity.setCommunityTags("all"); //给所有用户加一个通用tag，用于全体消息推送
         boolean uroraTagsResult = userUroraTagsService.createUroraTags(userUroraTagsEntity);
         if (!uroraTagsResult) {
             log.error("用户极光推送tags设置失败，用户创建失败，相关账户：" + qo.getAccount());
             throw new ProprietorException(JSYError.INTERNAL);
-        }
+        }*/
 
         //推送房屋消息
         List<HouseInfoEntity> houseInfoEntities = houseInfoService.selectList(qo.getAccount());
@@ -617,20 +621,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userHouseService.updateMobile(houseIds, uid);
         }
 
-        //创建金钱账户(t_user_account表)
-        boolean userAccountResult = userAccountService.createUserAccount(uid);
-        if (!userAccountResult) {
-            log.error("用户账户创建失败，用户创建失败，相关账户：" + qo.getAccount());
-            throw new ProprietorException(JSYError.INTERNAL);
-        }
-
         UserInfoVo userInfoVo = new UserInfoVo();
         userInfoVo.setUid(uid);
         userInfoVo.setIsBindMobile(1);
 
         UserAuthVo userAuthVo = new UserAuthVo();
         userAuthVo.setToken(loginVo.getToken().getToken());
-        userAuthVo.setExpiredTime(LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime(), 0, ZoneOffset.ofHours(8)));
+        userAuthVo.setExpiredTime(LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime()/1000, 0, ZoneOffset.ofHours(8)));
         userAuthVo.setUserInfo(userInfoVo);
         return userAuthVo;
     }

@@ -23,7 +23,7 @@ import javax.annotation.Resource;
 @Api(tags = "支付宝支付配置")
 @RestController
 @RequestMapping("/ali/config")
-@ApiJSYController
+// @ApiJSYController
 public class AliConfigController {
     
     @Resource

@@ -28,7 +28,7 @@ import java.util.List;
 @Api(tags = "APP内容控制器")
 @Slf4j
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class AppContentController {
 	
 	@Autowired

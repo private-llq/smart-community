@@ -1,5 +1,4 @@
 package com.jsy.community.utils;
-
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
@@ -7,10 +6,8 @@ import com.jsy.community.vo.ControlVO;
 import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.sys.SysInfoVo;
-import com.zhsj.basecommon.constant.BaseConstant;
-import com.zhsj.baseweb.interfaces.IPermitRpcService;
+import com.zhsj.baseweb.support.ContextHolder;
 import com.zhsj.baseweb.support.LoginUser;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -19,7 +16,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
@@ -44,17 +40,6 @@ public class UserUtils {
 	private static StringRedisTemplate stringRedisTemplate;
 
 	private static RedisTemplate redisTemplate;
-	
-	@DubboReference(version = BaseConstant.Rpc.VERSION, group = BaseConstant.Rpc.Group.GROUP_BASE_USER, check = false)
-	private IPermitRpcService permitRpcService;
-	
-	private static UserUtils userUtils;
-	
-	@PostConstruct
-	public void init() {
-		userUtils = this;
-		userUtils.permitRpcService= this.permitRpcService;
-	}
 
 	@Autowired
 	public void setStringRedisTemplate(StringRedisTemplate stringRedisTemplate) {
@@ -137,9 +122,16 @@ public class UserUtils {
 	 * @Date: 2020/12/3
 	**/
 	public static UserInfoVo getUserInfo() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (UserInfoVo)request.getAttribute(USER_INFO);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+		LoginUser loginUser = ContextHolder.getContext().getLoginUser();
+		UserInfoVo userInfoVo = new UserInfoVo();
+
+		userInfoVo.setMobile(loginUser.getPhone());
+		userInfoVo.setUid(loginUser.getAccount());
+		userInfoVo.setImId(loginUser.getImId());
+		userInfoVo.setNickname(loginUser.getNickName());
+		return userInfoVo;
 	}
 
 
@@ -164,24 +156,10 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/3
 	**/
-	/*public static String getUserId() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (String) request.getAttribute(USER_KEY);
-	}*/
-	
 	public static String getUserId() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		LoginUser loginUser = userUtils.permitRpcService.getLoginUser((String) request.getAttribute(USER_TOKEN));
-		return loginUser.getAccount();
-	}
-	
-	public static Long getAdminId() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		LoginUser loginUser = userUtils.permitRpcService.getLoginUser((String) request.getAttribute(USER_TOKEN));
-		return loginUser.getId();
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+		return ContextHolder.getContext().getLoginUser().getAccount();
 	}
 	
 	/**

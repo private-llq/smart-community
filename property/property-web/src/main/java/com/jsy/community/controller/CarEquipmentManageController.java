@@ -27,7 +27,7 @@ import java.util.Map;
 @Api("车禁模块-设备管理")
 @RestController
 @RequestMapping("/carEquipmentManage")
-@ApiJSYController
+// @ApiJSYController
 public class CarEquipmentManageController {
 
     @DubboReference(version = Const.version,group = Const.group_property,check = false)

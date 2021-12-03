@@ -35,7 +35,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @Slf4j
 @RequestMapping("alipay")
 public class AliAppPayController {

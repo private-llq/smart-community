@@ -43,5 +43,7 @@
 			#{id}
 		</foreach>
     </update>
-
+	<select id="selectMembers" resultType="com.jsy.community.vo.HouseMembersQO">
+        select DISTINCT uid,name,mobile from t_house_member where relation=6 and householder_id=#{uid}
+    </select>
 </mapper>

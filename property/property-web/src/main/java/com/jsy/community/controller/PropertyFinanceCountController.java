@@ -27,7 +27,7 @@ import java.time.LocalDate;
 @Api(tags = "财务板块 - 统计")
 @RestController
 @RequestMapping("/finance/count")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyFinanceCountController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)

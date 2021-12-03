@@ -42,7 +42,7 @@ import java.util.Objects;
  * @create: 2021-01-21 17:05
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @Slf4j
 public class WeChatH5PayController {
     @DubboReference(version = Const.version, group = Const.group, check = false)

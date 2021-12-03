@@ -58,7 +58,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Api(tags = "业主信息控制器")
 @RestController
 @RequestMapping("/proprietor")
-@ApiJSYController
+// @ApiJSYController
 @Slf4j
 public class ProprietorController {
 

@@ -24,7 +24,7 @@ import java.util.Map;
 @Api(tags = "社区集市")
 @RestController
 @RequestMapping("/market")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyMarketController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyMarketService marketService;

@@ -25,7 +25,7 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("role")
-@ApiJSYController
+// @ApiJSYController
 public class SysRoleController {
 	
 	@Resource

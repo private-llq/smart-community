@@ -1,5 +1,8 @@
 package com.jsy.community.vo.cebbank;
 
+import com.jsy.community.vo.cebbank.test.CebBillQueryResultDataModelVO;
+import com.jsy.community.vo.cebbank.test.CebCreatePaymentBillParamsModelVO;
+import com.jsy.community.vo.cebbank.test.CebPaymentBillFieldsInfoModelListVO;
 import lombok.Data;
 
 import java.io.Serializable;

@@ -27,7 +27,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/app")
-@ApiJSYController
+// @ApiJSYController
 public class AppController {
 	
 	@Resource

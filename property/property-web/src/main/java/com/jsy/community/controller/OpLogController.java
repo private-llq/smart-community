@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "操作日志控制器")
 @RestController
 @RequestMapping("/op/log")
-@ApiJSYController
+// @ApiJSYController
 public class OpLogController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)

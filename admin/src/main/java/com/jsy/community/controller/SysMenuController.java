@@ -22,7 +22,7 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("menu")
-@ApiJSYController
+// @ApiJSYController
 public class SysMenuController {
 	
 	@Resource

@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "收款管理操作日志控制器")
 @RestController
 @RequestMapping("/finance/log")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyFinanceLogController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)

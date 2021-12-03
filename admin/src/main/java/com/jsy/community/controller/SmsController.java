@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @ConditionalOnProperty( value = "jsy.enable-dev-sms", havingValue = "true")
 @RequestMapping("/sms")
-@ApiJSYController
+// @ApiJSYController
 public class SmsController {
 
     private static final String HOST = "http://smsbanling.market.alicloudapi.com";

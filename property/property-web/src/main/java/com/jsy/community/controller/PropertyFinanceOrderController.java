@@ -57,7 +57,7 @@ import java.util.*;
 @Api(tags = "物业房间账单")
 @RestController
 @RequestMapping("/financeOrder")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyFinanceOrderController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyFinanceOrderService propertyFinanceOrderService;

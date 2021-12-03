@@ -15,7 +15,7 @@ import java.util.List;
 @Api(tags = "社区集市")
 @RestController
 @RequestMapping("/marketCategory")
-@ApiJSYController
+// @ApiJSYController
 public class MarketCategoryController {
     @Resource
     private IMarketCategoryService categoryService;

@@ -29,7 +29,7 @@ import java.util.Map;
 @Api(tags = "物业租户查询")
 @RestController
 @RequestMapping("/tenement")
-@ApiJSYController
+// @ApiJSYController
 public class TenementController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ITenementService tenementService;

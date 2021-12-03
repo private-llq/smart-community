@@ -31,7 +31,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/payCompany")
-@ApiJSYController
+// @ApiJSYController
 public class PayCompanyController {
 	
 	@Resource

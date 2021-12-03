@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class SysLoginController {
 	@Resource
 	private ISysUserService sysUserService;

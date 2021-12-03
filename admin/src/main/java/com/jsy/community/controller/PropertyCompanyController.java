@@ -24,7 +24,7 @@ import javax.annotation.Resource;
 @Api(tags = "物业公司控制器")
 @Slf4j
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class PropertyCompanyController {
 	
 	@Resource

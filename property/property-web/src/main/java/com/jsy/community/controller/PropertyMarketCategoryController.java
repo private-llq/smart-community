@@ -16,7 +16,7 @@ import java.util.List;
 @Api(tags = "社区集市")
 @RestController
 @RequestMapping("/marketCategory")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyMarketCategoryController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyMarketCategoryService categoryService;

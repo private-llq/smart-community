@@ -22,7 +22,7 @@ import java.util.Map;
 @Api(tags = "车禁模块-入场登记")
 @RestController
 @RequestMapping("/carEntrance")
-@ApiJSYController
+// @ApiJSYController
 public class CarEntranceController {
 
     @DubboReference(version = Const.version,group = Const.group_property,check = false)

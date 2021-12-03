@@ -39,7 +39,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Override
 	public void configurePathMatch(PathMatchConfigurer configurer) {
 		configurer
-			.addPathPrefix(prefix, c -> c.isAnnotationPresent(ApiJSYController.class))
+			// .addPathPrefix(prefix, c -> c.isAnnotationPresent(ApiJSYController.class))ApiJSYController
 			.addPathPrefix(prefix2, c -> c.isAnnotationPresent(ApiOutController.class));
 	}
 	

@@ -33,7 +33,7 @@ import java.util.zip.ZipOutputStream;
  */
 @Controller
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 public class DownloadLogController {
 
     //日志的绝对路径 本地

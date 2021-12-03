@@ -23,7 +23,7 @@ import javax.annotation.Resource;
  **/
 @RestController
 @RequestMapping("/activity")
-@ApiJSYController
+// @ApiJSYController
 public class ActivityController {
 
     @Resource
