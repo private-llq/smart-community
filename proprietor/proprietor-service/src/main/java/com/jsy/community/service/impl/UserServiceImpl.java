@@ -304,11 +304,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userInfoVo.setUroraTags(getUroraTags(userInfoVo.getUid()));
         userInfoVo.setImId(loginVo.getUserIm().getImId());
         userInfoVo.setImPassword(loginVo.getUserIm().getPassword());
-        userInfoVo.setBirthday(idCardRealInfo.getIdCardBirthday());
         userInfoVo.setNickname(loginVo.getUserInfo().getNickName());
         userInfoVo.setAvatarUrl(loginVo.getUserInfo().getAvatarThumbnail());
         userInfoVo.setSex(loginVo.getUserInfo().getSex());
         if (idCardRealInfo != null) {
+            userInfoVo.setBirthday(idCardRealInfo.getIdCardBirthday());
             userInfoVo.setRealName(idCardRealInfo.getIdCardName());
             userInfoVo.setIdCard(idCardRealInfo.getIdCardNumber());
         }

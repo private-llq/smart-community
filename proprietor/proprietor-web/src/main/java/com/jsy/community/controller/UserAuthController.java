@@ -269,7 +269,6 @@ public class UserAuthController {
         return CommonResult.ok(map);
     }
 
-    @LoginIgnore
     @ApiOperation("重置密码")
     @PostMapping("/reset/password")
     @Auth
