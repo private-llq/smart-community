@@ -712,6 +712,17 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	 */
 	@Override
 	public List<HouseMembersQO> selectMembers(String userId) {
-		return houseMemberMapper.selectMembers(userId);
+		List<HouseMembersQO> list = houseMemberMapper.selectMembers(userId);
+		if (list.size()==0){
+			list = new LinkedList<>();
+			for (int i = 1; i <= 3; i++) {
+				HouseMembersQO membersQO = new HouseMembersQO();
+				membersQO.setUid("test000"+i);
+				membersQO.setMobile("1502357777"+i);
+				membersQO.setName("测试数据"+i);
+				list.add(membersQO);
+			}
+		}
+		return list;
 	}
 }
