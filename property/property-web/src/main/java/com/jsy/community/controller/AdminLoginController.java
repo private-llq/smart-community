@@ -2,7 +2,6 @@ package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
@@ -16,6 +15,7 @@ import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.domain.PermitMenu;
@@ -234,7 +234,8 @@ public class AdminLoginController {
 	@Permit("community:property:sys:enter")
 	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
 		Long communityId = jsonObject.getLong("communityId");
-		Long adminId = UserUtils.getAdminId();
+		UserInfoVo userInfo = UserUtils.getUserInfo();
+		Long adminId = userInfo.getId();
 		List communityIds = UserUtils.getAdminCommunityIdList();
 		UserUtils.validateCommunityId(communityId);
 		//用户资料

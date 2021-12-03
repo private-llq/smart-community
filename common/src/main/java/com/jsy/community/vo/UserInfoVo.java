@@ -17,6 +17,9 @@ import java.util.List;
 @Data
 @ApiModel("业主个人信息")
 public class UserInfoVo implements Serializable {
+	// 主键id
+	private Long id;
+	
 	@ApiModelProperty("ID")
 	private Long thirdPlatformId;
 

@@ -14,7 +14,6 @@ import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.rpc.IBaseSmsRpcService;
-import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
@@ -76,7 +75,6 @@ public class UserAuthController {
             @ApiImplicitParam(name = "type", value = UserAuthEntity.CODE_TYPE_NOTE, required = true,
                     allowableValues = "1,2,3,4,5", paramType = "query")
     })
-    @LoginIgnore
     public CommonResult<Boolean> sendCode(@RequestParam String account, @RequestParam Integer type) {
         if (RegexUtils.isMobile(account)) {
             baseSmsRpcService.sendVerificationCode(account);
