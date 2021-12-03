@@ -2,27 +2,29 @@ package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.UserAuthEntity;
-import com.jsy.community.entity.sys.SysMenuEntity;
-import com.jsy.community.entity.sys.SysUserAuthEntity;
-import com.jsy.community.entity.sys.SysUserEntity;
-import com.jsy.community.entity.sys.SysUserRoleEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.admin.AdminLoginQO;
 import com.jsy.community.service.*;
-import com.jsy.community.utils.RSAUtil;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.sys.SysInfoVo;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.PermitMenu;
+import com.zhsj.base.api.domain.PermitRole;
+import com.zhsj.base.api.rpc.IBaseAuthRpcService;
+import com.zhsj.base.api.rpc.IBaseMenuRpcService;
+import com.zhsj.base.api.rpc.IBaseRoleRpcService;
+import com.zhsj.base.api.vo.LoginVo;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.crypto.hash.Sha256Hash;
-import org.springframework.beans.BeanUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +33,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,13 @@ public class SysLoginController {
 	private ICaptchaService captchaService;
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseAuthRpcService baseAuthRpcService;
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseMenuRpcService baseMenuRpcService;
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseRoleRpcService baseRoleRpcService;
 	
 //	/**
 //	 * 验证码
@@ -113,6 +121,7 @@ public class SysLoginController {
 	/**
 	 * 发送手机验证码
 	 */
+	@LoginIgnore
 	@ApiOperation("发送手机验证码")
 	@GetMapping("/send/code")
 	@ApiImplicitParams({
@@ -139,66 +148,44 @@ public class SysLoginController {
 	 * @Author: DKS
 	 * @Date: 2021/10/12
 	 **/
+	@LoginIgnore
 	@PostMapping("/sys/login")
 	public CommonResult<?> login(@RequestBody AdminLoginQO form) {
-		//图形验证码
-//		boolean captcha = adminCaptchaService.validate(form.getUsername(), form.getCaptcha());
-//		if (!captcha) {
-//			return CommonResult.error("验证码无效");
-//		}
 		ValidatorUtils.validateEntity(form);
 		if (StrUtil.isEmpty(form.getCode()) && StrUtil.isEmpty(form.getPassword())) {
 			throw new AdminException("验证码和密码不能同时为空");
 		}
+		LoginVo loginVo;
 		// 判断是不是验证码登陆,如果是,判断验证码正不正确
 		if(!StringUtils.isEmpty(form.getCode())){
 			checkVerifyCode(form.getAccount(),form.getCode());
+			loginVo = baseAuthRpcService.propertyLogin(form.getAccount(), form.getCode(), "PHONE_CODE");
+		} else {
+			loginVo = baseAuthRpcService.propertyLogin(form.getAccount(), form.getPassword(), "PHONE_PWD");
 		}
 		log.info(form.getAccount() + "开始登录");
-		//查询用户账号密码
-		SysUserAuthEntity user;
-		user = sysUserService.queryLoginUserByMobile(form.getAccount());
+		// 获取用户菜单
+		List<PermitMenu> userMenu = baseMenuRpcService.all(Long.valueOf(loginVo.getUserInfo().getAccount()), "ultimate_admin");
 		
-		//账号不存在、密码错误
-		if (user == null) {
-			log.error(form.getAccount() + "登录失败，原因：账号不存在");
-			return CommonResult.error("账号或密码不正确");
-		}
-		// 如果是密码登录,判断密码正不正确
-		if (StringUtils.isEmpty(form.getCode())) {
-			if(!user.getPassword().equals(new Sha256Hash(RSAUtil.privateDecrypt(form.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), user.getSalt()).toHex())){
-				log.error(form.getAccount() + "登录失败，原因：密码不正确");
-				return CommonResult.error("账号或密码不正确");
-			}
-		}
-		//用户资料
-		SysUserEntity userData = sysUserService.queryUserByMobile(form.getAccount(), null);
-		
-		// 查询用户角色
-		SysUserRoleEntity sysUserRoleEntity = sysConfigService.queryRoleIdByUid(String.valueOf(userData.getId()));
-		
-		//用户菜单
-		List<SysMenuEntity> userMenu = new ArrayList<>();
 		//返回VO
 		SysInfoVo sysInfoVo = new SysInfoVo();
 		
-		if (sysUserRoleEntity != null) {
-			sysInfoVo.setRoleId(sysUserRoleEntity.getRoleId());
-			userData.setRoleId(sysUserRoleEntity.getRoleId());
-			userMenu = sysConfigService.queryMenuByUid(sysUserRoleEntity.getRoleId());
+		// 获取用户角色
+		List<PermitRole> userRoles = baseRoleRpcService.listAllRolePermission(Long.valueOf(loginVo.getUserInfo().getAccount()), "ultimate_admin");
+		if (userRoles != null && userRoles.size() > 0) {
+			sysInfoVo.setRoleId(userRoles.get(0).getId());
 		}
+		
 		//设置菜单
-		userData.setMenuList(userMenu);
+		if (userMenu != null && userMenu.size() > 0) {
+			sysInfoVo.setMenuList(userMenu);
+		}
 		
 		//清空该账号已之前的token(踢下线)
 		String oldToken = redisTemplate.opsForValue().get("Sys:LoginAccount:" + form.getAccount());
 		redisTemplate.delete("Sys:Login:" + oldToken);
-		//创建token，保存redis
-		String token = sysUserTokenService.createToken(userData);
-		userData.setToken(token);
-		
-		//返回VO属性封装
-		BeanUtils.copyProperties(userData,sysInfoVo);
+		//获取token
+		sysInfoVo.setToken(loginVo.getToken().getToken());
 		sysInfoVo.setUid(null);
 		sysInfoVo.setStatus(null);
 		return CommonResult.ok(sysInfoVo);
@@ -228,6 +215,7 @@ public class SysLoginController {
 	 * @Author: chq459799974
 	 * @Date: 2021/4/16
 	 **/
+	@LoginIgnore
 	@ApiOperation(value = "敏感操作短信验证", notes = "忘记密码等")
 	@GetMapping("/check/code")
 	public CommonResult<Map<String,Object>> checkCode(@RequestParam String account, @RequestParam String code) {
@@ -243,7 +231,7 @@ public class SysLoginController {
 	 * 退出
 	 */
 	@PostMapping("/sys/logout")
-	@Login
+	@Permit("community:admin:sys:logout")
 	public CommonResult<Boolean> logout() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		String token = request.getHeader("token");

@@ -7,16 +7,23 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.UserAuthEntity;
-import com.jsy.community.entity.admin.*;
+import com.jsy.community.entity.admin.AdminCommunityEntity;
+import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.admin.AdminLoginQO;
 import com.jsy.community.util.MyCaptchaUtil;
-import com.jsy.community.utils.RSAUtil;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.PermitMenu;
+import com.zhsj.base.api.domain.PermitRole;
+import com.zhsj.base.api.rpc.IBaseAuthRpcService;
+import com.zhsj.base.api.rpc.IBaseMenuRpcService;
+import com.zhsj.base.api.rpc.IBaseRoleRpcService;
+import com.zhsj.base.api.vo.LoginVo;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.ApiImplicitParam;
@@ -24,9 +31,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -60,8 +65,14 @@ public class AdminLoginController {
 	private ICaptchaService captchaService;
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IPropertyCompanyService iPropertyCompanyService;
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseAuthRpcService baseAuthRpcService;
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseMenuRpcService baseMenuRpcService;
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseRoleRpcService baseRoleRpcService;
 	
-	@Autowired
+	@Resource
 	private MyCaptchaUtil captchaUtil;
 	
 	@Resource
@@ -104,7 +115,6 @@ public class AdminLoginController {
 			allowableValues = "1,2,3,4,5,6", paramType = "query")
 	})
 	@LoginIgnore
-	@Permit("community:property:send:code")
 	public CommonResult<Boolean> sendCode(@RequestParam String account,
 	                                      @RequestParam Integer type) {
 		boolean b;
@@ -126,7 +136,6 @@ public class AdminLoginController {
 	**/
 	@LoginIgnore
 	@PostMapping("/sys/login")
-	@Permit("community:property:sys:login")
 	public CommonResult<?> login(@RequestBody AdminLoginQO form) {
 		//图形验证码
 //		boolean captcha = adminCaptchaService.validate(form.getUsername(), form.getCaptcha());
@@ -137,38 +146,30 @@ public class AdminLoginController {
 		if (StrUtil.isEmpty(form.getCode()) && StrUtil.isEmpty(form.getPassword())) {
 			throw new PropertyException("验证码和密码不能同时为空");
 		}
-		// 判断是不是验证码登陆,如果是,判断验证码正不正确
+		LoginVo loginVo;
+		// 判断是不是验证码登陆,如果是,判断验证码正不正确并获取用户信息
 		if(!StringUtils.isEmpty(form.getCode())){
 			checkVerifyCode(form.getAccount(),form.getCode());
+			loginVo = baseAuthRpcService.propertyLogin(form.getAccount(), form.getCode(), "PHONE_CODE");
+		} else {
+			loginVo = baseAuthRpcService.propertyLogin(form.getAccount(), form.getPassword(), "PHONE_PWD");
 		}
 		log.info(form.getAccount() + "开始登录");
-		//查询用户账号密码
-		AdminUserAuthEntity user;
-		user = adminUserService.queryLoginUserByMobile(form.getAccount());
+		// 获取用户菜单
+		List<PermitMenu> userMenu = baseMenuRpcService.all(Long.valueOf(loginVo.getUserInfo().getAccount()), "property_admin");
 		
-		//账号不存在、密码错误
-		if (user == null) {
-			log.error(form.getAccount() + "登录失败，原因：账号不存在");
-			return CommonResult.error("账号或密码不正确");
-		}
-		// 如果是密码登录,判断密码正不正确
-		if (StringUtils.isEmpty(form.getCode())) {
-			if(!user.getPassword().equals(new Sha256Hash(RSAUtil.privateDecrypt(form.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), user.getSalt()).toHex())){
-				log.error(form.getAccount() + "登录失败，原因：密码不正确");
-				return CommonResult.error("账号或密码不正确");
-			}
-		}
 		//用户资料
-		AdminUserEntity userData = adminUserService.queryUserByMobile(form.getAccount(), null);
-
+//		AdminUserEntity userData = adminUserService.queryUserByMobile(form.getAccount(), null);
+		AdminUserEntity userData = adminUserService.queryByUid(loginVo.getUserInfo().getAccount());
+		
 		// 查询用户角色
-		AdminUserRoleEntity adminUserRoleEntity = adminConfigService.queryRoleIdByUid(userData.getUid());
+//		AdminUserRoleEntity adminUserRoleEntity = adminConfigService.queryRoleIdByUid(userData.getUid());
 
 		//有权限的小区列表
 		List<AdminCommunityEntity> adminCommunityList = adminConfigService.listAdminCommunity(userData.getUid());
 		
 		//用户菜单
-		List<AdminMenuEntity> userMenu = new ArrayList<>();
+//		List<AdminMenuEntity> userMenu = new ArrayList<>();
 		//返回VO
 		AdminInfoVo adminInfoVo = new AdminInfoVo();
 
@@ -176,27 +177,27 @@ public class AdminLoginController {
 		/*if(CollectionUtils.isEmpty(adminCommunityList)){
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"无社区管理权限，请联系管理员添加社区权限");
 		}*/
-		if (adminUserRoleEntity != null) {
-			adminInfoVo.setRoleId(adminUserRoleEntity.getRoleId());
-			userData.setRoleId(adminUserRoleEntity.getRoleId());
-			/*//判断登录类型 (根据拥有权限的小区数量等于1是小区管理员账号 否则是物业公司账号)
-			if(adminCommunityList.size() == 1){
-				//小区管理员账号 直接登入小区菜单
-				userData.setCommunityId(adminCommunityList.get(0).getCommunityId());
-				userMenu = adminConfigService.queryMenuByUid(adminUserRoleEntity.getRoleId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
-				//设置登录类型
-				adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_COMMUNITY);
-			}else{
-				//物业公司账号 进入物业公司管理菜单
-				userMenu = adminConfigService.queryMenuByUid(adminUserRoleEntity.getRoleId(),PropertyConsts.LOGIN_TYPE_PROPERTY);
-				//设置登录类型
-				adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_PROPERTY);
-			}*/
+		// 获取用户角色
+		List<PermitRole> userRoles = baseRoleRpcService.listAllRolePermission(Long.valueOf(loginVo.getUserInfo().getAccount()), "property_admin");
+		adminInfoVo.setRoleId(userRoles.get(0).getId());
+		userData.setRoleId(userRoles.get(0).getId());
+		/*//判断登录类型 (根据拥有权限的小区数量等于1是小区管理员账号 否则是物业公司账号)
+		if(adminCommunityList.size() == 1){
+			//小区管理员账号 直接登入小区菜单
+			userData.setCommunityId(adminCommunityList.get(0).getCommunityId());
+			userMenu = adminConfigService.queryMenuByUid(adminUserRoleEntity.getRoleId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
+			//设置登录类型
+			adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_COMMUNITY);
+		}else{
 			//物业公司账号 进入物业公司管理菜单
 			userMenu = adminConfigService.queryMenuByUid(adminUserRoleEntity.getRoleId(),PropertyConsts.LOGIN_TYPE_PROPERTY);
 			//设置登录类型
 			adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_PROPERTY);
-		}
+		}*/
+		//物业公司账号 进入物业公司管理菜单
+//		userMenu = adminConfigService.queryMenuByUid(adminUserRoleEntity.getRoleId(),PropertyConsts.LOGIN_TYPE_PROPERTY);
+		//设置登录类型
+		adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_PROPERTY);
 		//设置菜单
 		userData.setMenuList(userMenu);
 		
@@ -206,14 +207,14 @@ public class AdminLoginController {
 		//清空该账号已之前的token(踢下线)
 		String oldToken = redisTemplate.opsForValue().get("Admin:LoginAccount:" + form.getAccount());
 		redisTemplate.delete("Admin:Login:" + oldToken);
-		//创建token，保存redis
+		// 获取token
 		List communityIdList = new ArrayList<>();
 		for(AdminCommunityEntity entity : adminCommunityList){
 			communityIdList.add(String.valueOf(entity.getCommunityId()));
 		}
 		userData.setCommunityIdList(communityIdList);
-		String token = adminUserTokenService.createToken(userData);
-		userData.setToken(token);
+//		String token = adminUserTokenService.createToken(userData);
+		userData.setToken(loginVo.getToken().getToken());
 		
 		//返回VO属性封装
 		BeanUtils.copyProperties(userData,adminInfoVo);
@@ -233,12 +234,14 @@ public class AdminLoginController {
 	@Permit("community:property:sys:enter")
 	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
 		Long communityId = jsonObject.getLong("communityId");
+		Long adminId = UserUtils.getAdminId();
 		List communityIds = UserUtils.getAdminCommunityIdList();
 		UserUtils.validateCommunityId(communityId);
 		//用户资料
 		AdminUserEntity user = adminUserService.queryByUid(UserUtils.getUserId());
 		//用户菜单
-		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getAdminRoleId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
+//		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getAdminRoleId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
+		List<PermitMenu> userMenu = baseMenuRpcService.all(adminId, "community_admin");
 		//设置小区级菜单
 		user.setMenuList(userMenu);
 		user.setCompanyId(UserUtils.getAdminCompanyId());
@@ -282,7 +285,6 @@ public class AdminLoginController {
 	@ApiOperation(value = "敏感操作短信验证", notes = "忘记密码等")
 	@GetMapping("/check/code")
 	@LoginIgnore
-	@Permit("community:property:check:code")
 	public CommonResult<Map<String,Object>> checkCode(@RequestParam String account, @RequestParam String code) {
 		checkVerifyCode(account, code);
 		String token = UserUtils.setRedisTokenWithTime("Admin:Auth", account,1, TimeUnit.HOURS);

@@ -58,7 +58,6 @@ public class CarChargeController {
     @LoginIgnore
     @PutMapping("/update")
     @CarOperation(operation = "更新了【停车收费设置模板】")
-    @Permit("community:property:carCharge:update")
     public CommonResult update(@RequestBody CarChargeEntity carChargeEntity){
         carChargeService.UpdateCarCharge(carChargeEntity);
         return CommonResult.ok();
@@ -68,7 +67,6 @@ public class CarChargeController {
     @LoginIgnore
     @DeleteMapping("/del")
     @CarOperation(operation = "删除了【停车收费设置模板】")
-    @Permit("community:property:carCharge:del")
     public CommonResult delete(@RequestParam("uid") String uid){
         carChargeService.DelCarCharge(uid);
         return CommonResult.ok();
@@ -116,7 +114,6 @@ public class CarChargeController {
      */
     @LoginIgnore
     @PostMapping("/orderCharge")
-    @Permit("community:property:carCharge:orderCharge")
     public CommonResult orderCharge(@RequestParam Long adminCommunityId,@RequestParam String carNumber){
         orderChargeDto orderCharge =carChargeService.orderCharge(adminCommunityId,carNumber);
 

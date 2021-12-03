@@ -16,7 +16,6 @@ import com.jsy.community.untils.wechat.PublicConfig;
 import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.LoginIgnore;
-import com.zhsj.baseweb.annotation.Permit;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -71,7 +70,6 @@ public class WeChatH5PayController {
     
     @LoginIgnore
     @PostMapping("/wxH5Pay")
-    @Permit("community:payment:wxH5Pay")
     public CommonResult<Map<String, Object>> wxH5Pay(@RequestBody AliOrderContentQO qo) throws Exception {
         System.out.println(qo);
         //返回前端参数
@@ -137,7 +135,6 @@ public class WeChatH5PayController {
      **/
     @LoginIgnore
     @RequestMapping(value = "/callback/H5/{companyId}", method = {RequestMethod.POST,RequestMethod.GET})
-    @Permit("community:payment:callback:H5")
     public void callback(HttpServletRequest request, HttpServletResponse response,@PathVariable("companyId") String companyId) throws Exception {
         log.info("\n\n\n\n回调成功\n\n\n\n");
         System.out.println(companyId);
@@ -196,7 +193,6 @@ public class WeChatH5PayController {
 
     @LoginIgnore
     @GetMapping("ip")
-    @Permit("community:payment:ip")
     public String getClientIpAddress(HttpServletRequest request) {
         String clientIp = request.getHeader("x-forwarded-for");
         if(clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {

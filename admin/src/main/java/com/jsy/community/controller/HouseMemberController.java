@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.HouseMemberEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseMemberQO;
@@ -10,6 +9,7 @@ import com.jsy.community.service.IHouseMemberService;
 import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -55,9 +55,9 @@ public class HouseMemberController {
 	 * @Author: DKS
 	 * @Date: 2021/10/22
 	**/
-	@Login
 	@ApiOperation("【住户】条件查询")
 	@PostMapping("query")
+	@Permit("community:admin:house:member:query")
 	public CommonResult<PageInfo<HouseMemberEntity>> queryHouseMember(@RequestBody BaseQO<HouseMemberQO> baseQO){
 		return CommonResult.ok(houseMemberService.queryHouseMember(baseQO));
 	}
@@ -69,9 +69,9 @@ public class HouseMemberController {
 	 *@Return: com.jsy.community.vo.CommonResult
 	 *@Date: 2021/10/22 16:38
 	 **/
-	@Login
 	@ApiOperation("导出住户信息")
 	@PostMapping("/downloadHouseMemberList")
+	@Permit("community:admin:house:member:downloadHouseMemberList")
 	public ResponseEntity<byte[]> downloadOrderList(@RequestBody HouseMemberQO houseMemberQO) {
 		List<HouseMemberEntity> houseMemberEntities = houseMemberService.queryExportHouseMemberExcel(houseMemberQO);
 		//设置excel 响应头信息

@@ -182,7 +182,6 @@ public class PropertyRelationController {
     @LoginIgnore
     @ApiOperation("查询推送消息类容")
     @GetMapping("/getByPushInfo")
-    @Permit("community:property:members:getByPushInfo")
     public CommonResult getByPushInfo(@RequestParam Long id){
         return CommonResult.ok(houseInfoService.getByPushInfo(id));
     }
@@ -190,7 +189,6 @@ public class PropertyRelationController {
     @LoginIgnore
     @ApiOperation("用户确定入驻房间")
     @PostMapping("/relationSave")
-    @Permit("community:property:members:relationSave")
     public CommonResult relationSave(@RequestBody HouseInfoEntity houseInfoEntity){
         houseInfoService.relationSave(houseInfoEntity);
         return CommonResult.ok();

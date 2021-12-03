@@ -46,7 +46,6 @@ public class CommonController {
 
     @LoginIgnore
     @GetMapping("community2")
-    @Permit("community:proprietor:common:community2")
     public CommonResult test(@RequestParam Long id,@RequestParam Integer queryType){
         Integer page = 0;
         Integer size = 10;
@@ -160,7 +159,6 @@ public class CommonController {
     @LoginIgnore
 	@ApiOperation("查询下级省市区、查询城市等")
     @GetMapping("/region")
-    @Permit("community:proprietor:common:region")
     public CommonResult<?> queryRegion(@RequestParam Integer queryType,Integer regionNumber,String searchStr) {
         String queryMethodName = BusinessEnum.RegionQueryTypeEnum.regionQueryNameMap.get(queryType);
         if(queryMethodName == null){
@@ -203,7 +201,6 @@ public class CommonController {
     //    @IpLimit(prefix = "weatherNow", second = 30, count = 1, desc = "获取首页天气，调用限制用于经纬度接口，经纬度方式做不了缓存，由前端做缓存")
     @ApiOperation("首页天气")
     @GetMapping("weatherNow")
-    @Permit("community:proprietor:common:weatherNow")
     public CommonResult<JSONObject> getWeatherNow(@RequestParam String cityName){
         //真实数据
         JSONObject weather = commonService.getWeather(cityName);
@@ -216,7 +213,6 @@ public class CommonController {
     //    @IpLimit(prefix = "weatherDetails", second = 30, count = 1, desc = "获取天气详情，调用限制用于经纬度接口，经纬度方式做不了缓存，由前端做缓存")
     @ApiOperation("天气详情")
     @GetMapping("weatherDetails")
-    @Permit("community:proprietor:common:weatherDetails")
     public CommonResult<JSONObject> getWeatherNowDetails(@RequestParam String cityName){
         //真实数据
         JSONObject weather = commonService.getWeatherDetails(cityName);

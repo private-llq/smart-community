@@ -78,7 +78,6 @@ public class CarMonthlyVehicleController {
     @LoginIgnore
     @DeleteMapping("DelMonthlyVehicle")
     @CarOperation(operation = "删除了【月租停车】")
-    @Permit("community:property:CarMonthlyVehicle:DelMonthlyVehicle")
     public CommonResult DelMonthlyVehicle(@RequestParam("uid") String uid) {
         vehicleService.DelMonthlyVehicle(uid);
         return CommonResult.ok();
@@ -131,7 +130,6 @@ public class CarMonthlyVehicleController {
      */
     @LoginIgnore
     @PostMapping("uploadTemplate")
-    @Permit("community:property:CarMonthlyVehicle:uploadTemplate")
     public  String uploadTemplate(MultipartFile file){
         String path = MinioUtils.upload(file, "template");
         return path;
@@ -145,7 +143,6 @@ public class CarMonthlyVehicleController {
     @LoginIgnore
     @CarOperation(operation = "下载了【包月车辆导入模板】")
     @PostMapping("dataExportTemplate")
-    @Permit("community:property:CarMonthlyVehicle:dataExportTemplate")
     public String dataExportTemplate(){
         return "http://222.178.212.29:9000/template/d3134ee2d696455881ab6038ea205eab";
     }
@@ -325,7 +322,6 @@ public class CarMonthlyVehicleController {
     @LoginIgnore
     @PostMapping("dataExportTemplate2Position")
     @CarOperation(operation = "下载了【包月车位导入模板】")
-    @Permit("community:property:CarMonthlyVehicle:dataExportTemplate2Position")
     public String dataExportTemplate2Position(){
         return "http://222.178.212.29:9000/template/485336f8ed1d46fea3d26f6475770f5a";
     }

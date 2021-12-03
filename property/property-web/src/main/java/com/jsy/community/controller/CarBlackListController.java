@@ -76,7 +76,6 @@ public class CarBlackListController {
     @LoginIgnore
     @DeleteMapping("delBlackList")
     @CarOperation(operation = "移除了【车辆黑名单】")
-    @Permit("community:property:carBlackList:delBlackList")
     public CommonResult delBlackList(@RequestParam("uid") String uid){
         blackListService.delBlackList(uid);
         return CommonResult.ok();

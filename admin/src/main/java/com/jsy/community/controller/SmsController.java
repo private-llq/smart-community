@@ -6,6 +6,7 @@ import com.jsy.community.qo.sys.SmsQO;
 import com.jsy.community.utils.MyHttpUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpGet;
@@ -47,6 +48,7 @@ public class SmsController {
      * 内部测试、暂无任何拦截及 短信在一定时间内 不能二次发送
      * @param qo    请求参数
      */
+    @LoginIgnore
     @PostMapping("/send")
     public CommonResult<Boolean> send(@RequestBody SmsQO qo){
 

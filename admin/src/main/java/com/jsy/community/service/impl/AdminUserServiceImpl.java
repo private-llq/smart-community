@@ -9,6 +9,7 @@ import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.admin.AdminUserAuthEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
+import com.jsy.community.entity.admin.AdminUserRoleEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
@@ -20,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +28,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -57,8 +58,8 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Resource
 	private CommunityMapper communityMapper;
 	
-	@Value("${propertyLoginExpireHour}")
-	private long loginExpireHour = 12;
+	@Resource
+	private AdminUserRoleMapper adminUserRoleMapper;
 	
 	/**
 	 * @Description: 操作员条件查询
@@ -146,20 +147,18 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		adminUserEntity.setPassword(new Sha256Hash(RSAUtil.privateDecrypt(adminUserEntity.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), salt).toHex());
 		adminUserEntity.setSalt(salt);
 		adminUserMapper.addOperator(adminUserEntity);
-		// TODO 变为添加角色
-//		AdminUserRoleEntity adminUserRoleEntity = new AdminUserRoleEntity();
-//		adminUserRoleEntity.setUid(uid);
-//		adminUserRoleEntity.setRoleId(adminUserEntity.getRoleId());
-//		adminUserRoleEntity.setCreateTime(LocalDateTime.now());
-//		adminUserRoleMapper.insert(adminUserRoleEntity);
-//		//t_admin_user_menu添加菜单权限
+		// 添加角色
+		AdminUserRoleEntity adminUserRoleEntity = new AdminUserRoleEntity();
+		adminUserRoleEntity.setUid(uid);
+		adminUserRoleEntity.setRoleId(adminUserEntity.getRoleId());
+		adminUserRoleEntity.setCreateTime(LocalDateTime.now());
+		adminUserRoleMapper.insert(adminUserRoleEntity);
+		//t_admin_user_menu添加菜单权限
 //		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
 		//t_admin_user_auth用户登录表插入数据
 		AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
 		BeanUtils.copyProperties(adminUserEntity,adminUserAuthEntity);
 		adminUserAuthMapper.createLoginUser(adminUserAuthEntity);
-//		//发短信通知，并发送初始密码
-//		SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
 		//添加社区权限(添加物业下面所有社区)
 		if(adminUserEntity.getCompanyId() != null){
 			List<String> communityIdList = new ArrayList<>();

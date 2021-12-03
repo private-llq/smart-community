@@ -235,7 +235,6 @@ public class UnionPayController {
     @LoginIgnore
     @PostMapping(value = "/unionPayNotifyUrl")
     @ApiOperation("银联消费支付回调接口")
-    @Permit("community:payment:unionPay:unionPayNotifyUrl")
     public void unionPayNotifyUrl(HttpServletRequest request) {
         // 获取回调参数
         StringBuilder data = new StringBuilder();
@@ -330,7 +329,6 @@ public class UnionPayController {
     @LoginIgnore
     @PostMapping("/credentialNotifyUrl")
     @ApiOperation("凭据异步回调接口")
-    @Permit("community:payment:unionPay:credentialNotifyUrl")
     public void credentialNotifyUrl(HttpServletRequest request) {
         // 获取回调参数
         StringBuilder data = new StringBuilder();

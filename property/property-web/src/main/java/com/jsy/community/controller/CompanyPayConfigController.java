@@ -33,7 +33,6 @@ public class CompanyPayConfigController {
     @LoginIgnore
     @ApiOperation("上传私钥")
     @PostMapping("/key")
-    @Permit("community:property:company:config:key")
     public CommonResult uploadApiclientKey(@RequestParam("file") MultipartFile file) {
         String upload = MinioUtils.upload(file, "apiclient-key");
         return  CommonResult.ok(upload,"上传成功");

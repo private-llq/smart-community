@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
 import com.jsy.community.utils.RegexUtils;
+import com.zhsj.base.api.domain.PermitMenu;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -172,7 +173,7 @@ public class AdminUserEntity extends BaseEntity {
 	 * 用户菜单列表
 	 */
 	@TableField(exist = false)
-	private List<AdminMenuEntity> menuList;
+	private List<PermitMenu> menuList;
 	
 	/**
 	 * 创建者UID (老功能暂时使用，新接口统一用createBy)

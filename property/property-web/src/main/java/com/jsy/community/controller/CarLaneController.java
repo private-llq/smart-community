@@ -47,7 +47,6 @@ public class CarLaneController {
     @LoginIgnore
     @PutMapping("UpdateCarLane")
     @CarOperation(operation = "更新了【车道管理】")
-    @Permit("community:property:carLane:UpdateCarLane")
     public CommonResult UpdateCarLane(@RequestBody CarLaneEntity carLaneEntity) {
         carLaneService.UpdateCarLane(carLaneEntity);
         return CommonResult.ok();
@@ -62,7 +61,6 @@ public class CarLaneController {
     @LoginIgnore
     @DeleteMapping("DelCarLane")
     @CarOperation(operation = "删除了【车道管理】")
-    @Permit("community:property:carLane:DelCarLane")
     public CommonResult DelCarLane(@RequestParam("uid") String uid) {
         carLaneService.DelCarLane(uid);
         return CommonResult.ok();

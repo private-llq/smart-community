@@ -1,0 +1,246 @@
+#配置中心的地址
+server:
+  port: 9003
+  servlet:
+    context-path: /
+spring:
+  application:
+    name: admin
+  profiles:
+    active: dev
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: true
+  thymeleaf:
+    prefix: classpath:/templates/
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    config:
+      #uri: http://127.0.0.1:2020 #zuul要从配置中心拉取文件
+      discovery:
+        enabled: true #开启springcloudconfig服务端的服务发现
+        service-id: base-config-server #config-server服务的名称
+      #你要拉取具体的哪个配置文件
+      name: common,common-service,common-web  #配置文件名字   dev是环境
+      profile: ${spring.profiles.active} #环境  组成完整的文件名：gateway-service-dev.yml
+      label: master #主分支
+
+  redis:
+    port: 6379
+    host: 222.178.212.29
+    password: smart99--
+    database: 0
+    #    sms-databases: 7
+    jedis:
+      pool:
+        min-idle: 10
+        max-idle: 20
+        max-wait: -1ms
+        max-active: 200
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://222.178.212.29:3306/project_dev?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      username: root
+      password: helloworld123
+      initial-size: 10
+      max-active: 100
+      min-idle: 10
+      max-wait: 60000
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        #login-username: admin
+        #login-password: admin
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: false
+        wall:
+          config:
+            multi-statement-allow: true
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.jsy.community.entity
+  global-config:
+    #数据库相关配置
+    db-config:
+      #主键类型  AUTO:"数据库ID自增", INPUT:"用户输入ID", ID_WORKER:"全局唯一ID (数字类型唯一ID)", UUID:"全局唯一ID UUID";
+      id-type: NONE
+      logic-delete-value: id
+      logic-not-delete-value: 0
+    banner: false
+  #原生配置
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    call-setters-on-nulls: true
+    jdbc-type-for-null: 'null'
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+jsy:
+  enable-dev-sms: true
+  shiro:
+    redis: false
+  jwt:
+    # 加密秘钥
+    secret: HL-A61332F5-ABC6-4D39-94C9-680EA8FB19ED
+    # token有效时长，7天，单位秒
+    expire: 604800
+    header: token
+  #行驶证识别相关信息
+  drivinglicense:
+    api: https://api08.aliyun.venuscn.com
+    path: /ocr/vehicle-license
+    method: POST
+    appCode: 9b53bb7f5f5945fcb4c42ecd79f31642
+  redis:
+    annotation:
+      # 当前模块@Cacheable 缓存的数据的超时时间/s
+      cacheTimeout: 1800
+
+loginExpireHour: 12
+
+email:
+  host: smtp.qq.com
+  baseAccount: 459799974@qq.com
+  authPass: nfezhwyeduksbjjh
+  linkExpiretime: 24
+
+alipay:
+  appid: dPHlJ8MTKFM/fTLpyfSzuFWQ8DMH1pOlHzcwcge1NVo=
+  app-private-key: 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
+  sellerId: TCxxMPqEGO2KNNI4zLodzMRhKHgHAnODd63fxygWKDI=
+  sellerEmail: EsHo3RWOoNEgvOdUymo8Li8uy55aQoBVKU+mekm/SZk=
+  sellerPID: TCxxMPqEGO2KNNI4zLodzMRhKHgHAnODd63fxygWKDI=
+  cert-path:
+    app-public-cert: /yMUV9bwkX/qWgXuuo3Tn0BIDZuj5lOfjdp/XztdQ15R+VEYa74K3asVSOsI9WCXDo4MVqWj4RqvYMe3ThdYumnZAyjwI3d1azh6DYX7H88=
+    alipay-public-cert: /yMUV9bwkX/qWgXuuo3Tn0BIDZuj5lOfjdp/XztdQ15qbBLdzQJkM7QsnxbgB2Dc/1mbQsqE49BNhdf6kmsHDnA4BI+fU4byotb6SDlsUZ8=
+    root-cert: /yMUV9bwkX/qWgXuuo3Tn0BIDZuj5lOfjdp/XztdQ17UiK8ZLIVZbCNVejlM24NyTkKoI4y8q+5+FyPuq655yQ==
+
+
+#阿里云
+aliyun:
+  sms:
+    #阿里云短信子账号accessKeyId
+    smsAccessKeyId: 622Q5a5VNsT/d8HgXBx4jQjcjeO4DSZnS2KNlLjLVss=
+    #阿里云短信子账号secret
+    smsSecret: QncgeFbByiIuHgB327wpp7kVrWNvZhS6zTurWIEPYE8=
+  #通用appcode
+  appCode: syPMjrYHXkdwA+2hgBYqsPosEzLrkZ4hgNncsiuGFJdhXEuLWcOV9xgIRp2XMS6S
+  #三方接口url
+  url:
+    #身份证照片识别
+    id-card-ocr: https://dm-51.data.aliyun.com/rest/160601/ocr/ocr_idcard.json
+    #天气相关
+    weather:
+      #天气实况
+      now: http://aliv8.data.moji.com/whapi/json/aliweather/condition
+      #15天天气预报
+      days: http://aliv8.data.moji.com/whapi/json/aliweather/forecast15days
+      #24小时预报
+      hours: http://aliv8.data.moji.com/whapi/json/aliweather/forecast24hours
+      #空气质量
+      air: http://aliv8.data.moji.com/whapi/json/aliweather/aqi
+      #生活指数
+      living: http://aliv8.data.moji.com/whapi/json/aliweather/index
+
+minio:
+  end-point: http://222.178.212.29
+  port: 9000
+  access-key: minio
+  secret-key: minimini
+
+# 光大银行云缴费请求地址
+cebbank:
+  private_key: MIIEpgIBAAKCAQEA5Dgb6BtLIYdFncWiXICX3r4e/wU8qPK0wxrBgBp69V+yvavS6UvBnESvq0tMYVXa36vdxsqyKpqWYG8jaFN7z758w2y3c3nGhtSfzOlUX+b987WJ8P+7/FSWbswkKOXXkwmTxs8E42ZPsPvcUQzYimIE3GM+36qyyoLoIzu1zrh2jhF/1gTrB5D41F8BRIqpoP8EHvdEqryO9sepNluU30HGw3CgBA2ciEI7cT5qsZ7F9IOFMdiwbFSuk/ZlQA9LebgLSOBEacXqX8IcjIuCfSGFmiepfjbwZwsmrtB/7VVp2paw0/wbgrUcuc0BWrPItlEGTafAjqO4qFLXnxmV1wIDAQABAoIBAQDeaghYdnEMJgcksb2AJRrdS7BtnS73AEJGesbmD+iRRkiuLMyJ7PitUQtbBzFTExcSMS8cU+K7PpkbNnTtcZ8SYXS6CDPpaF6gfIuYajV+mWIZp2zd4H3WdqF9LZp3+TfU5tqMQKlk7QrxUyPuIXTPuKNAHcDivjssvdN6svCGmsvTeMhFNBE5Mw94I7IlVwwU+Z4rnkb38hQBwyVHHCY0Q98jVe0E0rPSh9fe/UiswunaQV8f9ZMTBeytB1aGJB9e1/HG0qc5/+5Uyq8+HglbANipzBPhS33QLrrvc5UrSG4sL6412IMTy6scI268qSLTQ8+R2HRJg4Fd+Ldu2LWBAoGBAP2RqnKaJEZRttq999EZc+KXm7fyLzoKhfkkh9mP/1w+bhmOfznm1WKEBJg/NkREmTtFy6SlDPQ8aHy01d5ltzgBroAm4oVqxmEDT84QbDkLOn1AK4CMz0z/P2GrFzSNFzjevb1NKx+rZSBYKPfAc62/SP3PDx1yQ52+85oLKr63AoGBAOZoOiVAMF0Weqo7O7Tp75SGpspCEiRE3xqON+1NEbRfufBOaAvlWOX+MqVCow7ftElF4Fyi/4Yv5xDK5uQ4fBRCNe9nx3vRKAyuVCpLz5tuaiHbUyNNUnJjHsw6fS2HIavtUpKeo0mInRU1Z52CtxGsKCCFTDm0cfQv4gdRQMHhAoGBAIELxgwG6FklMwMF1P4EjxaNg8FMrr5CJsaR0dVmVFZUq2G0RIlqMcSuXUxCN1Ls+nLQ5X/IQ9x0ddSpj4Jcj68gI/eyUmwF2Cn9Lns3nmw1i7G8m6cTgli0OkRxdyDWgS//I98YS88VQiUA2PClb/nHtNT+sLmSsliwmncWIc3nAoGBAJGqSUBtsWXYpVpkMl4xG8dhzabHWKLXa9llGlSLSesoLeyQFVWX/LkDGU/DrkTkBx3f8HWAk11pgYLrVEfqsf840NJ3YPWViOVjfVB0N1+D0dNvzsLdyocIxVrGi4cyDIaednq9kmwV04GqDsTU9BpXJdNRkpxUyUpgz1xi8TbhAoGBAOcaqlRky+WkGXTtDn2LTYeqcXIjVYk0z/Dd419qVmBVzyxJsndIkCKywuUX8kxX59cEdIJHEzN2yLBoWK3iTZ3p/XN+2Oj73AaRMhaR3OcD2NerqYnuWiGfir8u5lN5Ne+DQ3wTZGNawxGvQNbcsMjctkSy6L6voeKAeHOxVf1v
+  public_key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5Dgb6BtLIYdFncWiXICX3r4e/wU8qPK0wxrBgBp69V+yvavS6UvBnESvq0tMYVXa36vdxsqyKpqWYG8jaFN7z758w2y3c3nGhtSfzOlUX+b987WJ8P+7/FSWbswkKOXXkwmTxs8E42ZPsPvcUQzYimIE3GM+36qyyoLoIzu1zrh2jhF/1gTrB5D41F8BRIqpoP8EHvdEqryO9sepNluU30HGw3CgBA2ciEI7cT5qsZ7F9IOFMdiwbFSuk/ZlQA9LebgLSOBEacXqX8IcjIuCfSGFmiepfjbwZwsmrtB/7VVp2paw0/wbgrUcuc0BWrPItlEGTafAjqO4qFLXnxmV1wIDAQAB
+  request_url: https://yaoyaotest.cebbank.com/LifePayment/Test/yaoyaoAppInterface.json
+  site_code: zonghengshiji
+  version: 1.0.0
+  charset: UTF-8
+
+#服务调用
+dubbo:
+  registry:
+    address: spring-cloud://127.0.0.1
+    use-as-metadata-center: false
+  protocol:
+    name: dubbo
+    port: -1
+    threadname: admin
+    dispatcher: message
+    threads: 50
+  application:
+    name: ${spring.application.name}
+#  cloud:
+#    subscribed-services: property-service
+  consumer:
+    retries: 0
+    timeout: 99999
+  provider:
+    retries: 0
+    timeout: 99999
+# 分布式事务配置
+tx-lcn:
+  client:
+    manager-address: 192.168.12.49:8070
+  ribbon:
+    loadbalancer:
+      dtx:
+        enabled: true
+
+---
+spring:
+  profiles: dev
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://192.168.12.49:36366/eureka
+  instance:
+    hostname: ${spring.cloud.client.ip-address}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}
+
+---
+spring:
+  profiles: test
+eureka:
+  client:
+    service-url:
+      defaultZone: http://222.178.212.29:36366/eureka
+  instance:
+    hostname: ${spring.cloud.client.ip-address}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}
+
+---
+spring:
+  profiles: prod
+eureka:
+  client:
+    service-url:
+      defaultZone: ${server.eureka-service-address}
+  instance:
+    hostname: ${spring.cloud.client.ip-address}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}

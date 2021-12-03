@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.ComplainEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
@@ -9,6 +8,7 @@ import com.jsy.community.qo.proprietor.ComplainQO;
 import com.jsy.community.service.IComplainService;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -37,9 +37,9 @@ public class ComplainController {
      * @Author: DKS
      * @Date: 2021/10/27
      **/
-    @Login
     @ApiOperation("意见反馈条件查询")
     @PostMapping("/query")
+    @Permit("community:admin:complain:query")
     public CommonResult<PageInfo<ComplainEntity>> queryComplain(@RequestBody BaseQO<ComplainQO> baseQO){
         return CommonResult.ok(complainService.queryComplain(baseQO));
     }
@@ -51,8 +51,8 @@ public class ComplainController {
      * @Author: DKS
      * @Date: 2021/10/19
      **/
-    @Login
     @GetMapping("/getDetail")
+    @Permit("community:admin:complain:getDetail")
     public CommonResult getDetailComplain(Long id){
         return CommonResult.ok(complainService.getDetailComplain(id));
     }
@@ -64,8 +64,8 @@ public class ComplainController {
      * @Author: DKS
      * @Date: 2021/10/27
      **/
-    @Login
     @DeleteMapping("/delete")
+    @Permit("community:admin:complain:delete")
     public CommonResult deleteComplain(Long id){
         return complainService.deleteComplain(id)? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"删除失败");
     }

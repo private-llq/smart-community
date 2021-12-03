@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Auth;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.entity.sys.SysUserRoleEntity;
@@ -17,10 +16,11 @@ import com.jsy.community.service.ISysUserService;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -48,7 +48,7 @@ import java.util.Map;
 @ApiJSYController
 public class SysUserController {
 	
-	@Autowired
+	@Resource
 	private ISysUserService sysUserService;
 	
 	@Resource
@@ -61,6 +61,7 @@ public class SysUserController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
+	@LoginIgnore
 	@Transactional(rollbackFor = Exception.class)
 	@PostMapping("roles")
 	public CommonResult setUserRoles(@RequestBody SysUserRoleEntity sysUserRoleEntity){
@@ -77,6 +78,7 @@ public class SysUserController {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/30
 	**/
+	@LoginIgnore
 	@PostMapping("invitation")
 	public CommonResult invitation(@RequestBody SysUserEntity sysUserEntity) {
 		ValidatorUtils.validateEntity(sysUserEntity,SysUserEntity.inviteUserValidatedGroup.class);
@@ -91,6 +93,7 @@ public class SysUserController {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/30
 	**/
+	@LoginIgnore
 	@GetMapping("activation")
 	public ModelAndView activation(SysUserEntity sysUserEntity){
 		ModelAndView mv = new ModelAndView();
@@ -113,6 +116,7 @@ public class SysUserController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/1
 	**/
+	@LoginIgnore
 	@PutMapping("disable")
 	public CommonResult disableUser(@RequestParam Long uid){
 		SysUserEntity sysUserEntity = new SysUserEntity();
@@ -126,6 +130,7 @@ public class SysUserController {
 	
 	
 	//邮箱注册后添加用户名
+	@LoginIgnore
 	@PutMapping("username")
 	public CommonResult setUserName(@RequestParam String userName){
 		//TODO TOKEN获取uid
@@ -135,6 +140,7 @@ public class SysUserController {
 	}
 	
 	//添加手机号(短信验证)
+	@LoginIgnore
 	@PutMapping("mobile")
 	public CommonResult changeMobile(){
 		Long uid = 1L;
@@ -148,8 +154,8 @@ public class SysUserController {
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
-	@Login
 	@PostMapping("query")
+	@Permit("community:admin:sys:user:query")
 	public CommonResult queryOperator(@RequestBody BaseQO<SysUserQO> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new SysUserQO());
@@ -164,10 +170,10 @@ public class SysUserController {
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
-	@Login
 	@PostMapping("add")
 	@Transactional(rollbackFor = Exception.class)
 	@businessLog(operation = "新增",content = "新增了【操作员】")
+	@Permit("community:admin:sys:user:add")
 	public CommonResult addOperator(@RequestBody SysUserEntity sysUserEntity){
 		ValidatorUtils.validateEntity(sysUserEntity);
 		sysUserService.addOperator(sysUserEntity);
@@ -181,10 +187,10 @@ public class SysUserController {
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
-	@Login
 	@PutMapping("update")
 	@Transactional(rollbackFor = Exception.class)
 	@businessLog(operation = "编辑",content = "更新了【操作员】")
+	@Permit("community:admin:sys:user:update")
 	public CommonResult updateOperator(@RequestBody SysUserEntity sysUserEntity){
 		sysUserService.updateOperator(sysUserEntity);
 		return CommonResult.ok("操作成功");
@@ -197,10 +203,10 @@ public class SysUserController {
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
-	@Login
 	@DeleteMapping("delete")
 	@Transactional(rollbackFor = Exception.class)
 	@businessLog(operation = "删除",content = "删除了【操作员】")
+	@Permit("community:admin:sys:user:delete")
 	public CommonResult deleteOperator(Long id){
 		sysUserService.deleteOperator(id);
 		return CommonResult.ok("操作成功");
@@ -220,7 +226,7 @@ public class SysUserController {
 	@ApiOperation("修改/忘记密码")
 	@PutMapping("password")
 	@Auth
-	@Login(allowAnonymous = true)
+	@Permit("community:admin:sys:user:password")
 	public CommonResult<Boolean> updatePassword(@RequestAttribute(value = "body") String body) {
 		ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
 		String uid = UserUtils.getUserId();

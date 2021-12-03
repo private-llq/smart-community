@@ -4,13 +4,13 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.qo.PermitQO;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.base.api.constant.RpcConst;
-import com.zhsj.base.api.rpc.IBaseRoleRpcService;
+import com.zhsj.base.api.rpc.IBasePermissionRpcService;
 import com.zhsj.baseweb.annotation.LoginIgnore;
-import lombok.Data;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.Serializable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @Author: Pipi
@@ -24,7 +24,7 @@ import java.io.Serializable;
 public class PermitController {
 
     @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
-    private IBaseRoleRpcService roleRpcService;
+    private IBasePermissionRpcService basePermissionRpcService;
 
     /***
      * @author: Pipi
@@ -40,7 +40,7 @@ public class PermitController {
     @PostMapping("/addPermit")
     @LoginIgnore
     public CommonResult addPermit(@RequestBody PermitQO permitQO) {
-        roleRpcService.createPermission(permitQO.getName(), permitQO.getPermit(), permitQO.getScope(), permitQO.getDescription(), permitQO.getCreateUid());
+        basePermissionRpcService.createPermission(permitQO.getName(), permitQO.getPermit(), permitQO.getScope(), permitQO.getDescription(), permitQO.getCreateUid());
         return CommonResult.ok();
     }
 }

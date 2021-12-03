@@ -133,7 +133,6 @@ public class WechatRefundController {
      */
     @LoginIgnore
     @RequestMapping(value = "/refund/callback/{companyId}", method = {RequestMethod.POST,RequestMethod.GET})
-    @Permit("community:payment:refund:callback")
     public void callback(HttpServletRequest request, HttpServletResponse response, @PathVariable("companyId") Long companyId) throws Exception {
         log.info("退款回调成功");
         log.info(String.valueOf(companyId));

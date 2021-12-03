@@ -27,6 +27,7 @@ public class AdminMenuEntity extends BaseEntity {
 	private String path;//菜单url
 	private Integer sort;//排序
 	private Long pid;//父级id
+	private Integer type;//类型 1.目录 2.菜单 3.按钮
 	@JsonIgnore
 	private Long belongTo;//顶级菜单id
 	@TableField(exist = false)
