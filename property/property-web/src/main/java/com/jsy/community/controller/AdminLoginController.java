@@ -156,11 +156,11 @@ public class AdminLoginController {
 		}
 		log.info(form.getAccount() + "开始登录");
 		// 获取用户菜单
-		List<PermitMenu> userMenu = baseMenuRpcService.all(Long.valueOf(loginVo.getUserInfo().getAccount()), "property_admin");
+		List<PermitMenu> userMenu = baseMenuRpcService.all(loginVo.getUserInfo().getId(), "property_admin");
 		
 		//用户资料
 //		AdminUserEntity userData = adminUserService.queryUserByMobile(form.getAccount(), null);
-		AdminUserEntity userData = adminUserService.queryByUid(loginVo.getUserInfo().getAccount());
+		AdminUserEntity userData = adminUserService.queryByUid(String.valueOf(loginVo.getUserInfo().getId()));
 		
 		// 查询用户角色
 //		AdminUserRoleEntity adminUserRoleEntity = adminConfigService.queryRoleIdByUid(userData.getUid());
@@ -178,7 +178,7 @@ public class AdminLoginController {
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"无社区管理权限，请联系管理员添加社区权限");
 		}*/
 		// 获取用户角色
-		List<PermitRole> userRoles = baseRoleRpcService.listAllRolePermission(Long.valueOf(loginVo.getUserInfo().getAccount()), "property_admin");
+		List<PermitRole> userRoles = baseRoleRpcService.listAllRolePermission(loginVo.getUserInfo().getId(), "property_admin");
 		adminInfoVo.setRoleId(userRoles.get(0).getId());
 		userData.setRoleId(userRoles.get(0).getId());
 		/*//判断登录类型 (根据拥有权限的小区数量等于1是小区管理员账号 否则是物业公司账号)
@@ -205,8 +205,8 @@ public class AdminLoginController {
 		adminInfoVo.setCompanyName(iPropertyCompanyService.getCompanyNameByCompanyId(userData.getCompanyId()));
 		
 		//清空该账号已之前的token(踢下线)
-		String oldToken = redisTemplate.opsForValue().get("Admin:LoginAccount:" + form.getAccount());
-		redisTemplate.delete("Admin:Login:" + oldToken);
+//		String oldToken = redisTemplate.opsForValue().get("Admin:LoginAccount:" + form.getAccount());
+//		redisTemplate.delete("Admin:Login:" + oldToken);
 		// 获取token
 		List communityIdList = new ArrayList<>();
 		for(AdminCommunityEntity entity : adminCommunityList){

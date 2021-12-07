@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.ISmsPurchaseRecordService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.SmsPurchaseRecordEntity;
@@ -22,7 +21,7 @@ import java.util.List;
  * @author: DKS
  * @create: 2021-09-14 15:01
  **/
-@Api(tags = "短信发送记录")
+@Api(tags = "短信购买记录")
 @RestController
 @RequestMapping("/sms/purchase")
 // @ApiJSYController
@@ -38,7 +37,7 @@ public class SmsPurchaseRecordController {
      * @Author: DKS
      * @Date: 2021/09/14
      **/
-    @ApiOperation("查询短信发送记录")
+    @ApiOperation("查询短信购买记录")
     @PostMapping("/query")
     @Permit("community:property:sms:purchase:query")
     public CommonResult<List<SmsPurchaseRecordEntity>> queryPropertyDeposit() {

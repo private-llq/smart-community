@@ -1,13 +1,18 @@
 package com.jsy.community.service.impl;
 
-import com.jsy.community.api.*;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jsy.community.api.IAdminUserService;
+import com.jsy.community.api.ICaptchaService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.ConstClasses;
+import com.jsy.community.entity.SmsEntity;
 import com.jsy.community.entity.UserAuthEntity;
+import com.jsy.community.mapper.SmsMapper;
 import com.jsy.community.utils.SmsUtil;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -27,6 +32,9 @@ public class CaptchaServiceImpl implements ICaptchaService {
 	
 	@Value(value = "${jsy.mobileCodeExpiredTime}")
 	private Integer mobileExpiredTime;
+	
+	@Resource
+	private SmsMapper smsMapper;
 	
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
@@ -52,7 +60,9 @@ public class CaptchaServiceImpl implements ICaptchaService {
 		}
 		
 		//发短信
-		String code = SmsUtil.sendVcode(mobile, BusinessConst.SMS_VCODE_LENGTH_DEFAULT);
+		SmsEntity smsEntity = smsMapper.selectOne(new QueryWrapper<SmsEntity>().eq("deleted", 0));
+		ConstClasses.AliYunDataEntity.setConfig(smsEntity);
+		String code = SmsUtil.sendVcode(mobile, BusinessConst.SMS_VCODE_LENGTH_DEFAULT, smsEntity.getSmsSign());
 		//5分钟有效期
 		redisTemplate.opsForValue().set("vCodeAdmin:" + mobile, code, mobileExpiredTime, TimeUnit.MINUTES);
 		

@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.qo.BaseQO;
@@ -44,9 +43,9 @@ public class AdminUserController {
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new AdminUserQO());
 		}
-		baseQO.getQuery().setCommunityIdList(UserUtils.getAdminCommunityIdList());
-		baseQO.getQuery().setCompanyId(UserUtils.getAdminCompanyId());
-		baseQO.getQuery().setUid(UserUtils.getUserId());
+//		baseQO.getQuery().setCommunityIdList(UserUtils.getAdminCommunityIdList());
+//		baseQO.getQuery().setCompanyId(UserUtils.getAdminCompanyId());
+//		baseQO.getQuery().setUid(UserUtils.getUserId());
 		return CommonResult.ok(adminUserService.queryOperator(baseQO));
 	}
 	
