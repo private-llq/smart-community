@@ -57,7 +57,7 @@ public class UserLivingExpensesOrderEntity extends BaseEntity {
     /**
      * 账单状态;0:订单创建成;1:支付成功;2:支付失败;3:销账成功;4:销账失败;5:未知状态;8:实时退款
      */
-    private Integer orderStaus;
+    private Integer orderStatus;
     /**
      * 支付方式:1:银联支付;2:微信支付;3:支付宝支付;4:中金支付
      */

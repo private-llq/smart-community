@@ -6,6 +6,8 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.cebbank.*;
+import com.jsy.community.qo.unionpay.HttpResponseModel;
+import com.jsy.community.untils.cebbank.CebBankContributionUtil;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.LoginIgnore;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.concurrent.*;
 
 /**
  * @Author: Pipi

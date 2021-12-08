@@ -1,10 +1,12 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 /**
  * @Author: Pipi
@@ -25,4 +27,10 @@ public class UserLivingExpensesGroupEntity extends BaseEntity {
     @NotBlank(message = "分组名称不能为空")
     @Length(min = 2, max = 16, message = "分组名称长度为2到16个字符")
     private String groupName;
+
+    /**
+     * 户号列表
+     */
+    @TableField(exist = false)
+    private List<UserLivingExpensesAccountEntity> accountEntityList;
 }

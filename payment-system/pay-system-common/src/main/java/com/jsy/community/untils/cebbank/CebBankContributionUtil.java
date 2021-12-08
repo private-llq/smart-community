@@ -89,7 +89,7 @@ public class CebBankContributionUtil {
     public static HttpResponseModel queryBillInfo(CebQueryBillInfoQO billInfoQO) {
         String deviceType = billInfoQO.getDeviceType();
         billInfoQO.setCanal(CebBankEntity.siteCode);
-        billInfoQO.setDeviceType(null);
+        // billInfoQO.setDeviceType(null);
         return sendRequest(billInfoQO, deviceType, CebBankConst.QUERY_BILL_INFO);
     }
 
