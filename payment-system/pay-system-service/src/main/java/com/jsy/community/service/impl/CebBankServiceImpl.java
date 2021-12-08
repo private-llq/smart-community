@@ -3,20 +3,29 @@ package com.jsy.community.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.jsy.community.api.CebBankService;
 import com.jsy.community.api.PaymentException;
+import com.jsy.community.config.CebBankExConfig;
 import com.jsy.community.config.service.CebBankEntity;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.cebbank.*;
 import com.jsy.community.qo.unionpay.HttpResponseModel;
 import com.jsy.community.untils.cebbank.CebBankContributionUtil;
 import com.jsy.community.vo.cebbank.*;
+import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessagePostProcessor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 
 /**
  * @Author: Pipi
@@ -30,6 +39,9 @@ public class CebBankServiceImpl implements CebBankService {
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     /**
      * @author: Pipi
@@ -50,6 +62,26 @@ public class CebBankServiceImpl implements CebBankService {
         // 存入缓存,有效期2小时
         redisTemplate.opsForValue().set("cebBank-sessionId:" + cebLoginQO.getUserPhone(), cebLoginVO.getSessionId(), 2L, TimeUnit.HOURS);
         return cebLoginVO.getSessionId();
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 获取云缴费sessionId
+     * @param mobile: 手机号
+     * @param devicetype: // 1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序-部分接口必填
+     * @return: {@link String}
+     * @date: 2021/12/6 9:56
+     **/
+    @Override
+    public String getCebBankSessionId(String mobile, String devicetype) {
+        String sessionId = redisTemplate.opsForValue().get("cebBank-sessionId:" + mobile);
+        if (sessionId == null) {
+            CebLoginQO cebLoginQO = new CebLoginQO();
+            cebLoginQO.setUserPhone(mobile);
+            cebLoginQO.setDeviceType(devicetype);
+            sessionId = login(cebLoginQO);
+        }
+        return sessionId;
     }
 
     /**
@@ -83,7 +115,13 @@ public class CebBankServiceImpl implements CebBankService {
             throw new PaymentException("查询缴费类别下缴费项目失败");
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
-        return JSON.parseObject(respData, CebQueryContributionProjectVO.class);
+        CebQueryContributionProjectVO projectVO = JSON.parseObject(respData, CebQueryContributionProjectVO.class);
+        if (projectVO != null && projectVO.getPaymentItemPagingModel() != null && !CollectionUtils.isEmpty(projectVO.getPaymentItemPagingModel().getPaymentItemModelList())) {
+            for (CebPaymentItemModelVO cebPaymentItemModelVO : projectVO.getPaymentItemPagingModel().getPaymentItemModelList()) {
+                redisTemplate.opsForValue().set("cebBankParam:" + cebPaymentItemModelVO.getPaymentItemCode(), JSON.toJSONString(cebPaymentItemModelVO.getQueryPaymentBillParamModelList()));
+            }
+        }
+        return projectVO;
     }
 
     /**
@@ -96,34 +134,166 @@ public class CebBankServiceImpl implements CebBankService {
     @Override
     public CebQueryBillInfoVO queryBillInfo(CebQueryBillInfoQO billInfoQO) {
         HttpResponseModel responseModel = new HttpResponseModel();
-        if (billInfoQO.getBusinessFlow() == 2) {
-            billInfoQO.setFlag("1");
-            Timer timer = new Timer();
-            for (Integer i = 1; i <= 5; i++) {
-                billInfoQO.setPollingTimes(i.toString());
-                try {
-                    if (i > 1) {
-                        Thread.sleep(i * 1000);
+        // 获取查询账单的参数条件
+        List<CebQueryPaymentBillParamModelVO> cebQueryPaymentBillParamModelVOS = new ArrayList<>();
+        String cebBankParamString = redisTemplate.opsForValue().get("cebBankParam:" + billInfoQO.getItemId());
+        if (StringUtil.isNotBlank(cebBankParamString)) {
+            cebQueryPaymentBillParamModelVOS = JSON.parseArray(cebBankParamString, CebQueryPaymentBillParamModelVO.class);
+        } else {
+            CebQueryContributionProjectQO projectQO = new CebQueryContributionProjectQO();
+            projectQO.setSessionId(billInfoQO.getSessionId());
+            projectQO.setCityName(billInfoQO.getCityName());
+            projectQO.setType(billInfoQO.getType());
+            projectQO.setCanal(billInfoQO.getCanal());
+            projectQO.setDeviceType(billInfoQO.getDeviceType());
+            CebQueryContributionProjectVO cebQueryContributionProjectVO = queryContributionProject(projectQO);
+            if (cebQueryContributionProjectVO != null && cebQueryContributionProjectVO.getPaymentItemPagingModel() != null) {
+                for (CebPaymentItemModelVO cebPaymentItemModelVO : cebQueryContributionProjectVO.getPaymentItemPagingModel().getPaymentItemModelList()) {
+                    if (billInfoQO.getItemId().equals(cebPaymentItemModelVO.getPaymentItemCode())) {
+                        cebQueryPaymentBillParamModelVOS = cebPaymentItemModelVO.getQueryPaymentBillParamModelList();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            }
+        }
+        // 设置查询账单的参数
+        if (!CollectionUtils.isEmpty(cebQueryPaymentBillParamModelVOS)) {
+            for (int i = 1; i <= cebQueryPaymentBillParamModelVOS.size(); i++) {
+                CebQueryPaymentBillParamModelVO paramModelVO = cebQueryPaymentBillParamModelVOS.get(i - 1);
+                if ("2".equals(paramModelVO.getPriorLevel())) {
+                    // 需要上送的field属性
+                    switch (paramModelVO.getFiledNum()) {
+                        case "1":
+                            if (StringUtil.isBlank(billInfoQO.getFiled1())) {
+                                if ("1".equals(paramModelVO.getFiledType())) {
+                                    // 下拉框
+                                    String[] optionsList = paramModelVO.getListBoxOptions().split("\\|");
+                                    String[] options = optionsList[0].split("=");
+                                    billInfoQO.setFiled1(options[1]);
+                                } else {
+                                    // 文本框,没传给默认值
+                                    billInfoQO.setFiled1("200");
+                                }
+                            }
+                            if ("0".equals(paramModelVO.getInputType())) {
+                                // 将上传的乘以100
+                                billInfoQO.setFiled1(new BigDecimal(billInfoQO.getFiled1()).multiply(new BigDecimal("100")).setScale(0).toString());
+                            }
+                            break;
+                        case "2":
+                            if (StringUtil.isBlank(billInfoQO.getFiled2())) {
+                                if ("1".equals(paramModelVO.getFiledType())) {
+                                    // 下拉框
+                                    String[] optionsList = paramModelVO.getListBoxOptions().split("\\|");
+                                    String[] options = optionsList[0].split("=");
+                                    billInfoQO.setFiled2(options[1]);
+                                } else {
+                                    // 文本框,没传给默认值
+                                    billInfoQO.setFiled2("200");
+                                }
+                            }
+                            if ("0".equals(paramModelVO.getInputType())) {
+                                // 将上传的乘以100
+                                billInfoQO.setFiled2(new BigDecimal(billInfoQO.getFiled2()).multiply(new BigDecimal("100")).setScale(0).toString());
+                            }
+                            break;
+                        case "3":
+                            if (StringUtil.isBlank(billInfoQO.getFiled3())) {
+                                if ("1".equals(paramModelVO.getFiledType())) {
+                                    // 下拉框
+                                    String[] optionsList = paramModelVO.getListBoxOptions().split("\\|");
+                                    String[] options = optionsList[0].split("=");
+                                    billInfoQO.setFiled3(options[1]);
+                                } else {
+                                    // 文本框,没传给默认值
+                                    billInfoQO.setFiled3("200");
+                                }
+                            }
+                            if ("0".equals(paramModelVO.getInputType())) {
+                                // 将上传的乘以100
+                                billInfoQO.setFiled3(new BigDecimal(billInfoQO.getFiled3()).multiply(new BigDecimal("100")).setScale(0).toString());
+                            }
+                            break;
+                        case "4":
+                            if (StringUtil.isBlank(billInfoQO.getFiled4())) {
+                                if ("1".equals(paramModelVO.getFiledType())) {
+                                    // 下拉框
+                                    String[] optionsList = paramModelVO.getListBoxOptions().split("\\|");
+                                    String[] options = optionsList[0].split("=");
+                                    billInfoQO.setFiled4(options[1]);
+                                } else {
+                                    // 文本框,没传给默认值
+                                    billInfoQO.setFiled4("200");
+                                }
+                            }
+                            if ("0".equals(paramModelVO.getInputType())) {
+                                // 将上传的乘以100
+                                billInfoQO.setFiled4(new BigDecimal(billInfoQO.getFiled4()).multiply(new BigDecimal("100")).setScale(0).toString());
+                            }
+                            break;
+                        case "5":
+                            if (StringUtil.isBlank(billInfoQO.getFiled5())) {
+                                if ("1".equals(paramModelVO.getFiledType())) {
+                                    // 下拉框
+                                    String[] optionsList = paramModelVO.getListBoxOptions().split("\\|");
+                                    String[] options = optionsList[0].split("=");
+                                    billInfoQO.setFiled5(options[1]);
+                                } else {
+                                    // 文本框,没传给默认值
+                                    billInfoQO.setFiled5("200");
+                                }
+                            }
+                            if ("0".equals(paramModelVO.getInputType())) {
+                                // 将上传的乘以100
+                                billInfoQO.setFiled5(new BigDecimal(billInfoQO.getFiled5()).multiply(new BigDecimal("100")).setScale(0).toString());
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+        for (Integer i = 1; i <= 5; i++) {
+            if (i > 1) {
+                billInfoQO.setPollingTimes(i.toString());
+                billInfoQO.setFlag("2");
                 responseModel = CebBankContributionUtil.queryBillInfo(billInfoQO);
-                if (responseModel != null && CebBankEntity.successCode.equals(responseModel.getRespCode())) {
+                /*if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
+                    // 第二次查询失败,丢给延迟队列去执行3次
+                    rabbitTemplate.convertAndSend(CebBankExConfig.CEB_BANK_DELAYED_EXCHANGE,
+                            CebBankExConfig.CEB_BANK_DELAYED_QUEUE,
+                            billInfoQO.toString(),
+                            new MessagePostProcessor() {
+                                @Override
+                                public Message postProcessMessage(Message message) throws AmqpException {
+                                    message.getMessageProperties().setHeader("x-delay", 2 * 1000);
+                                    return message;
+                                }
+                            }
+                    );
+                    return null;
+                }*/
+            } else {
+                responseModel = CebBankContributionUtil.queryBillInfo(billInfoQO);
+            }
+            if (responseModel != null) {
+                if ("1002".equals(responseModel.getRespCode()) && i == 1) {
+                    String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
+                    CebQueryBillInfoVO cebQueryBillInfoVO = JSON.parseObject(respData, CebQueryBillInfoVO.class);
+                    billInfoQO.setQryAcqSsn(cebQueryBillInfoVO.getQryAcqSsn());
+                }
+                if (CebBankEntity.successCode.equals(responseModel.getRespCode()) || ("1002".equals(responseModel.getRespCode()) && i > 1)) {
+                    // 获取到账单信息,跳出循环
                     break;
                 }
             }
-        } else {
-            responseModel = CebBankContributionUtil.queryBillInfo(billInfoQO);
         }
-        if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
+        if (responseModel == null || (!CebBankEntity.successCode.equals(responseModel.getRespCode()) && !"1002".equals(responseModel.getRespCode()))) {
             throw new PaymentException("查询缴费账单信息失败");
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         return JSON.parseObject(respData, CebQueryBillInfoVO.class);
     }
-
-
 
     /**
      * @author: Pipi

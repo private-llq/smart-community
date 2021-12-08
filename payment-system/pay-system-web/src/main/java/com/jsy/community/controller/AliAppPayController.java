@@ -106,14 +106,14 @@ public class AliAppPayController {
 			}
 			aliAppPayQO.setTotalAmount(aliAppPayQO.getTotalAmount().abs()); //支付金额
 		}
-		//商城订单支付，调用商城接口，校验订单
-		if(PaymentEnum.TradeFromEnum.TRADE_FROM_SHOPPING.getIndex().equals(aliAppPayQO.getTradeFrom())){
-			Map<String, Object> validationMap = shoppingMallService.validateShopOrder(aliAppPayQO.getOrderData(),UserUtils.getUserToken());
-			if(0 != (int)validationMap.get("code")){
-				throw new JSYException((int)validationMap.get("code"),String.valueOf(validationMap.get("msg")));
-			}
-			aliAppPayQO.setServiceOrderNo(String.valueOf(aliAppPayQO.getOrderData().get("uuid")));
-		}
+//		//商城订单支付，调用商城接口，校验订单
+//		if(PaymentEnum.TradeFromEnum.TRADE_FROM_SHOPPING.getIndex().equals(aliAppPayQO.getTradeFrom())){
+//			Map<String, Object> validationMap = shoppingMallService.validateShopOrder(aliAppPayQO.getOrderData(),UserUtils.getUserToken());
+//			if(0 != (int)validationMap.get("code")){
+//				throw new JSYException((int)validationMap.get("code"),String.valueOf(validationMap.get("msg")));
+//			}
+//			aliAppPayQO.setServiceOrderNo(String.valueOf(aliAppPayQO.getOrderData().get("uuid")));
+//		}
 		//停车缴费逻辑
 		if (aliAppPayQO.getTradeFrom()==8){
 			if ("".equals(aliAppPayQO.getServiceOrderNo())||aliAppPayQO.getServiceOrderNo()==null){

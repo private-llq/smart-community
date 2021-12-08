@@ -25,6 +25,8 @@ public class CebQueryBillInfoQO extends CebBaseQO {
     @NotBlank(message = "缴费项目id不能为空")
     private String itemCode;
 
+    private String itemId;
+
     /**
      * 缴款码-必填
      * 用户输入账单号：电费号，水费号，用户号，手机号等
@@ -72,4 +74,7 @@ public class CebQueryBillInfoQO extends CebBaseQO {
     @NotNull(message = "业务流程不能为空")
     @Range(min = 0, max = 2, message = "业务流程取值范围:0：先查后缴1：直接缴费2：二次查询;")
     private Integer businessFlow;
+
+    private String type;
+    private String cityName;
 }

@@ -18,6 +18,8 @@ public class CebBillQueryResultDataModelVO implements Serializable {
     // 客户姓名
     private String customerName;
 
+    private String originalCustomerName;
+
     // 账单金额,单位分
     private String payAmount;
 
@@ -44,4 +46,8 @@ public class CebBillQueryResultDataModelVO implements Serializable {
 
     // 预留字段
     private String filed5;
+    private String payBeginDate;
+    private String payEndDate;
+    private String serialNumber;
+    private String account;
 }
