@@ -49,7 +49,7 @@ public class UserDataController {
 
     @GetMapping("/selectUserDataOne")
     @ApiOperation("查询个人信息")
-    @Permit("community:proprietor:userdata:selectUserDataOne")
+    // @Permit("community:proprietor:userdata:selectUserDataOne")
     public CommonResult selectUserDataOne(){
         String userId = UserUtils.getUserId();
         UserDataVO userDataVO = userDataService.selectUserDataOne(userId);
@@ -63,7 +63,7 @@ public class UserDataController {
     
     @PostMapping("/addAvatar")
     @ApiOperation("上传头像")
-    @Permit("community:proprietor:userdata:addAvatar")
+    // @Permit("community:proprietor:userdata:addAvatar")
     public CommonResult avatarUrl(@RequestParam("file") MultipartFile file){
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -76,7 +76,7 @@ public class UserDataController {
     
     @PutMapping("/updateUserData")
     @ApiOperation("修改个人信息(头像、生日)")
-    @Permit("community:proprietor:userdata:updateUserData")
+    // @Permit("community:proprietor:userdata:updateUserData")
     public CommonResult updateUserData(@RequestBody UserDataQO userDataQO){
         String userId = UserUtils.getUserId();
         userDataQO.setNickname(null);
@@ -86,7 +86,7 @@ public class UserDataController {
     
     @PutMapping("/updateUserNickName")
     @ApiOperation("修改个人名称")
-    @Permit("community:proprietor:userdata:updateUserNickName")
+    // @Permit("community:proprietor:userdata:updateUserNickName")
     public CommonResult updateUserNickName(@RequestParam("nickname") String nickname){
         try {
             String s = new String(nickname.getBytes("GBK"));
@@ -124,7 +124,7 @@ public class UserDataController {
     **/
     @GetMapping("/safeStatus")
     @ApiOperation("账号安全状态查询")
-    @Permit("community:proprietor:userdata:safeStatus")
+    // @Permit("community:proprietor:userdata:safeStatus")
     public CommonResult querySafeStatus(){
         return CommonResult.ok(userDataService.querySafeStatus(UserUtils.getUserId()));
     }

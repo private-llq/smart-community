@@ -45,7 +45,7 @@ public class DepartmentController {
 	
 	@ApiOperation("通讯录")
 	@GetMapping("/listDepartment")
-	@Permit("community:proprietor:department:listDepartment")
+	// @Permit("community:proprietor:department:listDepartment")
 	public CommonResult<List<Map>> listDepartment(@ApiParam(value = "社区id") @RequestParam Long id) {
 		List<DepartmentEntity> departmentList = departmentService.listDepartment(id);
 		List<Map> strings = new ArrayList<>();

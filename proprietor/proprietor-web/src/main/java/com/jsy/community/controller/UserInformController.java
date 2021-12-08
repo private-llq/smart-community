@@ -38,7 +38,7 @@ public class UserInformController {
      */
     @ApiOperation("添加已读通知人员")
     @PostMapping("/add")
-    @Permit("community:proprietor:inform:add")
+    // @Permit("community:proprietor:inform:add")
     public CommonResult save(@RequestBody UserInformEntity userInformEntity) {
         String userId = UserUtils.getUserId();
         userInformEntity.setUid(userId);
@@ -54,7 +54,7 @@ public class UserInformController {
      */
     @GetMapping("/totalList")
     @ApiOperation("用户社区总未读消息列表查看")
-    @Permit("community:proprietor:inform:totalList")
+    // @Permit("community:proprietor:inform:totalList")
     public CommonResult<List<InformListVO>> totalCommunityInformList(){
         return CommonResult.ok(userInformService.totalCommunityInformList(UserUtils.getUserId()));
     }
@@ -67,7 +67,7 @@ public class UserInformController {
      */
     @GetMapping("/totalInForm")
     @ApiOperation("查看当前登录人员是否有未读消息")
-    @Permit("community:proprietor:inform:totalInForm")
+    // @Permit("community:proprietor:inform:totalInForm")
     public CommonResult<Integer> totalInForm(){
         return CommonResult.ok(userInformService.totalInForm(UserUtils.getUserId()));
     }

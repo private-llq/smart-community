@@ -69,7 +69,6 @@ public class UserAuthController {
     /**
      * 发送验证码
      */
-    @LoginIgnore
     @ApiOperation("发送验证码，手机或邮箱，参数不可同时为空")
     @GetMapping("/send/code")
     @ApiImplicitParams({
@@ -77,6 +76,7 @@ public class UserAuthController {
             @ApiImplicitParam(name = "type", value = UserAuthEntity.CODE_TYPE_NOTE, required = true,
                     allowableValues = "1,2,3,4,5", paramType = "query")
     })
+    @LoginIgnore
     public CommonResult<Boolean> sendCode(@RequestParam String account, @RequestParam Integer type) {
         if (RegexUtils.isMobile(account)) {
             baseSmsRpcService.sendVerificationCode(account);
@@ -96,7 +96,7 @@ public class UserAuthController {
             @ApiImplicitParam(name = "type", value = UserAuthEntity.CODE_TYPE_NOTE, required = true,
                     allowableValues = "1,2,3,4,5", paramType = "query")
     })
-    @Permit("community:proprietor:user:auth:send:code")
+    // @Permit("community:proprietor:user:auth:send:code")
     @LoginIgnore
     public CommonResult<Boolean> sendCode(@RequestParam String account,
                                           @RequestParam Integer type) {
@@ -216,7 +216,7 @@ public class UserAuthController {
 
     @ApiOperation(value = "注册后设置密码", notes = "需要登录")
     @PostMapping("/password")
-    @Permit("community:proprietor:user:auth:password")
+    // @Permit("community:proprietor:user:auth:password")
     public CommonResult<Boolean> addPassword(@RequestBody AddPasswordQO qo) {
 
         ValidatorUtils.validateEntity(qo, AddPasswordQO.passwordVGroup.class);
@@ -227,7 +227,7 @@ public class UserAuthController {
 
     @ApiOperation("绑定微信")
     @PostMapping("/bindingWechat")
-    @Permit("community:proprietor:user:auth:bindingWechat")
+    // @Permit("community:proprietor:user:auth:bindingWechat")
     public CommonResult bindingWechat(@RequestParam("code") String code) {
         JSONObject object = WeCharUtil.getAccessToken(code);
         if ("".equals(object) || object == null) {
@@ -242,7 +242,7 @@ public class UserAuthController {
 
     @ApiOperation("解绑微信绑定")
     @PostMapping("/relieveBindingWechat")
-    @Permit("community:proprietor:user:auth:relieveBindingWechat")
+    // @Permit("community:proprietor:user:auth:relieveBindingWechat")
     public CommonResult relieveBindingWechat(@RequestBody RegisterQO registerQO) {
         commonService.checkVerifyCode(registerQO.getAccount(), registerQO.getCode());
         userService.relieveBindingWechat(registerQO, UserUtils.getUserId());
@@ -251,7 +251,7 @@ public class UserAuthController {
 
     @ApiOperation(value = "设置支付密码", notes = "需要登录")
     @PostMapping("/password/pay")
-    @Permit("community:proprietor:user:auth:password:pay")
+    // @Permit("community:proprietor:user:auth:password:pay")
     public CommonResult<Boolean> addPayPassword(@RequestBody AddPasswordQO qo) {
         //todo 个人觉得明文传递支付密码有问题
         ValidatorUtils.validateEntity(qo, AddPasswordQO.payPasswordVGroup.class);
@@ -263,6 +263,7 @@ public class UserAuthController {
     @LoginIgnore
     @ApiOperation(value = "敏感操作短信验证", notes = "忘记密码等")
     @GetMapping("/check/code")
+    // @Permit("community:proprietor:user:auth:check:code")
     public CommonResult<Map<String, Object>> checkCode(@RequestParam String account, @RequestParam String code) {
         commonService.checkVerifyCode(account, code);
         String token = UserUtils.setRedisTokenWithTime("Auth", account, 1, TimeUnit.HOURS);
@@ -275,6 +276,7 @@ public class UserAuthController {
     @ApiOperation("重置密码")
     @PostMapping("/reset/password")
     @Auth
+    // @Permit("community:proprietor:user:auth:reset:password")
     public CommonResult<Boolean> resetPassword(@RequestAttribute(value = "body") String body) {
         ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
         ValidatorUtils.validateEntity(qo, ResetPasswordQO.forgetPassVGroup.class);
@@ -296,7 +298,7 @@ public class UserAuthController {
 
     @ApiOperation("发送修改支付密码的手机验证码")
     @GetMapping("/send/password/pay/code")
-    @Permit("community:proprietor:user:auth:send:password:pay:code")
+    // @Permit("community:proprietor:user:auth:send:password:pay:code")
     public CommonResult<Boolean> sendPayPasswordVerificationCode() {
         String mobile = UserUtils.getUserInfo().getMobile();
         userAuthService.sendPayPasswordVerificationCode(mobile);
@@ -305,7 +307,7 @@ public class UserAuthController {
 
     @ApiOperation("手机验证码验证，更换支付密码")
     @PostMapping("/check/password/pay/code")
-    @Permit("community:proprietor:user:auth:check:password:pay:code")
+    // @Permit("community:proprietor:user:auth:check:password:pay:code")
     public CommonResult<Boolean> updatePayPasswordByMobileCode(@RequestBody MobileCodePayPasswordQO qo) {
         String mobile = UserUtils.getUserInfo().getMobile();
         String userId = UserUtils.getUserId();
@@ -363,7 +365,7 @@ public class UserAuthController {
 
     @ApiOperation("更换手机号(旧手机在线)")
     @PutMapping("/reset/mobile")
-    @Permit("community:proprietor:user:auth:reset:mobile")
+    // @Permit("community:proprietor:user:auth:reset:mobile")
     public CommonResult changeMobile(@RequestBody Map<String, String> map) {
         //入参验证
         String newMobile = map.get("account");

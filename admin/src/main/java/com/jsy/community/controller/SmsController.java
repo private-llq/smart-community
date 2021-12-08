@@ -1,21 +1,20 @@
 package com.jsy.community.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.entity.SmsEntity;
 import com.jsy.community.qo.sys.SmsQO;
+import com.jsy.community.service.ISmsService;
 import com.jsy.community.utils.MyHttpUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpGet;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -43,6 +42,9 @@ public class SmsController {
 
     @Resource(name = "adminRedisTemplate")
     private RedisTemplate<String, Object> adminRedisTemplate;
+    
+    @Resource
+    private ISmsService smsService;
 
     /**
      * 内部测试、暂无任何拦截及 短信在一定时间内 不能二次发送
@@ -84,7 +86,7 @@ public class SmsController {
         return CommonResult.ok("发送成功!");
     }
 
-    public static String getSpecifyRandomString(int length)
+    private static String getSpecifyRandomString(int length)
     {
         String charList = "0123456789";
         StringBuilder rev = new StringBuilder();
@@ -94,5 +96,31 @@ public class SmsController {
             rev.append(charList.charAt(Math.abs(f.nextInt()) % charList.length()));
         }
         return rev.toString();
+    }
+    
+    /**
+     * @Description: 新增或修改短信配置
+     * @author: DKS
+     * @since: 2021/12/6 11:06
+     * @Param: [smsEntity]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @PostMapping("/add/setting")
+    @Permit("community:admin:sms:add:setting")
+    public CommonResult addSmsSetting(@RequestBody SmsEntity smsEntity){
+        return smsService.addSmsSetting(smsEntity) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+    }
+    
+    /**
+     * @Description: 查询短信配置
+     * @author: DKS
+     * @since: 2021/12/6 11:49
+     * @Param: [sysType]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @GetMapping("/query/setting")
+    @Permit("community:admin:sms:query:setting")
+    public CommonResult querySmsSetting(){
+        return CommonResult.ok(smsService.querySmsSetting(),"查询成功");
     }
 }

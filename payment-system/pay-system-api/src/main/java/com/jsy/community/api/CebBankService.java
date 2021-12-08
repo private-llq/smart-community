@@ -22,6 +22,16 @@ public interface CebBankService {
 
     /**
      * @author: Pipi
+     * @description: 获取云缴费sessionId
+     * @param mobile: 手机号
+         * @param devicetype: // 1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序-部分接口必填
+     * @return: {@link String}
+     * @date: 2021/12/6 9:56
+     **/
+    String getCebBankSessionId(String mobile, String devicetype);
+
+    /**
+     * @author: Pipi
      * @description: 查询城市下缴费类别
      * @param categoryQO:
      * @return: java.lang.String

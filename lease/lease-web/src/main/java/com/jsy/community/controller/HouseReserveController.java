@@ -46,7 +46,7 @@ public class HouseReserveController {
     @IpLimit(prefix = "reserveConst", second = 60, count = 10, desc = "预约时间常量")
     @GetMapping("/datetime")
     @ApiOperation("预约常量时间查询接口")
-    @Permit("community:lease:house:reserve:datetime")
+    // @Permit("community:lease:house:reserve:datetime")
     public CommonResult<Map<String, List<String>>> datetime() {
         //获得租房可选择的预约时间常量
         List<HouseLeaseConstEntity> houseConstListByType = houseConstService.getHouseConstListByType(String.valueOf(15));
@@ -60,7 +60,7 @@ public class HouseReserveController {
 
     @PostMapping("/add")
     @ApiOperation("预约提交接口")
-    @Permit("community:lease:house:reserve:add")
+    // @Permit("community:lease:house:reserve:add")
     public CommonResult<Boolean> add(@RequestBody HouseReserveEntity qo) {
         //基本参数验证
         ValidatorUtils.validateEntity(qo, HouseReserveEntity.Add.class);
@@ -71,7 +71,7 @@ public class HouseReserveController {
     
     @DeleteMapping("/cancel")
     @ApiOperation("预约取消接口")
-    @Permit("community:lease:house:reserve:cancel")
+    // @Permit("community:lease:house:reserve:cancel")
     public CommonResult<Boolean> cancel(@RequestBody HouseReserveQO qo) {
         ValidatorUtils.validateEntity(qo, HouseReserveQO.Cancel.class);
         qo.setReserveUid(UserUtils.getUserId());
@@ -82,7 +82,7 @@ public class HouseReserveController {
     @DeleteMapping("/reject")
     @ApiOperation("预约拒绝接口")
     @Deprecated
-    @Permit("community:lease:house:reserve:reject")
+    // @Permit("community:lease:house:reserve:reject")
     public CommonResult<Boolean> reject(@RequestBody HouseReserveQO qo) {
         ValidatorUtils.validateEntity(qo, HouseReserveQO.Reject.class);
         qo.setReserveUid(UserUtils.getUserId());
@@ -92,7 +92,7 @@ public class HouseReserveController {
 
     @PostMapping("/confirm")
     @ApiOperation("预约确认接口")
-    @Permit("community:lease:house:reserve:confirm")
+    // @Permit("community:lease:house:reserve:confirm")
     public CommonResult<Boolean> confirm(@RequestBody HouseReserveQO qo) {
         Boolean confirm = iHouseReserveService.confirm(qo, UserUtils.getUserId());
         return CommonResult.ok(confirm ? "确认预约成功!" : "确认预约失败!重复提交或数据不存在!");
@@ -100,7 +100,7 @@ public class HouseReserveController {
     
     @PostMapping("/whole")
     @ApiOperation("全部预约接口")
-    @Permit("community:lease:house:reserve:whole")
+    // @Permit("community:lease:house:reserve:whole")
     public CommonResult<List<HouseReserveVO>> whole(@RequestBody BaseQO<HouseReserveQO> qo) {
         //预约分为两部分：1. 租客预约我发布的房子  2.我预约其他人发布的房子
         ValidatorUtils.validatePageParam(qo);
@@ -117,7 +117,7 @@ public class HouseReserveController {
      **/
     @DeleteMapping("/deleteReserve")
     @ApiOperation("删除预约信息")
-    @Permit("community:lease:house:reserve:deleteReserve")
+    // @Permit("community:lease:house:reserve:deleteReserve")
     public CommonResult<Boolean> delete(@RequestBody HouseReserveQO qo) {
         qo.setReserveUid(UserUtils.getUserId());
         ValidatorUtils.validateEntity(qo, HouseReserveQO.Cancel.class);
@@ -135,7 +135,7 @@ public class HouseReserveController {
      **/
     @PostMapping("/completeChecking")
     @ApiOperation("租房用户确认完成看房")
-    @Permit("community:lease:house:reserve:completeChecking")
+    // @Permit("community:lease:house:reserve:completeChecking")
     public CommonResult<Boolean> completeChecking(@RequestBody HouseReserveQO qo) {
         qo.setReserveUid(UserUtils.getUserId());
         ValidatorUtils.validateEntity(qo, HouseReserveQO.Reject.class);

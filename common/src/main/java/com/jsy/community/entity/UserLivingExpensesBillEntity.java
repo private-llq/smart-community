@@ -75,5 +75,8 @@ public class UserLivingExpensesBillEntity extends BaseEntity {
     /**
      * 账单状态;0:未缴;1:已缴
      */
-    private Integer billStaus;
+    private Integer billStatus;
+
+    private String rangLimit;
+    private String chooseAmount;
 }

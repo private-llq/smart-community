@@ -9,9 +9,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.dto.signature.SignatureUserDTO;
+import com.jsy.community.entity.SmsEntity;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.mapper.SmsMapper;
 import com.jsy.community.mapper.UserAuthMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.proprietor.AddPasswordQO;
@@ -32,8 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 //import org.springframework.integration.redis.util.RedisLockRegistry;
 
@@ -59,6 +60,9 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 
     @Resource
     private UserMapper userMapper;
+    
+    @Resource
+    private SmsMapper smsMapper;
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ISignatureService signatureService;
@@ -292,7 +296,9 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
     @Override
     public void sendPayPasswordVerificationCode(String account) {
         //发送短信验证码
-        String code = SmsUtil.sendVcode(account, BusinessConst.SMS_VCODE_LENGTH_DEFAULT);
+        SmsEntity smsEntity = smsMapper.selectOne(new QueryWrapper<SmsEntity>().eq("deleted", 0));
+        ConstClasses.AliYunDataEntity.setConfig(smsEntity);
+        String code = SmsUtil.sendVcode(account, BusinessConst.SMS_VCODE_LENGTH_DEFAULT, smsEntity.getSmsSign());
         //5分钟有效期
         redisTemplate.opsForValue().set("vProprietorCodePayPassword" + account, code, 5, TimeUnit.MINUTES);
     }

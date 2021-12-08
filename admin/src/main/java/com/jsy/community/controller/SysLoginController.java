@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.admin.AdminLoginQO;
@@ -159,19 +158,19 @@ public class SysLoginController {
 		// 判断是不是验证码登陆,如果是,判断验证码正不正确
 		if(!StringUtils.isEmpty(form.getCode())){
 			checkVerifyCode(form.getAccount(),form.getCode());
-			loginVo = baseAuthRpcService.propertyLogin(form.getAccount(), form.getCode(), "PHONE_CODE");
+			loginVo = baseAuthRpcService.login("ultimate_admin", form.getAccount(), form.getCode(), "PHONE_CODE");
 		} else {
-			loginVo = baseAuthRpcService.propertyLogin(form.getAccount(), form.getPassword(), "PHONE_PWD");
+			loginVo = baseAuthRpcService.login("ultimate_admin", form.getAccount(), form.getPassword(), "PHONE_PWD");
 		}
 		log.info(form.getAccount() + "开始登录");
 		// 获取用户菜单
-		List<PermitMenu> userMenu = baseMenuRpcService.all(Long.valueOf(loginVo.getUserInfo().getAccount()), "ultimate_admin");
+		List<PermitMenu> userMenu = baseMenuRpcService.all(loginVo.getUserInfo().getId(), "ultimate_admin");
 		
 		//返回VO
 		SysInfoVo sysInfoVo = new SysInfoVo();
 		
 		// 获取用户角色
-		List<PermitRole> userRoles = baseRoleRpcService.listAllRolePermission(Long.valueOf(loginVo.getUserInfo().getAccount()), "ultimate_admin");
+		List<PermitRole> userRoles = baseRoleRpcService.listAllRolePermission(loginVo.getUserInfo().getId(), "ultimate_admin");
 		if (userRoles != null && userRoles.size() > 0) {
 			sysInfoVo.setRoleId(userRoles.get(0).getId());
 		}
@@ -182,8 +181,8 @@ public class SysLoginController {
 		}
 		
 		//清空该账号已之前的token(踢下线)
-		String oldToken = redisTemplate.opsForValue().get("Sys:LoginAccount:" + form.getAccount());
-		redisTemplate.delete("Sys:Login:" + oldToken);
+//		String oldToken = redisTemplate.opsForValue().get("Sys:LoginAccount:" + form.getAccount());
+//		redisTemplate.delete("Sys:Login:" + oldToken);
 		//获取token
 		sysInfoVo.setToken(loginVo.getToken().getToken());
 		sysInfoVo.setUid(null);

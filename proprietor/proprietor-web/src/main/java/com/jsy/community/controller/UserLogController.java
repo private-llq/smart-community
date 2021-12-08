@@ -30,7 +30,7 @@ public class UserLogController {
 	private IUserLogService iUserLogService;
 	
 	@PostMapping("")
-	@Permit("community:proprietor:user:log")
+	// @Permit("community:proprietor:user:log")
 	public CommonResult addUserLoginLog(@RequestBody UserLoginLogEntity userLoginLogEntity){
 		userLoginLogEntity.setUid(UserUtils.getUserId());
 		boolean result = iUserLogService.addUserLoginLog(userLoginLogEntity);

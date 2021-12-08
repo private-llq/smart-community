@@ -80,7 +80,7 @@ public class HouseMemberController {
 	
 	@ApiOperation("【房间成员】查询")
 	@PostMapping("page")
-	@Permit("community:proprietor:houseMember:page")
+	// @Permit("community:proprietor:houseMember:page")
 		public CommonResult<PageInfo<HouseMemberEntity>> queryHouseMemberPage(@RequestBody BaseQO<HouseMemberQO> baseQO){
 		if( baseQO.getQuery() == null ){
 			baseQO.setQuery(new HouseMemberQO());

@@ -115,7 +115,7 @@ public class WeChatPayController {
      * @return:
      */
     @PostMapping("/wxPay")
-    @Permit("community:payment:wxPay")
+    // @Permit("community:payment:wxPay")
     public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
         if (weChatPayQO.getTradeFrom()==9){
             weChatPayQO.setCommunityId(1L);
@@ -237,6 +237,7 @@ public class WeChatPayController {
      */
     @LoginIgnore
     @RequestMapping(value = "/callback/{companyId}", method = {RequestMethod.POST,RequestMethod.GET})
+    // @Permit("community:payment:callback")
     public void callback(HttpServletRequest request, HttpServletResponse response,@PathVariable("companyId") Long companyId) throws Exception {
         log.info("回调成功");
         log.info(String.valueOf(companyId));
@@ -325,7 +326,7 @@ public class WeChatPayController {
      * @return:
      */
     @PostMapping(value = "/withdrawDeposit")
-    @Permit("community:payment:withdrawDeposit")
+    // @Permit("community:payment:withdrawDeposit")
     public CommonResult<Map<String, String>> withdrawDeposit(@RequestBody WithdrawalQO withdrawalQO) throws Exception {
 
         String body=null;
@@ -373,7 +374,7 @@ public class WeChatPayController {
      * @return:
      */
     @GetMapping("/wxPayQuery")
-    @Permit("community:payment:wxPayQuery")
+    // @Permit("community:payment:wxPayQuery")
     public CommonResult wxPayQuery(@RequestParam("orderId")String orderId){
         String body = "";
         HttpGet httpGet = new HttpGet(WechatConfig.WXPAY_PAY+orderId+""+"?mchid="+WechatConfig.MCH_ID+"");
@@ -405,7 +406,7 @@ public class WeChatPayController {
      * @return: CommonResult
      */
     @GetMapping("/withdrawDepositQuery")
-    @Permit("community:payment:withdrawDepositQuery")
+    // @Permit("community:payment:withdrawDepositQuery")
     public CommonResult withdrawDepositQuery(@RequestParam("orderId")String orderId){
         HashMap<String, Object> map = new LinkedHashMap<>();
         map.put("appid",WechatConfig.APPID);

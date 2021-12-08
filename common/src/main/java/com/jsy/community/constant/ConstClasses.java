@@ -1,6 +1,7 @@
 package com.jsy.community.constant;
 
 import com.jsy.community.entity.PayConfigureEntity;
+import com.jsy.community.entity.SmsEntity;
 import com.jsy.community.utils.AESOperator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -151,14 +152,19 @@ public interface ConstClasses {
 		public static String URL_WEATHER_AIR;//空气质量
 		public static String URL_WEATHER_LIVING;//生活指数
 		
-		@Value("${aliyun.sms.smsAccessKeyId}")
-		public void setSmsAccessKeyId(String smsAccessKeyId) {
-			AliYunDataEntity.smsAccessKeyId = AESOperator.decrypt(smsAccessKeyId);
+		public static void setConfig(SmsEntity smsEntity) {
+			smsAccessKeyId = AESOperator.decrypt(smsEntity.getAccessKeyId());
+			smsSecret = AESOperator.decrypt(smsEntity.getAccessKeySecret());
 		}
-		@Value("${aliyun.sms.smsSecret}")
-		public void setSmsSecret(String smsSecret) {
-			AliYunDataEntity.smsSecret = AESOperator.decrypt(smsSecret);
-		}
+		
+//		@Value("${aliyun.sms.smsAccessKeyId}")
+//		public void setSmsAccessKeyId(String smsAccessKeyId) {
+//			AliYunDataEntity.smsAccessKeyId = AESOperator.decrypt(smsAccessKeyId);
+//		}
+//		@Value("${aliyun.sms.smsSecret}")
+//		public void setSmsSecret(String smsSecret) {
+//			AliYunDataEntity.smsSecret = AESOperator.decrypt(smsSecret);
+//		}
 		
 		@Value("${aliyun.appCode}")
 		public void setAppCode(String appCode) {

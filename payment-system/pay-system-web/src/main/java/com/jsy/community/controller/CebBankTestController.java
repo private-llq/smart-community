@@ -37,6 +37,7 @@ import java.util.HashMap;
 @RestController
 // @ApiJSYController
 @RequestMapping("/cebBankTest")
+@LoginIgnore
 @Slf4j
 public class CebBankTestController {
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
@@ -52,7 +53,6 @@ public class CebBankTestController {
      * @return: {@link CommonResult}
      * @date: 2021/11/23 15:12
      **/
-    @LoginIgnore
     @PostMapping("/v2/queryCity")
     public CommonResult queryCity(@RequestBody CebQueryCityQO cebQueryCityQO) {
         String sessionId = getCebBankSessionId();
@@ -70,7 +70,6 @@ public class CebBankTestController {
      * @date: 2021/11/17 17:47
      **/
     @PostMapping("/v2/cityContributionCategory")
-    @LoginIgnore
     public CommonResult queryCityContributionCategory(@RequestBody CebQueryCityContributionCategoryQO categoryQO) {
         String sessionId = getCebBankSessionId();
         categoryQO.setCityName("北京市");
@@ -86,7 +85,6 @@ public class CebBankTestController {
      * @return: {@link CommonResult}
      * @date: 2021/11/23 15:33
      **/
-    @LoginIgnore
     @PostMapping("/v2/queryContributionProject")
     public CommonResult queryContributionProject(@RequestBody CebQueryContributionProjectQO projectQO) {
         String sessionId = getCebBankSessionId();
@@ -104,7 +102,6 @@ public class CebBankTestController {
      * @return: {@link CommonResult}
      * @date: 2021/11/23 17:14
      **/
-    @LoginIgnore
     @PostMapping("/v2/queryBillInfo")
     public CommonResult queryBillInfo(@RequestBody CebQueryBillInfoQO billInfoQO) {
         String sessionId = getCebBankSessionId();
@@ -123,7 +120,6 @@ public class CebBankTestController {
      * @return: {@link CommonResult}
      * @date: 2021/11/23 18:05
      **/
-    @LoginIgnore
     @PostMapping("/v2/queryMobileBill")
     public CommonResult queryMobileBill(@RequestBody CebQueryMobileBillQO cebQueryMobileBillQO) {
         String sessionId = getCebBankSessionId();
@@ -141,7 +137,6 @@ public class CebBankTestController {
      * @return: {@link CommonResult}
      * @date: 2021/11/23 18:10
      **/
-    @LoginIgnore
     @PostMapping("/v2/queryContributionRecord")
     public CommonResult queryContributionRecord(@RequestBody CebQueryContributionRecordQO recordQO) {
         String sessionId = getCebBankSessionId();
@@ -160,7 +155,6 @@ public class CebBankTestController {
      * @return: {@link CommonResult}
      * @date: 2021/11/23 18:16
      **/
-    @LoginIgnore
     @PostMapping("/v2/queryContributionRecordInfo")
     public CommonResult queryContributionRecordInfo(@RequestBody CebQueryContributionRecordInfoQO infoQO) {
         String sessionId = getCebBankSessionId();
@@ -178,7 +172,6 @@ public class CebBankTestController {
      * @return: {@link CommonResult}
      * @date: 2021/11/23 18:26
      **/
-    @LoginIgnore
     @PostMapping("/v2/createCashierDesk")
     public CommonResult createCashierDesk(@RequestBody CebCreateCashierDeskQO deskQO) {
         String sessionId = getCebBankSessionId();
@@ -249,7 +242,6 @@ public class CebBankTestController {
      * @return: {@link CommonResult}
      * @date: 2021/11/24 9:45
      **/
-    @LoginIgnore
     @PostMapping(value = "/v2/cebCallback")
     public CommonResult cebBankPayCallback(HttpServletRequest request) {
         // 获取回调参数
@@ -344,7 +336,6 @@ public class CebBankTestController {
      * @return: {@link String}
      * @date: 2021/11/23 14:59
      **/
-    @LoginIgnore
     private String getCebBankSessionId() {
         String sessionId = redisTemplate.opsForValue().get("cebBank-sessionId:" + "18996226451");
         if (sessionId == null) {

@@ -37,7 +37,7 @@ public class HouseFavoriteController {
     
     @PostMapping()
     @ApiOperation("租房收藏接口")
-    @Permit("community:lease:favorite")
+    // @Permit("community:lease:favorite")
     public CommonResult<Boolean> houseFavorite(@RequestBody HouseFavoriteQO qo) {
         ValidatorUtils.validateEntity(qo, HouseFavoriteQO.AddFavorite.class);
         //验证数据有效性 如果不存在
@@ -50,7 +50,7 @@ public class HouseFavoriteController {
     
     @PostMapping("/shop")
     @ApiOperation("商铺收藏列表")
-    @Permit("community:lease:favorite:shop")
+    // @Permit("community:lease:favorite:shop")
     public CommonResult<List<HouseFavoriteVO>> shopFavorite(@RequestBody BaseQO<HouseFavoriteQO> qo) {
         ValidatorUtils.validatePageParam(qo);
         if (qo.getQuery() == null) {
@@ -62,7 +62,7 @@ public class HouseFavoriteController {
 
     @PostMapping("/house")
     @ApiOperation("租房收藏列表")
-    @Permit("community:lease:favorite:house")
+    // @Permit("community:lease:favorite:house")
     public CommonResult<List<HouseFavoriteVO>> leaseFavorite(@RequestBody BaseQO<HouseFavoriteQO> qo) {
         ValidatorUtils.validatePageParam(qo);
         if (qo.getQuery() == null) {
@@ -74,7 +74,7 @@ public class HouseFavoriteController {
 
     @DeleteMapping()
     @ApiOperation("删除我的收藏")
-    @Permit("community:lease:favorite")
+    // @Permit("community:lease:favorite")
     public CommonResult<Boolean> deleteFavorite(@RequestParam Long id) {
         return iHouseFavoriteService.deleteFavorite(id, UserUtils.getUserId()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
@@ -87,7 +87,7 @@ public class HouseFavoriteController {
      * @date: 2021/7/8 16:05
      **/
     @DeleteMapping("/cancelFavorite")
-    @Permit("community:lease:favorite:cancelFavorite")
+    // @Permit("community:lease:favorite:cancelFavorite")
     public CommonResult cancelFavorite(@RequestParam Long id) {
         HouseFavoriteQO qo = new HouseFavoriteQO();
         qo.setUid(UserUtils.getUserId());

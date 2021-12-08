@@ -57,7 +57,7 @@ public class CarController {
 
 	@ApiOperation("新增车辆")
 	@PostMapping("add")
-	@Permit("community:proprietor:car:add")
+	// @Permit("community:proprietor:car:add")
 	public CommonResult addRelationCar(@RequestBody CarEntity carEntity) {
 		//0.从JWT取uid
 		carEntity.setUid(UserUtils.getUserId());
@@ -69,7 +69,7 @@ public class CarController {
 
 	@ApiOperation("绑定月租车辆")
 	@PostMapping("bindingMonthCar")
-	@Permit("community:proprietor:car:bindingMonthCar")
+	// @Permit("community:proprietor:car:bindingMonthCar")
 	public CommonResult bindingMonthCar(@RequestBody CarEntity carEntity) {
 		//0.从JWT取uid
 		carEntity.setUid(UserUtils.getUserId());
@@ -80,14 +80,14 @@ public class CarController {
 
 	@ApiOperation("查询月租缴费")
 	@PostMapping("getMonthOrder")
-	@Permit("community:proprietor:car:getMonthOrder")
+	// @Permit("community:proprietor:car:getMonthOrder")
 	public CommonResult MonthOrder(@RequestBody BaseQO<CarEntity> baseQO) {
 		return CommonResult.ok(carService.MonthOrder(baseQO,UserUtils.getUserId()));
 	}
 
 	@ApiOperation("查询临时车辆账单")
 	@GetMapping("getTemporaryOrder")
-	@Permit("community:proprietor:car:getTemporaryOrder")
+	// @Permit("community:proprietor:car:getTemporaryOrder")
 	public CommonResult getTemporaryOrder(@RequestParam Long communityId) {
 		List<CarOrderEntity> list = carService.getTemporaryOrder(communityId,UserUtils.getUserId());
 		return CommonResult.ok(list);
@@ -95,7 +95,7 @@ public class CarController {
 	
 	@ApiOperation("查询临时车辆一条账单详情")
 	@GetMapping("getTemporaryOrderById")
-	@Permit("community:proprietor:car:getTemporaryOrderById")
+	// @Permit("community:proprietor:car:getTemporaryOrderById")
 	public CommonResult getTemporaryOrderById(@RequestParam Long id) {
 		CarOrderEntity carOrderEntity = carService.getTemporaryOrderById(id,UserUtils.getUserId());
 		return CommonResult.ok(carOrderEntity);
@@ -103,14 +103,14 @@ public class CarController {
 
 	@ApiOperation("查询缴费详情")
 	@GetMapping("getOrder")
-	@Permit("community:proprietor:car:getOrder")
+	// @Permit("community:proprietor:car:getOrder")
 	public CommonResult getOrder(@RequestParam Long id) {
 		return CommonResult.ok(carService.getOrder(id));
 	}
 
 	@ApiOperation("续费月租车辆")
 	@PostMapping("renewMonthCar")
-	@Permit("community:proprietor:car:renewMonthCar")
+	// @Permit("community:proprietor:car:renewMonthCar")
 	public CommonResult renewMonthCar(@RequestBody CarEntity carEntity) {
 		if (carEntity.getId()==null){
 			return CommonResult.error("参数错误！");
@@ -125,7 +125,7 @@ public class CarController {
 
 	@ApiOperation("修改车辆")
 	@PutMapping("update")
-	@Permit("community:proprietor:car:update")
+	// @Permit("community:proprietor:car:update")
 	public CommonResult updateRelationCar(@RequestBody CarEntity carEntity) {
 		//0.从JWT取uid
 //		carEntity.setUid(UserUtils.getUserId());
@@ -137,7 +137,7 @@ public class CarController {
 
 	@ApiOperation("查询车辆")
 	@PostMapping("getCars")
-	@Permit("community:proprietor:car:getCars")
+	// @Permit("community:proprietor:car:getCars")
 	public CommonResult getCars(@RequestBody CarEntity carEntity) {
 		List<CarEntity> carEntities = carService.getCars(carEntity,UserUtils.getUserId());
 		return CommonResult.ok(carEntities);
@@ -145,7 +145,7 @@ public class CarController {
 
 	@ApiOperation("删除车辆")
 	@DeleteMapping("delete")
-	@Permit("community:proprietor:car:delete")
+	// @Permit("community:proprietor:car:delete")
 	public CommonResult delete(@RequestParam Long id) {
 		carService.delete(id,UserUtils.getUserId());
 		return CommonResult.ok();
@@ -153,7 +153,7 @@ public class CarController {
 
 	@ApiOperation("获取当前小区车位")
 	@GetMapping("getPosition")
-	@Permit("community:proprietor:car:getPosition")
+	// @Permit("community:proprietor:car:getPosition")
 	public CommonResult getPosition(@RequestParam Long communityId) {
 //		List<CarPositionEntity> list = carService.getPosition(communityId);
 		CommunityEntity communityEntity = carService.selectCommunityName(communityId);
@@ -167,7 +167,7 @@ public class CarController {
 	
 	@ApiOperation("获取车位费")
 	@PostMapping("payPositionFees")
-	@Permit("community:proprietor:car:payPositionFees")
+	// @Permit("community:proprietor:car:payPositionFees")
 	public CommonResult payPositionFees(@RequestBody CarEntity carEntity) {
 		BigDecimal decimal = carService.payPositionFees(carEntity);
 		return CommonResult.ok(decimal);
@@ -175,7 +175,7 @@ public class CarController {
 	
 	@ApiOperation("解除月租车辆")
 	@DeleteMapping("deleteMonthCar")
-	@Permit("community:proprietor:car:deleteMonthCar")
+	// @Permit("community:proprietor:car:deleteMonthCar")
 	public CommonResult deleteMonthCar(@RequestParam Long id) {
 		carService.deleteMonthCar(id);
 		return CommonResult.ok();
@@ -190,7 +190,7 @@ public class CarController {
 	 */
 	@ApiOperation("新增固定车辆登记方法")
 	@PostMapping(produces = "application/json;charset=utf-8")
-	@Permit("community:proprietor:car")
+	// @Permit("community:proprietor:car")
 	public CommonResult<Boolean> addProprietorCar(@RequestBody CarEntity carEntity) {
 		//0.从JWT取uid
 		carEntity.setUid(UserUtils.getUserId());
@@ -216,7 +216,7 @@ public class CarController {
 	@Deprecated
 	@ApiOperation(value = "修改固定车辆方法", produces = "application/json;charset=utf-8")
 	@PutMapping()
-	@Permit("community:proprietor:car")
+	// @Permit("community:proprietor:car")
 	public CommonResult<Boolean> updateProprietorCar(@RequestBody CarQO qo) {
 		//效验前端新增车辆参数合法性
 		ValidatorUtils.validateEntity(qo, CarQO.UpdateCarValidated.class);
@@ -226,7 +226,7 @@ public class CarController {
 	
 	@ApiOperation("所属人固定车辆查询方法")
 	@PostMapping(value = "/page", produces = "application/json;charset=utf-8")
-	@Permit("community:proprietor:car:page")
+	// @Permit("community:proprietor:car:page")
 	public CommonResult<?> queryProprietorCar(@RequestBody BaseQO<CarEntity> qo) {
 		if (null == qo.getQuery()) {
 			return CommonResult.error("没有选择社区!");
@@ -248,7 +248,7 @@ public class CarController {
 	@ApiOperation("所属人固定车辆删除方法")
 	@ApiImplicitParam(name = "id", value = "车辆固定id")
 	@DeleteMapping()
-	@Permit("community:proprietor:car")
+	// @Permit("community:proprietor:car")
 	public CommonResult<Boolean> deleteProprietorCar(@RequestParam String id) {
 		//从请求获得uid
 		if (!ValidatorUtils.isInteger(id)) {
@@ -270,7 +270,7 @@ public class CarController {
 	@ApiOperation("所属人车辆行驶证图片上传接口")
 	@ApiImplicitParam(name = "carImage", value = "车辆行驶证文件")
 	@PostMapping(value = "carImageUpload")
-	@Permit("community:proprietor:car:carImageUpload")
+	// @Permit("community:proprietor:car:carImageUpload")
 	public CommonResult<?> carImageUpload(@RequestParam("carImage") MultipartFile carImage)  {
 		PicUtil.imageQualified(carImage);
 		//4.调用上传服务接口 进行上传文件  返回访问路径
@@ -283,7 +283,7 @@ public class CarController {
 	@ApiOperation("所属人车辆图片批量上传接口")
 	@ApiImplicitParam(name = "carImageForBatch", value = "所有车辆图片文件")
 	@PostMapping(value = "carImageBatchUpload")
-	@Permit("community:proprietor:car:carImageBatchUpload")
+	// @Permit("community:proprietor:car:carImageBatchUpload")
 	public CommonResult<String[]> carImageUpload(MultipartFile[] carImages, HttpServletRequest request)  {
 		String requestHeader = "user-agent";
 		if (isMobileClient(request.getHeader(requestHeader))) {
@@ -297,7 +297,7 @@ public class CarController {
 
 	@ApiOperation("行驶证识别")
 	@PostMapping("drivingLicenseContent")
-	@Permit("community:proprietor:car:drivingLicenseContent")
+	// @Permit("community:proprietor:car:drivingLicenseContent")
 	public CommonResult<Map<String, Object>> getDrivingLicenseContent(MultipartFile drivingLicenseImage){
 		//验证行驶证图片
 		PicUtil.imageQualified(drivingLicenseImage);

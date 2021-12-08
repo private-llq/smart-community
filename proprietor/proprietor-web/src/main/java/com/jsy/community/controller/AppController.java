@@ -37,7 +37,7 @@ public class AppController {
 	
 	@ApiOperation("APP上传到服务器")
 	@PostMapping("/uploadApp")
-	@Permit("community:proprietor:app:uploadApp")
+	// @Permit("community:proprietor:app:uploadApp")
 	public CommonResult uploadApp(@RequestParam("file") MultipartFile file) {
 		String app = MinioUtils.upload(file, "app");
 		return CommonResult.ok(app);
@@ -45,7 +45,7 @@ public class AppController {
 
 	@ApiOperation("APP上传到服务器")
 	@PostMapping("/uploadIos")
-	@Permit("community:proprietor:app:uploadIos")
+	// @Permit("community:proprietor:app:uploadIos")
 	public CommonResult uploadIos(@RequestParam("file") MultipartFile file) {
 		String app = MinioUtils.uploadName(file, "ios");
 		return CommonResult.ok(app);
@@ -61,7 +61,7 @@ public class AppController {
 	
 	@ApiOperation("查询APP版本列表")
 	@GetMapping("/list/version")
-	@Permit("community:proprietor:app:list:version")
+	// @Permit("community:proprietor:app:list:version")
 	public CommonResult queryAppVersionList(Integer sysType, String sysVersion){
 		if(!BusinessConst.SYS_TYPE_ANDROID.equals(sysType) && !BusinessConst.SYS_TYPE_IOS.equals(sysType)){
 			sysType = null;
@@ -75,7 +75,7 @@ public class AppController {
 	
 	@ApiOperation("添加APP版本")
 	@PostMapping("/version")
-	@Permit("community:proprietor:app:version")
+	// @Permit("community:proprietor:app:version")
 	public CommonResult addAppVersion(@RequestBody AppVersionEntity appVersionEntity){
 		ValidatorUtils.validateEntity(appVersionEntity);
 		appVersionService.addAppVersion(appVersionEntity);
@@ -84,7 +84,7 @@ public class AppController {
 	
 	@ApiOperation("修改APP版本信息")
 	@PutMapping("/version")
-	@Permit("community:proprietor:app:version")
+	// @Permit("community:proprietor:app:version")
 	public CommonResult updateAppVersion(@RequestBody AppVersionEntity appVersionEntity){
 		if(appVersionEntity.getId() == null){
 			return CommonResult.error("请传入id");
@@ -96,7 +96,7 @@ public class AppController {
 	
 	@ApiOperation("删除APP版本")
 	@DeleteMapping("/version")
-	@Permit("community:proprietor:app:version")
+	// @Permit("community:proprietor:app:version")
 	public CommonResult delAppVersion(@RequestParam Long id){
 		if(id == null){
 			return CommonResult.error("请传入id");
@@ -113,7 +113,7 @@ public class AppController {
 	 */
 	@ApiOperation("查询APP版本详情")
 	@GetMapping("/v2/version")
-	@Permit("community:proprietor:app:v2:version")
+	// @Permit("community:proprietor:app:v2:version")
 	public CommonResult queryAppVersion(Integer sysType, String sysVersion){
 		if(!BusinessConst.SYS_TYPE_ANDROID.equals(sysType) && !BusinessConst.SYS_TYPE_IOS.equals(sysType)){
 			return CommonResult.error("请传入正确的系统类型");

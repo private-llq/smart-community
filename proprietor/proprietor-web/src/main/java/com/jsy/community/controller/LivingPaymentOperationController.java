@@ -42,7 +42,7 @@ public class LivingPaymentOperationController {
 
     @ApiOperation("新增分组")
     @PostMapping("/saveGroupName")
-        @Permit("community:proprietor:livingpaymentoperation:saveGroupName")
+        // @Permit("community:proprietor:livingpaymentoperation:saveGroupName")
     public CommonResult saveGroup(@ApiParam("组名") @RequestParam String name){
         String userId = UserUtils.getUserId();
         payGroupService.insertGroup(name,userId);
@@ -51,7 +51,7 @@ public class LivingPaymentOperationController {
     
     @ApiOperation("修改组名")
     @PutMapping("/updateGroupName")
-    @Permit("community:proprietor:livingpaymentoperation:updateGroupName")
+    // @Permit("community:proprietor:livingpaymentoperation:updateGroupName")
     public CommonResult updateGroup(@ApiParam("id") @RequestParam Long id,@ApiParam("name") String name){
         String userId = UserUtils.getUserId();
         payGroupService.updateGroup(id,name,userId);
@@ -60,7 +60,7 @@ public class LivingPaymentOperationController {
 
     @ApiOperation("删除分组")
     @DeleteMapping("/deleteGroupName")
-    @Permit("community:proprietor:livingpaymentoperation:deleteGroupName")
+    // @Permit("community:proprietor:livingpaymentoperation:deleteGroupName")
     public CommonResult deleteGroupName(@ApiParam("组名") @RequestParam String name){
         String userId = UserUtils.getUserId();
         payGroupService.delete(name,userId);
@@ -74,7 +74,7 @@ public class LivingPaymentOperationController {
      */
     @ApiOperation("生活缴费")
     @PostMapping("/add")
-    @Permit("community:proprietor:livingpaymentoperation:add")
+    // @Permit("community:proprietor:livingpaymentoperation:add")
     public CommonResult add(@RequestBody LivingPaymentQO livingPaymentQO){
         ValidatorUtils.validateEntity(livingPaymentQO, LivingPaymentQO.LivingPaymentValidated.class);
 //            if (new BigDecimal(livingPaymentQO.getAccountBalance().abs().intValue()).compareTo(livingPaymentQO.getAccountBalance().abs())==0){
@@ -101,7 +101,7 @@ public class LivingPaymentOperationController {
      */
     @ApiOperation("添加备注")
     @PostMapping("/addRemark")
-    @Permit("community:proprietor:livingpaymentoperation:addRemark")
+    // @Permit("community:proprietor:livingpaymentoperation:addRemark")
     public CommonResult addRemark(@RequestBody RemarkQO remarkQO){
         String userId = UserUtils.getUserId();
         remarkQO.setUid(userId);
@@ -116,7 +116,7 @@ public class LivingPaymentOperationController {
      */
     @ApiOperation("添加备注图片")
     @PostMapping("/addRemarkImg")
-    @Permit("community:proprietor:livingpaymentoperation:addRemarkImg")
+    // @Permit("community:proprietor:livingpaymentoperation:addRemarkImg")
     public CommonResult addRemarkImg(@RequestParam("file") MultipartFile file){
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);

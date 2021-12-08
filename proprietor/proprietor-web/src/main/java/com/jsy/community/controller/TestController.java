@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
  /*   @GetMapping("/test")
-    @Permit("community:proprietor:test:test")
+    // @Permit("community:proprietor:test:test")
     public R<Void> test(){
         LoginUser loginUser = ContextHolder.getContext().getLoginUser();
         return R.ok();
