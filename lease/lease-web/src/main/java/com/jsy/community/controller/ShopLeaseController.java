@@ -22,6 +22,7 @@ import com.jsy.community.vo.shop.IndexShopVO;
 import com.jsy.community.vo.shop.ShopDetailsVO;
 import com.jsy.community.vo.shop.ShopLeaseVO;
 import com.jsy.community.vo.shop.UserShopLeaseVO;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -232,6 +233,7 @@ public class ShopLeaseController {
     @ApiOperation("查询店铺详情")
     @RequireRecentBrowse
     @GetMapping("/getShop")
+    @LoginIgnore({"00000tourist"})
     // @Permit("community:lease:shop:getShop")
     public CommonResult getShop(@ApiParam("店铺id") @RequestParam Long shopId) {
         Map<String, Object> map = shopLeaseService.getShop(shopId, UserUtils.getUserId());
@@ -349,14 +351,6 @@ public class ShopLeaseController {
         return CommonResult.ok(shops);
     }
 
-    @ApiOperation("测试分布式事物---暂时先不删。用于测试")
-    @GetMapping("/testTransaction")
-    // @Permit("community:lease:shop:testTransaction")
-    public CommonResult testTransaction() {
-        shopLeaseService.testTransaction();
-        return CommonResult.ok();
-    }
-
     @ApiOperation("更多筛选")
     @GetMapping("/moreOption")
     // @Permit("community:lease:shop:moreOption")
@@ -449,6 +443,7 @@ public class ShopLeaseController {
 
     @ApiOperation("根据筛选条件查询商铺列表")
     @PostMapping("/getShopByCondition")
+    @LoginIgnore({"00000tourist"})
     // @Permit("community:lease:shop:getShopByCondition")
     public CommonResult<PageInfo> getShopByCondition(@RequestBody BaseQO<HouseLeaseQO> baseQO) {
         if (baseQO.getQuery() == null) {

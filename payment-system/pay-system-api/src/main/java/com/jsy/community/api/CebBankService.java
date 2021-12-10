@@ -24,11 +24,20 @@ public interface CebBankService {
      * @author: Pipi
      * @description: 获取云缴费sessionId
      * @param mobile: 手机号
-         * @param devicetype: // 1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序-部分接口必填
+         * @param deviceType: // 1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序-部分接口必填
      * @return: {@link String}
      * @date: 2021/12/6 9:56
      **/
-    String getCebBankSessionId(String mobile, String devicetype);
+    String getCebBankSessionId(String mobile, String deviceType);
+
+    /**
+     * @author: Pipi
+     * @description: 查询城市
+     * @param cebQueryCityQO:
+     * @return: {@link CebCityModelListVO}
+     * @date: 2021/12/10 10:35
+     **/
+    CebCityModelListVO queryCity(CebQueryCityQO cebQueryCityQO);
 
     /**
      * @author: Pipi

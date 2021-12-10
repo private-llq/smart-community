@@ -25,6 +25,10 @@ public class UserLivingExpensesBillEntity extends BaseEntity {
      */
     private String billKey;
     /**
+     * 用户uid
+     */
+    private String uid;
+    /**
      * 账单金额(分)
      */
     private String billAmount;

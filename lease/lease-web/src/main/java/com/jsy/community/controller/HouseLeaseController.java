@@ -165,6 +165,7 @@ public class HouseLeaseController {
 //    @Cacheable( value = "lease:house", key = "#baseQo", unless = "#result.data == null or #result.data.size() == 0", cacheManager = "redisCacheManager")
     @ApiOperation("分页查询房屋出租数据")
     // @Permit("community:lease:house:page")
+    @LoginIgnore({"00000tourist"})
     public CommonResult<List<HouseLeaseVO>> queryHouseLeaseByList(@RequestBody BaseQO<HouseLeaseQO> baseQo) {
         ValidatorUtils.validatePageParam(baseQo);
         if (baseQo.getQuery() == null) {
@@ -177,6 +178,7 @@ public class HouseLeaseController {
     @ApiOperation("查询房屋出租数据单条详情")
     @RequireRecentBrowse
     // @Permit("community:lease:house:details")
+    @LoginIgnore({"00000tourist"})
     public CommonResult<HouseLeaseVO> houseLeaseDetails(@RequestParam Long houseId) {
         return CommonResult.ok(iHouseLeaseService.queryHouseLeaseOne(houseId, UserUtils.getUserId()), "查询成功!");
     }

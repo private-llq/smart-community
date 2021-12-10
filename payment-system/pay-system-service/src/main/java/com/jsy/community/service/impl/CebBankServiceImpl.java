@@ -10,6 +10,7 @@ import com.jsy.community.qo.cebbank.*;
 import com.jsy.community.qo.unionpay.HttpResponseModel;
 import com.jsy.community.untils.cebbank.CebBankContributionUtil;
 import com.jsy.community.vo.cebbank.*;
+import com.jsy.community.vo.cebbank.CebCityPagingModelVO;
 import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -59,7 +60,7 @@ public class CebBankServiceImpl implements CebBankService {
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         CebLoginVO cebLoginVO = JSON.parseObject(respData, CebLoginVO.class);
-        // 存入缓存,有效期2小时
+        // 存入缓存,有效期2小时,银行那边建议是实时申请
         redisTemplate.opsForValue().set("cebBank-sessionId:" + cebLoginQO.getUserPhone(), cebLoginVO.getSessionId(), 2L, TimeUnit.HOURS);
         return cebLoginVO.getSessionId();
     }
@@ -68,20 +69,40 @@ public class CebBankServiceImpl implements CebBankService {
      * @author: Pipi
      * @description: 获取云缴费sessionId
      * @param mobile: 手机号
-     * @param devicetype: // 1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序-部分接口必填
+     * @param deviceType: // 1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序-部分接口必填
      * @return: {@link String}
      * @date: 2021/12/6 9:56
      **/
     @Override
-    public String getCebBankSessionId(String mobile, String devicetype) {
+    public String getCebBankSessionId(String mobile, String deviceType) {
+        mobile = StringUtil.isBlank(mobile) ? "18996226451" : mobile;
         String sessionId = redisTemplate.opsForValue().get("cebBank-sessionId:" + mobile);
         if (sessionId == null) {
             CebLoginQO cebLoginQO = new CebLoginQO();
             cebLoginQO.setUserPhone(mobile);
-            cebLoginQO.setDeviceType(devicetype);
+            cebLoginQO.setDeviceType(deviceType);
             sessionId = login(cebLoginQO);
         }
         return sessionId;
+    }
+
+    /**
+     * @param cebQueryCityQO :
+     * @author: Pipi
+     * @description: 查询城市
+     * @return: {@link CebCityModelListVO}
+     * @date: 2021/12/10 10:35
+     **/
+    @Override
+    public CebCityModelListVO queryCity(CebQueryCityQO cebQueryCityQO) {
+        HttpResponseModel responseModel = CebBankContributionUtil.queryCity(cebQueryCityQO);
+        if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
+            log.info("查询城市失败");
+            return null;
+        }
+        String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
+        CebCityPagingModelVO cebCityPagingModelVO = JSON.parseObject(respData, CebCityPagingModelVO.class);
+        return cebCityPagingModelVO.getCityPagingModel();
     }
 
     /**

@@ -1,10 +1,12 @@
 package com.jsy.community.qo.proprietor;
 
+import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 /**
@@ -32,5 +34,6 @@ public class RegisterQO implements Serializable {
 	 * 密码
 	 */
 	@NotEmpty(message = "密码不能为空")
+	@Pattern(regexp = RegexUtils.REGEX_PASSWORD, message = "密码格式验证不通过,长度为6-20位的数字或字母组成")
 	private String password;
 }

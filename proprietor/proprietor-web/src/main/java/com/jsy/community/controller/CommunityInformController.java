@@ -10,6 +10,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.lease.HouseLeaseVO;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -48,6 +49,7 @@ public class CommunityInformController {
 //    @Cacheable(value = "inform:rotation", key = "#communityId", unless = "#result.data == null or #result.data.size() == 0", condition = "#communityId > 0", cacheManager = "redisCacheManager")
     @ApiOperation("社区轮播消息")
     // @Permit("community:proprietor:community:inform:rotation")
+    @LoginIgnore({"00000tourist"})
     public CommonResult<List<PushInformEntity>> rotationCommunityInform(@RequestParam Long communityId) {
         return CommonResult.ok(communityInformService.rotationCommunityInform(informInitializeCount, communityId));
     }
@@ -68,6 +70,7 @@ public class CommunityInformController {
      */
     @GetMapping("/details")
     @ApiOperation("社区推送消息详情查看")
+    @LoginIgnore({"00000tourist"})
     // @Permit("community:proprietor:community:inform:details")
     public CommonResult<PushInformEntity> detailsCommunityInform(@RequestParam Long informId) {
         return CommonResult.ok(communityInformService.detailsCommunityInform(informId, UserUtils.getUserId()));
@@ -83,6 +86,7 @@ public class CommunityInformController {
      */
     @PostMapping(value = "/page", produces = "application/json;charset=utf-8")
     @ApiOperation("查询社区通知消息")
+    @LoginIgnore({"00000tourist"})
     // @Permit("community:proprietor:community:inform:page")
     public CommonResult<?> listCommunityInform(@RequestBody BaseQO<OldPushInformQO> qo) {
         ValidatorUtils.validatePageParam(qo);

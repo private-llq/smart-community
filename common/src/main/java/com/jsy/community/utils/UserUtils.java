@@ -162,6 +162,17 @@ public class UserUtils {
 //			.getRequest();
 		return ContextHolder.getContext().getLoginUser().getAccount();
 	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 获取e到家用户id
+	 * @param :
+	 * @return: {@link Long}
+	 * @date: 2021/12/8 16:54
+	 **/
+	public static Long getEHomeUserId() {
+		return ContextHolder.getContext().getLoginUser().getId();
+	}
 	
 	/**
 	 * @Description: 获取request域中用户id(登录用户自己的uid)
@@ -184,10 +195,13 @@ public class UserUtils {
 	 * @Date: 2021/4/8
 	**/
 	public static String getUserToken() {
+		return ContextHolder.getContext().getLoginUser().getToken();
+	}
+	/*public static String getUserToken() {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
 		return (String) request.getAttribute(USER_TOKEN);
-	}
+	}*/
 	
 	/**
 	* @Description: 获取物业端登录用户社区ID

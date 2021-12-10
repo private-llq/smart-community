@@ -8,9 +8,11 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.cebbank.*;
 import com.jsy.community.qo.unionpay.HttpResponseModel;
 import com.jsy.community.untils.cebbank.CebBankContributionUtil;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.LoginIgnore;
+import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -44,11 +46,10 @@ public class CebBankController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/11/17 17:47
      **/
-    @LoginIgnore
     @PostMapping("/v2/cityContributionCategory")
-    public CommonResult queryCityContributionCategory(@RequestBody CebQueryCityContributionCategoryQO categoryQO) {
+    public CommonResult<?> queryCityContributionCategory(@RequestBody CebQueryCityContributionCategoryQO categoryQO) {
         ValidatorUtils.validateEntity(categoryQO);
-        categoryQO.setSessionId(getCebBankSessionId());
+        categoryQO.setSessionId(cebBankService.getCebBankSessionId(UserUtils.getUserInfo().getMobile(), categoryQO.getDeviceType()));
         return CommonResult.ok(cebBankService.queryCityContributionCategory(categoryQO));
     }
 
@@ -59,50 +60,29 @@ public class CebBankController {
      * @return: {@link CommonResult}
      * @date: 2021/11/23 15:33
      **/
-    @LoginIgnore
     @PostMapping("/v2/queryContributionProject")
-    public CommonResult queryContributionProject(@RequestBody CebQueryContributionProjectQO projectQO) {
+    public CommonResult<?> queryContributionProject(@RequestBody CebQueryContributionProjectQO projectQO) {
         ValidatorUtils.validateEntity(projectQO);
-        String sessionId = getCebBankSessionId();
-        projectQO.setSessionId(sessionId);
+        projectQO.setSessionId(cebBankService.getCebBankSessionId(UserUtils.getUserInfo().getMobile(), projectQO.getDeviceType()));
         return CommonResult.ok(cebBankService.queryContributionProject(projectQO));
     }
 
     /**
-     * @param billInfoQO:
      * @author: Pipi
-     * @description: 查询缴费账单信息(作用同查询手机充值缴费账单, 但是适用于生活缴费, 不适用于手机话费)
-     * @return: {@link CommonResult}
-     * @date: 2021/11/23 17:14
+     * @description: 查询城市
+     * @param deviceType: 1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序
+     * @return: {@link CommonResult<?>}
+     * @date: 2021/12/10 14:05
      **/
-    @LoginIgnore
-    @PostMapping("/v2/queryBillInfo")
-    public CommonResult queryBillInfo(@RequestBody CebQueryBillInfoQO billInfoQO) {
-        ValidatorUtils.validateEntity(billInfoQO);
-        if (billInfoQO.getBusinessFlow() == 1) {
-            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "直接缴费业务,请查询直缴接口");
+    @GetMapping("/v2/queryCity")
+    public CommonResult<?> queryCity(@RequestParam("deviceType") String deviceType) {
+        if (StringUtil.isBlank(deviceType)) {
+            throw new JSYException(JSYError.REQUEST_PARAM);
         }
-        String sessionId = getCebBankSessionId();
-        billInfoQO.setSessionId(sessionId);
-        return CommonResult.ok(cebBankService.queryBillInfo(billInfoQO));
-    }
-
-    /**
-     * @param :
-     * @author: Pipi
-     * @description: 获取cebBankSession
-     * @return: {@link String}
-     * @date: 2021/11/23 14:59
-     **/
-    @LoginIgnore
-    private String getCebBankSessionId() {
-        String sessionId = redisTemplate.opsForValue().get("cebBank-sessionId:" + "18996226451");
-        if (sessionId == null) {
-            CebLoginQO cebLoginQO = new CebLoginQO();
-            cebLoginQO.setUserPhone("18996226451");
-            cebLoginQO.setDeviceType("1");
-            sessionId = cebBankService.login(cebLoginQO);
-        }
-        return sessionId;
+        CebQueryCityQO cebQueryCityQO = new CebQueryCityQO();
+        cebQueryCityQO.setSessionId(cebBankService.getCebBankSessionId(UserUtils.getUserInfo().getMobile(), deviceType));
+        cebQueryCityQO.setCityRange("SOME");
+        cebQueryCityQO.setDeviceType(deviceType);
+        return CommonResult.ok(cebBankService.queryCity(cebQueryCityQO));
     }
 }

@@ -214,8 +214,8 @@ public class UserAuthController {
     @ApiOperation(value = "注册后设置密码", notes = "需要登录")
     @PostMapping("/password")
     // @Permit("community:proprietor:user:auth:password")
+    @Deprecated
     public CommonResult<Boolean> addPassword(@RequestBody AddPasswordQO qo) {
-
         ValidatorUtils.validateEntity(qo, AddPasswordQO.passwordVGroup.class);
         String uid = UserUtils.getUserId();
         boolean b = userAuthService.addPassword(uid, qo);
@@ -226,6 +226,10 @@ public class UserAuthController {
     @PostMapping("/bindingWechat")
     // @Permit("community:proprietor:user:auth:bindingWechat")
     public CommonResult bindingWechat(@RequestParam("code") String code) {
+        baseAuthRpcService.bindWeChat(code);
+        return CommonResult.ok("", "绑定成功");
+    }
+    /*public CommonResult bindingWechat(@RequestParam("code") String code) {
         JSONObject object = WeCharUtil.getAccessToken(code);
         if ("".equals(object) || object == null) {
             return CommonResult.error("系统异常，请稍后再试！");
@@ -235,27 +239,42 @@ public class UserAuthController {
         JSONObject jsonObject = WeCharUtil.getUserInfo(accessToken, openid);
         userService.bindingWechat(UserUtils.getUserId(), openid);
         return CommonResult.ok(jsonObject.getString("nickname"), "绑定成功");
-    }
+    }*/
 
     @ApiOperation("解绑微信绑定")
     @PostMapping("/relieveBindingWechat")
     // @Permit("community:proprietor:user:auth:relieveBindingWechat")
     public CommonResult relieveBindingWechat(@RequestBody RegisterQO registerQO) {
+        baseAuthRpcService.unboundWeChat(UserUtils.getUserToken());
+        return CommonResult.ok();
+    }
+    /*public CommonResult relieveBindingWechat(@RequestBody RegisterQO registerQO) {
         commonService.checkVerifyCode(registerQO.getAccount(), registerQO.getCode());
         userService.relieveBindingWechat(registerQO, UserUtils.getUserId());
         return CommonResult.ok();
-    }
+    }*/
 
     @ApiOperation(value = "设置支付密码", notes = "需要登录")
     @PostMapping("/password/pay")
     // @Permit("community:proprietor:user:auth:password:pay")
     public CommonResult<Boolean> addPayPassword(@RequestBody AddPasswordQO qo) {
+        ValidatorUtils.validateEntity(qo, AddPasswordQO.payPasswordVGroup.class);
+        if (StringUtil.isNotBlank(qo.getOldPayPassword())) {
+            // 修改支付密码
+            baseAuthRpcService.updatePayPassword(UserUtils.getUserToken(), qo.getOldPayPassword(), qo.getPayPassword());
+        } else {
+            // 添加支付密码
+            baseAuthRpcService.initPayPassword(UserUtils.getUserToken(), qo.getPayPassword());
+        }
+        return CommonResult.ok();
+    }
+    /*public CommonResult<Boolean> addPayPassword(@RequestBody AddPasswordQO qo) {
         //todo 个人觉得明文传递支付密码有问题
         ValidatorUtils.validateEntity(qo, AddPasswordQO.payPasswordVGroup.class);
         String uid = UserUtils.getUserId();
         boolean b = userAuthService.addPayPassword(uid, qo);
         return b ? CommonResult.ok() : CommonResult.error("支付密码设置失败");
-    }
+    }*/
 
     @LoginIgnore
     @ApiOperation(value = "敏感操作短信验证", notes = "忘记密码等")
@@ -280,18 +299,27 @@ public class UserAuthController {
         if (!qo.getPassword().equals(qo.getConfirmPassword())) {
             throw new JSYException("两次密码不一致");
         }
+        baseAuthRpcService.resetPhoneLoginPassword(UserUtils.getUserToken(), qo.getCode(), qo.getPassword());
+        return CommonResult.ok();
+    }
+    /*public CommonResult<Boolean> resetPassword(@RequestAttribute(value = "body") String body) {
+        ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
+        ValidatorUtils.validateEntity(qo, ResetPasswordQO.forgetPassVGroup.class);
+        if (!qo.getPassword().equals(qo.getConfirmPassword())) {
+            throw new JSYException("两次密码不一致");
+        }
         boolean b = userAuthService.resetPassword(qo);
         if (b) {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             String authToken = request.getHeader("authToken");
-            if (StrUtil.isBlank(authToken)) {
+if (StrUtil.isBlank(authToken)) {
                 authToken = request.getParameter("authToken");
             }
             //销毁Auth token
             UserUtils.destroyToken("Auth", authToken);
         }
         return b ? CommonResult.ok() : CommonResult.error("重置失败");
-    }
+    }*/
 
     @ApiOperation("发送修改支付密码的手机验证码")
     @GetMapping("/send/password/pay/code")
@@ -399,4 +427,16 @@ public class UserAuthController {
 
     //TODO 待定-手机丢失更换新手机(旧手机不在线)
 
+    /**
+     * @author: Pipi
+     * @description: 用户账号注销(危险操作)
+     * @param :
+     * @return: {@link CommonResult<?>}
+     * @date: 2021/12/9 17:39
+     **/
+    @PostMapping("/v2/cancellation")
+    public CommonResult<?> cancellation() {
+        baseAuthRpcService.cancellation(UserUtils.getEHomeUserId());
+        return CommonResult.ok("注销成功");
+    }
 }

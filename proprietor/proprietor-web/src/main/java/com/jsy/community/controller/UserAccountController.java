@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IRedbagService;
 import com.jsy.community.api.IUserAccountRecordService;
 import com.jsy.community.api.IUserAccountService;
@@ -21,15 +20,25 @@ import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAccountVO;
 import com.jsy.community.vo.WithdrawalResulrVO;
-import com.zhsj.baseweb.annotation.Permit;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.BaseWallet;
+import com.zhsj.base.api.domain.WalletBalanceChange;
+import com.zhsj.base.api.rpc.IBaseAuthRpcService;
+import com.zhsj.base.api.rpc.IBaseWalletRpcService;
+import com.zhsj.base.api.rpc.IBaseWithdrawalRpcService;
+import com.zhsj.base.api.vo.PageVO;
+import com.zhsj.basecommon.exception.BaseException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,6 +61,15 @@ public class UserAccountController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IRedbagService redbagService;
 
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseWalletRpcService baseWalletRpcService;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseAuthRpcService baseAuthRpcService;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseWithdrawalRpcService withdrawalRpcService;
+
     //========================== 用户账户 ==============================
 
     /**
@@ -63,13 +81,19 @@ public class UserAccountController {
      **/
     @ApiOperation("【用户账户】查询余额")
     @GetMapping("balance")
-    // @Permit("community:proprietor:user:account:balance")
     public CommonResult queryBalance() {
+        BaseWallet baseWallet = baseWalletRpcService.getWalletByCon(UserUtils.getEHomeUserId(), "RMB");
+        Map<String, Object> returnMap = new HashMap<>();
+        returnMap.put("balance", baseWallet.getBalance());
+        return CommonResult.ok(returnMap, "查询成功");
+    }
+    // @Permit("community:proprietor:user:account:balance")
+    /*public CommonResult queryBalance() {
         UserAccountVO userAccountVO = userAccountService.queryBalance(UserUtils.getUserId());
         Map<String, Object> returnMap = new HashMap<>();
         returnMap.put("balance", userAccountVO.getBalance().setScale(2, RoundingMode.HALF_UP).toPlainString());
         return CommonResult.ok(returnMap, "查询成功");
-    }
+    }*/
 
     /**
      * @Description: 账户交易
@@ -102,37 +126,97 @@ public class UserAccountController {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new UserAccountRecordQO());
         }
+        PageVO<WalletBalanceChange> walletBalanceChange = baseWalletRpcService.getWalletBalanceChange(UserUtils.getEHomeUserId(), baseQO.getPage().intValue(), baseQO.getSize().intValue(), baseQO.getQuery().getTradeType());
+        List<UserAccountRecordEntity> recordEntities = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(walletBalanceChange.getData())) {
+            for (WalletBalanceChange datum : walletBalanceChange.getData()) {
+                UserAccountRecordEntity userAccountRecordEntity = new UserAccountRecordEntity();
+                userAccountRecordEntity.setUid(UserUtils.getUserId());
+                userAccountRecordEntity.setTradeFromStr(datum.getSource());
+                userAccountRecordEntity.setTradeType(datum.getType());
+                userAccountRecordEntity.setTradeTypeStr(PaymentEnum.TradeTypeEnum.tradeTypeMap.get(datum.getType()));
+                userAccountRecordEntity.setTradeAmount(datum.getAmount());
+                userAccountRecordEntity.setTradeAmountStr(String.valueOf(datum.getAmount()));
+                userAccountRecordEntity.setBalance(datum.getBalance());
+                userAccountRecordEntity.setBalanceStr(String.valueOf(datum.getBalance()));
+                userAccountRecordEntity.setComment(datum.getRemark());
+                userAccountRecordEntity.setId(datum.getId());
+                userAccountRecordEntity.setIdStr(String.valueOf(datum.getId()));
+                userAccountRecordEntity.setCreateTime(datum.getCreateTime());
+                userAccountRecordEntity.setUpdateTime(datum.getUpdateTime());
+                recordEntities.add(userAccountRecordEntity);
+            }
+        }
+        PageInfo<UserAccountRecordEntity> pageInfo = new PageInfo<>();
+        pageInfo.setRecords(recordEntities);
+        pageInfo.setTotal(walletBalanceChange.getTotal());
+        pageInfo.setSize(walletBalanceChange.getPageSize());
+        pageInfo.setCurrent(walletBalanceChange.getPageNum());
+        return CommonResult.ok(pageInfo);
+    }
+    /*public CommonResult<PageInfo<UserAccountRecordEntity>> queryAccountRecord(@RequestBody BaseQO<UserAccountRecordQO> baseQO) {
+        if (baseQO.getQuery() == null) {
+            baseQO.setQuery(new UserAccountRecordQO());
+        }
         baseQO.getQuery().setUid(UserUtils.getUserId());
         return CommonResult.ok(userAccountRecordService.queryAccountRecord(baseQO));
-    }
+    }*/
 
     @ApiOperation(value = "验证支付密码", notes = "需要登录")
     @GetMapping("/password/pay/check")
     // @Permit("community:proprietor:user:account:password:pay:check")
     public CommonResult<Boolean> checkPayPassword(@RequestParam String payPassword) {
+        try {
+            return CommonResult.ok(baseAuthRpcService.checkPayPassword(UserUtils.getEHomeUserId(), payPassword));
+        } catch (BaseException baseException) {
+            /*if (baseException.getErrorEnum().getCode().equals(ErrorEnum.PAY_PASSWORD_ERROR.getCode())) {
+                return CommonResult.ok(false);
+            }*/
+        }
+        return CommonResult.ok(false);
+    }
+    /*public CommonResult<Boolean> checkPayPassword(@RequestParam String payPassword) {
         String uid = UserUtils.getUserId();
         return CommonResult.ok(userAccountService.checkPayPassword(uid, payPassword));
-    }
+    }*/
 
     @ApiOperation(value = "用户余额提现至微信", notes = "需要登录")
     @PostMapping("/wechat/withdrawal")
     // @Permit("community:proprietor:user:account:wechat:withdrawal")
     public CommonResult<WithdrawalResulrVO> wechatWithdrawal(@RequestBody UserWithdrawalQ0 userWithdrawalQ0) {
+        withdrawalRpcService.walletWithdrawalToWeChat(UserUtils.getEHomeUserId(), userWithdrawalQ0.getPayPassword(), userWithdrawalQ0.getAmount(), "");
+        WithdrawalResulrVO withdrawalResulrVO = new WithdrawalResulrVO();
+        withdrawalResulrVO.setCode("0");
+        withdrawalResulrVO.setMsg("");
+        withdrawalResulrVO.setSuccess(true);
+        return CommonResult.ok(withdrawalResulrVO);
+    }
+
+    /*public CommonResult<WithdrawalResulrVO> wechatWithdrawal(@RequestBody UserWithdrawalQ0 userWithdrawalQ0) {
         String uid = UserUtils.getUserId();
         return CommonResult.ok(userAccountService.wechatWithdrawal(userWithdrawalQ0, uid));
-    }
+    }*/
 
     @ApiOperation(value = "用户余额提现至支付宝", notes = "需要登录")
     @PostMapping("/zhifubao/withdrawal")
     // @Permit("community:proprietor:user:account:zhifubao:withdrawal")
     public CommonResult<WithdrawalResulrVO> zhifubaoWithdrawal(@RequestBody UserWithdrawalQ0 userWithdrawalQ0) {
+        withdrawalRpcService.walletWithdrawalToAliPay(UserUtils.getEHomeUserId(), userWithdrawalQ0.getPayPassword(), userWithdrawalQ0.getAmount(), "");
+        WithdrawalResulrVO withdrawalResulrVO = new WithdrawalResulrVO();
+        withdrawalResulrVO.setCode("0");
+        withdrawalResulrVO.setMsg("");
+        withdrawalResulrVO.setSuccess(true);
+        return CommonResult.ok(withdrawalResulrVO);
+    }
+    /*public CommonResult<WithdrawalResulrVO> zhifubaoWithdrawal(@RequestBody UserWithdrawalQ0 userWithdrawalQ0) {
         String uid = UserUtils.getUserId();
         return CommonResult.ok(userAccountService.zhiFuBaoWithdrawal(userWithdrawalQ0, uid));
-    }
+    }*/
 
     @ApiOperation(value = "查询已绑定支付宝账户", notes = "需要登录")
     @GetMapping("/zhifubao/account/query")
     // @Permit("community:proprietor:user:account:zhifubao:account:query")
+    @Deprecated
     public CommonResult<ZhiFuBaoAccountBindingQO> queryZhiFuBaoAccount() {
         return CommonResult.ok(userAccountService.queryZhiFuBaoAccount(UserUtils.getUserId()));
     }
@@ -140,6 +224,7 @@ public class UserAccountController {
     @ApiOperation(value = "绑定(修改)支付宝账户", notes = "需要登录")
     @PostMapping("/zhifubao/account/binding")
     // @Permit("community:proprietor:user:account:zhifubao:account:binding")
+    @Deprecated
     public CommonResult<Boolean> bindingZhiFuBaoAccount(@RequestBody ZhiFuBaoAccountBindingQO accountBindingQO) {
         String uid = UserUtils.getUserId();
         userAccountService.bindingZhiFuBaoAccount(uid, accountBindingQO);
@@ -149,6 +234,7 @@ public class UserAccountController {
     @ApiOperation(value = "解绑支付宝账户", notes = "需要登录")
     @GetMapping("/zhifubao/account/unbundling")
     // @Permit("community:proprietor:user:account:zhifubao:account:unbundling")
+    @Deprecated
     public CommonResult<Boolean> unbundlingZhiFuBaoAccount() {
         String uid = UserUtils.getUserId();
         userAccountService.unbundlingZhiFuBaoAccount(uid);

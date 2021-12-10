@@ -24,7 +24,9 @@ public interface PaymentEnum {
 	**/
 	enum TradeTypeEnum {
 		TRADE_TYPE_EXPEND("支出", 1),
-		TRADE_TYPE_INCOME("收入", 2);
+		TRADE_TYPE_INCOME("收入", 2),
+		TRADE_TYPE_WITHDRAWAL("提现", 3),
+		TRADE_TYPE_RECHARGE("充值", 4);
 		private String name;
 		private Integer index;
 		TradeTypeEnum(String name, Integer index) {

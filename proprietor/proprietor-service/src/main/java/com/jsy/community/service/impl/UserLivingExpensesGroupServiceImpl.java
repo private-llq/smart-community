@@ -6,15 +6,20 @@ import com.jsy.community.api.ProprietorException;
 import com.jsy.community.api.UserLivingExpensesGroupService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserLivingExpensesAccountEntity;
+import com.jsy.community.entity.UserLivingExpensesBillEntity;
 import com.jsy.community.entity.UserLivingExpensesGroupEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.UserLivingExpensesAccountMapper;
+import com.jsy.community.mapper.UserLivingExpensesBillMapper;
 import com.jsy.community.mapper.UserLivingExpensesGroupMapper;
 import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.validation.constraints.NotBlank;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -31,6 +36,8 @@ public class UserLivingExpensesGroupServiceImpl extends ServiceImpl<UserLivingEx
     private UserLivingExpensesGroupMapper groupMapper;
     @Autowired
     private UserLivingExpensesAccountMapper accountMapper;
+    @Autowired
+    private UserLivingExpensesBillMapper billMapper;
 
     /**
      * @param groupEntity :
@@ -46,7 +53,8 @@ public class UserLivingExpensesGroupServiceImpl extends ServiceImpl<UserLivingEx
         queryWrapper.eq("group_name", groupEntity.getGroupName());
         UserLivingExpensesGroupEntity expensesGroupEntity = groupMapper.selectOne(queryWrapper);
         if (expensesGroupEntity != null) {
-            throw new ProprietorException(JSYError.DUPLICATE_KEY);
+            // 组已经存在,良好体验,直接返回已有组ID
+            return expensesGroupEntity.getIdStr();
         }
         groupEntity.setId(SnowFlake.nextId());
         int insert = groupMapper.insert(groupEntity);
@@ -77,7 +85,24 @@ public class UserLivingExpensesGroupServiceImpl extends ServiceImpl<UserLivingEx
      * @date: 2021/12/3 14:34
      **/
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Integer deleteGroup(UserLivingExpensesGroupEntity groupEntity) {
+        // 删除分组下的户号
+        QueryWrapper<UserLivingExpensesAccountEntity> accountEntityQueryWrapper = new QueryWrapper<>();
+        accountEntityQueryWrapper.eq("uid", groupEntity.getUid());
+        accountEntityQueryWrapper.eq("group_id", groupEntity.getId());
+        List<UserLivingExpensesAccountEntity> accountEntities = accountMapper.selectList(accountEntityQueryWrapper);
+        accountMapper.delete(accountEntityQueryWrapper);
+        // 删除分组下的户号的未缴费的账单
+        if (!CollectionUtils.isEmpty(accountEntities)) {
+            Set<String> accountSet = accountEntities.stream().map(UserLivingExpensesAccountEntity::getAccount).collect(Collectors.toSet());
+            QueryWrapper<UserLivingExpensesBillEntity> billEntityQueryWrapper = new QueryWrapper<>();
+            billEntityQueryWrapper.eq("uid", groupEntity.getUid());
+            billEntityQueryWrapper.eq("bill_status", 0);
+            billEntityQueryWrapper.in("bill_key", accountSet);
+            billMapper.delete(billEntityQueryWrapper);
+        }
+        // 删除分组
         QueryWrapper<UserLivingExpensesGroupEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", groupEntity.getId());
         queryWrapper.eq("uid", groupEntity.getUid());

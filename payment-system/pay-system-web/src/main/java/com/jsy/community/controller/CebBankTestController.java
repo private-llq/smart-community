@@ -173,6 +173,7 @@ public class CebBankTestController {
      * @date: 2021/11/23 18:26
      **/
     @PostMapping("/v2/createCashierDesk")
+    @LoginIgnore
     public CommonResult createCashierDesk(@RequestBody CebCreateCashierDeskQO deskQO) {
         String sessionId = getCebBankSessionId();
         deskQO.setMerOrderNo(String.valueOf(SnowFlake.nextId()));

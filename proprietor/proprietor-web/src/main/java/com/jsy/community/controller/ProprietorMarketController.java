@@ -13,6 +13,7 @@ import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -155,6 +156,7 @@ public class ProprietorMarketController {
     @PostMapping("/selectMarketAllPage")
     @ApiOperation("社区集市所有已发布商品")
     // @Permit("community:proprietor:market:selectMarketAllPage")
+    @LoginIgnore({"00000tourist"})
     public CommonResult selectMarketAllPage(@RequestBody  BaseQO<ProprietorMarketQO> baseQO){
         ValidatorUtils.validatePageParam(baseQO);
         if (baseQO.getQuery()==null){
