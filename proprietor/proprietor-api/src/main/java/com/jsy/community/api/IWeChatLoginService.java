@@ -2,6 +2,7 @@ package com.jsy.community.api;
 
 import com.jsy.community.qo.proprietor.BindingMobileQO;
 import com.jsy.community.vo.UserAuthVo;
+import com.zhsj.baseweb.support.LoginUser;
 
 /**
  * @program: com.jsy.community
@@ -45,4 +46,22 @@ public interface IWeChatLoginService {
      * @return:
      */
     UserAuthVo loginNotMobile(String sub);
+
+    /**
+     * @Description: 登录v2
+     * @author: Hu
+     * @since: 2021/12/8 16:31
+     * @Param:
+     * @return:
+     */
+    UserAuthVo loginV2(String code);
+
+    /**
+     * @Description: 绑定手机v2
+     * @author: Hu
+     * @since: 2021/5/21 13:58
+     * @Param: bindingMobileQO
+     * @return: UserAuthVo
+     */
+    UserAuthVo bindingMobileV2(BindingMobileQO bindingMobileQO, LoginUser loginUser);
 }

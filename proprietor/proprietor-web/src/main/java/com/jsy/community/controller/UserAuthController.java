@@ -16,6 +16,8 @@ import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.rpc.IBaseSmsRpcService;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
+import com.zhsj.baseweb.support.ContextHolder;
+import com.zhsj.baseweb.support.LoginUser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -189,10 +191,10 @@ public class UserAuthController {
                 && StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())) {
             return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "accessToken和authCode不允许同时为空");
         }
-        return CommonResult.ok(userService.thirdPlatformLogin(userThirdPlatformQO));
+        return CommonResult.ok(userService.thirdPlatformLoginV2(userThirdPlatformQO));
     }
 
-    @LoginIgnore
+
     @ApiOperation("三方平台绑定手机")
     @PostMapping("/third/binding")
     public CommonResult bindingThirdPlatform(@RequestBody UserThirdPlatformQO userThirdPlatformQO) {
@@ -208,7 +210,8 @@ public class UserAuthController {
                 || StringUtils.isEmpty(userThirdPlatformQO.getCode())) {
             return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "手机和验证码不能为空");
         }
-        return CommonResult.ok(userService.bindThirdPlatform(userThirdPlatformQO), "绑定成功");
+        LoginUser loginUser = ContextHolder.getContext().getLoginUser();
+        return CommonResult.ok(userService.bindThirdPlatformV2(userThirdPlatformQO,loginUser), "绑定成功");
     }
 
     @ApiOperation(value = "注册后设置密码", notes = "需要登录")

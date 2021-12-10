@@ -28,7 +28,6 @@ import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
 import com.jsy.community.utils.hardware.xu.XUFaceUtil;
-import com.jsy.community.utils.CallUtil;
 import com.jsy.community.utils.imutils.entity.ImResponseEntity;
 import com.jsy.community.vo.*;
 import com.zhsj.base.api.constant.RpcConst;
@@ -37,6 +36,7 @@ import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.LoginVo;
 import com.zhsj.base.api.vo.ThirdBindStatusVo;
+import com.zhsj.baseweb.support.LoginUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -55,7 +55,6 @@ import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -664,6 +663,62 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return thirdUid;
     }
 
+
+    /**
+     * @Description: 三方登录v2
+     * @author: Hu
+     * @since: 2021/12/7 15:33
+     * @Param: [userThirdPlatformQO]
+     * @return: com.jsy.community.vo.UserAuthVo
+     */
+    @Override
+    public UserAuthVo thirdPlatformLoginV2(UserThirdPlatformQO userThirdPlatformQO) {
+        UserAuthVo userAuthVo = new UserAuthVo();
+        LoginVo loginVo = baseAuthRpcService.aliPayLoginEHome(userThirdPlatformQO.getAuthCode());
+        userAuthVo.setToken(loginVo.getToken().getToken());
+        LocalDateTime localDateTime = LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime()/1000, 0, ZoneOffset.ofHours(8));
+        userAuthVo.setExpiredTime(localDateTime);
+        userAuthVo.setExpiredTime(localDateTime);
+        userAuthVo.setUserInfo(getUserInfoVo(loginVo));
+        return userAuthVo;
+    }
+
+    public UserInfoVo getUserInfoVo(LoginVo loginVo){
+        // 调用基础用户模块获取三方绑定状态
+        ThirdBindStatusVo thirdBindStatus = baseUserInfoRpcService.getThirdBindStatus(loginVo.getUserInfo().getId());
+        // 调用基础用户模块获取支付密码设置状态
+        Boolean payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(loginVo.getUserInfo().getId(), loginVo.getUserInfo().getAccount());
+        // 调用基础用户模块获取实名信息
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(loginVo.getUserInfo().getId());
+        UserInfoVo userInfoVo = new UserInfoVo();
+        userInfoVo.setIsBindMobile(loginVo.getUserInfo().getPhone() != null ? 1 : 0);
+        if (thirdBindStatus != null) {
+            userInfoVo.setIsBindWechat(thirdBindStatus.getWeChatBind() ? 1 : 0);
+            userInfoVo.setIsBindAlipay(thirdBindStatus.getAliPayBind() ? 1 : 0);
+        }
+
+        if (userInfoVo.getIsBindMobile()==1){
+            userInfoVo.setIsBindPayPassword(payPasswordStatus != null && payPasswordStatus ? 1 : 0);
+            userInfoVo.setMobile(loginVo.getUserInfo().getPhone());
+            userInfoVo.setUroraTags(getUroraTags(userInfoVo.getUid()));
+            userInfoVo.setNickname(loginVo.getUserInfo().getNickName());
+            userInfoVo.setAvatarUrl(loginVo.getUserInfo().getAvatarThumbnail());
+            userInfoVo.setSex(loginVo.getUserInfo().getSex());
+            if (idCardRealInfo != null) {
+                userInfoVo.setBirthday(idCardRealInfo.getIdCardBirthday());
+                userInfoVo.setRealName(idCardRealInfo.getIdCardName());
+                userInfoVo.setIdCard(idCardRealInfo.getIdCardNumber());
+            }
+            userInfoVo.setIsRealAuth(loginVo.getUserInfo().getIsAuthFace() ? 1 : 0);
+
+            userInfoVo.setUid(loginVo.getUserInfo().getAccount());
+            userInfoVo.setImId(loginVo.getUserIm().getImId());
+            userInfoVo.setImPassword(loginVo.getUserIm().getPassword());
+        }
+
+        return userInfoVo;
+    }
+
     /**
      * @Description: 三方登录
      * @Param: [userThirdPlatformQO]
@@ -711,6 +766,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             }
 //            return returnMap;
         }
+    }
+
+
+    /**
+     * @Description: 三方平台绑定手机v2
+     * @author: Hu
+     * @since: 2021/12/7 15:52
+     * @Param: [userThirdPlatformQO]
+     * @return: com.jsy.community.vo.UserInfoVo
+     */
+    @Override
+    public UserAuthVo bindThirdPlatformV2(UserThirdPlatformQO userThirdPlatformQO, LoginUser loginUser) {
+        UserAuthVo authVo = new UserAuthVo();
+        LoginVo loginVo = baseAuthRpcService.weChatBindPhone(loginUser.getToken(), userThirdPlatformQO.getMobile(), userThirdPlatformQO.getCode());
+        authVo.setToken(loginVo.getToken().getToken());
+        LocalDateTime localDateTime = LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime()/1000, 0, ZoneOffset.ofHours(8));
+        authVo.setExpiredTime(localDateTime);
+        authVo.setUserInfo(getUserInfoVo(loginVo));
+        return authVo;
     }
 
     /**

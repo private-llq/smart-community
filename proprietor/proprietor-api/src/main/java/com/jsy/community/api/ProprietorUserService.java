@@ -10,6 +10,8 @@ import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.vo.ControlVO;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
+import com.zhsj.base.api.vo.LoginVo;
+import com.zhsj.baseweb.support.LoginUser;
 
 import java.util.Collection;
 import java.util.List;
@@ -368,4 +370,31 @@ public interface ProprietorUserService extends IService<UserEntity> {
      * @return:
      */
 	void relieveBindingWechat(RegisterQO registerQO, String userId);
+
+	/**
+	 * @Description: 支付宝登录v2
+	 * @author: Hu
+	 * @since: 2021/12/7 15:32
+	 * @Param:
+	 * @return:
+	 */
+	UserAuthVo thirdPlatformLoginV2(UserThirdPlatformQO userThirdPlatformQO);
+
+	/**
+	 * @Description: 查询用户信息
+	 * @author: Hu
+	 * @since: 2021/12/7 15:49
+	 * @Param:
+	 * @return:
+	 */
+	UserInfoVo getUserInfoVo(LoginVo loginVo);
+
+	/**
+	 * @Description: 三方绑定手机V2
+	 * @author: Hu
+	 * @since: 2021/12/7 15:51
+	 * @Param:
+	 * @return:
+	 */
+	UserAuthVo bindThirdPlatformV2(UserThirdPlatformQO userThirdPlatformQO, LoginUser loginUser);
 }

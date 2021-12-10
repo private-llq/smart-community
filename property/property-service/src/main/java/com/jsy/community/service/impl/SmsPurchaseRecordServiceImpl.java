@@ -64,9 +64,7 @@ public class SmsPurchaseRecordServiceImpl extends ServiceImpl<SmsPurchaseRecordM
 		}
 		// 补充状态
 		for (SmsPurchaseRecordEntity smsPurchaseRecordEntity : smsPurchaseRecordEntities) {
-			if (smsPurchaseRecordEntity.getStatus() == 1) {
-				smsPurchaseRecordEntity.setStatusName("已支付 已收货");
-			}
+			smsPurchaseRecordEntity.setStatusName(smsPurchaseRecordEntity.getStatus() == 1 ? "已支付 已收货" : "未付款");
 		}
 		return smsPurchaseRecordEntities;
 	}
