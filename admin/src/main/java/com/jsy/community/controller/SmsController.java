@@ -1,10 +1,14 @@
 package com.jsy.community.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.jsy.community.entity.SmsEntity;
+import com.jsy.community.entity.*;
+import com.jsy.community.qo.BaseQO;
+import com.jsy.community.qo.sys.SmsPurchaseRecordQO;
 import com.jsy.community.qo.sys.SmsQO;
-import com.jsy.community.service.ISmsService;
+import com.jsy.community.qo.sys.SmsTemplateQO;
+import com.jsy.community.service.*;
 import com.jsy.community.utils.MyHttpUtils;
+import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.LoginIgnore;
@@ -17,10 +21,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,6 +46,18 @@ public class SmsController {
     
     @Resource
     private ISmsService smsService;
+    
+    @Resource
+    private ISmsTypeService smsTypeService;
+    
+    @Resource
+    private ISmsTemplateService smsTemplateService;
+    
+    @Resource
+    private ISmsMenuService smsMenuService;
+    
+    @Resource
+    private ISmsPurchaseRecordService smsPurchaseRecordService;
 
     /**
      * 内部测试、暂无任何拦截及 短信在一定时间内 不能二次发送
@@ -122,5 +135,203 @@ public class SmsController {
     @Permit("community:admin:sms:query:setting")
     public CommonResult querySmsSetting(){
         return CommonResult.ok(smsService.querySmsSetting(),"查询成功");
+    }
+    
+    /**
+     * @Description: 新增短信分类
+     * @author: DKS
+     * @since: 2021/12/8 10:42
+     * @Param: [smsTypeEntity]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @PostMapping("/type/add")
+    @Permit("community:admin:sms:type:add")
+    public CommonResult addSmsType(@RequestBody SmsTypeEntity smsTypeEntity){
+        return CommonResult.ok(smsTypeService.addSmsType(smsTypeEntity) ? "添加成功" : "添加失败");
+    }
+    
+    /**
+     * @Description: 修改短信分类
+     * @author: DKS
+     * @since: 2021/12/8 10:45
+     * @Param: [smsTypeEntity]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @PutMapping("/type/update")
+    @Permit("community:admin:sms:type:update")
+    public CommonResult updateSmsType(@RequestBody SmsTypeEntity smsTypeEntity){
+        return CommonResult.ok(smsTypeService.updateSmsType(smsTypeEntity) ? "修改成功" : "修改失败");
+    }
+    
+    /**
+     * @Description: 删除短信分类
+     * @author: DKS
+     * @since: 2021/12/8 10:58
+     * @Param: [id]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @DeleteMapping("/type/delete")
+    @Permit("community:admin:sms:type:delete")
+    public CommonResult deleteSmsType(@RequestParam("id") Long id){
+        return CommonResult.ok(smsTypeService.deleteSmsType(id) ? "删除成功" : "删除失败");
+    }
+    
+    /**
+     * @Description: 查询短信分类列表
+     * @author: DKS
+     * @since: 2021/12/8 10:58
+     * @Param: []
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @GetMapping("/type/query")
+    @Permit("community:admin:sms:type:query")
+    public CommonResult selectSmsType(){
+        List<SmsTypeEntity> list = smsTypeService.selectSmsType();
+        return CommonResult.ok(list,"查询成功");
+    }
+    
+    /**
+     * @Description: 新增短信模板
+     * @author: DKS
+     * @since: 2021/12/8 11:38
+     * @Param: [smsTemplateEntity]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @PostMapping("/template/add")
+    @Permit("community:admin:sms:template:add")
+    public CommonResult addSmsTemplate(@RequestBody SmsTemplateEntity smsTemplateEntity){
+        return CommonResult.ok(smsTemplateService.addSmsTemplate(smsTemplateEntity) ? "添加成功" : "添加失败");
+    }
+    
+    /**
+     * @Description: 修改短信模板
+     * @author: DKS
+     * @since: 2021/12/8 11:38
+     * @Param: [smsTemplateEntity]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @PutMapping("/template/update")
+    @Permit("community:admin:sms:template:update")
+    public CommonResult updateSmsTemplate(@RequestBody SmsTemplateEntity smsTemplateEntity){
+        return CommonResult.ok(smsTemplateService.updateSmsTemplate(smsTemplateEntity) ? "修改成功" : "修改失败");
+    }
+    
+    /**
+     * @Description: 删除短信模板
+     * @author: DKS
+     * @since: 2021/12/8 11:38
+     * @Param: [id]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @DeleteMapping("/template/delete")
+    @Permit("community:admin:sms:template:delete")
+    public CommonResult deleteSmsTemplate(@RequestParam("id") Long id){
+        return CommonResult.ok(smsTemplateService.deleteSmsTemplate(id) ? "删除成功" : "删除失败");
+    }
+    
+    /**
+     * @Description: 查询短信模板列表
+     * @author: DKS
+     * @since: 2021/12/8 11:38
+     * @Param: []
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @GetMapping("/template/query")
+    @Permit("community:admin:sms:template:query")
+    public CommonResult selectSmsTemplate(){
+        List<SmsTemplateEntity> list = smsTemplateService.selectSmsTemplate();
+        return CommonResult.ok(list,"查询成功");
+    }
+    
+    /**
+     * @Description: 短信模板分页查询
+     * @author: DKS
+     * @since: 2021/12/8 11:52
+     * @Param: [baseQO]
+     * @return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo<com.jsy.community.entity.SmsTemplateEntity>>
+     */
+    @PostMapping("/template/query")
+    @Permit("community:admin:sms:template:query")
+    public CommonResult<PageInfo<SmsTemplateEntity>> querySmsTemplatePage(@RequestBody BaseQO<SmsTemplateQO> baseQO) {
+        return CommonResult.ok(smsTemplateService.querySmsTemplatePage(baseQO));
+    }
+    
+    /**
+     * @Description: 新增短信套餐
+     * @author: DKS
+     * @since: 2021/12/9 11:11
+     * @Param: [smsMenuEntity]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @PostMapping("/menu/add")
+    @Permit("community:admin:sms:menu:add")
+    public CommonResult addSmsMenu(@RequestBody SmsMenuEntity smsMenuEntity){
+        return CommonResult.ok(smsMenuService.addSmsMenu(smsMenuEntity) ? "添加成功" : "添加失败");
+    }
+    
+    /**
+     * @Description: 修改短信套餐
+     * @author: DKS
+     * @since: 2021/12/9 11:11
+     * @Param: [smsMenuEntity]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @PutMapping("/menu/update")
+    @Permit("community:admin:sms:menu:update")
+    public CommonResult updateSmsMenu(@RequestBody SmsMenuEntity smsMenuEntity){
+        return CommonResult.ok(smsMenuService.updateSmsMenu(smsMenuEntity) ? "修改成功" : "修改失败");
+    }
+    
+    /**
+     * @Description: 删除短信套餐
+     * @author: DKS
+     * @since: 2021/12/9 11:11
+     * @Param: [id]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @DeleteMapping("/menu/delete")
+    @Permit("community:admin:sms:menu:delete")
+    public CommonResult deleteSmsMenu(@RequestParam("id") Long id){
+        return CommonResult.ok(smsMenuService.deleteSmsMenu(id) ? "删除成功" : "删除失败");
+    }
+    
+    /**
+     * @Description: 查询短信套餐列表
+     * @author: DKS
+     * @since: 2021/12/9 11:11
+     * @Param: []
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @GetMapping("/menu/query")
+    @Permit("community:admin:sms:menu:query")
+    public CommonResult selectSmsMenu(){
+        List<SmsMenuEntity> list = smsMenuService.selectSmsMenu();
+        return CommonResult.ok(list,"查询成功");
+    }
+    
+    /**
+     * @Description: 查询短信购买记录
+     * @Param: [smsPurchaseRecordQO]
+     * @Return: com.jsy.community.vo.CommonResult<com.jsy.community.utils.PageInfo<com.jsy.community.entity.SmsPurchaseRecordEntity>>
+     * @Author: DKS
+     * @Date: 2021/12/9
+     **/
+    @PostMapping("/purchase/query")
+    @Permit("community:admin:sms:purchase:query")
+    public CommonResult<PageInfo<SmsPurchaseRecordEntity>> queryPropertyDeposit(@RequestBody BaseQO<SmsPurchaseRecordQO> smsPurchaseRecordQO) {
+        return CommonResult.ok(smsPurchaseRecordService.querySmsPurchaseRecord(smsPurchaseRecordQO));
+    }
+    
+    /**
+     * @Description: 批量删除短信购买记录
+     * @author: DKS
+     * @since: 2021/12/9 17:05
+     * @Param: [ids]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @DeleteMapping("/purchase/deleteIds")
+    @Permit("community:admin:sms:purchase:deleteIds")
+    public CommonResult deleteIds(@RequestParam("ids") List<Long> ids) {
+        return CommonResult.ok(smsPurchaseRecordService.deleteIds(ids) ? "删除成功" : "删除失败");
     }
 }

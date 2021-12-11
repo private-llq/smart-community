@@ -6,13 +6,13 @@ import com.jsy.community.entity.SmsMenuEntity;
 import java.util.List;
 
 /**
- * @Description: 短信分类
+ * @Description: 短信套餐
  * @author: DKS
  * @since: 2021/12/9 10:39
  */
 public interface ISmsMenuService extends IService<SmsMenuEntity>{
     /**
-     * @Description: 新增短信分类
+     * @Description: 新增短信套餐
      * @author: DKS
      * @since: 2021/12/9 11:10
      * @Param: [smsMenuEntity]
@@ -21,7 +21,7 @@ public interface ISmsMenuService extends IService<SmsMenuEntity>{
     boolean addSmsMenu(SmsMenuEntity smsMenuEntity);
     
     /**
-     * @Description: 修改短信分类
+     * @Description: 修改短信套餐
      * @author: DKS
      * @since: 2021/12/9 11:10
      * @Param: [smsMenuEntity]
@@ -30,7 +30,7 @@ public interface ISmsMenuService extends IService<SmsMenuEntity>{
     boolean updateSmsMenu(SmsMenuEntity smsMenuEntity);
     
     /**
-     * @Description: 删除短信分类
+     * @Description: 删除短信套餐
      * @author: DKS
      * @since: 2021/12/9 11:10
      * @Param: [id]
@@ -39,7 +39,7 @@ public interface ISmsMenuService extends IService<SmsMenuEntity>{
     boolean deleteSmsMenu(Long id);
     
     /**
-     * @Description: 查询短信分类列表
+     * @Description: 查询短信套餐列表
      * @author: DKS
      * @since: 2021/12/9 11:10
      * @Param: []
