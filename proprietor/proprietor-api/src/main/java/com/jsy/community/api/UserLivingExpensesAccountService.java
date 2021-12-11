@@ -27,4 +27,13 @@ public interface UserLivingExpensesAccountService extends IService<UserLivingExp
      * @date: 2021/12/7 10:30
      **/
     UserLivingExpensesAccountEntity queryAccount(UserLivingExpensesAccountEntity accountEntity);
+
+    /**
+     * @author: Pipi
+     * @description: 根据id和uid查询账户信息
+     * @param accountEntity:
+     * @return: {@link UserLivingExpensesAccountEntity}
+     * @date: 2021/12/10 18:49
+     **/
+    UserLivingExpensesAccountEntity queryAccountById(UserLivingExpensesAccountEntity accountEntity);
 }

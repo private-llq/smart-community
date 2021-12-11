@@ -125,4 +125,19 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
         queryWrapper.eq("uid", accountEntity.getUid());
         return accountMapper.selectOne(queryWrapper);
     }
+
+    /**
+     * @param accountEntity :
+     * @author: Pipi
+     * @description: 根据id查询账户信息
+     * @return: {@link UserLivingExpensesAccountEntity}
+     * @date: 2021/12/10 18:49
+     **/
+    @Override
+    public UserLivingExpensesAccountEntity queryAccountById(UserLivingExpensesAccountEntity accountEntity) {
+        QueryWrapper<UserLivingExpensesAccountEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", accountEntity.getId());
+        queryWrapper.eq("uid", accountEntity.getUid());
+        return accountMapper.selectOne(queryWrapper);
+    }
 }

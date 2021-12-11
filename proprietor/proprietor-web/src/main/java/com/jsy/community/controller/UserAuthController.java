@@ -299,15 +299,16 @@ public class UserAuthController {
 
     @ApiOperation("重置密码")
     @PostMapping("/reset/password")
-    @Auth
+//    @Auth
     // @Permit("community:proprietor:user:auth:reset:password")
-    public CommonResult<Boolean> resetPassword(@RequestAttribute(value = "body") String body) {
-        ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
+    @LoginIgnore
+    public CommonResult<Boolean> resetPassword(@RequestBody ResetPasswordQO qo) {
+//        ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
         ValidatorUtils.validateEntity(qo, ResetPasswordQO.forgetPassVGroup.class);
         if (!qo.getPassword().equals(qo.getConfirmPassword())) {
             throw new JSYException("两次密码不一致");
         }
-        baseAuthRpcService.resetPhoneLoginPassword(UserUtils.getUserToken(), qo.getCode(), qo.getPassword());
+        baseAuthRpcService.resetPhoneLoginPassword(qo.getAccount(), qo.getCode(), qo.getPassword());
         return CommonResult.ok();
     }
     /*public CommonResult<Boolean> resetPassword(@RequestAttribute(value = "body") String body) {

@@ -34,4 +34,8 @@ public interface ConstError {
 	 * 余额不足
 	 */
 	int NOT_ENOUGH = 40003;
+	/**
+	 * 数据丢失
+	 */
+	int DATA_LOST = 4041;
 }

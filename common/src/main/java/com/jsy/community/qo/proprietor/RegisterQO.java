@@ -4,6 +4,7 @@ import com.jsy.community.utils.RegexUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
@@ -34,6 +35,6 @@ public class RegisterQO implements Serializable {
 	 * 密码
 	 */
 	@NotEmpty(message = "密码不能为空")
-	@Pattern(regexp = RegexUtils.REGEX_PASSWORD, message = "密码格式验证不通过,长度为6-20位的数字或字母组成")
+	@Length(min = 8, max = 30, message = "密码长度8-30")
 	private String password;
 }

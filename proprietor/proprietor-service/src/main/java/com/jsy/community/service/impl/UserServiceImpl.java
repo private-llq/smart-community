@@ -311,7 +311,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userInfoVo.setRealName(idCardRealInfo.getIdCardName());
             userInfoVo.setIdCard(idCardRealInfo.getIdCardNumber());
         }
-        userInfoVo.setIsRealAuth(loginVo.getUserInfo().getIsAuthFace() ? 1 : 0);
+        userInfoVo.setIsRealAuth(loginVo.getUserInfo().getRealAuthType() == 2 ? 1 : 0);
 
         UserAuthVo userAuthVo = new UserAuthVo();
         userAuthVo.setToken(loginVo.getToken().getToken());
@@ -709,7 +709,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 userInfoVo.setRealName(idCardRealInfo.getIdCardName());
                 userInfoVo.setIdCard(idCardRealInfo.getIdCardNumber());
             }
-            userInfoVo.setIsRealAuth(loginVo.getUserInfo().getIsAuthFace() ? 1 : 0);
+            userInfoVo.setIsRealAuth(loginVo.getUserInfo().getRealAuthType() == 2 ? 1 : 0);
 
             userInfoVo.setUid(loginVo.getUserInfo().getAccount());
             userInfoVo.setImId(loginVo.getUserIm().getImId());

@@ -13,6 +13,9 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAccountVO;
 import com.jsy.community.vo.UserDataVO;
+import com.jsy.community.vo.UserInfoVo;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.UnsupportedEncodingException;
 import java.math.RoundingMode;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -46,6 +51,9 @@ public class UserDataController {
     
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserAccountService userAccountService;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
 
     @GetMapping("/selectUserDataOne")
     @ApiOperation("查询个人信息")
@@ -126,7 +134,15 @@ public class UserDataController {
     @ApiOperation("账号安全状态查询")
     // @Permit("community:proprietor:userdata:safeStatus")
     public CommonResult querySafeStatus(){
-        return CommonResult.ok(userDataService.querySafeStatus(UserUtils.getUserId()));
+        UserInfoVo userInfo = UserUtils.getUserInfo();
+        Boolean payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(userInfo.getId(), userInfo.getUid());
+        Boolean loginPasswordStatus = baseUserInfoRpcService.getLoginPasswordStatus(userInfo.getId(), userInfo.getUid());
+        Map<String, String> returnMap = new HashMap<>();
+        returnMap.put("hasPayPassword", payPasswordStatus ? "1" : "0");
+        returnMap.put("hasPassword", loginPasswordStatus ? "1" : "0");
+        returnMap.put("mobile", UserUtils.getUserInfo().getMobile().substring(0, 3).concat("****").concat(returnMap.get("mobile").substring(7, 11)));
+        return CommonResult.ok(returnMap);
+//        return CommonResult.ok(userDataService.querySafeStatus(UserUtils.getUserId()));
     }
     
 }

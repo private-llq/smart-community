@@ -49,4 +49,27 @@ public class UserLivingExpensesAccountController {
         }
         return accountService.addAccount(accountEntity) == 1 ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
     }
+
+    /**
+     * @author: Pipi
+     * @description: 修改户号
+     * @param accountEntity:
+     * @return: {@link CommonResult<?>}
+     * @date: 2021/12/10 18:41
+     **/
+    @PostMapping("/v2/modifyAccount")
+    public CommonResult<?> modifyAccount(@RequestBody UserLivingExpensesAccountEntity accountEntity) {
+        if (accountEntity.getId() == null) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "账号ID不能为空");
+        }
+        accountEntity.setUid(UserUtils.getUserId());
+        UserLivingExpensesAccountEntity originalAccountEntity = accountService.queryAccountById(accountEntity);
+        if (originalAccountEntity == null) {
+            throw new JSYException(JSYError.DATA_LOST);
+        }
+        if (!accountEntity.getAccount().equals(originalAccountEntity.getAccount()) || !accountEntity.getItemCode().equals(originalAccountEntity.getItemCode())) {
+            // 如果户号或者项目有改变,需要重新查询账单信息,同时删除原有未缴费账单
+        }
+        return CommonResult.ok();
+    }
 }

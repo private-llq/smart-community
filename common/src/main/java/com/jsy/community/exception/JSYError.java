@@ -25,8 +25,10 @@ public enum JSYError {
 	NO_REAL_NAME_AUTH(ConstError.NO_REAL_NAME_AUTHENTICATION, "用户未实名认证!"),
 	OPERATOR_INFORMATION_NOT_OBTAINED(ConstError.BAD_REQUEST, "未获取到操作员信息!"),
 	NO_AUTH_HOUSE(ConstError.NO_AUTH_HOUSE, "房屋待认证!"),
+	DATA_LOST(ConstError.DATA_LOST,"数据不存在！"),
 	NOT_ENOUGH(ConstError.NOT_ENOUGH,"余额不足！");
-	
+
+
 	private final Integer code;
 	private final String message;
 	
