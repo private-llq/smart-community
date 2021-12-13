@@ -7,7 +7,6 @@ import com.jsy.community.api.IActivityService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.UserIMEntity;
 import com.jsy.community.entity.property.ActivityUserEntity;
 import com.jsy.community.entity.proprietor.ActivityEntity;
 import com.jsy.community.mapper.ActivityMapper;
@@ -16,6 +15,11 @@ import com.jsy.community.mapper.UserIMMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,7 +46,11 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
     private UserIMMapper userIMMapper;
 
 
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    private IBaseUserInfoRpcService userInfoRpcService;
 
+    @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT)
+    private IImChatPublicPushRpcService iImChatPublicPushRpcService;
 
 
     /**
@@ -118,13 +126,14 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
             }
             activityUserMapper.insert(activityUserEntity);
         }
-        UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", activityUserEntity.getUid()));
+        UserImVo userIm = userInfoRpcService.getEHomeUserIm(activityUserEntity.getUid());
         Map<Object, Object> map = new HashMap<>();
         map.put("type",4);
         map.put("dataId",entity.getId());
         //推送消息
         PushInfoUtil.PushPublicTextMsg(
-                userIMEntity.getImId(),
+                iImChatPublicPushRpcService,
+                userIm.getImId(),
                 "活动投票",
                 entity.getTheme(),
                 null,

@@ -511,9 +511,9 @@ public class UserController {
         if(userEntity == null){
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"用户不存在");
         }
-        UserEntity returnEntity = new UserEntity();
-        returnEntity.setIsRealAuth(userEntity.getIsRealAuth()); //实名 0.否 1.已实名 2.已实人
-        return CommonResult.ok(returnEntity,"查询成功");
+        /*UserEntity returnEntity = new UserEntity();
+        returnEntity.setIsRealAuth(userEntity.getIsRealAuth()); //实名 0.否 1.已实名 2.已实人*/
+        return CommonResult.ok(userEntity,"查询成功");
     }
 
     /**
