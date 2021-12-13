@@ -3,6 +3,7 @@ package com.jsy.community.controller;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CompanyPayConfigEntity;
+import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.entity.SmsPurchaseRecordEntity;
 import com.jsy.community.entity.SmsSendRecordEntity;
 import com.jsy.community.exception.JSYError;
@@ -25,12 +26,23 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessagePostProcessor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -56,6 +68,12 @@ public class SmsController {
     
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICompanyPayConfigService companyPayConfigService;
+    
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IPropertyCompanyService propertyCompanyService;
+    
+    @Resource
+    private RabbitTemplate rabbitTemplate;
     
     /**
      * @Description: 分页查询短信发送记录
@@ -113,6 +131,7 @@ public class SmsController {
      */
     @LoginIgnore
     @PostMapping("/wechat/pay")
+    @Transactional(rollbackFor = Exception.class)
 //    @Permit("community:property:sms:wechat:pay")
     public CommonResult buySmsMenu(@RequestBody SmsWeChatPayQO smsWeChatPayQO) {
         // 设置微信支付配置
@@ -127,15 +146,15 @@ public class SmsController {
         
         // 创建请求参数
         SortedMap<Object, Object> req = new TreeMap<>();
-        req.put("appid", WechatConfig.APPID);    //appId
-        req.put("mch_id", WechatConfig.MCH_ID);  // 商户号
+        req.put("appid", WechatConfig.APPID); //appId
+        req.put("mch_id", WechatConfig.MCH_ID); // 商户号
         req.put("nonce_str", nonce_str); // 32位随机字符串
-        req.put("body", smsWeChatPayQO.getDescriptionStr()); // 商品描述
-        req.put("out_trade_no", OrderNoUtil.getOrder());   // 商户订单号
-        req.put("total_fee", smsWeChatPayQO.getAmount());    // 标价金额(分)
-        req.put("spbill_create_ip", SmsWechatPayUtils.localIp());   // 终端IP
-        req.put("notify_url", "http://www.baidu.com");  // 回调地址
-        req.put("trade_type", "NATIVE");    // 交易类型
+        req.put("body", smsWeChatPayQO.getNumber() + "条短信"); // 商品描述
+        req.put("out_trade_no", OrderNoUtil.getOrder()); // 商户订单号
+        req.put("total_fee", smsWeChatPayQO.getAmount()); // 标价金额(分)
+        req.put("spbill_create_ip", SmsWechatPayUtils.localIp()); // 终端IP
+        req.put("notify_url", "http://test.free.svipss.top/sms/wechat/pay/callback"); // 回调地址
+        req.put("trade_type", "NATIVE"); // 交易类型
         req.put("sign", SmsWechatPayUtils.createSign("UTF-8", req, WechatConfig.PRIVATE_KEY));  // 签名
     
         // 生成要发送的 xml
@@ -166,11 +185,133 @@ public class SmsController {
         if (CollectionUtils.isEmpty(resultMap)) {
             throw new PropertyException("微信支付响应参数的报文解析错误");
         }
+        
+        // 保存短信购买记录到数据库
+        SmsPurchaseRecordEntity entity = new SmsPurchaseRecordEntity();
+//        entity.setCompanyId(UserUtils.getAdminCompanyId());
+        entity.setCompanyId(1L);
+        entity.setOrderNum(req.get("out_trade_no").toString());
+        entity.setGoods(smsWeChatPayQO.getNumber());
+        entity.setOrderMoney(new BigDecimal(smsWeChatPayQO.getAmount()).divide(new BigDecimal("100")));
+//        entity.setPayBy(UserUtils.getUserId());
+        entity.setPayBy("1465506950023352321");
+        entity.setPayType(1);
+        smsPurchaseRecordService.addSmsPurchaseRecord(entity);
+        
+        // 二维码有效时间两个小时 如果还没支付就自动更改订单为未付款状态
+        rabbitTemplate.convertAndSend("exchange_sms_purchase", "queue.sms.purchase", req.get("out_trade_no"), new MessagePostProcessor() {
+            @Override
+            public Message postProcessMessage(Message message) throws AmqpException {
+                message.getMessageProperties().setHeader("x-delay",60000*120);
+                return message;
+            }
+        });
+        
         map.put("code_url", resultMap.get("code_url")); // 支付地址
         map.put("qr_code", qrCode); // 二维码
         map.put("total_fee", smsWeChatPayQO.getAmount()); // 总金额
         map.put("out_trade_no", req.get("out_trade_no"));    // 订单号
         return CommonResult.ok(map);
     }
-    // TODO:购买大后台短信套餐支付回调
+    
+    /**
+     * @Description: 短信购买微信支付回调地址
+     * @author: DKS
+     * @since: 2021/12/13 17:13
+     * @Param: [request, response]
+     * @return: void
+     */
+    @LoginIgnore
+    @RequestMapping(value = "/wechat/pay/callback", method = {RequestMethod.POST,RequestMethod.GET})
+    public void SmsPurchaseWechatCallback(HttpServletRequest request, HttpServletResponse response) throws Exception{
+        // 设置微信支付配置
+        CompanyPayConfigEntity serviceConfig = companyPayConfigService.getCompanyConfig(0L,1);
+        WechatConfig.setConfig(serviceConfig);
+        
+        // 读取参数
+        InputStream inputStream ;
+        StringBuilder sb = new StringBuilder();
+        inputStream = request.getInputStream();
+        String s ;
+        BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        while ((s = in.readLine()) != null){
+            sb.append(s);
+        }
+        in.close();
+        inputStream.close();
+        
+        // 解析xml成map
+        Map<String, String> m;
+        m = SmsWechatPayUtils.doXMLParse(sb.toString());
+        
+        // 过滤空 设置 TreeMap
+        SortedMap<Object,Object> packageParams = new TreeMap<Object,Object>();
+        Iterator<String> it = m.keySet().iterator();
+        while (it.hasNext()) {
+            String parameter = it.next();
+            String parameterValue = m.get(parameter);
+            String v = "";
+            if(null != parameterValue) {
+                v = parameterValue.trim();
+            }
+            packageParams.put(parameter, v);
+        }
+        // 微信支付的API密钥
+        String key = WechatConfig.API_V3_KEY;
+        
+        log.info("微信支付返回回来的参数："+packageParams);
+        // 判断签名是否正确
+        if(SmsWechatPayUtils.isTenpaySign("UTF-8", packageParams,key)) {
+            //------------------------------
+            // 处理业务开始
+            //------------------------------
+            String resXml;
+            if("SUCCESS".equals(packageParams.get("result_code"))){
+                // 支付成功
+                // 执行自己的业务逻辑开始
+                //商户订单号
+                String outTradeNo = (String)packageParams.get("out_trade_no");
+                //微信生成的交易订单号
+                String transactionId = (String)packageParams.get("transaction_id");//微信支付订单号
+                //支付完成时间
+                String timeEnd = (String)packageParams.get("time_end");
+                
+                // 更改订单号支付状态
+                SmsPurchaseRecordEntity smsPurchaseRecordEntity = smsPurchaseRecordService.querySmsPurchaseByOrderNum(outTradeNo);
+                if (smsPurchaseRecordEntity != null) {
+                    if (smsPurchaseRecordEntity.getStatus() == 0) {
+                        smsPurchaseRecordEntity.setStatus(1);
+                        smsPurchaseRecordEntity.setTransactionId(transactionId);
+                        smsPurchaseRecordEntity.setPayTime(timeEnd);
+                        smsPurchaseRecordService.updateSmsPurchase(smsPurchaseRecordEntity);
+                    }
+                    // 更改短信剩余数量
+                    PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(smsPurchaseRecordEntity.getCompanyId());
+                    companyEntity.setMessageQuantity(companyEntity.getMessageQuantity() + smsPurchaseRecordEntity.getGoods());
+                    propertyCompanyService.updatePropertyCompany(companyEntity);
+                }
+                
+                //执行自己的业务逻辑结束
+                log.info(outTradeNo + "支付成功");
+                //通知微信.异步确认成功.必写.不然会一直通知后台.八次之后就认为交易失败了.
+                resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
+                    + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+                
+            } else {
+                log.info("支付失败,错误信息：" + packageParams.get("err_code"));
+                resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
+                    + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+            }
+            //------------------------------
+            //处理业务完毕
+            //------------------------------
+            BufferedOutputStream out = new BufferedOutputStream(
+                response.getOutputStream());
+            out.write(resXml.getBytes());
+            out.flush();
+            out.close();
+        } else{
+            log.info("签名验证失败");
+        }
+    }
 }

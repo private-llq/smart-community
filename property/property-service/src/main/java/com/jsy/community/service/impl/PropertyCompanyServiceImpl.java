@@ -73,4 +73,16 @@ public class PropertyCompanyServiceImpl extends ServiceImpl<PropertyCompanyMappe
     public PropertyCompanyEntity selectCompany(Long companyId) {
         return propertyCompanyMapper.selectOne(new QueryWrapper<PropertyCompanyEntity>().select("*").eq("id", companyId));
     }
+    
+    /**
+     * @Description: 修改物业公司
+     * @author: DKS
+     * @since: 2021/12/13 17:05
+     * @Param: [propertyCompanyEntity]
+     * @return: void
+     */
+    @Override
+    public void updatePropertyCompany(PropertyCompanyEntity propertyCompanyEntity) {
+        propertyCompanyMapper.updateById(propertyCompanyEntity);
+    }
 }

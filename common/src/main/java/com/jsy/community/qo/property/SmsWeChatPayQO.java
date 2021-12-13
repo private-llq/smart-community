@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class SmsWeChatPayQO {
     @ApiModelProperty(value = "商品描述")
-    private String descriptionStr;
+    private Integer number;
     
     @ApiModelProperty("支付金额(分)")
     private String amount;

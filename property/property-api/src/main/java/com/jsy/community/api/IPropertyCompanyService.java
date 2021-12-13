@@ -42,4 +42,13 @@ public interface IPropertyCompanyService {
      * @date: 2021/9/1 11:50
      **/
     PropertyCompanyEntity selectCompany(Long companyId);
+    
+    /**
+     * @Description: 修改物业公司
+     * @author: DKS
+     * @since: 2021/12/13 17:05
+     * @Param: [propertyCompanyEntity]
+     * @return: void
+     */
+    void updatePropertyCompany(PropertyCompanyEntity propertyCompanyEntity);
 }

@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import cn.hutool.json.JSONUtil;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderRecordEntity;
@@ -18,7 +17,6 @@ import com.jsy.community.untils.wechat.*;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.LoginIgnore;
-import com.zhsj.baseweb.annotation.Permit;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.apache.dubbo.config.annotation.DubboReference;

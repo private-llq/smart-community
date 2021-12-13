@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 /**
  * @program: com.jsy.community
@@ -24,6 +23,9 @@ public class SmsPurchaseRecordEntity extends BaseEntity {
 	@ApiModelProperty(value = "订单编号")
 	private String orderNum;
 	
+	@ApiModelProperty(value = "支付订单号")
+	private String transactionId;
+	
 	@ApiModelProperty(value = "商品")
 	private Integer goods;
 	
@@ -32,13 +34,16 @@ public class SmsPurchaseRecordEntity extends BaseEntity {
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
 	@ApiModelProperty(value = "支付时间")
-	private LocalDateTime payTime;
+	private String payTime;
 	
 	@ApiModelProperty(value = "状态(1.已支付 已收货)")
 	private Integer status;
 	
 	@ApiModelProperty(value = "支付uid")
 	private String payBy;
+	
+	@ApiModelProperty(value = "支付方式(1.微信 2.支付宝 3.其他)")
+	private Integer payType;
 	
 	@ApiModelProperty(value = "支付账号")
 	@TableField(exist = false)
