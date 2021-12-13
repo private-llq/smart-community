@@ -1,7 +1,5 @@
 package com.jsy.community.controller;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSONObject;
-import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserAuthEntity;
@@ -9,14 +7,16 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.UserThirdPlatformQO;
 import com.jsy.community.qo.proprietor.*;
-import com.jsy.community.utils.*;
+import com.jsy.community.utils.OrderInfoUtil2_0;
+import com.jsy.community.utils.RegexUtils;
+import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import com.zhsj.base.api.rpc.IBaseSmsRpcService;
 import com.zhsj.baseweb.annotation.LoginIgnore;
-import com.zhsj.baseweb.annotation.Permit;
 import com.zhsj.baseweb.support.ContextHolder;
 import com.zhsj.baseweb.support.LoginUser;
 import io.swagger.annotations.Api;
@@ -204,9 +204,9 @@ public class UserAuthController {
     @PostMapping("/third/binding")
     public CommonResult bindingThirdPlatform(@RequestBody UserThirdPlatformQO userThirdPlatformQO) {
         ValidatorUtils.validateEntity(userThirdPlatformQO);
-        if (StringUtils.isEmpty(userThirdPlatformQO.getThirdPlatformId())) {
-            return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "id不允许为空");
-        }
+//        if (StringUtils.isEmpty(userThirdPlatformQO.getThirdPlatformId())) {
+//            return CommonResult.error(JSYError.REQUEST_PARAM.getCode(), "id不允许为空");
+//        }
 //		if(StringUtils.isEmpty(userThirdPlatformQO.getAccessToken())
 //			&& StringUtils.isEmpty(userThirdPlatformQO.getAuthCode())){
 //			return CommonResult.error(JSYError.REQUEST_PARAM.getCode(),"accessToken和authCode不允许同时为空");
