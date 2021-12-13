@@ -47,7 +47,7 @@ public class UserDataServiceImpl implements IUserDataService {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ISignatureService signatureService;
 
-    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
     private IBaseUserInfoRpcService baseUserInfoRpcService;
 
 

@@ -56,10 +56,10 @@ public class UserDataController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserAccountService userAccountService;
 
-    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
     private IBaseUserInfoRpcService baseUserInfoRpcService;
 
-    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
     private IBaseUpdateUserRpcService baseUpdateUserRpcService;
 
     @GetMapping("/selectUserDataOne")

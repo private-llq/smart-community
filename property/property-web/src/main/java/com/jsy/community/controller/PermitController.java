@@ -30,7 +30,7 @@ import java.util.List;
 @RequestMapping(value = "/permit")
 public class PermitController {
 
-    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
     private IBasePermissionRpcService permissionRpcService;
     @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
     private IBaseMenuRpcService baseMenuRpcService;

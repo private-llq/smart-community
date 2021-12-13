@@ -73,7 +73,7 @@ public class UserAccountServiceImpl implements IUserAccountService {
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private UserAccountWithdrawalService userAccountWithdrawalService;
 
-    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
     private IBaseWalletRpcService baseWalletRpcService;
 
     private static final String ZHIFUBAO_WITHDRAWAL_INFO_KEY = "ZHIFUBAO_WITHDRAWAL_INFO_KEY";
