@@ -549,8 +549,8 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 				//房间成员表里添加数据
 				// UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
-				UserDetail userDetail = baseUserInfoRpcService.getUserDetail(userId);
-				RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(userId);
+				UserDetail userDetail = userInfoRpcService.getUserDetail(userId);
+				RealInfoDto idCardRealInfo = userInfoRpcService.getIdCardRealInfo(userId);
 				HouseMemberEntity houseMemberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("community_id", userHouseQO.getCommunityId()).eq("house_id", userHouseQO.getHouseId()).eq("mobile", userHouseQO.getMobile()).eq("name", userHouseQO.getName()));
 				if (houseMemberEntity!=null){
 					houseMemberEntity.setUid(userId);
