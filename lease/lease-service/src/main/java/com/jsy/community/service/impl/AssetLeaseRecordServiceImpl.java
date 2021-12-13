@@ -1,4 +1,5 @@
 package com.jsy.community.service.impl;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -23,10 +24,14 @@ import com.jsy.community.untils.wechat.PublicConfig;
 import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.util.HouseHelper;
 import com.jsy.community.utils.*;
-import com.jsy.community.utils.imutils.entity.ImResponseEntity;
 import com.jsy.community.utils.signature.ZhsjUtil;
 import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.lease.HouseLeaseContractVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -119,6 +124,12 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    private IBaseUserInfoRpcService userInfoRpcService;
+
+    @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT)
+    private IImChatPublicPushRpcService iImChatPublicPushRpcService;
+
     /**
      * @param assetLeaseRecordEntity : 房屋租赁记录表实体
      * @author: Pipi
@@ -208,16 +219,16 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         assetLeaseRecordMapper.insert(assetLeaseRecordEntity);
 
         //消息推送
-        UserIMEntity userIMEntity = userImService.selectUid(assetLeaseRecordEntity.getHomeOwnerUid());
-        UserEntity userEntity = userService.getUser(assetLeaseRecordEntity.getTenantUid());
+        UserImVo userIm = userInfoRpcService.getEHomeUserIm(assetLeaseRecordEntity.getHomeOwnerUid());
+        UserDetail userDetail = userInfoRpcService.getUserDetail(assetLeaseRecordEntity.getTenantUid());
         HashMap<Object, Object> map = new HashMap<>();
         map.put("type",6);
         map.put("dataId",null);
-        PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
+        PushInfoUtil.PushPublicTextMsg(iImChatPublicPushRpcService,userIm.getImId(),
                 "合同签约",
-                userEntity.getRealName()+"向你发起了房屋签约！",
+                userDetail.getNickName()+"向你发起了房屋签约！",
                 null,
-                userEntity.getRealName()+"向你发起了房屋签约请求，在我的租赁中去查看吧，请在7天时间内处理房屋签约请求，过时系统将自动取消。",
+                userDetail.getNickName()+"向你发起了房屋签约请求，在我的租赁中去查看吧，请在7天时间内处理房屋签约请求，过时系统将自动取消。",
                 map,
                 BusinessEnum.PushInfromEnum.CONTRACTSIGNING.getName());
         return String.valueOf(assetLeaseRecordEntity.getId());
@@ -1510,16 +1521,16 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             assetLeaseRecordMapper.updateById(assetLeaseRecordEntity);
 
 
-            UserIMEntity userIMEntity = userImService.selectUid(assetLeaseRecordEntity.getTenantUid());
+            UserImVo userIm = userInfoRpcService.getEHomeUserIm(assetLeaseRecordEntity.getTenantUid());
             PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(assetLeaseRecordEntity.getCommunityId());
-            UserEntity userEntity = userService.getUser(assetLeaseRecordEntity.getTenantUid());
+            UserDetail userDetail = userInfoRpcService.getUserDetail(assetLeaseRecordEntity.getTenantUid());
             //支付上链
             CochainResponseEntity cochainResponseEntity = OrderCochainUtil.orderCochain("停车费",
                     1,
                     payType,
                     total,
                     orderNum,
-                    userEntity.getUid(),
+                    userDetail.getAccount(),
                     companyEntity.getUnifiedSocialCreditCode(),
                     "房屋租金支付",
                     null);
@@ -1530,14 +1541,13 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             map.put("type", 10);
             map.put("dataId", conId);
             map.put("orderNum", orderNum);
-            ImResponseEntity imResponseEntity = PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+            PushInfoUtil.pushPayAppMsg(iImChatPublicPushRpcService,userIm.getImId(),
                     payType,
                     total.toString(),
                     null,
                     "租赁缴费",
                     map,
                     BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
-            log.info("支付上链："+imResponseEntity);
         } else {
             log.info("没有找到合同:{}相关的签约ID", conId);
         }

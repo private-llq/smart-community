@@ -7,7 +7,9 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
-import com.jsy.community.entity.*;
+import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
@@ -17,10 +19,13 @@ import com.jsy.community.qo.property.FinanceOrderOperationQO;
 import com.jsy.community.qo.property.FinanceOrderQO;
 import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.utils.*;
-import com.jsy.community.utils.imutils.entity.ImResponseEntity;
 import com.jsy.community.vo.admin.AdminInfoVo;
-import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import com.jsy.community.vo.property.FinanceOrderAndCarOrHouseInfoVO;
+import com.jsy.community.vo.property.PropertyFinanceOrderVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -97,6 +102,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 
     @Autowired
     private IPropertyFinanceTicketTemplateFieldService ticketTemplateFieldService;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    private IBaseUserInfoRpcService userInfoRpcService;
+
+    @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT)
+    private IImChatPublicPushRpcService iImChatPublicPushRpcService;
 
     /**
      * @Description: 查询房间所有未缴账单
@@ -692,7 +703,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         StringBuilder detailedList = new StringBuilder();
         PropertyFinanceOrderEntity orderEntity = propertyFinanceOrderMapper.selectById(ids[0]);
-        UserIMEntity userIMEntity = userImService.selectUid(orderEntity.getUid());
+        UserImVo userIm = userInfoRpcService.getEHomeUserIm(orderEntity.getUid());
         CommunityEntity communityEntity = communityMapper.selectById(orderEntity.getCommunityId());
         PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(communityEntity.getPropertyId());
 
@@ -719,15 +730,15 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         map.put("type", 3);
         map.put("dataId", tripartiteOrder);
         map.put("orderNum", tripartiteOrder);
-        ImResponseEntity imResponseEntity = PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+        PushInfoUtil.pushPayAppMsg(
+                iImChatPublicPushRpcService,
+                userIm.getImId(),
                 payType,
                 total.toString(),
                 null,
                 "物业缴费",
                 map,
                 BusinessEnum.PushInfromEnum.PROPERTYPAYMENT.getName());
-        log.info("支付助手："+imResponseEntity);
-
     }
 
     /**

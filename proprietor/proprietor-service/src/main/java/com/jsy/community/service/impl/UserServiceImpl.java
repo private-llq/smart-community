@@ -37,6 +37,7 @@ import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.LoginVo;
 import com.zhsj.base.api.vo.ThirdBindStatusVo;
 import com.zhsj.baseweb.support.LoginUser;
+import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -145,6 +146,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
     private IBaseUserInfoRpcService baseUserInfoRpcService;
+
+    @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT)
+    private IImChatPublicPushRpcService iImChatPublicPushRpcService;
 
     private long expire = 60 * 60 * 24 * 7; //暂时
 
@@ -417,6 +421,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             for (HouseInfoEntity houseInfoEntity : houseInfoEntities) {
                 //推送消息
                 PushInfoUtil.PushPublicMsg(
+                        iImChatPublicPushRpcService,
                         imId,
                         "房屋管理",
                         houseInfoEntity.getTitle(),
@@ -595,6 +600,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             for (HouseInfoEntity houseInfoEntity : houseInfoEntities) {
                 //推送消息
                 PushInfoUtil.PushPublicMsg(
+                        iImChatPublicPushRpcService,
                         imId,
                         "房屋管理",
                         houseInfoEntity.getTitle(),
