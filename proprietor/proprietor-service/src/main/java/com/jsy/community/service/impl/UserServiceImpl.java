@@ -32,6 +32,7 @@ import com.jsy.community.utils.imutils.entity.ImResponseEntity;
 import com.jsy.community.vo.*;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.entity.RealInfoDto;
+import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.LoginVo;
@@ -1373,8 +1374,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Transactional(rollbackFor = Exception.class)
     @Override
     public UserInfoVo proprietorDetails(String userId) {
+        UserDetail userDetail = baseUserInfoRpcService.getUserDetail(userId);
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(userId);
         //1.查出用户姓名信息
-        UserInfoVo userInfo = userMapper.selectUserInfoById(userId);
+        UserInfoVo userInfo = new UserInfoVo();
+        userInfo.setIsRealAuth(0);
+        if (userDetail != null) {
+            userInfo.setUid(userDetail.getAccount());
+            userInfo.setSex(userDetail.getSex());
+            userInfo.setMobile(userDetail.getPhone());
+        }
+        if (idCardRealInfo != null) {
+            userInfo.setRealName(idCardRealInfo.getIdCardName());
+            userInfo.setIdCard(idCardRealInfo.getIdCardNumber());
+            userInfo.setIsRealAuth(1);
+        }
         //2.查出用户房屋信息
         List<HouseVo> userHouses = userHouseService.queryUserHouseList(userId);
         //3.查出用户家属
@@ -1461,6 +1475,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      **/
     @Override
     public UserEntity queryUserDetailByUid(String uid) {
+        UserDetail userDetail = baseUserInfoRpcService.getUserDetail(uid);
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(uid);
+        UserEntity userEntity = new UserEntity();
+        if (userDetail != null) {
+            userEntity.setIsRealAuth(0);
+            userEntity.setUid(uid);
+            userEntity.setMobile(userDetail.getPhone());
+        }
+        if (idCardRealInfo != null) {
+            userEntity.setRealName(idCardRealInfo.getIdCardName());
+            userEntity.setIsRealAuth(1);
+            userEntity.setIdCard(idCardRealInfo.getIdCardNumber());
+        }
         return userMapper.selectOne(new QueryWrapper<UserEntity>().select("*").eq("uid", uid));
     }
 
