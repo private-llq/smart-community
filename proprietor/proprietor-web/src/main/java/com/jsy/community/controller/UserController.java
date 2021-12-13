@@ -395,7 +395,7 @@ public class UserController {
         userService.deleteFaceAvatar(UserUtils.getUserId());
         return CommonResult.ok();
     }
-    
+
     /**
     * @Description: 身份证照片识别
      * @Param: [file, type]
@@ -405,6 +405,7 @@ public class UserController {
     **/
     @ApiOperation("身份证照片识别")
     @PostMapping("idCard/distinguish")
+    @Deprecated
     // @Permit("community:proprietor:user:idCard:distinguish")
     public CommonResult distinguishIdCard(MultipartFile file,@RequestParam String type){
         PicUtil.imageQualified(file);
@@ -433,6 +434,7 @@ public class UserController {
     **/
     @ApiOperation("眨眼版实人验证初始化")
     @PostMapping("realName/blink/init")
+    @Deprecated
     // @Permit("community:proprietor:user:realName:blink:init")
     public JSONObject initBlink(@RequestBody RealnameBlinkInitQO realnameBlinkInitQO){
         ValidatorUtils.validateEntity(realnameBlinkInitQO);
@@ -453,6 +455,7 @@ public class UserController {
     **/
     @ApiOperation("眨眼版实人查询结果")
     @PostMapping("realName/blink/result")
+    @Deprecated
     // @Permit("community:proprietor:user:realName:blink:result")
     public CommonResult getBlinkResult(@RequestBody RealnameBlinkQueryQO realnameBlinkQueryQO){
         ValidatorUtils.validateEntity(realnameBlinkQueryQO);
