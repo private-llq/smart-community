@@ -15,6 +15,7 @@ import com.jsy.community.vo.UserAuthVo;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import com.zhsj.base.api.rpc.IBaseSmsRpcService;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import com.zhsj.baseweb.support.ContextHolder;
@@ -70,6 +71,9 @@ public class UserAuthController {
 
     @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
     private IBaseAuthRpcService baseAuthRpcService;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
 
     /**
      * 发送验证码
@@ -413,6 +417,22 @@ if (StrUtil.isBlank(authToken)) {
         if (StrUtil.isEmpty(map.get("code"))) {
             throw new ProprietorException("验证码不能为空");
         }
+        baseUserInfoRpcService.updateUserPhone(UserUtils.getUserToken(), newMobile, code);
+        return CommonResult.ok("操作成功");
+    }
+    /*public CommonResult changeMobile(@RequestBody Map<String, String> map) {
+        //入参验证
+        String newMobile = map.get("account");
+        if (StringUtils.isEmpty(newMobile)) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "请填写新手机号");
+        }
+        if (!RegexUtils.isMobile(newMobile)) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "请检查手机号格式是否正确");
+        }
+        String code = map.get("code");
+        if (StrUtil.isEmpty(map.get("code"))) {
+            throw new ProprietorException("验证码不能为空");
+        }
         //权限验证
         commonService.checkVerifyCode(newMobile, code);
         //从请求获取uid
@@ -432,7 +452,7 @@ if (StrUtil.isBlank(authToken)) {
         }
         UserUtils.destroyToken("Login", token);
         return CommonResult.ok("操作成功");
-    }
+    }*/
 
     //TODO 待定-手机丢失更换新手机(旧手机不在线)
 

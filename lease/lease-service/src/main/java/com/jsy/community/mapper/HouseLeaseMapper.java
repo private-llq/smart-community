@@ -68,7 +68,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param type        常量类型
      * @return 返回名称集合
      */
-    List<String> queryHouseConstNameByFurnitureId(List<Long> furnitureId, long type);
+    List<String> queryHouseConstNameByFurnitureId(@Param("furnitureId") List<Long> furnitureId, @Param("type") long type);
 
 
     /**
