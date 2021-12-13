@@ -22,6 +22,7 @@ import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.UserImVo;
 import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
+import com.zhsj.base.api.entity.RealInfoDto;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +81,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 	@DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT)
 	private IImChatPublicPushRpcService iImChatPublicPushRpcService;
-	
+
 	/**
 	 * @return java.lang.Boolean
 	 * @Author lihao
@@ -547,7 +548,9 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 				userHouseMapper.insert(houseEntity);
 
 				//房间成员表里添加数据
-				UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
+				// UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
+				UserDetail userDetail = baseUserInfoRpcService.getUserDetail(userId);
+				RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(userId);
 				HouseMemberEntity houseMemberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("community_id", userHouseQO.getCommunityId()).eq("house_id", userHouseQO.getHouseId()).eq("mobile", userHouseQO.getMobile()).eq("name", userHouseQO.getName()));
 				if (houseMemberEntity!=null){
 					houseMemberEntity.setUid(userId);
@@ -557,11 +560,15 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 					memberEntity.setUid(userId);
 					memberEntity.setCommunityId(userHouseQO.getCommunityId());
 					memberEntity.setHouseId(userHouseQO.getHouseId());
-					memberEntity.setName(userEntity.getRealName());
-					memberEntity.setSex(userEntity.getSex());
-					memberEntity.setMobile(userEntity.getMobile());
+					if (userDetail != null) {
+						memberEntity.setMobile(userDetail.getPhone());
+						memberEntity.setSex(userDetail.getSex());
+					}
+					if (idCardRealInfo != null) {
+						memberEntity.setIdCard(idCardRealInfo.getIdCardNumber());
+						memberEntity.setName(idCardRealInfo.getIdCardName());
+					}
 					memberEntity.setRelation(1);
-					memberEntity.setIdCard(userEntity.getIdCard());
 					memberEntity.setId(SnowFlake.nextId());
 					houseMemberMapper.insert(memberEntity);
 				}

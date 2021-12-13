@@ -1488,7 +1488,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userEntity.setIsRealAuth(1);
             userEntity.setIdCard(idCardRealInfo.getIdCardNumber());
         }
-        return userMapper.selectOne(new QueryWrapper<UserEntity>().select("*").eq("uid", uid));
+        return userEntity;
     }
 
 
@@ -1664,7 +1664,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Override
     public Integer userIsRealAuth(String userId) {
-        return userMapper.getRealAuthStatus(userId);
+        if (baseUserInfoRpcService.getIdCardRealInfo(userId) == null) {
+            return 2;
+        } else {
+            return 0;
+        }
+        // return userMapper.getRealAuthStatus(userId);
     }
 
     /**
