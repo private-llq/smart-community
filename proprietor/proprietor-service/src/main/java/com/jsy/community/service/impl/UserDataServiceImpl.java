@@ -13,6 +13,9 @@ import com.jsy.community.qo.proprietor.UserDataQO;
 import com.jsy.community.utils.CallUtil;
 import com.jsy.community.utils.imutils.open.StringUtils;
 import com.jsy.community.vo.UserDataVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -43,6 +46,9 @@ public class UserDataServiceImpl implements IUserDataService {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ISignatureService signatureService;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
 
 
     /**
@@ -91,22 +97,19 @@ public class UserDataServiceImpl implements IUserDataService {
      */
     @Override
     public UserDataVO selectUserDataOne(String userId) {
-        UserDataVO userDataVO = userDataMapper.selectUserDataOne(userId);
-        if (userDataVO == null) {
+        UserDetail userDetail = baseUserInfoRpcService.getUserDetail(userId);
+        UserDataVO userDataVO = new UserDataVO();
+        // UserDataVO userDataVO = userDataMapper.selectUserDataOne(userId);
+        if (userDetail == null) {
             UserDataVO dataVO = new UserDataVO();
             dataVO.setAvatarUrl("");
             dataVO.setNickname("");
             dataVO.setBirthdayTime("");
             return dataVO;
-        }
-        if (userDataVO.getNickname() == null) {
-            userDataVO.setNickname("");
-        }
-        if (userDataVO.getAvatarUrl() == null) {
-            userDataVO.setAvatarUrl("");
-        }
-        if (userDataVO.getBirthdayTime() == null) {
-            userDataVO.setBirthdayTime("");
+        } else {
+            userDataVO.setNickname(userDetail.getNickName() == null ? "" : userDetail.getNickName());
+            userDataVO.setAvatarUrl(userDetail.getAvatarThumbnail() == null ? "" : userDetail.getAvatarThumbnail());
+            userDataVO.setBirthdayTime(userDetail.getBirthday() == null ? "" : userDetail.getBirthday());
         }
         return userDataVO;
     }

@@ -15,7 +15,9 @@ import com.jsy.community.vo.UserAccountVO;
 import com.jsy.community.vo.UserDataVO;
 import com.jsy.community.vo.UserInfoVo;
 import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseUpdateUserRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.rpc.IBaseWalletRpcService;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,6 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.UnsupportedEncodingException;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +59,9 @@ public class UserDataController {
     @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
     private IBaseUserInfoRpcService baseUserInfoRpcService;
 
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    private IBaseUpdateUserRpcService baseUpdateUserRpcService;
+
     @GetMapping("/selectUserDataOne")
     @ApiOperation("查询个人信息")
     // @Permit("community:proprietor:userdata:selectUserDataOne")
@@ -72,6 +79,7 @@ public class UserDataController {
     @PostMapping("/addAvatar")
     @ApiOperation("上传头像")
     // @Permit("community:proprietor:userdata:addAvatar")
+    @Deprecated
     public CommonResult avatarUrl(@RequestParam("file") MultipartFile file){
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -86,9 +94,15 @@ public class UserDataController {
     @ApiOperation("修改个人信息(头像、生日)")
     // @Permit("community:proprietor:userdata:updateUserData")
     public CommonResult updateUserData(@RequestBody UserDataQO userDataQO){
-        String userId = UserUtils.getUserId();
         userDataQO.setNickname(null);
-        userDataService.updateUserData(userDataQO,userId);
+        baseUpdateUserRpcService.updateUserInfo(UserUtils.getUserToken(),
+                userDataQO.getNickname(),
+                userDataQO.getAvatarUrl(),
+                userDataQO.getBirthdayTime().toString(),
+                true);
+        /*String userId = UserUtils.getUserId();
+        userDataQO.setNickname(null);
+        userDataService.updateUserData(userDataQO,userId);*/
         return CommonResult.ok();
     }
     
@@ -116,10 +130,15 @@ public class UserDataController {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        String userId = UserUtils.getUserId();
+        /*String userId = UserUtils.getUserId();
         UserDataQO dataQO = new UserDataQO();
         dataQO.setNickname(nickname);
-        userDataService.updateUserData(dataQO,userId);
+        userDataService.updateUserData(dataQO,userId);*/
+        baseUpdateUserRpcService.updateUserInfo(UserUtils.getUserToken(),
+                nickname,
+                null,
+                null,
+                true);
         return CommonResult.ok();
     }
     
@@ -144,6 +163,5 @@ public class UserDataController {
         return CommonResult.ok(returnMap);
 //        return CommonResult.ok(userDataService.querySafeStatus(UserUtils.getUserId()));
     }
-    
 }
 
