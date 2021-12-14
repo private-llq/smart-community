@@ -2,6 +2,7 @@ package com.jsy.community.config;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.intercepter.AuthorizationInterceptor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -18,23 +19,27 @@ import javax.annotation.Resource;
 @Configuration
 @ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class WebMvcConfig implements WebMvcConfigurer {
-	
-	private String name="admin";
+
+	@Value("${spring.application.name}")
+	private String name;
 	
 	private String prefix = "/api/v1/";
 	
 	@PostConstruct
 	public void init() {
-		prefix += name.split("-")[0];
+		prefix += name;
 	}
-	
+	/*public void init() {
+		prefix += name.split("-")[0];
+	}*/
+
 	@Resource
 	private AuthorizationInterceptor authorizationInterceptor;
 	
 	/*@Override
 	public void configurePathMatch(PathMatchConfigurer configurer) {
 		configurer
-			.addPathPrefix(prefix, c -> c.isAnnotationPresent(ApiJSYController.class))ApiJSYController;
+			.addPathPrefix(prefix, c -> c.isAnnotationPresent(ApiJSYController.class));
 	}*/
 	
 	@Override

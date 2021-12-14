@@ -34,12 +34,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Resource
     private AuthorizationInterceptor authorizationInterceptor;
 
-    @Override
+    /*@Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
         configurer
                 // .addPathPrefix(prefix, c -> c.isAnnotationPresent(ApiJSYController.class))ApiJSYController
                 .addPathPrefix(prefix2, c -> c.isAnnotationPresent(ApiOutController.class));
-    }
+    }*/
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
