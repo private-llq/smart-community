@@ -5,6 +5,7 @@ import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.admin.AdminLoginQO;
 import com.jsy.community.service.*;
+import com.jsy.community.utils.RSAUtil;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -160,7 +161,7 @@ public class SysLoginController {
 			checkVerifyCode(form.getAccount(),form.getCode());
 			loginVo = baseAuthRpcService.login("ultimate_admin", form.getAccount(), form.getCode(), "PHONE_CODE");
 		} else {
-			loginVo = baseAuthRpcService.login("ultimate_admin", form.getAccount(), form.getPassword(), "PHONE_PWD");
+			loginVo = baseAuthRpcService.login("ultimate_admin", form.getAccount(), RSAUtil.privateDecrypt(form.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), "PHONE_PWD");
 		}
 		log.info(form.getAccount() + "开始登录");
 		// 获取用户菜单
