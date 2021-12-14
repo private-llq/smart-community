@@ -13,7 +13,6 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.client.methods.HttpPost;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -97,7 +96,7 @@ public class ShoppingMallServiceImpl implements IShoppingMallService {
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("orderNumber",outTradeNo);
 		map.put("payType",payType);
-		map.put("payTime", LocalDateTime.now());
+		map.put("payTime", System.currentTimeMillis());
 		map.put("billMonth", LocalDate.now().getMonthValue());
 		map.put("billNum",transactionId);
 		//url
