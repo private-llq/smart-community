@@ -142,13 +142,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Autowired
     private ISignatureService signatureService;
 
-    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
     private IBaseAuthRpcService baseAuthRpcService;
 
-    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
     private IBaseUserInfoRpcService baseUserInfoRpcService;
 
-    @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT)
+    @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check=false)
     private IImChatPublicPushRpcService iImChatPublicPushRpcService;
 
     private long expire = 60 * 60 * 24 * 7; //暂时
@@ -1488,7 +1488,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userEntity.setIsRealAuth(1);
             userEntity.setIdCard(idCardRealInfo.getIdCardNumber());
         }
-        return userMapper.selectOne(new QueryWrapper<UserEntity>().select("*").eq("uid", uid));
+        return userEntity;
     }
 
 
@@ -1664,7 +1664,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Override
     public Integer userIsRealAuth(String userId) {
-        return userMapper.getRealAuthStatus(userId);
+        if (baseUserInfoRpcService.getIdCardRealInfo(userId) == null) {
+            return 2;
+        } else {
+            return 0;
+        }
+        // return userMapper.getRealAuthStatus(userId);
     }
 
     /**

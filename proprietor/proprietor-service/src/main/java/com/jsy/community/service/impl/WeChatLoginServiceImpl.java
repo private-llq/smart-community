@@ -65,7 +65,7 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ProprietorUserService userService;
 
-    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
     private IBaseAuthRpcService baseAuthRpcService;
 
     @Resource
