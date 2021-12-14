@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.IShoppingMallService;
@@ -9,9 +10,10 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.utils.MyHttpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,10 +28,10 @@ public class ShoppingMallServiceImpl implements IShoppingMallService {
 	
 	private static final String PROTOCOL_TYPE = "http://";
 //	private static final String HOST = "192.168.12.29";
-	private static final String HOST = "222.178.212.29";
-	private static final String PORT = "9927";
+	private static final String HOST = "192.168.12.49";
+	private static final String PORT = "8090";
 	private static final String PATH_CHECK_ORDER = "/services/order/order/checkOrder";
-	private static final String PATH_COMPLETE_ORDER = "/services/order/order/pub/payedOrder";
+	private static final String PATH_COMPLETE_ORDER = "/shop/order/newOrder/replyPay";
 	
 	/**
 	* @Description: 商城订单校验
@@ -90,22 +92,28 @@ public class ShoppingMallServiceImpl implements IShoppingMallService {
 	 * @Date: 2021/4/8
 	**/
 	@Override
-	public Map<String,Object> completeShopOrder(String serviceOrderNo){
+	public Map<String,Object> completeShopOrder(String serviceOrderNo,String outTradeNo,String transactionId,Integer payType){
 		Map<String, Object> returnMap = new HashMap<>();
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("orderNumber",outTradeNo);
+		map.put("payType",payType);
+		map.put("payTime", LocalDateTime.now());
+		map.put("billMonth", LocalDate.now().getMonthValue());
+		map.put("billNum",transactionId);
 		//url
-		String url = PROTOCOL_TYPE + HOST + ":" + PORT + PATH_COMPLETE_ORDER + "/" + serviceOrderNo;
+		String url = PROTOCOL_TYPE + HOST + ":" + PORT + PATH_COMPLETE_ORDER;
 		//组装http请求
-		HttpGet httpGet = MyHttpUtils.httpGetWithoutParams(url);
+		HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(url, JSONUtil.toJsonStr(map));
 		//设置header
-		MyHttpUtils.setDefaultHeader(httpGet);
+		MyHttpUtils.setDefaultHeader(httpPost);
 		//设置默认配置
-		MyHttpUtils.setRequestConfig(httpGet);
+		MyHttpUtils.setRequestConfig(httpPost);
 		//执行
 		String httpResult;
 		JSONObject result = null;
 		try{
 			//执行请求，解析结果
-			httpResult = (String)MyHttpUtils.exec(httpGet,MyHttpUtils.ANALYZE_TYPE_STR);
+			httpResult = (String)MyHttpUtils.exec(httpPost,MyHttpUtils.ANALYZE_TYPE_STR);
 			result = JSON.parseObject(httpResult);
 			if(0 == result.getIntValue("code")){
 				returnMap.put("code",0);

@@ -113,6 +113,28 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         return authVo;
     }
 
+    @Override
+    public UserAuthVo loginNotMobileV2(String identityToken) {
+        UserAuthVo userAuthVo = new UserAuthVo();
+        LoginVo loginVo = baseAuthRpcService.iosLoginEHome(identityToken);
+        userAuthVo.setToken(loginVo.getToken().getToken());
+        LocalDateTime localDateTime = LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime()/1000, 0, ZoneOffset.ofHours(8));
+        userAuthVo.setExpiredTime(localDateTime);
+        userAuthVo.setUserInfo(userService.getUserInfoVo(loginVo));
+        return userAuthVo;
+    }
+
+    @Override
+    public UserAuthVo iosBindingMobileV2(BindingMobileQO bindingMobileQO, LoginUser loginUser) {
+        UserAuthVo authVo = new UserAuthVo();
+        LoginVo loginVo = baseAuthRpcService.iosBindPhone(loginUser.getToken(), bindingMobileQO.getMobile(), bindingMobileQO.getCode());
+        authVo.setToken(loginVo.getToken().getToken());
+        LocalDateTime localDateTime = LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime()/1000, 0, ZoneOffset.ofHours(8));
+        authVo.setExpiredTime(localDateTime);
+        authVo.setUserInfo(userService.getUserInfoVo(loginVo));
+        return authVo;
+    }
+
     /**
      * @Description: 登录
      * @author: Hu

@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import cn.hutool.json.JSONUtil;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderRecordEntity;
@@ -11,14 +10,12 @@ import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
 import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.payment.WeChatPayQO;
 import com.jsy.community.qo.payment.WithdrawalQO;
 import com.jsy.community.untils.wechat.*;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.LoginIgnore;
-import com.zhsj.baseweb.annotation.Permit;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -144,10 +141,11 @@ public class WeChatPayController {
 
         //商城业务逻辑
         if (weChatPayQO.getTradeFrom()==2){
-            Map<String, Object> objectMap = shoppingMallService.validateShopOrder(weChatPayQO.getOrderData(), UserUtils.getUserToken());
-            if(0 != (int)objectMap.get("code")){
-                throw new JSYException((int)objectMap.get("code"),String.valueOf(objectMap.get("msg")));
-            }
+//            Map<String, Object> objectMap = shoppingMallService.validateShopOrder(weChatPayQO.getOrderData(), UserUtils.getUserToken());
+//            if(0 != (int)objectMap.get("code")){
+//                throw new JSYException((int)objectMap.get("code"),String.valueOf(objectMap.get("msg")));
+//            }
+
             map.put("attach",weChatPayQO.getTradeFrom()+","+weChatPayQO.getOrderData().get("uuid"));
         } else
         //物业费业务逻辑
@@ -254,7 +252,7 @@ public class WeChatPayController {
             String[] split = map.get("attach").split(",");
             //处理商城支付回调后的业务逻辑
             if (split[0].equals("2")){
-                shoppingMallService.completeShopOrder(split[1]);
+                shoppingMallService.completeShopOrder(split[1],map.get("out_trade_no"),map.get("transaction_id"),2);
                 log.info("处理完成");
             } else
             //处理物业费支付回调后的业务逻辑

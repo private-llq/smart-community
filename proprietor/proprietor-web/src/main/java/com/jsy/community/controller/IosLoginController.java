@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IWeChatLoginService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.proprietor.BindingMobileQO;
@@ -11,6 +10,8 @@ import com.jsy.community.utils.ios.IOSUtil;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
 import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.support.ContextHolder;
+import com.zhsj.baseweb.support.LoginUser;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,15 +60,15 @@ public class IosLoginController {
     @PostMapping("/loginNotMobile")
     // @Permit("community:proprietor:Ios:loginNotMobile")
     public CommonResult loginNotMobile(@RequestParam String identityToken){
-        String[] split = identityToken.split("\\.");
-        AppleTokenVo userInfo = AppleUtil.getAppleUserInfo(split[1]);
-        if (userInfo != null) {
-            if (AppleUtil.verifyIdentityToken(IOSUtil.getPublicKey(AppleUtil.getKid(split[0])), identityToken, userInfo.getAud(), userInfo.getSub())){
-                UserAuthVo userAuthVo = weChatLoginService.loginNotMobile(userInfo.getSub());
+//        String[] split = identityToken.split("\\.");
+//        AppleTokenVo userInfo = AppleUtil.getAppleUserInfo(split[1]);
+//        if (userInfo != null) {
+//            if (AppleUtil.verifyIdentityToken(IOSUtil.getPublicKey(AppleUtil.getKid(split[0])), identityToken, userInfo.getAud(), userInfo.getSub())){
+                UserAuthVo userAuthVo = weChatLoginService.loginNotMobileV2(identityToken);
                 return CommonResult.ok(userAuthVo);
-            }
-        }
-        return CommonResult.error("服务器繁忙，请稍后再试！");
+//            }
+//        }
+//        return CommonResult.error("服务器繁忙，请稍后再试！");
     }
 
     /**
@@ -77,12 +78,13 @@ public class IosLoginController {
      * @Param: [bindingMobileQO]
      * @return: com.jsy.community.vo.CommonResult
      */
-    @LoginIgnore
+
     @PostMapping("/bindingMobile")
     // @Permit("community:proprietor:Ios:bindingMobile")
     public CommonResult bindingMobile(@RequestBody BindingMobileQO bindingMobileQO){
         ValidatorUtils.validateEntity(bindingMobileQO, BindingMobileQO.BindingMobileValidated.class);
-        UserAuthVo userAuthVo=weChatLoginService.bindingMobile(bindingMobileQO);
+        LoginUser loginUser = ContextHolder.getContext().getLoginUser();
+        UserAuthVo userAuthVo=weChatLoginService.iosBindingMobileV2(bindingMobileQO,loginUser);
         return CommonResult.ok(userAuthVo);
     }
 }
