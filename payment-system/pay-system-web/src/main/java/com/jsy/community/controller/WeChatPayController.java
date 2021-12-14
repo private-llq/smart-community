@@ -114,7 +114,7 @@ public class WeChatPayController {
     @PostMapping("/wxPay")
     // @Permit("community:payment:wxPay")
     public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
-        if (weChatPayQO.getTradeFrom()==9){
+        if (weChatPayQO.getTradeFrom()==9||weChatPayQO.getTradeFrom()==2){
             weChatPayQO.setCommunityId(1L);
         }
         CommunityEntity entity = communityService.getCommunityNameById(weChatPayQO.getCommunityId());
