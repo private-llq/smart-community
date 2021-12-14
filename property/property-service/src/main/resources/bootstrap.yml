@@ -61,7 +61,7 @@ dubbo:
   application:
     name: ${spring.application.name}
   cloud:
-    subscribed-services: property-service,proprietor-service,lease-service
+    subscribed-services: property-service,proprietor-service,lease-service,im-chat-user
   consumer:
     retries: 0
     timeout: 99999

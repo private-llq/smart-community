@@ -98,7 +98,7 @@ public class UserDataController {
         baseUpdateUserRpcService.updateUserInfo(UserUtils.getUserToken(),
                 userDataQO.getNickname(),
                 userDataQO.getAvatarUrl(),
-                userDataQO.getBirthdayTime().toString(),
+                userDataQO.getBirthdayTime() == null ? null : userDataQO.getBirthdayTime().toString(),
                 true);
         /*String userId = UserUtils.getUserId();
         userDataQO.setNickname(null);
