@@ -92,7 +92,7 @@ public class ShoppingMallServiceImpl implements IShoppingMallService {
 	 * @Date: 2021/4/8
 	**/
 	@Override
-	public Map<String,Object> completeShopOrder(String serviceOrderNo,String outTradeNo,String transactionId,Integer payType){
+	public Map<String,Object> completeShopOrder(String outTradeNo,String transactionId,Integer payType){
 		Map<String, Object> returnMap = new HashMap<>();
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("orderNumber",outTradeNo);

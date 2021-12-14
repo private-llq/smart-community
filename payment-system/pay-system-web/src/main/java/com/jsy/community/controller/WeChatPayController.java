@@ -146,7 +146,8 @@ public class WeChatPayController {
 //                throw new JSYException((int)objectMap.get("code"),String.valueOf(objectMap.get("msg")));
 //            }
 
-            map.put("attach",weChatPayQO.getTradeFrom()+","+weChatPayQO.getOrderData().get("uuid"));
+//            map.put("attach",weChatPayQO.getTradeFrom()+","+weChatPayQO.getOrderData().get("uuid"));
+            map.put("attach",weChatPayQO.getTradeFrom());
         } else
         //物业费业务逻辑
         if (weChatPayQO.getTradeFrom()==4){
@@ -252,7 +253,7 @@ public class WeChatPayController {
             String[] split = map.get("attach").split(",");
             //处理商城支付回调后的业务逻辑
             if (split[0].equals("2")){
-                shoppingMallService.completeShopOrder(split[1],map.get("out_trade_no"),map.get("transaction_id"),2);
+                shoppingMallService.completeShopOrder(map.get("out_trade_no"),map.get("transaction_id"),2);
                 log.info("处理完成");
             } else
             //处理物业费支付回调后的业务逻辑

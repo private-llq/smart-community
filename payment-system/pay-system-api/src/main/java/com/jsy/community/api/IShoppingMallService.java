@@ -24,5 +24,5 @@ public interface IShoppingMallService {
 	 * @Author: chq459799974
 	 * @Date: 2021/4/8
 	**/
-	Map<String,Object> completeShopOrder(String orderNo,String outTradeNo,String transactionId,Integer payType);
+	Map<String,Object> completeShopOrder(String outTradeNo,String transactionId,Integer payType);
 }
