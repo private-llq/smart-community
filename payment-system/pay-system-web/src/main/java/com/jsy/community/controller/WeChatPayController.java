@@ -147,7 +147,7 @@ public class WeChatPayController {
 //            }
 
 //            map.put("attach",weChatPayQO.getTradeFrom()+","+weChatPayQO.getOrderData().get("uuid"));
-            map.put("attach",weChatPayQO.getTradeFrom());
+            map.put("attach",String.valueOf(weChatPayQO.getTradeFrom()));
         } else
         //物业费业务逻辑
         if (weChatPayQO.getTradeFrom()==4){
@@ -160,7 +160,7 @@ public class WeChatPayController {
 //            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
             //缓存物业缴费的账单id到redis
             redisTemplate.opsForValue().set(PROPERTY_FEE+map.get("out_trade_no"),weChatPayQO.getIds(),payOrderTimeout, TimeUnit.HOURS);
-            map.put("attach",4+","+map.get("out_trade_no")+","+propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()));
+            map.put("attach","4"+","+map.get("out_trade_no")+","+propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()));
         } else
         //停车缴费逻辑
         if (weChatPayQO.getTradeFrom()==8){
@@ -171,7 +171,7 @@ public class WeChatPayController {
                 map.put("description", "车位缴费");
             }
 //            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
-            map.put("attach",8+","+weChatPayQO.getServiceOrderNo());
+            map.put("attach","8"+","+weChatPayQO.getServiceOrderNo());
         } else
         //房屋租赁业务逻辑
         if (weChatPayQO.getTradeFrom()==9){
@@ -183,13 +183,13 @@ public class WeChatPayController {
                 return CommonResult.ok(JSONObject.fromObject(redisTemplate.opsForValue().get(SIGNATURE + weChatPayQO.getServiceOrderNo())));
             } else {
 //                hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
-                map.put("attach",9+","+weChatPayQO.getServiceOrderNo());
+                map.put("attach","9"+","+weChatPayQO.getServiceOrderNo());
             }
         } else
         //车辆临时缴费
         if (weChatPayQO.getTradeFrom()==10){
 //            hashMap.put("total",propertyFinanceOrderService.getTotalMoney(weChatPayQO.getIds()).multiply(new BigDecimal(100)));
-              map.put("attach",10+","+weChatPayQO.getServiceOrderNo());
+              map.put("attach","10"+","+weChatPayQO.getServiceOrderNo());
 
         }
         //新增数据库订单记录

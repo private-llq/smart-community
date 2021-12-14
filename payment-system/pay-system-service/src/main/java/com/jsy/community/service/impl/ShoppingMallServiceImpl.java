@@ -82,7 +82,7 @@ public class ShoppingMallServiceImpl implements IShoppingMallService {
 			return returnMap;
 		}
 	}
-	
+
 	/**
 	* @Description: 修改商城订单状态为完成
 	 * @Param: [orderNo]
@@ -135,5 +135,5 @@ public class ShoppingMallServiceImpl implements IShoppingMallService {
 			return returnMap;
 		}
 	}
-	
+
 }
