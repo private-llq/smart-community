@@ -8,6 +8,7 @@ import com.jsy.community.entity.AppVersionEntity;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -37,6 +38,7 @@ public class AppController {
 	
 	@ApiOperation("APP上传到服务器")
 	@PostMapping("/uploadApp")
+	@LoginIgnore
 	// @Permit("community:proprietor:app:uploadApp")
 	public CommonResult uploadApp(@RequestParam("file") MultipartFile file) {
 		String app = MinioUtils.upload(file, "app");
@@ -45,6 +47,7 @@ public class AppController {
 
 	@ApiOperation("APP上传到服务器")
 	@PostMapping("/uploadIos")
+	@LoginIgnore
 	// @Permit("community:proprietor:app:uploadIos")
 	public CommonResult uploadIos(@RequestParam("file") MultipartFile file) {
 		String app = MinioUtils.uploadName(file, "ios");
@@ -61,6 +64,7 @@ public class AppController {
 	
 	@ApiOperation("查询APP版本列表")
 	@GetMapping("/list/version")
+	@LoginIgnore
 	// @Permit("community:proprietor:app:list:version")
 	public CommonResult queryAppVersionList(Integer sysType, String sysVersion){
 		if(!BusinessConst.SYS_TYPE_ANDROID.equals(sysType) && !BusinessConst.SYS_TYPE_IOS.equals(sysType)){
@@ -75,6 +79,7 @@ public class AppController {
 	
 	@ApiOperation("添加APP版本")
 	@PostMapping("/version")
+	@LoginIgnore
 	// @Permit("community:proprietor:app:version")
 	public CommonResult addAppVersion(@RequestBody AppVersionEntity appVersionEntity){
 		ValidatorUtils.validateEntity(appVersionEntity);
@@ -84,6 +89,7 @@ public class AppController {
 	
 	@ApiOperation("修改APP版本信息")
 	@PutMapping("/version")
+	@LoginIgnore
 	// @Permit("community:proprietor:app:version")
 	public CommonResult updateAppVersion(@RequestBody AppVersionEntity appVersionEntity){
 		if(appVersionEntity.getId() == null){
@@ -96,6 +102,7 @@ public class AppController {
 	
 	@ApiOperation("删除APP版本")
 	@DeleteMapping("/version")
+	@LoginIgnore
 	// @Permit("community:proprietor:app:version")
 	public CommonResult delAppVersion(@RequestParam Long id){
 		if(id == null){
@@ -113,6 +120,7 @@ public class AppController {
 	 */
 	@ApiOperation("查询APP版本详情")
 	@GetMapping("/v2/version")
+	@LoginIgnore
 	// @Permit("community:proprietor:app:v2:version")
 	public CommonResult queryAppVersion(Integer sysType, String sysVersion){
 		if(!BusinessConst.SYS_TYPE_ANDROID.equals(sysType) && !BusinessConst.SYS_TYPE_IOS.equals(sysType)){

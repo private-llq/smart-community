@@ -46,10 +46,10 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
     private UserIMMapper userIMMapper;
 
 
-    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
     private IBaseUserInfoRpcService userInfoRpcService;
 
-    @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT)
+    @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check=false)
     private IImChatPublicPushRpcService iImChatPublicPushRpcService;
 
 

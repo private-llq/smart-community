@@ -30,7 +30,7 @@ dubbo:
   application:
     name: ${spring.application.name}
   cloud:
-    subscribed-services: proprietor-service,property-service,payment-service,lease-service
+    subscribed-services: proprietor-service,property-service,payment-service,lease-service,im-chat-user
   consumer:
     retries: 0
     timeout: 99999
