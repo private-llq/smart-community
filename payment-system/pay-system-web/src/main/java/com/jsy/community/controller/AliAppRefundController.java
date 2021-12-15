@@ -6,10 +6,7 @@ import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.vo.CommonResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @program: com.jsy.community
@@ -36,5 +33,10 @@ public class AliAppRefundController {
         } else {
             return CommonResult.error("当前订单不存在，请检查订单是否正确！");
         }
+    }
+
+    @GetMapping("getOrder")
+    public CommonResult getOrder(@RequestParam String orderNo){
+        return CommonResult.ok(aliAppRefundService.selectByOrder(orderNo));
     }
 }
