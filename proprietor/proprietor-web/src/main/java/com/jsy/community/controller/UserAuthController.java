@@ -234,6 +234,36 @@ public class UserAuthController {
         return b ? CommonResult.ok() : CommonResult.error("密码设置失败");
     }
 
+    /**
+     * @author: Pipi
+     * @description: 绑定支付宝
+     * @param code:
+     * @return: {@link CommonResult}
+     * @date: 2021/12/15 16:13
+     **/
+    @ApiOperation("绑定支付宝")
+    @PostMapping("/bindingAlipay")
+    // @Permit("community:proprietor:user:auth:bindingWechat")
+    public CommonResult bindingAlipay(@RequestParam("code") String code) {
+        baseAuthRpcService.bindAliPay(code);
+        return CommonResult.ok("", "绑定成功");
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 解绑支付宝
+     * @param :
+     * @return: {@link CommonResult}
+     * @date: 2021/12/15 16:13
+     **/
+    @ApiOperation("解绑支付宝")
+    @PostMapping("/unbindingAlipay")
+    // @Permit("community:proprietor:user:auth:bindingWechat")
+    public CommonResult unbindingAlipay() {
+        baseAuthRpcService.unboundAliPay(UserUtils.getUserToken());
+        return CommonResult.ok();
+    }
+
     @ApiOperation("绑定微信")
     @PostMapping("/bindingWechat")
     // @Permit("community:proprietor:user:auth:bindingWechat")

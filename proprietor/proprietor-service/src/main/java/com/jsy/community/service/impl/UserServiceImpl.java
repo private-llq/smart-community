@@ -1495,7 +1495,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     public UserEntity getRealAuthAndHouseId(String uid) {
         UserEntity userEntity = new UserEntity();
-        userEntity.setIsRealAuth(userMapper.getRealAuthStatus(uid));
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(uid);
+        if (idCardRealInfo != null) {
+            userEntity.setIsRealAuth(2);
+        } else {
+            userEntity.setIsRealAuth(0);
+        }
         //拿到用户的最新房屋id
         userEntity.setHouseId(userMapper.getLatestHouseId(uid));
         return userEntity;
