@@ -189,4 +189,6 @@ public class AliAppPayController {
 		Boolean wechatStatus = weChatService.checkPayStatus(orderNo, serviceOrderNo);
 		return aliStatus || wechatStatus ? CommonResult.ok(true,"查询成功") : CommonResult.ok(false,"查询成功");
 	}
+
+
 }

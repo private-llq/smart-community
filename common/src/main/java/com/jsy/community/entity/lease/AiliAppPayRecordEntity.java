@@ -1,15 +1,13 @@
 package com.jsy.community.entity.lease;
 
-import java.math.BigDecimal;
-
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.math.BigDecimal;
 
 /**
 * @Description: 支付宝流水实体类
@@ -47,7 +45,7 @@ public class AiliAppPayRecordEntity extends BaseEntity {
 	@ApiModelProperty(value = "交易类型 1.充值 2.提现")
 	private Integer tradeType;
 	
-	@ApiModelProperty(value = "交易状态 1.已下单")
+	@ApiModelProperty(value = "交易状态 1.待支付 2.支付完成，3退款进行中，4退款完成")
 	private Integer tradeStatus;
 	
 	@ApiModelProperty(value = "系统类型 1.安卓 2.IOS")

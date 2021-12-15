@@ -120,7 +120,7 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
      */
     @Override
     public WeChatOrderEntity getOrderByQuery(WechatRefundQO wechatRefundQO) {
-        return weChatMapper.selectOne(new QueryWrapper<WeChatOrderEntity>().eq("pay_type",wechatRefundQO.getTradeFrom()).eq("service_order_no",wechatRefundQO.getServiceOrderNo()));
+        return weChatMapper.selectById(wechatRefundQO.getOrderNum());
     }
 
     /**
