@@ -91,7 +91,8 @@ public class WechatRefundController {
         //退款单号
         map.put("out_refund_no", OrderNoUtil.getOrder());
         //回调地址
-        map.put("notify_url","http://tb2korpp.dongtaiyuming.net/api/v1/payment/refund/callback/"+entity.getCompanyId());
+        map.put("notify_url","http://zhsj.free.svipss.top/api/v1/payment/refund/callback/"+entity.getCompanyId());
+        log.info("回调地址:{}", map.get("notify_url"));
         map.put("amount",hashMap);
         //退款金额
         hashMap.put("refund",1);

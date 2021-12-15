@@ -18,9 +18,16 @@ import java.io.Serializable;
 @ApiModel("添加密码表单")
 public class AddPasswordQO implements Serializable {
 	@ApiModelProperty("密码")
-	@NotEmpty(groups = passwordVGroup.class,message = "密码不能为空")
-	@Length(groups = passwordVGroup.class,min = 8, max = 30, message = "密码长度8-30")
+	@NotEmpty(groups = {passwordVGroup.class,passwordUpdateGroup.class},message = "密码不能为空")
+	@Length(groups = {passwordVGroup.class,passwordUpdateGroup.class},min = 8, max = 30, message = "密码长度8-30")
 	private String password;
+
+	/**
+	 * 旧密码
+	 */
+	@NotEmpty(groups = {passwordVGroup.class,passwordUpdateGroup.class},message = "旧密码不能为空")
+	@Length(groups = {passwordVGroup.class,passwordUpdateGroup.class},min = 8, max = 30, message = "旧密码长度8-30")
+	private String oldPassword;
 	
 	@ApiModelProperty("确认密码")
 	@NotEmpty(groups = passwordVGroup.class,message = "确认密码不能为空")
@@ -44,7 +51,12 @@ public class AddPasswordQO implements Serializable {
 	 * 密码操作
 	 */
 	public interface passwordVGroup{}
-	
+
+	/**
+	 * 修改登录密码操作
+	 */
+	public interface passwordUpdateGroup{}
+
 	/**
 	 * 支付密码操作
 	 */
