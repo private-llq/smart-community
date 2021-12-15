@@ -109,6 +109,7 @@ public class UserController {
         if( Objects.nonNull(houseId) ){
             return switchHouse(houseId);
         }
+
         UserEntity userEntity = userService.getRealAuthAndHouseId(uid);
         //未实名认证
         if( Objects.isNull(userEntity) || Objects.equals(userEntity.getIsRealAuth(), BusinessConst.NO_REAL_NAME_AUTH)){
