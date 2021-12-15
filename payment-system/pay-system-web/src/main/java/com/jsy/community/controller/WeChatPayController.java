@@ -478,5 +478,10 @@ public class WeChatPayController {
 //        return clientIp;
 //    }
 
+    @LoginIgnore
+    @GetMapping("getOrder")
+    public CommonResult getOrder(@RequestParam String orderNum){
+        return CommonResult.ok(weChatService.getOrderOne(orderNum));
+    }
 
 }
