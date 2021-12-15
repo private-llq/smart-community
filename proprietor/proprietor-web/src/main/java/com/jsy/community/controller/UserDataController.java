@@ -21,6 +21,7 @@ import com.zhsj.base.api.rpc.IBaseWalletRpcService;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import jodd.util.StringUtil;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -159,7 +160,10 @@ public class UserDataController {
         Map<String, String> returnMap = new HashMap<>();
         returnMap.put("hasPayPassword", payPasswordStatus ? "1" : "0");
         returnMap.put("hasPassword", loginPasswordStatus ? "1" : "0");
-        returnMap.put("mobile", UserUtils.getUserInfo().getMobile().substring(0, 3).concat("****").concat(returnMap.get("mobile").substring(7, 11)));
+        if (StringUtil.isNotBlank(userInfo.getMobile())) {
+            String lastMobile = userInfo.getMobile().substring(7, 11);
+            returnMap.put("mobile", userInfo.getMobile().substring(0, 3).concat("****").concat(lastMobile));
+        }
         return CommonResult.ok(returnMap);
 //        return CommonResult.ok(userDataService.querySafeStatus(UserUtils.getUserId()));
     }
