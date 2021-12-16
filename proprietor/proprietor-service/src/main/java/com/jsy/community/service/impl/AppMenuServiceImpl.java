@@ -74,7 +74,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	 * @return: java.util.List<com.jsy.community.entity.AppMenuEntity>
 	 */
 	public List<AppMenuEntity> listAppMenu(Long communityId) {
-		return appMenuMapper.listAppMenu(communityId,7);
+		return appMenuMapper.listAppMenu(communityId,9);
 	}
 
 
@@ -87,6 +87,11 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	 */
 	@Override
 	public List<AppMenuEntity> listAppMenuAll(Long communityId) {
-		return appMenuMapper.selectList(new QueryWrapper<AppMenuEntity>().eq("path","/community/hotline"));
+		QueryWrapper<AppMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("version", "v2");
+		queryWrapper.orderByAsc("id");
+		queryWrapper.last("limit 9, 999");
+//		return appMenuMapper.selectList(new QueryWrapper<AppMenuEntity>().eq("path","/community/hotline"));
+		return appMenuMapper.selectList(queryWrapper);
 	}
 }

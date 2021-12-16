@@ -6,6 +6,8 @@ import com.jsy.community.qo.proprietor.AddPasswordQO;
 import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.MobileCodePayPasswordQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
+import com.jsy.community.vo.proprietor.ThirdPlatformInfoVO;
+import com.zhsj.base.api.domain.BaseThirdPlatform;
 
 import java.util.List;
 
@@ -136,4 +138,13 @@ public interface IUserAuthService extends IService<UserAuthEntity> {
 	 * @param uid     用户id
 	 */
     void updatePayPasswordByMobileCode(MobileCodePayPasswordQO qo, String account, String uid);
+
+    /**
+     * @author: Pipi
+     * @description: 查询三方平台绑定信息
+     * @param id: 用户id
+     * @return: {@link ThirdPlatformInfoVO}
+     * @date: 2021/12/16 16:21
+     **/
+	List<ThirdPlatformInfoVO> queryThirdPlatformInfo(Long id);
 }
