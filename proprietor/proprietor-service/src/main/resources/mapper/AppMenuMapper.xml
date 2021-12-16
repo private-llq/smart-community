@@ -24,7 +24,7 @@
         where community_id = #{communityId}
     </select>
     <select id="listAppMenu" resultType="com.jsy.community.entity.AppMenuEntity">
-        select * from  t_app_menu where version='v2' limit #{size}
+        select * from  t_app_menu where version='v2' order by id limit #{size}
     </select>
 
 </mapper>

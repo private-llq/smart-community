@@ -155,7 +155,7 @@ public class UserDataController {
     // @Permit("community:proprietor:userdata:safeStatus")
     public CommonResult querySafeStatus(){
         UserInfoVo userInfo = UserUtils.getUserInfo();
-        Boolean payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(userInfo.getId(), userInfo.getUid());
+        Boolean payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(userInfo.getId());
         Boolean loginPasswordStatus = baseUserInfoRpcService.getLoginPasswordStatus(userInfo.getId(), userInfo.getUid());
         Map<String, String> returnMap = new HashMap<>();
         returnMap.put("hasPayPassword", payPasswordStatus ? "1" : "0");
