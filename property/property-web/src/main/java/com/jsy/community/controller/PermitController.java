@@ -42,11 +42,11 @@ public class PermitController {
     /***
      * @author: Pipi
      * @description: 手动添加权限路由
-     * @param name: 权限名称
-         * @param permit: 权限标识
-         * @param scope: 权限 作用域  e_home(E到家用户),shop_admin（商家后台），property_admin（物业后台），ultimate_admin（大后台）
-         * @param description: 描述
-         * @param createUid: 用户id
+     *  name: 权限名称
+     *  permit: 权限标识
+     *  scope: 权限 作用域  e_home(E到家用户),shop_admin（商家后台），property_admin（物业后台），ultimate_admin（大后台）
+     *  description: 描述
+     *  createUid: 用户id
      * @return: {@link CommonResult}
      * @date: 2021/11/22 15:05
      **/
