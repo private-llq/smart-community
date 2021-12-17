@@ -147,17 +147,18 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	@Override
 	@Transactional
 	public void updateMobileUser(String uid) {
-		UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", uid));
+		// UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", uid));
+		UserDetail userDetail = userInfoRpcService.getUserDetail(uid);
 		Set<Long> ids = new HashSet<>();
-		if (userEntity != null) {
-			List<HouseMemberEntity> entityList = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("mobile", userEntity.getMobile()));
+		if (userDetail != null) {
+			List<HouseMemberEntity> entityList = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("mobile", userDetail.getPhone()));
 			if (entityList.size()!=0){
 				for (HouseMemberEntity houseMemberEntity : entityList) {
 					ids.add(houseMemberEntity.getHouseId());
 				}
 
 				//给成员表添加uid
-				houseMemberMapper.updateByUid(uid,userEntity.getMobile());
+				houseMemberMapper.updateByUid(uid,userDetail.getPhone());
 				//给房屋认证表添加用户uid
 				userHouseMapper.updateByUid(ids,uid);
 			}

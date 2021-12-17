@@ -45,7 +45,7 @@ public class AddPasswordQO implements Serializable {
 	/**
 	 * 短信验证码
 	 */
-	@NotBlank(groups = {passwordUpdateGroup.class},message = "短信验证码不能为空")
+	@NotBlank(groups = {passwordUpdateGroup.class, payPasswordVGroup.class},message = "短信验证码不能为空")
 	private String code;
 	/**
 	 * 密码操作

@@ -691,12 +691,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
     public UserInfoVo getUserInfoVo(LoginVo loginVo){
-        // 调用基础用户模块获取三方绑定状态
-        ThirdBindStatusVo thirdBindStatus = baseUserInfoRpcService.getThirdBindStatus(loginVo.getUserInfo().getId());
-        // 调用基础用户模块获取支付密码设置状态
-        Boolean payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(loginVo.getUserInfo().getId());
-        // 调用基础用户模块获取实名信息
-        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(loginVo.getUserInfo().getId());
+        ThirdBindStatusVo thirdBindStatus = new ThirdBindStatusVo();
+        thirdBindStatus.setWeChatBind(false);
+        thirdBindStatus.setAliPayBind(false);
+        Boolean payPasswordStatus = false;
+        RealInfoDto idCardRealInfo = new RealInfoDto();
+        if (loginVo.getUserInfo().getId() != null) {
+            // 调用基础用户模块获取三方绑定状态
+            thirdBindStatus = baseUserInfoRpcService.getThirdBindStatus(loginVo.getUserInfo().getId());
+            // 调用基础用户模块获取支付密码设置状态
+            payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(loginVo.getUserInfo().getId());
+            // 调用基础用户模块获取实名信息
+            idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(loginVo.getUserInfo().getId());
+        }
+
         UserInfoVo userInfoVo = new UserInfoVo();
         userInfoVo.setIsBindMobile(loginVo.getUserInfo().getPhone() != null ? 1 : 0);
         if (thirdBindStatus != null) {
@@ -1031,7 +1039,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             List<UserHouseQo> tmpQos = new ArrayList<>(houseList);
             log.error("入参houseList" + houseList);
             //1.通过uid拿到业主的身份证
-            userEntity = queryUserDetailByUid(qo.getUid());
+            RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(qo.getUid());
+            userEntity.setIsRealAuth(0);
+            userEntity.setUid(qo.getUid());
+            // TODO: 2021/12/17  修改人脸数据之后一起修改
+            userEntity.setFaceUrl("");
+            if (idCardRealInfo != null) {
+                userEntity.setIdCard(idCardRealInfo.getIdCardNumber());
+                userEntity.setIsRealAuth(2);
+                userEntity.setRealName(idCardRealInfo.getIdCardName());
+            }
+            UserDetail userDetail = baseUserInfoRpcService.getUserDetail(qo.getUid());
+            if (userDetail != null) {
+                userEntity.setSex(userDetail.getSex());
+            }
+            // userEntity = queryUserDetailByUid(qo.getUid());
             //通过 业主身份证 拿到 业主表的 该业主的所有 房屋id + 社区id
             List<UserHouseQo> resHouseList = userMapper.getProprietorInfo(userEntity.getIdCard());
             if (CollectionUtil.isEmpty(resHouseList)) {
@@ -1139,9 +1161,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Transactional(rollbackFor = Exception.class)
     @Override
     public UserInfoVo proprietorQuery(String userId, Long houseId) {
-        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId).select("real_name,sex,detail_address,avatar_url"));
+        // UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId).select("real_name,sex,detail_address,avatar_url"));
         UserInfoVo userInfoVo = new UserInfoVo();
-        BeanUtil.copyProperties(userEntity, userInfoVo);
+        UserDetail userDetail = baseUserInfoRpcService.getUserDetail(userId);
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(userId);
+        if (userDetail != null) {
+            userInfoVo.setSex(userDetail.getSex());
+            userInfoVo.setAvatarUrl(userDetail.getAvatarThumbnail());
+        }
+        if (idCardRealInfo != null) {
+            userInfoVo.setRealName(idCardRealInfo.getIdCardName());
+        }
+        // BeanUtil.copyProperties(userEntity, userInfoVo);
         //业主家属查询
         List<RelationVO> houseMemberEntities = relationService.selectID(userId, houseId);
         userInfoVo.setProprietorMembers(houseMemberEntities);
@@ -1244,11 +1275,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //查小区名、业主姓名
         /* t_community *//* t_user */
         Map<String, Map<String, Object>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
-        UserInfoVo userInfoVo = userMapper.selectUserInfoById(uid);
+        // UserInfoVo userInfoVo = userMapper.selectUserInfoById(uid);
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(uid);
         for (HouseEntity userHouseEntity : houses) {
             Map<String, Object> map = communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId()));
             userHouseEntity.setCommunityName(map == null ? null : String.valueOf(map.get("name")));
-            userHouseEntity.setOwner(userInfoVo.getRealName());
+            if (idCardRealInfo != null) {
+                userHouseEntity.setOwner(idCardRealInfo.getIdCardName());
+            }
         }
         return houses;
     }
@@ -1340,11 +1374,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         //查小区名、业主姓名
         /* t_community *//* t_user */
         Map<String, Map<String, Object>> communityMap = communityService.queryCommunityNameByIdBatch(communityIdSet);
-        UserInfoVo userInfoVo = userMapper.selectUserInfoById(userId);
+        // UserInfoVo userInfoVo = userMapper.selectUserInfoById(userId);
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(userId);
         for (HouseEntity userHouseEntity : houses) {
             Map<String, Object> map = communityMap.get(BigInteger.valueOf(userHouseEntity.getCommunityId()));
             userHouseEntity.setCommunityName(map == null ? null : String.valueOf(map.get("name")));
-            userHouseEntity.setOwner(userInfoVo.getRealName());
+            if (idCardRealInfo != null) {
+                userHouseEntity.setOwner(idCardRealInfo.getIdCardName());
+            }
         }
         return houses;
     }
@@ -1508,8 +1545,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @Override
     public UserInfoVo getUserAndMemberInfo(String uid, Long houseId) {
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(uid);
+        UserDetail userDetail = baseUserInfoRpcService.getUserDetail(uid);
         //1.查出用户姓名、用户性别、
-        UserInfoVo userInfo = userMapper.selectUserNameAndHouseAddr(uid);
+        // UserInfoVo userInfo = userMapper.selectUserNameAndHouseAddr(uid);
+        UserInfoVo userInfo = new UserInfoVo();
+        if (idCardRealInfo != null) {
+            userInfo.setRealName(idCardRealInfo.getIdCardName());
+        }
+        if (userDetail != null) {
+            userDetail.setSex(userDetail.getSex());
+        }
         //2.拿到房屋地址组成的字符串 如两江新区幸福广场天王星B栋1801 和 房屋所在社区id
         UserInfoVo userInfoVo = userMapper.selectHouseAddr(houseId);
         if (Objects.nonNull(userInfoVo)) {
@@ -1639,6 +1685,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     //保存人脸
     @Override
     @Transactional
+    // TODO: 2021/12/17 人脸需要修改的,到时候一起修改了
     public void saveFace(String userId, String faceUrl) {
         UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
         if (userEntity != null) {
@@ -1658,6 +1705,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
     }
 
+    // TODO: 2021/12/17 人脸需要修改的,到时候一起修改了
     @Override
     public String getFace(String userId) {
         UserEntity entity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));

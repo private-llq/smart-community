@@ -137,12 +137,12 @@ public class UserAccountController {
                 UserAccountRecordEntity userAccountRecordEntity = new UserAccountRecordEntity();
                 userAccountRecordEntity.setUid(UserUtils.getUserId());
                 userAccountRecordEntity.setTradeFromStr(datum.getSource());
-                userAccountRecordEntity.setTradeType(datum.getType());
-                userAccountRecordEntity.setTradeTypeStr(PaymentEnum.TradeTypeEnum.tradeTypeMap.get(datum.getType()));
-                userAccountRecordEntity.setTradeAmount(datum.getAmount());
-                userAccountRecordEntity.setTradeAmountStr(String.valueOf(datum.getAmount()));
-                userAccountRecordEntity.setBalance(datum.getBalance());
-                userAccountRecordEntity.setBalanceStr(String.valueOf(datum.getBalance()));
+                userAccountRecordEntity.setTradeType(datum.getChangeType());
+                userAccountRecordEntity.setTradeTypeStr(PaymentEnum.TradeTypeEnum.tradeTypeMap.get(datum.getChangeType()));
+                userAccountRecordEntity.setTradeAmount(datum.getAmount().setScale(2, RoundingMode.DOWN));
+                userAccountRecordEntity.setTradeAmountStr(String.valueOf(datum.getAmount().setScale(2, RoundingMode.DOWN)));
+                userAccountRecordEntity.setBalance(datum.getBalance().setScale(2, RoundingMode.DOWN));
+                userAccountRecordEntity.setBalanceStr(String.valueOf(datum.getBalance().setScale(2, RoundingMode.DOWN)));
                 userAccountRecordEntity.setComment(datum.getRemark());
                 userAccountRecordEntity.setId(datum.getId());
                 userAccountRecordEntity.setIdStr(String.valueOf(datum.getId()));

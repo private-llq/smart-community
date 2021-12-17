@@ -309,18 +309,19 @@ public class UserAuthController {
         return CommonResult.ok();
     }*/
 
-    @ApiOperation(value = "设置支付密码", notes = "需要登录")
+    @ApiOperation(value = "修改支付密码", notes = "需要登录")
     @PostMapping("/password/pay")
     // @Permit("community:proprietor:user:auth:password:pay")
     public CommonResult<Boolean> addPayPassword(@RequestBody AddPasswordQO qo) {
         ValidatorUtils.validateEntity(qo, AddPasswordQO.payPasswordVGroup.class);
-        if (StringUtil.isNotBlank(qo.getOldPayPassword())) {
+        /*if (StringUtil.isNotBlank(qo.getOldPayPassword())) {
             // 修改支付密码
             baseAuthRpcService.updatePayPassword(UserUtils.getUserToken(), qo.getOldPayPassword(), qo.getPayPassword());
         } else {
             // 添加支付密码
             baseAuthRpcService.initPayPassword(UserUtils.getUserToken(), qo.getPayPassword());
-        }
+        }*/
+        baseAuthRpcService.updatePayPassword(UserUtils.getEHomeUserId(), qo.getPayPassword(), qo.getCode());
         return CommonResult.ok();
     }
     /*public CommonResult<Boolean> addPayPassword(@RequestBody AddPasswordQO qo) {
