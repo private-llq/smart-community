@@ -965,6 +965,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 shopImgEntityQueryWrapper.last("limit 1");
                 ShopImgEntity shopImgEntity = shopImgMapper.selectOne(shopImgEntityQueryWrapper);
                 for (AssetLeaseRecordEntity leaseRecordEntity : assetLeaseRecordEntities) {
+                    UserDetail userDetail = userInfoRpcService.getUserDetail(leaseRecordEntity.getTenantUid());
+                    leaseRecordEntity.setRealName(userDetail.getNickName());
+                    leaseRecordEntity.setAvatarUrl(userDetail.getAvatarThumbnail());
                     leaseRecordEntity.setImageUrl(shopImgEntity == null ? null : shopImgEntity.getImgUrl());
                     leaseRecordEntity.setTitle(shopLeaseEntity.getTitle());
                     leaseRecordEntity.setSummarize(shopLeaseEntity.getSummarize());
