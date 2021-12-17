@@ -20,6 +20,8 @@ import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
+import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.UserImVo;
 import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
@@ -681,17 +683,19 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     @TxcTransaction
     public void bindingMonthCar(CarOrderRecordEntity entity) {
-            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", entity.getUid()));
-            CarEntity carEntity = new CarEntity();
-            if (userEntity != null) {
+        // UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", entity.getUid()));
+        UserDetail userDetail = userInfoRpcService.getUserDetail(entity.getUid());
+        RealInfoDto idCardRealInfo = userInfoRpcService.getIdCardRealInfo(entity.getUid());
+        CarEntity carEntity = new CarEntity();
+            if (userDetail != null && idCardRealInfo != null) {
                 BeanUtils.copyProperties(entity,carEntity);
                 carEntity.setId(SnowFlake.nextId());
                 carEntity.setBeginTime(LocalDateTime.now());
                 carEntity.setOverTime(LocalDateTime.now().plusMonths(carEntity.getMonth()));
                 carEntity.setType(2);
                 carEntity.setCarPositionId(null);
-                carEntity.setOwner(userEntity.getRealName());
-                carEntity.setContact(userEntity.getMobile());
+                carEntity.setOwner(idCardRealInfo.getIdCardName());
+                carEntity.setContact(userDetail.getPhone());
                 carMapper.insert(carEntity);
 
                 //业主绑定车辆后修改车位状态
@@ -923,12 +927,16 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     public void addRelationCar(CarEntity carEntity) {
-        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carEntity.getUid()));
+        // UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carEntity.getUid()));
+        UserDetail userDetail = userInfoRpcService.getUserDetail(carEntity.getUid());
+        RealInfoDto idCardRealInfo = userInfoRpcService.getIdCardRealInfo(carEntity.getUid());
+        if (userDetail != null && idCardRealInfo != null) {
             carEntity.setId(SnowFlake.nextId());
-            carEntity.setContact(userEntity.getMobile());
-            carEntity.setOwner(userEntity.getRealName());
+            carEntity.setContact(userDetail.getPhone());
+            carEntity.setOwner(idCardRealInfo.getIdCardName());
             carEntity.setType(3);
             carMapper.insert(carEntity);
+        }
     }
 
     @Override

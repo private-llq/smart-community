@@ -18,6 +18,12 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.ProprietorMarketQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.proprietor.ProprietorMarketVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import jodd.util.StringUtil;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +49,9 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
 
     @Autowired
     private UserMapper userMapper;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
 
     /**
      * @Description: 发布商品信息
@@ -198,7 +207,20 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
      **/
     @Override
     public ProprietorMarketEntity findOne(Long id) {
-          ProprietorMarketEntity marketEntity =  marketMapper.selectMarketOne(id);
+        ProprietorMarketEntity marketEntity =  marketMapper.selectMarketOne(id);
+        if (StringUtil.isNotBlank(marketEntity.getUid())) {
+            UserDetail userDetail = baseUserInfoRpcService.getUserDetail(marketEntity.getUid());
+            if (userDetail != null) {
+                marketEntity.setNickName(userDetail.getNickName());
+                marketEntity.setAvatarUrl(userDetail.getAvatarThumbnail());
+            }
+            RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(marketEntity.getUid());
+            marketEntity.setIsRealAuth(0);
+            if (idCardRealInfo != null) {
+                marketEntity.setIsRealAuth(1);
+                marketEntity.setRealName(idCardRealInfo.getIdCardName());
+            }
+        }
         return marketEntity;
     }
 

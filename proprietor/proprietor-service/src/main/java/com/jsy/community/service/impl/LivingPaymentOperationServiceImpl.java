@@ -10,6 +10,11 @@ import com.jsy.community.mapper.*;
 import com.jsy.community.qo.livingpayment.LivingPaymentQO;
 import com.jsy.community.qo.livingpayment.RemarkQO;
 import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
@@ -51,6 +56,8 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
     //缴费类型
     @Autowired
     private PayCompanyMapper payCompanyMapper;
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
 
     @Override
     public void saveStatus(String out_trade_no) {
@@ -148,14 +155,20 @@ public class LivingPaymentOperationServiceImpl implements ILivingPaymentOperatio
             payFamilyMapper.updateById(familyEntity);
         }
         //添加户主详情
-        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid",livingPaymentQO.getUserID()));
-        userEntity.setId(SnowFlake.nextId());
+        UserDetail userDetail = baseUserInfoRpcService.getUserDetail(livingPaymentQO.getUserID());
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(livingPaymentQO.getUserID());
+        // UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid",livingPaymentQO.getUserID()));
         PayUserDetailsEntity payUserDetailsEntity=new PayUserDetailsEntity();
+        payUserDetailsEntity.setId(SnowFlake.nextId());
         payUserDetailsEntity.setAddress(null);
         payUserDetailsEntity.setAge(null);
-        payUserDetailsEntity.setIdCard(userEntity.getIdCard());
-        payUserDetailsEntity.setName(userEntity.getRealName());
-        payUserDetailsEntity.setSex(userEntity.getSex());
+        if (idCardRealInfo != null) {
+            payUserDetailsEntity.setIdCard(idCardRealInfo.getIdCardNumber());
+            payUserDetailsEntity.setName(idCardRealInfo.getIdCardName());
+        }
+        if (userDetail != null) {
+            payUserDetailsEntity.setSex(userDetail.getSex());
+        }
         payUserDetailsMapper.insert(payUserDetailsEntity);
     }
 

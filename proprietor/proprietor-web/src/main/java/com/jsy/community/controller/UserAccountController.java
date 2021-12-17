@@ -85,7 +85,7 @@ public class UserAccountController {
         BaseWallet baseWallet = baseWalletRpcService.getWalletByCon(UserUtils.getEHomeUserId(), "RMB");
         Map<String, Object> returnMap = new HashMap<>();
         if (baseWallet != null) {
-            returnMap.put("balance", new BigDecimal(0E-8).compareTo(baseWallet.getBalance()) == 0 ? new BigDecimal(0.00) : baseWallet.getBalance());
+            returnMap.put("balance", new BigDecimal(0E-8).compareTo(baseWallet.getBalance()) == 0 ? new BigDecimal(0.00) : baseWallet.getBalance().setScale(2, RoundingMode.DOWN));
         } else {
             returnMap.put("balance", new BigDecimal(0.00));
         }
@@ -188,12 +188,13 @@ public class UserAccountController {
     @PostMapping("/wechat/withdrawal")
     // @Permit("community:proprietor:user:account:wechat:withdrawal")
     public CommonResult<WithdrawalResulrVO> wechatWithdrawal(@RequestBody UserWithdrawalQ0 userWithdrawalQ0) {
-        withdrawalRpcService.walletWithdrawalToWeChat(UserUtils.getEHomeUserId(), userWithdrawalQ0.getPayPassword(), userWithdrawalQ0.getAmount(), "");
+        ValidatorUtils.validateEntity(userWithdrawalQ0);
+        withdrawalRpcService.walletWithdrawalToWeChat(UserUtils.getEHomeUserId(), userWithdrawalQ0.getPayPassword(), userWithdrawalQ0.getAmount(), "余额提现到微信");
         WithdrawalResulrVO withdrawalResulrVO = new WithdrawalResulrVO();
         withdrawalResulrVO.setCode("0");
         withdrawalResulrVO.setMsg("");
         withdrawalResulrVO.setSuccess(true);
-        return CommonResult.ok(withdrawalResulrVO);
+        return CommonResult.ok(withdrawalResulrVO, "提现成功");
     }
 
     /*public CommonResult<WithdrawalResulrVO> wechatWithdrawal(@RequestBody UserWithdrawalQ0 userWithdrawalQ0) {
@@ -205,12 +206,13 @@ public class UserAccountController {
     @PostMapping("/zhifubao/withdrawal")
     // @Permit("community:proprietor:user:account:zhifubao:withdrawal")
     public CommonResult<WithdrawalResulrVO> zhifubaoWithdrawal(@RequestBody UserWithdrawalQ0 userWithdrawalQ0) {
-        withdrawalRpcService.walletWithdrawalToAliPay(UserUtils.getEHomeUserId(), userWithdrawalQ0.getPayPassword(), userWithdrawalQ0.getAmount(), "");
+        ValidatorUtils.validateEntity(userWithdrawalQ0);
+        withdrawalRpcService.walletWithdrawalToAliPay(UserUtils.getEHomeUserId(), userWithdrawalQ0.getPayPassword(), userWithdrawalQ0.getAmount(), "余额提现到支付宝");
         WithdrawalResulrVO withdrawalResulrVO = new WithdrawalResulrVO();
         withdrawalResulrVO.setCode("0");
         withdrawalResulrVO.setMsg("");
         withdrawalResulrVO.setSuccess(true);
-        return CommonResult.ok(withdrawalResulrVO);
+        return CommonResult.ok(withdrawalResulrVO, "提现成功");
     }
     /*public CommonResult<WithdrawalResulrVO> zhifubaoWithdrawal(@RequestBody UserWithdrawalQ0 userWithdrawalQ0) {
         String uid = UserUtils.getUserId();

@@ -40,7 +40,7 @@ public interface ProprietorMarketMapper extends BaseMapper<ProprietorMarketEntit
      * @Author: Tian
      * @Date: 2021/8/23-10:48
      **/
-    List<ProprietorMarketQO> selectMarketAllPage(@Param("page") Long page, @Param("size") Long size, ProprietorMarketQO query);
+    List<ProprietorMarketQO> selectMarketAllPage(@Param("page") Long page, @Param("size") Long size, @Param("query") ProprietorMarketQO query);
 
     /**
      * @Description: 查询所有发布的商品的条数
