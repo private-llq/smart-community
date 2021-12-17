@@ -4,7 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
-import com.jsy.community.utils.PageInfo;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.vo.PageVO;
 
 
 /**
@@ -21,7 +22,7 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Param: [baseQO]
 	 * @return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.admin.AdminUserEntity>
 	 */
-	PageInfo<AdminUserEntity> queryOperator(BaseQO<AdminUserQO> baseQO);
+	PageVO<UserDetail> queryOperator(BaseQO<AdminUserQO> baseQO);
 	
 	/**
 	 * @Description: 添加操作员
@@ -30,16 +31,16 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Param: [adminUserEntity]
 	 * @return: void
 	 */
-	void addOperator(AdminUserEntity adminUserEntity);
+	void addOperator(AdminUserQO adminUserQO);
 	
 	/**
 	 * @Description: 编辑操作员
 	 * @author: DKS
 	 * @since: 2021/11/19 16:55
-	 * @Param: [adminUserEntity]
+	 * @Param: [adminUserQO]
 	 * @return: void
 	 */
-	void updateOperator(AdminUserEntity adminUserEntity);
+	void updateOperator(AdminUserQO adminUserQO);
 	
 	/**
 	 * @Description: 删除操作员
@@ -49,22 +50,4 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @return: void
 	 */
 	void deleteOperator(Long id);
-	
-	/**
-	 * @Description: 根据手机号检查小区用户是否已存在(t_admin_user)
-	 * @author: DKS
-	 * @since: 2021/11/19 16:55
-	 * @Param: [mobile]
-	 * @return: boolean
-	 */
-	boolean checkUserExists(String mobile);
-	
-	/**
-	 * @Description: 修改手机号
-	 * @author: DKS
-	 * @since: 2021/11/19 16:56
-	 * @Param: [newMobile, oldMobile]
-	 * @return: boolean
-	 */
-	boolean changeMobile(String newMobile,String oldMobile);
 }

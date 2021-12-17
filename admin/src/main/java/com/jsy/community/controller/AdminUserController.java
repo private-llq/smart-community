@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.businessLog;
-import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.service.IAdminUserService;
@@ -43,15 +42,12 @@ public class AdminUserController {
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new AdminUserQO());
 		}
-//		baseQO.getQuery().setCommunityIdList(UserUtils.getAdminCommunityIdList());
-//		baseQO.getQuery().setCompanyId(UserUtils.getAdminCompanyId());
-//		baseQO.getQuery().setUid(UserUtils.getUserId());
 		return CommonResult.ok(adminUserService.queryOperator(baseQO));
 	}
 	
 	/**
 	* @Description: 给中台添加操作员
-	 * @Param: [adminUserEntity]
+	 * @Param: [adminUserQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: DKS
 	 * @Date: 2021/11/18
@@ -59,14 +55,14 @@ public class AdminUserController {
 	@PostMapping("insert")
 	@businessLog(operation = "新增",content = "新增了【账号管理】")
 	@Permit("community:admin:account:insert")
-	public CommonResult addOperator(@RequestBody AdminUserEntity adminUserEntity){
-		adminUserService.addOperator(adminUserEntity);
+	public CommonResult addOperator(@RequestBody AdminUserQO adminUserQO){
+		adminUserService.addOperator(adminUserQO);
 		return CommonResult.ok("添加成功");
 	}
 	
 	/**
 	* @Description: 编辑中台操作员
-	 * @Param: [adminUserEntity]
+	 * @Param: [adminUserQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: DKS
 	 * @Date: 2021/11/18
@@ -74,12 +70,12 @@ public class AdminUserController {
 	@PutMapping("update")
 	@businessLog(operation = "编辑",content = "更新了【账号管理】")
 	@Permit("community:admin:account:update")
-	public CommonResult updateOperator(@RequestBody AdminUserEntity adminUserEntity){
-		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
+	public CommonResult updateOperator(@RequestBody AdminUserQO adminUserQO){
+		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
 			//验证社区权限
-			UserUtils.validateCommunityIds(adminUserEntity.getCommunityIdList());
+			UserUtils.validateCommunityIds(adminUserQO.getCommunityIdList());
 		}
-		adminUserService.updateOperator(adminUserEntity);
+		adminUserService.updateOperator(adminUserQO);
 		return CommonResult.ok("操作成功");
 	}
 	

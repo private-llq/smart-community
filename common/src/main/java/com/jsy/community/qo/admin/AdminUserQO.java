@@ -1,6 +1,5 @@
 package com.jsy.community.qo.admin;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -34,10 +33,13 @@ public class AdminUserQO implements Serializable {
 	private String number;
 	
 	@ApiModelProperty(value = "姓名")
-	private String realName;
+	private String nickName;
 	
 	@ApiModelProperty(value = "电话号码")
-	private String mobile;
+	private String phone;
+	
+	// 密码
+	private String password;
 	
 	@ApiModelProperty(value = "身份证号")
 	private String idCard;
@@ -51,8 +53,7 @@ public class AdminUserQO implements Serializable {
 	// 角色ID
 	private Long roleId;
 	
-	@ApiModelProperty(value = "物业公司名称或者手机号")
-	@TableField(exist = false)
-	private String companyNameOrMobile;
+	@ApiModelProperty(value = "物业公司名称")
+	private String companyName;
 
 }

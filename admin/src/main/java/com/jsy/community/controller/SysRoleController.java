@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.sys.SysRoleEntity;
 import com.jsy.community.entity.sys.SysRoleMenuEntity;
@@ -10,7 +9,6 @@ import com.jsy.community.qo.sys.SysRoleQO;
 import com.jsy.community.service.ISysConfigService;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -38,10 +36,10 @@ public class SysRoleController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	@LoginIgnore
 	@PostMapping("add")
 	@Transactional(rollbackFor = Exception.class)
 	@businessLog(operation = "新增",content = "新增了【系统角色】")
+	@Permit("community:admin:role:add")
 	public CommonResult addRole(@RequestBody SysRoleEntity sysRoleEntity){
 		ValidatorUtils.validateEntity(sysRoleEntity);
 		boolean b = sysConfigService.addRole(sysRoleEntity);
@@ -55,9 +53,9 @@ public class SysRoleController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	@LoginIgnore
 	@DeleteMapping("delete")
 	@businessLog(operation = "删除",content = "删除了【系统角色】")
+	@Permit("community:admin:role:delete")
 	public CommonResult delMenu(@RequestParam("id") Long id){
 		boolean b = sysConfigService.delRole(id);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"删除失败");
@@ -70,10 +68,10 @@ public class SysRoleController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	@LoginIgnore
 	@PutMapping("update")
 	@Transactional(rollbackFor = Exception.class)
 	@businessLog(operation = "编辑",content = "更新了【系统角色】")
+	@Permit("community:admin:role:update")
 	public CommonResult updateMenu(@RequestBody SysRoleQO sysRoleQO){
 		boolean b = sysConfigService.updateRole(sysRoleQO);
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改失败");
@@ -86,8 +84,8 @@ public class SysRoleController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	@LoginIgnore
 	@GetMapping("list")
+	@Permit("community:admin:role:list")
 	public CommonResult<List<SysRoleEntity>> listOfMenu(){
 		return CommonResult.ok(sysConfigService.listOfRole());
 	}
@@ -115,9 +113,9 @@ public class SysRoleController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
-	@LoginIgnore
 	@Transactional(rollbackFor = Exception.class)
 	@PostMapping("menus")
+	@Permit("community:admin:role:menus")
 	public CommonResult setUserRoles(@RequestBody SysRoleMenuEntity sysRoleMenuEntity){
 		boolean b = sysConfigService.setRoleMenus(sysRoleMenuEntity.getMenuIds(), sysRoleMenuEntity.getRoleId());
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"设置角色菜单失败");
