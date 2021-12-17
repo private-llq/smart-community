@@ -14,9 +14,11 @@ import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
 import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.BaseThirdPlatform;
 import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import com.zhsj.base.api.rpc.IBaseSmsRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.rpc.IThirdRpcService;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.support.ContextHolder;
 import com.zhsj.baseweb.support.LoginUser;
@@ -34,6 +36,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -86,7 +89,7 @@ public class UserAuthController {
                     allowableValues = "1,2,3,4,5", paramType = "query")
     })
     @LoginIgnore
-    public CommonResult<Boolean> sendCode(@RequestParam String account, @RequestParam Integer type) {
+    public CommonResult<Boolean> sendCode(@RequestParam String account) {
         if (RegexUtils.isMobile(account)) {
             baseSmsRpcService.sendVerificationCode(account);
             return CommonResult.ok();
@@ -223,22 +226,59 @@ public class UserAuthController {
         return CommonResult.ok(userService.bindThirdPlatformV2(userThirdPlatformQO,loginUser), "绑定成功");
     }
 
-    @ApiOperation(value = "注册后设置密码", notes = "需要登录")
+    @ApiOperation(value = "修改登录密码", notes = "需要登录")
     @PostMapping("/password")
     // @Permit("community:proprietor:user:auth:password")
-    @Deprecated
     public CommonResult<Boolean> addPassword(@RequestBody AddPasswordQO qo) {
+        ValidatorUtils.validateEntity(qo, AddPasswordQO.passwordUpdateGroup.class);
+        baseAuthRpcService.resetPhoneLoginPassword(UserUtils.getUserInfo().getMobile(), qo.getCode(), qo.getPassword());
+        return CommonResult.ok();
+    }
+    /*public CommonResult<Boolean> addPassword(@RequestBody AddPasswordQO qo) {
         ValidatorUtils.validateEntity(qo, AddPasswordQO.passwordVGroup.class);
         String uid = UserUtils.getUserId();
         boolean b = userAuthService.addPassword(uid, qo);
         return b ? CommonResult.ok() : CommonResult.error("密码设置失败");
+    }*/
+
+    /**
+     * @author: Pipi
+     * @description: 绑定支付宝
+     * @param code:
+     * @return: {@link CommonResult}
+     * @date: 2021/12/15 16:13
+     **/
+    @ApiOperation("绑定支付宝")
+    @PostMapping("/bindingAlipay")
+    // @Permit("community:proprietor:user:auth:bindingWechat")
+    public CommonResult bindingAlipay(@RequestParam("code") String code) {
+        baseAuthRpcService.bindAliPay(UserUtils.getUserToken(), code);
+        return CommonResult.ok("", "绑定成功");
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 解绑支付宝
+     * @param :
+     * @return: {@link CommonResult}
+     * @date: 2021/12/15 16:13
+     **/
+    @ApiOperation("解绑支付宝")
+    @PostMapping("/unbindingAlipay")
+    // @Permit("community:proprietor:user:auth:bindingWechat")
+    public CommonResult unbindingAlipay(@RequestBody RegisterQO registerQO) {
+        if (StringUtil.isBlank(registerQO.getCode())) {
+            throw new JSYException(JSYError.REQUEST_PARAM);
+        }
+        baseAuthRpcService.unboundAliPay(UserUtils.getUserToken(), registerQO.getCode());
+        return CommonResult.ok();
     }
 
     @ApiOperation("绑定微信")
     @PostMapping("/bindingWechat")
     // @Permit("community:proprietor:user:auth:bindingWechat")
     public CommonResult bindingWechat(@RequestParam("code") String code) {
-        baseAuthRpcService.bindWeChat(code);
+        baseAuthRpcService.bindWeChat(UserUtils.getUserToken(), code);
         return CommonResult.ok("", "绑定成功");
     }
     /*public CommonResult bindingWechat(@RequestParam("code") String code) {
@@ -257,7 +297,10 @@ public class UserAuthController {
     @PostMapping("/relieveBindingWechat")
     // @Permit("community:proprietor:user:auth:relieveBindingWechat")
     public CommonResult relieveBindingWechat(@RequestBody RegisterQO registerQO) {
-        baseAuthRpcService.unboundWeChat(UserUtils.getUserToken());
+        if (StringUtil.isBlank(registerQO.getCode())) {
+            throw new JSYException(JSYError.REQUEST_PARAM);
+        }
+        baseAuthRpcService.unboundWeChat(UserUtils.getUserToken(), registerQO.getCode());
         return CommonResult.ok();
     }
     /*public CommonResult relieveBindingWechat(@RequestBody RegisterQO registerQO) {
@@ -467,5 +510,17 @@ if (StrUtil.isBlank(authToken)) {
     public CommonResult<?> cancellation() {
         baseAuthRpcService.cancellation(UserUtils.getEHomeUserId());
         return CommonResult.ok("注销成功");
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 查询三方平台绑定信息
+     * @param :
+     * @return: {@link CommonResult<?>}
+     * @date: 2021/12/15 17:00
+     **/
+    @GetMapping("/thirdPlarformInfo")
+    public CommonResult<?> thirdPlarformInfo() {
+        return CommonResult.ok(userAuthService.queryThirdPlatformInfo(UserUtils.getEHomeUserId()));
     }
 }

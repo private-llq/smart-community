@@ -84,7 +84,11 @@ public class UserAccountController {
     public CommonResult queryBalance() {
         BaseWallet baseWallet = baseWalletRpcService.getWalletByCon(UserUtils.getEHomeUserId(), "RMB");
         Map<String, Object> returnMap = new HashMap<>();
-        returnMap.put("balance", new BigDecimal(0E-8).compareTo(baseWallet.getBalance()) == 0?new BigDecimal(0.00) : baseWallet.getBalance());
+        if (baseWallet != null) {
+            returnMap.put("balance", new BigDecimal(0E-8).compareTo(baseWallet.getBalance()) == 0 ? new BigDecimal(0.00) : baseWallet.getBalance());
+        } else {
+            returnMap.put("balance", new BigDecimal(0.00));
+        }
         return CommonResult.ok(returnMap, "查询成功");
     }
     // @Permit("community:proprietor:user:account:balance")

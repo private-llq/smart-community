@@ -107,7 +107,9 @@ public class UserAccountServiceImpl implements IUserAccountService {
         UserAccountVO userAccountVO = new UserAccountVO();
         userAccountVO.setUid(uid);
         if (wallet != null) {
-            userAccountVO.setBalance(wallet.getBalance());
+            userAccountVO.setBalance(new BigDecimal(0E-8).compareTo(wallet.getBalance()) == 0 ? new BigDecimal(0.00) : wallet.getBalance());
+        } else {
+            userAccountVO.setBalance(new BigDecimal(0.00));
         }
         return userAccountVO;
     }

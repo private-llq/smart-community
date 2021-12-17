@@ -293,7 +293,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         // 调用基础用户模块获取三方绑定状态
         ThirdBindStatusVo thirdBindStatus = baseUserInfoRpcService.getThirdBindStatus(loginVo.getUserInfo().getId());
         // 调用基础用户模块获取支付密码设置状态
-        Boolean payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(loginVo.getUserInfo().getId(), loginVo.getUserInfo().getAccount());
+        Boolean payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(loginVo.getUserInfo().getId());
         // 调用基础用户模块获取实名信息
         RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(loginVo.getUserInfo().getId());
         UserInfoVo userInfoVo = new UserInfoVo();
@@ -694,7 +694,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         // 调用基础用户模块获取三方绑定状态
         ThirdBindStatusVo thirdBindStatus = baseUserInfoRpcService.getThirdBindStatus(loginVo.getUserInfo().getId());
         // 调用基础用户模块获取支付密码设置状态
-        Boolean payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(loginVo.getUserInfo().getId(), loginVo.getUserInfo().getAccount());
+        Boolean payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(loginVo.getUserInfo().getId());
         // 调用基础用户模块获取实名信息
         RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(loginVo.getUserInfo().getId());
         UserInfoVo userInfoVo = new UserInfoVo();
@@ -1495,7 +1495,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     public UserEntity getRealAuthAndHouseId(String uid) {
         UserEntity userEntity = new UserEntity();
-        userEntity.setIsRealAuth(userMapper.getRealAuthStatus(uid));
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(uid);
+        if (idCardRealInfo != null) {
+            userEntity.setIsRealAuth(2);
+        } else {
+            userEntity.setIsRealAuth(0);
+        }
         //拿到用户的最新房屋id
         userEntity.setHouseId(userMapper.getLatestHouseId(uid));
         return userEntity;
