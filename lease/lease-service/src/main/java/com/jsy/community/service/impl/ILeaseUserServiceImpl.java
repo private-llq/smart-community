@@ -27,6 +27,9 @@ public class ILeaseUserServiceImpl implements ILeaseUserService {
      **/
     @Override
     public String queryIMIdByUid(String uid) {
-        return userInfoRpcService.getEHomeUserIm(uid).getImId();
+        if (userInfoRpcService.getEHomeUserIm(uid) != null) {
+            return userInfoRpcService.getEHomeUserIm(uid).getImId();
+        }
+        return null;
     }
 }

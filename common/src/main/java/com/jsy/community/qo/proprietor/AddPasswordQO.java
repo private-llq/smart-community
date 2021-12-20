@@ -34,8 +34,8 @@ public class AddPasswordQO implements Serializable {
 	private String payPassword;
 	
 	@ApiModelProperty("确认支付密码")
-	@NotBlank(groups = payPasswordVGroup.class,message = "确认支付密码不能为空")
-	@Length(groups = payPasswordVGroup.class,min = 6, max = 6, message = "确认支付密码长度为6位")
+	// @NotBlank(groups = payPasswordVGroup.class,message = "确认支付密码不能为空")
+	// @Length(groups = payPasswordVGroup.class,min = 6, max = 6, message = "确认支付密码长度为6位")
 	private String confirmPayPassword;
 
 	@ApiModelProperty("原支付密码")

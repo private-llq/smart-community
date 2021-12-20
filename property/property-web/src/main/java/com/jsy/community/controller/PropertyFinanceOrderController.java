@@ -873,4 +873,9 @@ public class PropertyFinanceOrderController {
         FinanceOrderAndCarOrHouseInfoVO result = propertyFinanceOrderService.queryTemplateAndFinanceOrder(id);
         return CommonResult.ok(result);
     }
+
+    @PostMapping("/v2/completePropertyOrder")
+    public CommonResult completePropertyOrder() {
+        return CommonResult.ok();
+    }
 }

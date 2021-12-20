@@ -1,6 +1,8 @@
 package com.jsy.community.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.jsy.community.api.*;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.constant.PaymentEnum;
@@ -15,6 +17,10 @@ import com.jsy.community.utils.AlipayUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.base.api.domain.BaseTrade;
+import com.zhsj.base.api.entity.CreateTradeEntity;
+import com.zhsj.base.api.rpc.IBasePayRpcService;
+import com.zhsj.basecommon.utils.MD5Util;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -58,21 +64,62 @@ public class AliAppPayController {
 
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IPayConfigureService payConfigureService;
+
+	/**
+	 * 收款方为公司时的收款方id
+	 */
+	@Value("${companyReceiveUid}")
+	private Long companyReceiveUid;
 	
 	@Autowired
 	private RedisTemplate redisTemplate;
-	
+
 	@Value("${pay.order.timeout}")
 	private int payOrderTimeout;
-	
+
+	@DubboReference(version = com.zhsj.base.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.base.api.constant.RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBasePayRpcService basePayRpcService;
+
+	/**
+	 * 涉及到用户余额的,需要调用基础模块
+	 * 不涉及的则走原有的正常支付流程
+	 */
 	@ApiOperation("下单")
 	@PostMapping("order")
 	// @Permit("community:payment:alipay:order")
 	public CommonResult getOrderStr(@RequestBody AliAppPayQO aliAppPayQO, HttpServletRequest req){
-		if (aliAppPayQO.getTradeFrom()==9||aliAppPayQO.getTradeFrom()==2){
-			aliAppPayQO.setCommunityId(1L);
-		}
 		ValidatorUtils.validateEntity(aliAppPayQO,AliAppPayQO.addOrderGroup.class);
+		String orderNo = OrderNoUtil.getOrder();
+		// 租房和商家订单是涉及到房东或者商家余额的
+		if (aliAppPayQO.getTradeFrom() == BusinessEnum.TradeFromEnum.HOUSING_RENTAL.getCode()
+				|| aliAppPayQO.getTradeFrom() == BusinessEnum.TradeFromEnum.SHOPPING_MALL.getCode()){
+			ValidatorUtils.validateEntity(aliAppPayQO,AliAppPayQO.BalanceInvolvedGroup.class);
+			aliAppPayQO.setCommunityId(1L);
+			// 调用基础模块
+			CreateTradeEntity tradeEntity = new CreateTradeEntity();
+			// 服务调用方的订单号(商城的订单号/物业缴费的订单号等)
+			tradeEntity.setBusOrderNo(aliAppPayQO.getServiceOrderNo());
+			// 付款方的id
+			tradeEntity.setSendUid(UserUtils.getEHomeUserId());
+			// 收款方的id
+			tradeEntity.setReceiveUid(aliAppPayQO.getReceiveUid());
+			tradeEntity.setCno("RMB");
+			tradeEntity.setAmount(aliAppPayQO.getTotalAmount());
+			tradeEntity.setRemark(UserUtils.getUserInfo().getNickname() + "的" + BusinessEnum.TradeFromEnum.tradeMap.get(aliAppPayQO.getTradeFrom()));
+			tradeEntity.setType(BusinessEnum.BaseOrderExpensesTypeEnum.getExpenses(aliAppPayQO.getTradeFrom()));
+			tradeEntity.setTitle(BusinessEnum.TradeFromEnum.tradeMap.get(aliAppPayQO.getTradeFrom()));
+			tradeEntity.setSource(BusinessEnum.BaseOrderSourceEnum.getSourceByCode(aliAppPayQO.getTradeFrom()));
+			//签名
+			String string = JSON.toJSONString(tradeEntity);
+			Map map = JSON.parseObject(string, Map.class);
+			map.remove("sign");
+			map.put("communicationSecret", BusinessEnum.BaseOrderSourceEnum.getSecretByCode(aliAppPayQO.getTradeFrom()));
+			String sign = MD5Util.signStr(map);
+			tradeEntity.setSign(sign);
+			//创建交易，成功则返回trade，否则抛出异常
+			BaseTrade trade = basePayRpcService.createTrade(tradeEntity);
+			orderNo = trade.getSysOrderNo();
+		}
 		CommunityEntity communityEntity = communityService.getCommunityNameById(aliAppPayQO.getCommunityId());
 		String sysType = req.getHeader("sysType");
 //		if(!NumberUtil.isInteger(sysType) || (CommonConsts.SYS_ANDROID != Integer.parseInt(sysType)
@@ -83,12 +130,11 @@ public class AliAppPayController {
 //		}
 		//TODO 系统类型暂时写死
 		sysType = "1";
-		String orderNo = OrderNoUtil.getOrder();
 		aliAppPayQO.setOutTradeNo(orderNo); //本地订单号
 		aliAppPayQO.setSubject(PaymentEnum.TradeFromEnum.tradeFromMap.get(aliAppPayQO.getTradeFrom())); //交易类型名称
-		
-		//缴物业费
+
 		if(PaymentEnum.TradeFromEnum.TRADE_FROM_MANAGEMENT.getIndex().equals(aliAppPayQO.getTradeFrom())){
+			//缴物业费
 			//根据本次缴费月份和房间id 查出应缴金额
 			if(StringUtils.isEmpty(aliAppPayQO.getIds())){
 				throw new JSYException("缺少缴费账单数据id");
@@ -98,8 +144,13 @@ public class AliAppPayController {
 			aliAppPayQO.setTotalAmount(propertyFee.abs());
 			//缓存缴费账单id
 			redisTemplate.opsForValue().set("PropertyFee:" + orderNo,aliAppPayQO.getIds(),payOrderTimeout, TimeUnit.MINUTES);
-		}else{
-			if(aliAppPayQO.getTotalAmount() == null){
+		} else if (aliAppPayQO.getTradeFrom()==8) {
+			//停车缴费逻辑
+			if ("".equals(aliAppPayQO.getServiceOrderNo())||aliAppPayQO.getServiceOrderNo()==null){
+				return CommonResult.error("车位缴费临时订单记录id不能为空！");
+			}
+		} else {
+			if (aliAppPayQO.getTotalAmount() == null) {
 				throw new JSYException("缺少交易金额");
 			}
 			aliAppPayQO.setTotalAmount(aliAppPayQO.getTotalAmount().abs()); //支付金额
@@ -112,12 +163,6 @@ public class AliAppPayController {
 //			}
 //			aliAppPayQO.setServiceOrderNo(String.valueOf(aliAppPayQO.getOrderData().get("uuid")));
 //		}
-		//停车缴费逻辑
-		if (aliAppPayQO.getTradeFrom()==8){
-			if ("".equals(aliAppPayQO.getServiceOrderNo())||aliAppPayQO.getServiceOrderNo()==null){
-				return CommonResult.error("车位缴费临时订单记录id不能为空！");
-			}
-		}
 		//TODO 测试金额 0.1
 		aliAppPayQO.setTotalAmount(new BigDecimal("0.01"));
 		

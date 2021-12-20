@@ -321,7 +321,11 @@ public class UserAuthController {
             // 添加支付密码
             baseAuthRpcService.initPayPassword(UserUtils.getUserToken(), qo.getPayPassword());
         }*/
-        baseAuthRpcService.updatePayPassword(UserUtils.getEHomeUserId(), qo.getPayPassword(), qo.getCode());
+        if (baseUserInfoRpcService.getPayPasswordStatus(UserUtils.getEHomeUserId())) {
+            baseAuthRpcService.updatePayPassword(UserUtils.getEHomeUserId(), qo.getPayPassword(), qo.getCode());
+        } else {
+            baseAuthRpcService.initPayPassword(UserUtils.getUserToken(), qo.getPayPassword(), qo.getCode());
+        }
         return CommonResult.ok();
     }
     /*public CommonResult<Boolean> addPayPassword(@RequestBody AddPasswordQO qo) {
