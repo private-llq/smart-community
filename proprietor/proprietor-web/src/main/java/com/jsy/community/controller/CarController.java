@@ -316,4 +316,8 @@ public class CarController {
 		return !userAgent.contains("Android") || !userAgent.contains("iPhone") || !userAgent.contains("iPad");
 	}
 
+	@PostMapping("/v2/completeCarOrder")
+	public CommonResult completeCarOrder() {
+		return CommonResult.ok();
+	}
 }

@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -43,13 +44,25 @@ public class AliAppPayQO implements Serializable {
 	private Map<String,Object> orderData;
 	
 	@ApiModelProperty(value = "其他服务订单号 如 商城")
+	@NotBlank(groups = addOrderGroup.class, message = "服务订单号不能为空")
 	private String serviceOrderNo;
 	
 	@ApiModelProperty(value = "物业缴费账单数据id，逗号分隔")
 	private String ids;
+
+	/**
+	 * 收款方id
+	 */
+	@NotBlank(groups = BalanceInvolvedGroup.class, message = "收款方id不能为空")
+	private Long receiveUid;
 	
 	/**
 	 * 添加订单验证组
 	 */
 	public interface addOrderGroup{}
+
+	/**
+	 * 涉及余额的订单验证组
+	 */
+	public interface BalanceInvolvedGroup{}
 }

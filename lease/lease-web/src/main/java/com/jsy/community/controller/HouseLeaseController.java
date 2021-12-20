@@ -382,4 +382,10 @@ public class HouseLeaseController {
         }
         return CommonResult.ok(assetLeaseRecordService.queryContractPreFillInfo(assetLeaseRecordEntity));
     }
+
+
+    @PostMapping("/v2/completeLeaseOrder")
+    public CommonResult completeLeaseOrder() {
+        return CommonResult.ok();
+    }
 }

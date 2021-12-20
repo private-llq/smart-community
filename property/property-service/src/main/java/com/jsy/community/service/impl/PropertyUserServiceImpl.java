@@ -1,4 +1,8 @@
 package com.jsy.community.service.impl;
+import com.jsy.community.entity.CarEntity;
+import com.jsy.community.entity.HouseEntity;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import java.time.LocalDateTime;
 
 import com.alibaba.fastjson.JSON;
@@ -21,6 +25,10 @@ import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -50,12 +58,30 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
+
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseUserInfoRpcService baseUserInfoRpcService;
 	
 	@Override
 	public UserEntity selectOne(String uid) {
-		QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
+		UserDetail userDetail = baseUserInfoRpcService.getUserDetail(uid);
+		RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(uid);
+		UserEntity userEntity = new UserEntity();
+		userEntity.setUid(uid);
+		userEntity.setIsRealAuth(0);
+		if (userDetail != null) {
+			userEntity.setNickname(userDetail.getNickName());
+			userEntity.setAvatarUrl(userDetail.getAvatarThumbnail());
+			userEntity.setMobile(userDetail.getPhone());
+			userEntity.setSex(userDetail.getSex());
+		}
+		if (idCardRealInfo != null) {
+			userEntity.setRealName(idCardRealInfo.getIdCardName());
+			userEntity.setIdCard(idCardRealInfo.getIdCardNumber());
+		}
+		/*QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("uid",uid);
-		UserEntity userEntity = baseMapper.selectOne(wrapper);
+		UserEntity userEntity = baseMapper.selectOne(wrapper);*/
 		return userEntity;
 	}
 
