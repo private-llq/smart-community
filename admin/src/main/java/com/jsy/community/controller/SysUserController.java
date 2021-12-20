@@ -2,7 +2,6 @@ package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.sys.SysUserEntity;
@@ -174,15 +173,14 @@ public class SysUserController {
 	@Transactional(rollbackFor = Exception.class)
 	@businessLog(operation = "新增",content = "新增了【操作员】")
 	@Permit("community:admin:sys:user:add")
-	public CommonResult addOperator(@RequestBody SysUserEntity sysUserEntity){
-		ValidatorUtils.validateEntity(sysUserEntity);
-		sysUserService.addOperator(sysUserEntity);
+	public CommonResult addOperator(@RequestBody SysUserQO sysUserQO){
+		sysUserService.addOperator(sysUserQO);
 		return CommonResult.ok("添加成功");
 	}
 	
 	/**
 	 * @Description: 编辑操作员
-	 * @Param: [sysUserEntity]
+	 * @Param: [sysUserQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: DKS
 	 * @Date: 2021/10/13
@@ -191,8 +189,8 @@ public class SysUserController {
 	@Transactional(rollbackFor = Exception.class)
 	@businessLog(operation = "编辑",content = "更新了【操作员】")
 	@Permit("community:admin:sys:user:update")
-	public CommonResult updateOperator(@RequestBody SysUserEntity sysUserEntity){
-		sysUserService.updateOperator(sysUserEntity);
+	public CommonResult updateOperator(@RequestBody SysUserQO sysUserQO){
+		sysUserService.updateOperator(sysUserQO);
 		return CommonResult.ok("操作成功");
 	}
 	

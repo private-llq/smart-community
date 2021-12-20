@@ -1,10 +1,8 @@
 package com.jsy.community.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
-import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.vo.PageVO;
 
 
@@ -13,7 +11,7 @@ import com.zhsj.base.api.vo.PageVO;
  * @description 账号管理
  * @since 2021-11-18 16:24
  **/
-public interface IAdminUserService extends IService<AdminUserEntity> {
+public interface IAdminUserService{
 	
 	/**
 	 * @Description: 操作员条件查询
@@ -22,7 +20,7 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Param: [baseQO]
 	 * @return: com.jsy.community.utils.PageInfo<com.jsy.community.entity.admin.AdminUserEntity>
 	 */
-	PageVO<UserDetail> queryOperator(BaseQO<AdminUserQO> baseQO);
+	PageVO<AdminUserEntity> queryOperator(BaseQO<AdminUserQO> baseQO);
 	
 	/**
 	 * @Description: 添加操作员

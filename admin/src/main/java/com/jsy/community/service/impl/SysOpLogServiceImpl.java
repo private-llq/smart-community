@@ -65,6 +65,9 @@ public class SysOpLogServiceImpl extends ServiceImpl<SysOpLogMapper, SysOpLogEnt
 		// 模糊查询用户名
 		if (StringUtils.isNotBlank(query.getUserName())) {
 			List<String> idList = sysUserMapper.queryUidListByRealName(query.getUserName());
+			if (idList == null || idList.size() == 0) {
+				return new PageInfo<>();
+			}
 			queryWrapper.in("user_id", idList);
 		}
 		queryWrapper.orderByDesc("create_time");
