@@ -20,10 +20,13 @@ public class SysUserQO implements Serializable {
 	private String name;
 	
 	@ApiModelProperty(value = "姓名")
-	private String realName;
+	private String nickName;
 	
 	@ApiModelProperty(value = "电话号码")
-	private String mobile;
+	private String phone;
+	
+	@ApiModelProperty(value = "密码")
+	private String password;
 	
 	@ApiModelProperty(value = "身份证号")
 	private String idCard;

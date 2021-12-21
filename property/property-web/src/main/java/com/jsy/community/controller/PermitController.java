@@ -6,7 +6,9 @@ import com.jsy.community.qo.PermitQO;
 import com.jsy.community.qo.RoleQO;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.MenuPermission;
 import com.zhsj.base.api.domain.PermitRole;
+import com.zhsj.base.api.rpc.IBaseMenuPermissionRpcService;
 import com.zhsj.base.api.rpc.IBaseMenuRpcService;
 import com.zhsj.base.api.rpc.IBasePermissionRpcService;
 import com.zhsj.base.api.rpc.IBaseRoleRpcService;
@@ -38,6 +40,8 @@ public class PermitController {
     private IBaseRoleRpcService baseRoleRpcService;
     @DubboReference(version = BaseConstant.Rpc.VERSION, group = BaseConstant.Rpc.Group.GROUP_BASE_USER, check = false)
     private IPermitRpcService permitRpcService;
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseMenuPermissionRpcService baseMenuPermissionRpcService;
 
     /***
      * @author: Pipi
@@ -67,8 +71,8 @@ public class PermitController {
     @PostMapping("/createRole")
     @LoginIgnore
     public CommonResult createRole(@RequestBody RoleQO roleQO) {
-        baseRoleRpcService.createRole(roleQO.getName(), roleQO.getRemark(), "ultimate_admin", roleQO.getCreateUid());
-        return CommonResult.ok();
+        PermitRole permitRole = baseRoleRpcService.createRole(roleQO.getName(), roleQO.getRemark(), "ultimate_admin", roleQO.getCreateUid());
+        return CommonResult.ok(permitRole);
     }
     
     /**
@@ -139,5 +143,32 @@ public class PermitController {
     public CommonResult listAllRolePermission(Long uid) {
         List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(uid, "ultimate_admin");
         return CommonResult.ok(permitRoles);
+    }
+    
+    /**
+     * @Description: 新增菜单关联权限
+     * @author: DKS
+     * @since: 2021/12/20 11:11
+     * @Param: [entityList]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @PostMapping("/saveBatch")
+    @LoginIgnore
+    public CommonResult saveBatch(@RequestBody MenuPermission menuPermission) {
+        return baseMenuPermissionRpcService.save(menuPermission) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+    }
+    
+    /**
+     * @Description: 查询菜单关联权限列表
+     * @author: DKS
+     * @since: 2021/12/20 14:44
+     * @Param: [idList]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @GetMapping("/listByIds")
+    @LoginIgnore
+    public CommonResult listByIds(@RequestParam List<Long> idList) {
+        List<MenuPermission> menuPermissions = baseMenuPermissionRpcService.listByIds(idList);
+        return CommonResult.ok(menuPermissions);
     }
 }

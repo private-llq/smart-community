@@ -4,12 +4,10 @@ import com.jsy.community.annotation.businessLog;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.service.IAdminUserService;
-import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -71,10 +69,6 @@ public class AdminUserController {
 	@businessLog(operation = "编辑",content = "更新了【账号管理】")
 	@Permit("community:admin:account:update")
 	public CommonResult updateOperator(@RequestBody AdminUserQO adminUserQO){
-		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
-			//验证社区权限
-			UserUtils.validateCommunityIds(adminUserQO.getCommunityIdList());
-		}
 		adminUserService.updateOperator(adminUserQO);
 		return CommonResult.ok("操作成功");
 	}
