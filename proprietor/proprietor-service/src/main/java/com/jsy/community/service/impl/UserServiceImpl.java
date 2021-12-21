@@ -294,6 +294,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         ThirdBindStatusVo thirdBindStatus = baseUserInfoRpcService.getThirdBindStatus(loginVo.getUserInfo().getId());
         // 调用基础用户模块获取支付密码设置状态
         Boolean payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(loginVo.getUserInfo().getId());
+        Boolean passwordStatus = baseUserInfoRpcService.getLoginPasswordStatus(loginVo.getUserInfo().getId(), qo.getAccount());
         // 调用基础用户模块获取实名信息
         RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(loginVo.getUserInfo().getId());
         UserInfoVo userInfoVo = new UserInfoVo();
@@ -303,6 +304,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userInfoVo.setIsBindAlipay(thirdBindStatus.getAliPayBind() ? 1 : 0);
         }
         userInfoVo.setIsBindPayPassword(payPasswordStatus != null && payPasswordStatus ? 1 : 0);
+        userInfoVo.setIsBindPassword(passwordStatus != null && passwordStatus ? 1 : 0);
         userInfoVo.setMobile(loginVo.getUserInfo().getPhone());
         userInfoVo.setUid(loginVo.getUserInfo().getAccount());
         userInfoVo.setUroraTags(getUroraTags(userInfoVo.getUid()));
@@ -695,12 +697,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         thirdBindStatus.setWeChatBind(false);
         thirdBindStatus.setAliPayBind(false);
         Boolean payPasswordStatus = false;
+        Boolean passwordStatus = false;
         RealInfoDto idCardRealInfo = new RealInfoDto();
         if (loginVo.getUserInfo().getId() != null) {
             // 调用基础用户模块获取三方绑定状态
             thirdBindStatus = baseUserInfoRpcService.getThirdBindStatus(loginVo.getUserInfo().getId());
             // 调用基础用户模块获取支付密码设置状态
             payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(loginVo.getUserInfo().getId());
+            passwordStatus = baseUserInfoRpcService.getLoginPasswordStatus(loginVo.getUserInfo().getId(), loginVo.getUserInfo().getPhone());
             // 调用基础用户模块获取实名信息
             idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(loginVo.getUserInfo().getId());
         }
@@ -714,6 +718,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
         if (userInfoVo.getIsBindMobile()==1){
             userInfoVo.setIsBindPayPassword(payPasswordStatus != null && payPasswordStatus ? 1 : 0);
+            userInfoVo.setIsBindPassword(passwordStatus != null && passwordStatus ? 1 : 0);
             userInfoVo.setMobile(loginVo.getUserInfo().getPhone());
             userInfoVo.setUroraTags(getUroraTags(userInfoVo.getUid()));
             userInfoVo.setNickname(loginVo.getUserInfo().getNickName());
