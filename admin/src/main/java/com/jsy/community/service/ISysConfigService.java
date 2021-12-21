@@ -6,7 +6,7 @@ import com.jsy.community.entity.sys.SysUserRoleEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.sys.SysMenuQO;
 import com.jsy.community.qo.sys.SysRoleQO;
-import com.jsy.community.utils.PageInfo;
+import com.zhsj.base.api.vo.PageVO;
 
 import java.util.List;
 
@@ -71,7 +71,7 @@ public interface ISysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	boolean addRole(SysRoleEntity sysRoleEntity);
+	void addRole(SysRoleEntity sysRoleEntity);
 	
 	/**
 	* @Description: 删除角色
@@ -80,7 +80,7 @@ public interface ISysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	boolean delRole(Long id);
+	void delRole(Long id);
 	
 	/**
 	* @Description: 修改角色
@@ -89,7 +89,7 @@ public interface ISysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	boolean updateRole(SysRoleQO sysRoleQO);
+	void updateRole(SysRoleQO sysRoleQO);
 	
 	/**
 	* @Description: 角色列表
@@ -107,7 +107,7 @@ public interface ISysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
-	PageInfo<SysRoleEntity> queryPage(BaseQO<SysRoleEntity> baseQO);
+	PageVO<SysRoleEntity> queryPage(BaseQO<SysRoleEntity> baseQO);
 	
 	/**
 	 * @author: DKS

@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.PropertyCompanyEntity;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -10,6 +11,7 @@ import org.apache.ibatis.annotations.Param;
  * @author: Hu
  * @create: 2021-08-20 15:05
  **/
+@Mapper
 public interface PropertyCompanyMapper extends BaseMapper<PropertyCompanyEntity> {
 	/**
 	 *@Author: DKS

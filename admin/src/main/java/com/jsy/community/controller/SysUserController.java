@@ -1,7 +1,5 @@
 package com.jsy.community.controller;
 
-import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.sys.SysUserEntity;
@@ -12,24 +10,23 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.qo.sys.SysUserQO;
 import com.jsy.community.service.ISysUserService;
-import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +49,9 @@ public class SysUserController {
 	
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+	private IBaseAuthRpcService baseAuthRpcService;
 
 	/**
 	* @Description: 设置用户角色
@@ -225,28 +225,35 @@ public class SysUserController {
 	@PutMapping("password")
 	@Auth
 	@Permit("community:admin:sys:user:password")
-	public CommonResult<Boolean> updatePassword(@RequestAttribute(value = "body") String body) {
-		ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
-		String uid = UserUtils.getUserId();
-		if(uid == null){  //忘记密码
-			ValidatorUtils.validateEntity(qo,ResetPasswordQO.forgetPassVGroup.class);
-		}else{  //在线修改密码
-			ValidatorUtils.validateEntity(qo,ResetPasswordQO.updatePassVGroup.class);
-		}
+	public CommonResult<Boolean> updatePassword(@RequestBody ResetPasswordQO qo) {
+//		ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
+//		String uid = UserUtils.getUserId();
+//		if(uid == null){  //忘记密码
+//			ValidatorUtils.validateEntity(qo,ResetPasswordQO.forgetPassVGroup.class);
+//		}else{  //在线修改密码
+//			ValidatorUtils.validateEntity(qo,ResetPasswordQO.updatePassVGroup.class);
+//		}
+//		if (!qo.getPassword().equals(qo.getConfirmPassword())) {
+//			throw new JSYException("两次密码不一致");
+//		}
+//		boolean b = sysUserService.updatePassword(qo,UserUtils.getUserId());
+//		if(b){
+//			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+//			String authToken = request.getHeader("authToken");
+//			if (StrUtil.isBlank(authToken)) {
+//				authToken = request.getParameter("authToken");
+//			}
+//			//销毁Auth token
+//			UserUtils.destroyToken("Auth",authToken);
+//		}
+//		return b ? CommonResult.ok() : CommonResult.error("操作失败");
+		
+		ValidatorUtils.validateEntity(qo, ResetPasswordQO.forgetPassVGroup.class);
 		if (!qo.getPassword().equals(qo.getConfirmPassword())) {
 			throw new JSYException("两次密码不一致");
 		}
-		boolean b = sysUserService.updatePassword(qo,UserUtils.getUserId());
-		if(b){
-			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-			String authToken = request.getHeader("authToken");
-			if (StrUtil.isBlank(authToken)) {
-				authToken = request.getParameter("authToken");
-			}
-			//销毁Auth token
-			UserUtils.destroyToken("Auth",authToken);
-		}
-		return b ? CommonResult.ok() : CommonResult.error("操作失败");
+		baseAuthRpcService.resetPhoneLoginPassword(qo.getAccount(), qo.getCode(), qo.getPassword());
+		return CommonResult.ok();
 	}
 	
 //	@ApiOperation("更换手机号")

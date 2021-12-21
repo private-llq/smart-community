@@ -79,39 +79,31 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/21
 	**/
-	public static AdminInfoVo getAdminInfo(String loginToken) {
-		if(StringUtils.isEmpty(loginToken)){
-			return null;
-		}
+	public static AdminInfoVo getAdminInfo() {
 		String str;
 		try {
-			str = stringRedisTemplate.opsForValue().get("Admin:Login:" + loginToken);
+			str = stringRedisTemplate.opsForValue().get("Admin:Login:" + getUserToken());
 		} catch (Exception e) {
 			throw new JSYException(JSYError.INTERNAL.getCode(),"redis超时");
 		}
-		AdminInfoVo adminUser = JSONObject.parseObject(str, AdminInfoVo.class);
-		return adminUser;
+		return JSONObject.parseObject(str, AdminInfoVo.class);
 	}
 	
 	/**
-	 * @Description: 通过token获取用户信息(物业端)
+	 * @Description: 通过token获取用户信息(大后台)
 	 * @Param: [loginToken]
 	 * @Return: com.jsy.community.vo.sys.SysInfoVo
 	 * @Author: DKS
 	 * @Date: 2021/10/14
 	 **/
-	public static SysInfoVo getSysInfo(String loginToken) {
-		if(StringUtils.isEmpty(loginToken)){
-			return null;
-		}
+	public static SysInfoVo getSysInfo() {
 		String str;
 		try {
-			str = stringRedisTemplate.opsForValue().get("Sys:Login:" + loginToken);
+			str = stringRedisTemplate.opsForValue().get("Sys:Login:" + getUserToken());
 		} catch (Exception e) {
 			throw new JSYException(JSYError.INTERNAL.getCode(),"redis超时");
 		}
-		SysInfoVo sysUser = JSONObject.parseObject(str, SysInfoVo.class);
-		return sysUser;
+		return JSONObject.parseObject(str, SysInfoVo.class);
 	}
 	
 	/**
@@ -182,9 +174,10 @@ public class UserUtils {
 	 * @Date: 2021/10/14
 	 **/
 	public static String getId() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (String) request.getAttribute(USER_ID);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+//		return (String) request.getAttribute(USER_ID);
+		return String.valueOf(ContextHolder.getContext().getLoginUser().getId());
 	}
 	
 	/**

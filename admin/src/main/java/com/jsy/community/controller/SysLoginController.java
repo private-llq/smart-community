@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.admin.AdminLoginQO;
@@ -25,6 +26,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -64,6 +66,9 @@ public class SysLoginController {
 	private IBaseMenuRpcService baseMenuRpcService;
 	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
 	private IBaseRoleRpcService baseRoleRpcService;
+	
+	@Value("${propertyLoginExpireHour}")
+	private long loginExpireHour = 12;
 	
 //	/**
 //	 * 验证码
@@ -169,6 +174,9 @@ public class SysLoginController {
 		
 		//返回VO
 		SysInfoVo sysInfoVo = new SysInfoVo();
+		sysInfoVo.setId(String.valueOf(loginVo.getUserInfo().getId()));
+		sysInfoVo.setMobile(loginVo.getUserInfo().getPhone());
+		sysInfoVo.setRealName(loginVo.getUserInfo().getNickName());
 		
 		// 获取用户角色
 		List<PermitRole> userRoles = baseRoleRpcService.listAllRolePermission(loginVo.getUserInfo().getId(), "ultimate_admin");
@@ -186,6 +194,11 @@ public class SysLoginController {
 //		redisTemplate.delete("Sys:Login:" + oldToken);
 		//获取token
 		sysInfoVo.setToken(loginVo.getToken().getToken());
+		
+		redisTemplate.opsForValue().set("Sys:Login:" + loginVo.getToken().getToken(), JSON.toJSONString(sysInfoVo), loginExpireHour, TimeUnit.HOURS);//登录token
+		redisTemplate.opsForValue().set("Sys:LoginAccount:" + loginVo.getUserInfo().getPhone(), loginVo.getToken().getToken(), loginExpireHour, TimeUnit.HOURS);//登录账户key的value设为token
+		
+		sysInfoVo.setId(null);
 		sysInfoVo.setUid(null);
 		sysInfoVo.setStatus(null);
 		return CommonResult.ok(sysInfoVo);

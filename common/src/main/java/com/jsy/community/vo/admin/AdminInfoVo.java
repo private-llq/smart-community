@@ -1,6 +1,6 @@
 package com.jsy.community.vo.admin;
 
-import com.jsy.community.entity.admin.AdminMenuEntity;
+import com.zhsj.base.api.domain.PermitMenu;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
@@ -66,7 +66,7 @@ public class AdminInfoVo implements Serializable {
 	/**
 	 * 用户菜单列表
 	 */
-	private List<AdminMenuEntity> menuList;
+	private List<PermitMenu> menuList;
 	
 	/**
 	 * 手机号
