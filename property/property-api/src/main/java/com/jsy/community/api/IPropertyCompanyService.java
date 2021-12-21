@@ -51,4 +51,13 @@ public interface IPropertyCompanyService {
      * @return: void
      */
     void updatePropertyCompany(PropertyCompanyEntity propertyCompanyEntity);
+    
+    /**
+     * @Description: 根据uid查询物业公司id
+     * @author: DKS
+     * @since: 2021/12/21 15:21
+     * @Param: [uid]
+     * @return: java.lang.Long
+     */
+    Long getPropertyCompanyIdByUid(String uid);
 }

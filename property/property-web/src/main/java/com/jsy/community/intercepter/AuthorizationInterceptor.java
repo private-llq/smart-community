@@ -9,9 +9,7 @@ import com.jsy.community.api.PropertyException;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.UserUtils;
-import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
@@ -72,7 +70,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 			token = request.getParameter("token");
 		}
 		if(!StringUtils.isEmpty(token)){
-			AdminInfoVo adminInfoVo = UserUtils.getAdminInfo(token);
+			AdminInfoVo adminInfoVo = UserUtils.getAdminInfo();
 			if(adminInfoVo != null){
 				request.setAttribute(UserUtils.USER_KEY, adminInfoVo.getUid());
 				request.setAttribute(UserUtils.USER_INFO, adminInfoVo);

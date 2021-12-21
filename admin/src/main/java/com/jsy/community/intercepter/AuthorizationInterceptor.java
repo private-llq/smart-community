@@ -10,7 +10,6 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.service.AdminException;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.sys.SysInfoVo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
@@ -71,7 +70,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 			token = request.getParameter("token");
 		}
 		if(!StringUtils.isEmpty(token)){
-			SysInfoVo sysInfoVo = UserUtils.getSysInfo(token);
+			SysInfoVo sysInfoVo = UserUtils.getSysInfo();
 			if(sysInfoVo != null){
 				request.setAttribute(UserUtils.USER_ID, sysInfoVo.getId());
 				request.setAttribute(UserUtils.USER_INFO, sysInfoVo);

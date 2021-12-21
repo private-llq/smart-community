@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
@@ -32,6 +33,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -78,8 +80,8 @@ public class AdminLoginController {
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
 	
-	//	@Value("${propertyLoginExpireHour}")
-//	private long loginExpireHour = 12;
+	@Value("${propertyLoginExpireHour}")
+	private long loginExpireHour = 12;
 	
 //	/**
 //	 * 防频繁调用验证码
@@ -159,20 +161,22 @@ public class AdminLoginController {
 		List<PermitMenu> userMenu = baseMenuRpcService.all(loginVo.getUserInfo().getId(), "property_admin");
 		
 		//用户资料
-//		AdminUserEntity userData = adminUserService.queryUserByMobile(form.getAccount(), null);
-		AdminUserEntity userData = adminUserService.queryByUid(String.valueOf(loginVo.getUserInfo().getId()));
+//		AdminUserEntity userData = adminUserService.queryByUid(String.valueOf(loginVo.getUserInfo().getId()));
 		
 		// 查询用户角色
 //		AdminUserRoleEntity adminUserRoleEntity = adminConfigService.queryRoleIdByUid(userData.getUid());
 
 		//有权限的小区列表
-		List<AdminCommunityEntity> adminCommunityList = adminConfigService.listAdminCommunity(userData.getUid());
+		List<AdminCommunityEntity> adminCommunityList = adminConfigService.listAdminCommunity(String.valueOf(loginVo.getUserInfo().getId()));
 		
 		//用户菜单
 //		List<AdminMenuEntity> userMenu = new ArrayList<>();
 		//返回VO
 		AdminInfoVo adminInfoVo = new AdminInfoVo();
-
+		adminInfoVo.setUid(String.valueOf(loginVo.getUserInfo().getId()));
+		adminInfoVo.setMobile(loginVo.getUserInfo().getPhone());
+		adminInfoVo.setRealName(loginVo.getUserInfo().getNickName());
+		
 		//判断有无任一社区权限
 		/*if(CollectionUtils.isEmpty(adminCommunityList)){
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"无社区管理权限，请联系管理员添加社区权限");
@@ -180,7 +184,6 @@ public class AdminLoginController {
 		// 获取用户角色
 		List<PermitRole> userRoles = baseRoleRpcService.listAllRolePermission(loginVo.getUserInfo().getId(), "property_admin");
 		adminInfoVo.setRoleId(userRoles.get(0).getId());
-		userData.setRoleId(userRoles.get(0).getId());
 		/*//判断登录类型 (根据拥有权限的小区数量等于1是小区管理员账号 否则是物业公司账号)
 		if(adminCommunityList.size() == 1){
 			//小区管理员账号 直接登入小区菜单
@@ -199,25 +202,28 @@ public class AdminLoginController {
 		//设置登录类型
 		adminInfoVo.setLoginType(PropertyConsts.LOGIN_TYPE_PROPERTY);
 		//设置菜单
-		userData.setMenuList(userMenu);
+		adminInfoVo.setMenuList(userMenu);
 		
 		//设置物业公司名称
-		adminInfoVo.setCompanyName(iPropertyCompanyService.getCompanyNameByCompanyId(userData.getCompanyId()));
+		Long companyId = iPropertyCompanyService.getPropertyCompanyIdByUid(String.valueOf(loginVo.getUserInfo().getId()));
+		adminInfoVo.setCompanyName(iPropertyCompanyService.getCompanyNameByCompanyId(companyId));
 		
 		//清空该账号已之前的token(踢下线)
 //		String oldToken = redisTemplate.opsForValue().get("Admin:LoginAccount:" + form.getAccount());
 //		redisTemplate.delete("Admin:Login:" + oldToken);
 		// 获取token
-		List communityIdList = new ArrayList<>();
+		List<String> communityIdList = new ArrayList<>();
 		for(AdminCommunityEntity entity : adminCommunityList){
 			communityIdList.add(String.valueOf(entity.getCommunityId()));
 		}
-		userData.setCommunityIdList(communityIdList);
+		adminInfoVo.setCommunityIdList(communityIdList);
 //		String token = adminUserTokenService.createToken(userData);
-		userData.setToken(loginVo.getToken().getToken());
+		adminInfoVo.setToken(loginVo.getToken().getToken());
+		
+		redisTemplate.opsForValue().set("Admin:Login:" + loginVo.getToken().getToken(), JSON.toJSONString(adminInfoVo), loginExpireHour, TimeUnit.HOURS);//登录token
+		redisTemplate.opsForValue().set("Admin:LoginAccount:" + loginVo.getUserInfo().getPhone(), loginVo.getToken().getToken(), loginExpireHour, TimeUnit.HOURS);//登录账户key的value设为token
 		
 		//返回VO属性封装
-		BeanUtils.copyProperties(userData,adminInfoVo);
 		adminInfoVo.setUid(null);
 		adminInfoVo.setStatus(null);
 		return CommonResult.ok(adminInfoVo);
@@ -242,7 +248,7 @@ public class AdminLoginController {
 		AdminUserEntity user = adminUserService.queryByUid(UserUtils.getUserId());
 		//用户菜单
 //		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getAdminRoleId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
-		List<PermitMenu> userMenu = baseMenuRpcService.all(adminId, "community_admin");
+		List<PermitMenu> userMenu = baseMenuRpcService.all(adminId, "property_admin");
 		//设置小区级菜单
 		user.setMenuList(userMenu);
 		user.setCompanyId(UserUtils.getAdminCompanyId());
@@ -250,8 +256,8 @@ public class AdminLoginController {
 		user.setCommunityId(communityId);
 		user.setCommunityIdList(communityIds);
 		//创建token，保存redisIShopLeaseService
-		String token = adminUserTokenService.createToken(user);
-		user.setToken(token);
+//		String token = adminUserTokenService.createToken(user);
+//		user.setToken(token);
 		AdminInfoVo adminInfoVo = new AdminInfoVo();
 		BeanUtils.copyProperties(user,adminInfoVo);
 		adminInfoVo.setUid(null);
