@@ -63,6 +63,7 @@ dubbo:
   cloud:
     subscribed-services: property-service,proprietor-service,lease-service,im-chat-user
   consumer:
+    check: false
     retries: 0
     timeout: 99999
   provider:

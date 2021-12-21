@@ -62,6 +62,7 @@ dubbo:
   cloud:
     subscribed-services: payment-service,proprietor-service,property-service,lease-service
   consumer:
+    check: false
     retries: 0
     timeout: 99999
   provider:

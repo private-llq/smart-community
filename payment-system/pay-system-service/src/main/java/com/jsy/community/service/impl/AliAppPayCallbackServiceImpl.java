@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.jsy.community.api.*;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.constant.PaymentEnum;
@@ -15,6 +16,10 @@ import com.jsy.community.entity.property.PropertyFinanceReceiptEntity;
 import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.untils.OrderNoUtil;
 import com.jsy.community.utils.AlipayUtils;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBasePayRpcService;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -66,6 +71,12 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
 	private IUserAccountService userAccountService;
 
+	@DubboReference(version = com.zhsj.base.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.base.api.constant.RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBasePayRpcService basePayRpcService;
+
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseUserInfoRpcService baseUserInfoRpcService;
+
 	@Autowired
 	private StringRedisTemplate redisTemplate;
 
@@ -105,6 +116,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 			String sellerId = paramsMap.get("seller_id");//商家支付宝id
 			String sellerEmail = paramsMap.get("seller_email");//商家支付宝邮箱账号
 			String appId = paramsMap.get("app_id");//appid
+			String buyerId = paramsMap.get("buyer_id");//买家支付宝账号
 			log.info("系统订单号：" + outTradeNo);
 			log.info("支付宝渠道单号：" + tradeNo);
 			log.info("交易金额：" + totalAmount);
@@ -112,6 +124,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 			log.info("商家支付宝id：" + sellerId);
 			log.info("商家支付宝邮箱账号：" + sellerEmail);
 			log.info("appid：" + appId);
+			log.info("买家支付宝账号:" + buyerId);
 			AiliAppPayRecordEntity order = ailiAppPayRecordService.getAliAppPayByOutTradeNo(outTradeNo);
 			if(order != null){ // 订单号正确
 				log.info("订单号验证通过");
@@ -124,6 +137,8 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 							log.info("appid验证通过");
 							//设置渠道单号
 							order.setTradeNo(tradeNo);
+							// 设置买家支付宝id
+							order.setBuyerId(buyerId);
 							//处理订单
 							dealOrder(order);
 						}
@@ -154,7 +169,6 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 		BigDecimal tradeAmount = order.getTradeAmount();
 
 		if (tradeAmount!=null){
-
 			tradeAmount = tradeAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
 		}
 		log.info("支付宝回调 - 开始处理订单：" + orderNo);
@@ -164,17 +178,23 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 			ailiAppPayRecordService.completeAliAppPayRecord(orderNo);
 			log.info("支付宝回调 - 本地订单状态修改完成，订单号：" + orderNo);
 			String serviceOrderNo = order.getServiceOrderNo();
-			if(PaymentEnum.TradeFromEnum.TRADE_FROM_SHOPPING.getIndex().equals(order.getTradeName())){
+			if(BusinessEnum.TradeFromEnum.SHOPPING_MALL.getCode().equals(order.getTradeName())){
 				log.info("开始修改商城订单状态，订单号：" + orderNo);
+				UserDetail userDetail = baseUserInfoRpcService.getUserDetail(order.getUserid());
+				log.info("调用基础支付模块");
+				basePayRpcService.thirdPay(order.getOrderNo(), userDetail.getId(), 1, order.getBuyerId());
+				/*log.info("开始修改商城订单状态，订单号：" + orderNo);
 				Map<String, Object> shopOrderDealMap = shoppingMallService.completeShopOrder(orderNo,order.getTradeNo(),1);
 				if(0 != (int)shopOrderDealMap.get("code")){
 					throw new PaymentException((int)shopOrderDealMap.get("code"),String.valueOf(shopOrderDealMap.get("msg")));
 				}
-				log.info("商城订单状态修改完成，订单号：" + orderNo);
-			} else if (PaymentEnum.TradeFromEnum.HOUSE_RENT_PAYMENT.getIndex().equals(order.getTradeName())) {
+				log.info("商城订单状态修改完成，订单号：" + orderNo);*/
+			} else if (BusinessEnum.TradeFromEnum.HOUSING_RENTAL.getCode().equals(order.getTradeName())) {
 				// 房屋押金/房租缴费
 				log.info("开始修改房屋押金/房租缴费订单状态，订单号：" + orderNo);
-				// 查询签约状态
+				UserDetail userDetail = baseUserInfoRpcService.getUserDetail(order.getUserid());
+				basePayRpcService.thirdPay(order.getOrderNo(), userDetail.getId(), 1, order.getBuyerId());
+				/*// 查询签约状态
 				AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordService.queryRecordByConId(serviceOrderNo);
 				if (leaseRecordEntity != null && leaseRecordEntity.getOperation() == 32) {
 					log.info("房东已取消发起");
@@ -200,8 +220,8 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 					log.info("开始修改房东余额");
 					userAccountService.rentalIncome(leaseRecordEntity.getConId(), tradeAmount, leaseRecordEntity.getHomeOwnerUid());
 					log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + orderNo);
-				}
-			} else if (PaymentEnum.TradeFromEnum.TRADE_FROM_MANAGEMENT.getIndex().equals(order.getTradeName())) {
+				}*/
+			} else if (BusinessEnum.TradeFromEnum.PROPERTY_MANAGEMENT.getCode().equals(order.getTradeName())) {
 				log.info("开始修改物业费账单状态，订单号：" + orderNo);
 				String ids = redisTemplate.opsForValue().get("PropertyFee:" + orderNo);
 				if (StringUtils.isEmpty(ids)) {
@@ -220,7 +240,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 				propertyFinanceReceiptService.add(receiptEntity);
 				//修改物业费账单
 				propertyFinanceOrderService.updateOrderStatusBatch(2, orderNo, ids.split(","), tradeAmount);
-			} else if (PaymentEnum.TradeFromEnum.TRADE_FROM_PARKING_PAYMENT.getIndex().equals(order.getTradeName())){
+			} else if (BusinessEnum.TradeFromEnum.PARKING_PAYMENT.getCode().equals(order.getTradeName())){
 				log.info("开始修改停车账单状态，订单号：" + orderNo);
 				CarOrderRecordEntity entity = carService.findOne(Long.parseLong(serviceOrderNo));
 				entity.setPayType(2);

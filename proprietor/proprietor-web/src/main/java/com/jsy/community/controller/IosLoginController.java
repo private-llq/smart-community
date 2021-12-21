@@ -87,4 +87,20 @@ public class IosLoginController {
         UserAuthVo userAuthVo=weChatLoginService.iosBindingMobileV2(bindingMobileQO,loginUser);
         return CommonResult.ok(userAuthVo);
     }
+
+    /**
+     * @Description: 苹果三方登录解绑
+     * @author: Hu
+     * @since: 2021/6/1 9:12
+     * @Param: [bindingMobileQO]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+
+    @PostMapping("/unbind")
+    // @Permit("community:proprietor:Ios:bindingMobile")
+    public CommonResult unbind(@RequestParam String code){
+        LoginUser loginUser = ContextHolder.getContext().getLoginUser();
+        weChatLoginService.unbind(code,loginUser);
+        return CommonResult.ok();
+    }
 }
