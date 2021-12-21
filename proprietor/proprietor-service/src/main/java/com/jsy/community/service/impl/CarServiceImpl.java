@@ -394,6 +394,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     public BigDecimal payPositionFees(CarEntity carEntity) {
         CarChargeEntity carChargeEntity = carChargeService.selectOne(carEntity.getCommunityId());
+        if (carChargeEntity == null) {
+            throw new ProprietorException("当前小区不允许包月!");
+        }
         return carChargeEntity.getMoney().multiply(new BigDecimal(carEntity.getMonth()));
     }
 

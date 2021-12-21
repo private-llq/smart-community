@@ -88,6 +88,7 @@ public class AliAppPayController {
 	@PostMapping("order")
 	// @Permit("community:payment:alipay:order")
 	public CommonResult getOrderStr(@RequestBody AliAppPayQO aliAppPayQO, HttpServletRequest req){
+		log.info("创建订单参数:{}", JSON.toJSONString(aliAppPayQO));
 		ValidatorUtils.validateEntity(aliAppPayQO,AliAppPayQO.addOrderGroup.class);
 		String orderNo = OrderNoUtil.getOrder();
 		// 租房和商家订单是涉及到房东或者商家余额的
@@ -115,7 +116,7 @@ public class AliAppPayController {
 			map.remove("sign");
 			map.put("communicationSecret", BusinessEnum.BaseOrderSourceEnum.getSecretByCode(aliAppPayQO.getTradeFrom()));
 			String sign = MD5Util.signStr(map);
-			tradeEntity.setSign(sign);
+			tradeEntity.setSign(MD5Util.getMd5Str(sign));
 			//创建交易，成功则返回trade，否则抛出异常
 			BaseTrade trade = basePayRpcService.createTrade(tradeEntity);
 			orderNo = trade.getSysOrderNo();
