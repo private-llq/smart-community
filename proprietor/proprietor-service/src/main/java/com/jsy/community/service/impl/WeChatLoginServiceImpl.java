@@ -376,4 +376,17 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         return userInfoVo;
     }
 
+
+
+    /**
+     * @Description: 苹果三方登录解绑
+     * @author: Hu
+     * @since: 2021/12/21 14:38
+     * @Param: [identityToken, loginUser]
+     * @return: void
+     */
+    @Override
+    public void unbind(String code, LoginUser loginUser) {
+        baseAuthRpcService.unboundIos(loginUser.getToken(),code);
+    }
 }
