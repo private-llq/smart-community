@@ -34,6 +34,7 @@ dubbo:
   cloud:
     subscribed-services: lease-service
   consumer:
+    check: false
     retries: 0
     timeout: 99999
   provider:

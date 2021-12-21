@@ -34,6 +34,7 @@ dubbo:
   consumer:
     retries: 0
     timeout: 99999
+    check: false
   provider:
     retries: 0
     timeout: 99999

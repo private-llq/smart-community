@@ -15,7 +15,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 @DubboService(version = Const.version, group = Const.group_lease)
 public class ILeaseUserServiceImpl implements ILeaseUserService {
 
-    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER)
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
     private IBaseUserInfoRpcService userInfoRpcService;
 
     /**

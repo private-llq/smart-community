@@ -74,6 +74,7 @@ dubbo:
   cloud:
     subscribed-services: proprietor-service,base-user-service
   consumer:
+    check: false
     retries: 0
     timeout: 99999
   provider:
