@@ -207,6 +207,7 @@ public class AdminLoginController {
 		
 		//设置物业公司名称
 		Long companyId = iPropertyCompanyService.getPropertyCompanyIdByUid(String.valueOf(loginVo.getUserInfo().getId()));
+		adminInfoVo.setCompanyId(companyId);
 		adminInfoVo.setCompanyName(iPropertyCompanyService.getCompanyNameByCompanyId(companyId));
 		
 		//清空该账号已之前的token(踢下线)

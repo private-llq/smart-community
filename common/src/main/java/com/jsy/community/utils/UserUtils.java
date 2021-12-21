@@ -13,10 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -137,9 +134,10 @@ public class UserUtils {
 	 * @Date: 2020/12/3
 	 **/
 	public static AdminInfoVo getAdminUserInfo() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (AdminInfoVo)request.getAttribute(USER_INFO);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+//		return (AdminInfoVo)request.getAttribute(USER_INFO);
+		return getAdminInfo();
 	}
 	
 	/**
@@ -204,9 +202,11 @@ public class UserUtils {
 	 * @Date: 2021/4/1
 	**/
 	public static Long getAdminCommunityId() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (Long) request.getAttribute(USER_COMMUNITY);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+//		return (Long) request.getAttribute(USER_COMMUNITY);
+		AdminInfoVo adminInfo = getAdminInfo();
+		return adminInfo.getCommunityId();
 	}
 
 	/**
@@ -217,9 +217,11 @@ public class UserUtils {
 	 * @date: 2021/7/29 11:20
 	 **/
 	public static Long getAdminCompanyId() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-				.getRequest();
-		return (Long) request.getAttribute(USER_COMPANY_ID);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//				.getRequest();
+//		return (Long) request.getAttribute(USER_COMPANY_ID);
+		AdminInfoVo adminInfo = getAdminInfo();
+		return adminInfo.getCompanyId();
 	}
 
 	/**
@@ -230,9 +232,11 @@ public class UserUtils {
 	 * @date: 2021/8/6 14:28
 	 **/
 	public static Long getAdminRoleId() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-				.getRequest();
-		return (Long) request.getAttribute(USER_ROLE_ID);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//				.getRequest();
+//		return (Long) request.getAttribute(USER_ROLE_ID);
+		AdminInfoVo adminInfo = getAdminInfo();
+		return adminInfo.getRoleId();
 	}
 	
 	/**
@@ -243,9 +247,11 @@ public class UserUtils {
 	 * @Date: 2021/7/20
 	 **/
 	public static List<String> getAdminCommunityIdList() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (List<String>) request.getAttribute(USER_COMMUNITY_ID_LIST);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+//		return (List<String>) request.getAttribute(USER_COMMUNITY_ID_LIST);
+		AdminInfoVo adminInfo = getAdminInfo();
+		return adminInfo.getCommunityIdList();
 	}
 	
 	/**
