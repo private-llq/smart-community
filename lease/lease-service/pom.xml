@@ -129,6 +129,10 @@
 				<configuration>
 					<!-- springboot main方法入口 -->
 					<mainClass>com.jsy.community.LeaseServiceApp</mainClass>
+					<!--打成jar包后复制到的路径-->
+					<outputDirectory>
+						${basedir}../../../jar
+					</outputDirectory>
 				</configuration>
 				<executions>
 					<execution>

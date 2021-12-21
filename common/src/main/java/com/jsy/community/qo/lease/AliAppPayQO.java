@@ -53,7 +53,7 @@ public class AliAppPayQO implements Serializable {
 	/**
 	 * 收款方id
 	 */
-	@NotBlank(groups = BalanceInvolvedGroup.class, message = "收款方id不能为空")
+	@NotNull(groups = BalanceInvolvedGroup.class, message = "收款方id不能为空")
 	private Long receiveUid;
 	
 	/**

@@ -140,6 +140,10 @@
                     <!-- springboot main方法入口 -->
                     <includeSystemScope>true</includeSystemScope>
                     <mainClass>com.jsy.community.PaySystemWebApp</mainClass>
+                    <!--打成jar包后复制到的路径-->
+                    <outputDirectory>
+                        ${basedir}../../../jar
+                    </outputDirectory>
                 </configuration>
                 <executions>
                     <execution>
