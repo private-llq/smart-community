@@ -56,5 +56,9 @@ public class AiliAppPayRecordEntity extends BaseEntity {
 
 	@ApiModelProperty(value = "物业公司ID")
 	private String companyId;
+
+	@ApiModelProperty(value = "物业公司ID")
+	@TableField(exist = false)
+	private String buyerId;
 	
 }
