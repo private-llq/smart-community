@@ -2,7 +2,6 @@ package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Auth;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IAdminConfigService;
