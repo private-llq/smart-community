@@ -96,9 +96,9 @@ public class IosLoginController {
      * @return: com.jsy.community.vo.CommonResult
      */
 
-    @PostMapping("/unbundle")
+    @PostMapping("/unbind")
     // @Permit("community:proprietor:Ios:bindingMobile")
-    public CommonResult unbundle(@RequestParam String code){
+    public CommonResult unbind(@RequestParam String code){
         LoginUser loginUser = ContextHolder.getContext().getLoginUser();
         weChatLoginService.unbind(code,loginUser);
         return CommonResult.ok();
