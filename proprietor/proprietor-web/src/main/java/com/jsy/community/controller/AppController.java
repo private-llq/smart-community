@@ -23,7 +23,7 @@ import java.util.List;
  * @author lihao
  * @ClassName AppController
  * @Date 2021/2/5  15:38
- * @Description TODO
+ * @Description
  * @Version 1.0
  **/
 @Api(tags = "APP相关")

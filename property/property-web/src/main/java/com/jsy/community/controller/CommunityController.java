@@ -43,7 +43,6 @@ import java.util.Map;
 @RequestMapping("/community")
 public class CommunityController {
 
-    // TODO: 2021/4/16 这里的group没有改成  property是因为目前  group这种写法不知道其他人调ICommunityService时  人家是不是没有改成  property  所以我这里也先不动
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
 

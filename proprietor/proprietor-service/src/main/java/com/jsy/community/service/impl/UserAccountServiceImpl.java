@@ -212,7 +212,6 @@ public class UserAccountServiceImpl implements IUserAccountService {
         return pageInfo;
     }
 
-    //TODO 券相关操作改为支付(账户操作)时抵用 结果由本平台计算 展示项目结束后修改
 
     /**
      * @Description: id单查

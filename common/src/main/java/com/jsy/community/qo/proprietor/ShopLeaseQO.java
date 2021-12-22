@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
  * @author lihao
  * @ClassName ShopLeaseQO
  * @Date 2020/12/21  10:46
- * @Description TODO
+ * @Description
  * @Version 1.0
  **/
 @Data

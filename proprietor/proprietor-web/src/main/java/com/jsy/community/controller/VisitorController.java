@@ -136,7 +136,7 @@ public class VisitorController {
 //	@ApiOperation("【访客】社区门禁验证(模拟)")
 //	@GetMapping("verifyCommunityEntry")
 //	@Login(allowAnonymous = true)
-//	//TODO 流程未知，参数和返回值待确定
+//	 流程未知，参数和返回值待确定
 //	public boolean verifyCommunityEntry(@RequestParam("entryToken") String token){
 //		return iVisitorService.verifyEntry(token, BusinessEnum.EntryTypeEnum.COMMUNITY.getCode());
 //	}
@@ -145,7 +145,7 @@ public class VisitorController {
 //	@ApiOperation("【访客】楼栋门禁验证(模拟)")
 //	@GetMapping("verifyBuildingEntry")
 //	@Login(allowAnonymous = true)
-//	//TODO 流程未知，参数和返回值待确定
+//	流程未知，参数和返回值待确定
 //	public boolean verifyBuildingEntry(@RequestParam("entryToken") String token){
 //		return iVisitorService.verifyEntry(token,BusinessEnum.EntryTypeEnum.BUILDING.getCode());
 //	}

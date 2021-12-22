@@ -327,7 +327,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		QueryWrapper<RepairOrderEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("repair_id", id);
 		RepairOrderEntity orderEntity = repairOrderMapper.selectOne(wrapper);
-		orderEntity.setComment("");  // TODO 因为mybatis-plus动态sql 所以删除评论是对其评论设置的 ""   app前台判断未评价 已评价的时候 要注意赛选条件
+		orderEntity.setComment("");
 		repairOrderMapper.updateById(orderEntity);
 	}
 	

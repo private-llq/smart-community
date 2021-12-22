@@ -236,7 +236,6 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 //	 * @Date: 2020/11/20
 //	 **/
 //	public boolean deleteHouse(Long id){
-//		//TODO 级联删除下级 or 存在下级不允许删除？暂时级联下级
 //		List<Long> idList = new LinkedList<>(); // 级联出的要删除的id
 //		idList.add(id);
 //		List<Long> subIdList = houseMapper.getSubIdList(Arrays.asList(id));

@@ -329,7 +329,6 @@ public class UserAuthController {
         return CommonResult.ok();
     }
     /*public CommonResult<Boolean> addPayPassword(@RequestBody AddPasswordQO qo) {
-        //todo 个人觉得明文传递支付密码有问题
         ValidatorUtils.validateEntity(qo, AddPasswordQO.payPasswordVGroup.class);
         String uid = UserUtils.getUserId();
         boolean b = userAuthService.addPayPassword(uid, qo);

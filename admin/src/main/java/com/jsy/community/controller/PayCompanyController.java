@@ -47,7 +47,7 @@ public class PayCompanyController {
 	}
 	
 	@ApiOperation("查询所有缴费单位信息")
-	@PostMapping("/getPayCompany")  // TODO 做了一个根据缴费单位名称的模糊分页查询
+	@PostMapping("/getPayCompany")
 	@Permit("community:admin:payCompany:getPayCompany")
 	public CommonResult<PageInfo<PayCompanyEntity>> getPayCompany(@RequestBody BaseQO<PayCompanyEntity> baseQO){
 		PageInfo<PayCompanyEntity> pageInfo = payCompanyService.getPayCompany(baseQO);

@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  * @author lihao
  * @ClassName UserShopLeaseVO
  * @Date 2021/3/25  10:43
- * @Description TODO
+ * @Description
  * @Version 1.0
  **/
 @Data

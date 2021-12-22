@@ -158,7 +158,6 @@ public class AdminUserController {
 	//邮箱注册后添加用户名
 //	@PutMapping("username")
 //	public CommonResult setUserName(@RequestParam String userName){
-//		//TODO TOKEN获取uid
 //		Long uid = 1L;
 //		Map<String, String> resultMap = adminUserService.setUserName(uid, userName);
 //		return Boolean.parseBoolean(String.valueOf(resultMap.get("result"))) ? CommonResult.ok() : CommonResult.error(Integer.parseInt(resultMap.get("code")),resultMap.get("reason"));

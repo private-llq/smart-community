@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @author lihao
  * @ClassName SimulateTypeEntity
  * @Date 2020/12/10  15:53
- * @Description TODO
+ * @Description
  * @Version 1.0
  **/
 @Data

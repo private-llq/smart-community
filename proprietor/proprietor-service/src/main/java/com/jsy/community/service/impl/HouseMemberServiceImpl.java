@@ -135,8 +135,6 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	 * @Author: chq459799974
 	 * @Date: 2020/11/23
 	 **/
-	//TODO 物业端 houseid
-	//TODO 后台 code(t_house) - id(t_house) - houseid(t_house_member)
 //	@Override
 //	public Page<HouseMemberEntity> queryHouseMemberPage(BaseQO<HouseMemberQO> baseQO){
 //		HouseMemberQO houseMemberQO = baseQO.getQuery();

@@ -64,7 +64,6 @@ public class AppContentController {
 		PicUtil.imageQualified(avatar);
 		String url = MinioUtils.upload(avatar, BusinessConst.APP_SYS_DEFAULT_AVATAR_BUCKET_NAME);
 		if(!StringUtils.isEmpty(url)){
-			//TODO 修改静态配置文件sys_default_content.json(绝对路径)中的avatar属性
 			return CommonResult.ok(url);
 		}
 		return CommonResult.error("上传失败");

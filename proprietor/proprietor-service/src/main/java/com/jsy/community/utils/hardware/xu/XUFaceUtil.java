@@ -14,18 +14,6 @@ import java.util.Map;
  * @since 2021-01-29 16:48
  **/
 public class XUFaceUtil {
-	
-	/**
-	 * 人员添加
-	 */
-	public static boolean editPerson(XUFaceEditPersonDTO xUFaceEditPersonDTO){
-		Map bodyMap = JSONObject.parseObject(JSON.toJSONString(xUFaceEditPersonDTO), Map.class);
-		//TODO 改MQ 不要同步返回 硬件服务器消费完成调用云端接口入表
-		HttpPost httpPost = MyHttpUtils.httpPostWithoutParams("http://192.168.12.59:9363/face/xu/testEditPersonBase64", bodyMap);
-		MyHttpUtils.setDefaultHeader(httpPost);
-		String httpResult = (String)MyHttpUtils.exec(httpPost, MyHttpUtils.ANALYZE_TYPE_STR);
-		JSONObject result = JSONObject.parseObject(httpResult);
-		return result != null && "0".equals(result.getString("code"));
-	}
+
 	
 }

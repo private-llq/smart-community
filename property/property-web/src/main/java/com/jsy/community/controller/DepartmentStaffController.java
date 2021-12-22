@@ -66,10 +66,6 @@ public class DepartmentStaffController {
 	@PostMapping("/addDepartmentStaff")
 	@businessLog(operation = "新增",content = "新增了【社区员工】")
 	@Permit("community:property:staff:addDepartmentStaff")
-	// TODO: 2021/3/22 添加员工这里 我觉得姓名应该是唯一的  不过需求没要求唯一
-	// // TODO: 2021/4/14 今天做Excel添加时  当时问的经理 说是同一个部门 有一个人姓名相同,电话号码有一个相同  就算重复 不能添加成功
-	// // TODO: 2021/4/14 但是原型上面没有体现出来这个需求啊，没说。  好吧所以需求应该是员工（姓名相同，电话号码有一个以上相同就属于是同一个员工就不应该让其添加成功）
-	// // TODO: 2021/4/17  现在来处理2021/4/14这个问题
 	public CommonResult addDepartmentStaff(@RequestBody DepartmentStaffQO staffEntity) {
 		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
 		staffEntity.setCommunityId(communityId);
@@ -121,8 +117,7 @@ public class DepartmentStaffController {
 			return CommonResult.error("添加失败,请联系管理员");
 		}
 	}
-	
-	// TODO: 2021/4/16 这里暂时采用从服务器下载吧
+
 	@GetMapping("/down")
 	@ApiOperation("下载模板")
 	@Permit("community:property:staff:down")

@@ -48,8 +48,7 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	**/
 	@Select("select mobile from t_user where uid = #{uid} and deleted = 0")
 	String queryUserMobileByUid(String uid);
-	
-	//TODO user表householder_id字段暂未使用
+
 	@Update("update t_user set householder_id = #{householderId} where id = #{uid}")
 	int setUserBelongTo(Long householderId,Long uid);
 

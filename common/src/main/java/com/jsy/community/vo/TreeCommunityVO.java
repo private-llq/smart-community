@@ -12,7 +12,7 @@ import java.util.List;
  * @author lihao
  * @ClassName TreeCommunityVO
  * @Date 2021/3/16  9:51
- * @Description TODO 该VO用于社区通讯录与组织机构
+ * @Description  该VO用于社区通讯录与组织机构
  * @Version 1.0
  **/
 @Data

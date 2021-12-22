@@ -33,7 +33,6 @@ public interface PropertyFinanceReceiptMapper extends BaseMapper<PropertyFinance
 	 * @Author: chq459799974
 	 * @Date: 2021/4/23
 	**/
-	//TODO 加上社区id ? 看收款时能不能获取到 批量缴费项目是否必定全部是同一社区？
 	List<String> queryReceiptNumsByCondition(@Param("query")PropertyFinanceReceiptEntity query);
 	
 	//根据时间查询List<Map<月份,收款单号>>

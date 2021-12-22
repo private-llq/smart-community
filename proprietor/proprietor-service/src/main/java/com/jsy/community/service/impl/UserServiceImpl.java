@@ -869,25 +869,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         return userAuthVo;
     }
 
-
-    /**
-     * 添加社区硬件权限
-     */
-    private void setCommunityHardwareAuth(ProprietorQO proprietorQO) {
-        //TODO 根据uid查询所有房屋已审核社区 or 一个小区一次认证
-//        List<Long> communityIds = xxxxxx.getUserCommunitys(proprietorQO.getUid());
-        //TODO 获取对应社区的硬件服务器id、地址等相关数据 待设计，确认业务登记操作需要增加的权限
-
-        //执行调用 目前仅测试人脸机器
-        XUFaceEditPersonDTO xuFaceEditPersonDTO = new XUFaceEditPersonDTO();
-        xuFaceEditPersonDTO.setCustomId(proprietorQO.getIdCard());
-        xuFaceEditPersonDTO.setName(proprietorQO.getRealName());
-        xuFaceEditPersonDTO.setGender(proprietorQO.getSex());
-        xuFaceEditPersonDTO.setPic(Base64Util.netFileToBase64(proprietorQO.getFaceUrl()));
-        XUFaceUtil.editPerson(xuFaceEditPersonDTO);
-    }
-
-
     /**
      * 【用户】业主更新房屋认证信息  id等于null 或者 id == 0 表示需要新增的数据
      * 新方法至 -> updateImprover

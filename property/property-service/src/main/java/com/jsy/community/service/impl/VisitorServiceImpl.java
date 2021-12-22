@@ -86,7 +86,6 @@ public class VisitorServiceImpl implements IVisitorService {
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return new PageInfo<>();
         }
-        // TODO 纠错
 		/*Set<Long> visitorIds = new HashSet<>();
 		for(PeopleHistoryEntity historyEntity : pageData.getRecords()){
 			visitorIds.add(historyEntity.getVisitorId());
