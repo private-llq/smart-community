@@ -174,7 +174,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 		if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_EXPEND.getIndex().equals(order.getTradeType())){  // 支出
 			log.info("开始处理支出订单");
 			//支付订单修改状态完成
-			ailiAppPayRecordService.completeAliAppPayRecord(orderNo);
+			ailiAppPayRecordService.completeAliAppPayRecord(orderNo, order.getTradeNo());
 			log.info("支付宝回调 - 本地订单状态修改完成，订单号：" + orderNo);
 			String serviceOrderNo = order.getServiceOrderNo();
 			if(BusinessEnum.TradeFromEnum.SHOPPING_MALL.getCode().equals(order.getTradeName())){
@@ -192,7 +192,6 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 				// 房屋押金/房租缴费
 				log.info("开始修改房屋押金/房租缴费订单状态，订单号：" + orderNo);
 				UserDetail userDetail = baseUserInfoRpcService.getUserDetail(order.getUserid());
-				ailiAppPayRecordService.updateOrderStatus(orderNo);
 				basePayRpcService.thirdPay(order.getOrderNo(), userDetail.getId(), 1, order.getBuyerId());
 				/*// 查询签约状态
 				AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordService.queryRecordByConId(serviceOrderNo);

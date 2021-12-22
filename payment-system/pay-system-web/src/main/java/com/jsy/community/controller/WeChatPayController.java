@@ -1,7 +1,9 @@
 package com.jsy.community.controller;
 
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import com.jsy.community.api.*;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CarOrderRecordEntity;
 import com.jsy.community.entity.CommunityEntity;
@@ -13,8 +15,16 @@ import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.qo.payment.WeChatPayQO;
 import com.jsy.community.qo.payment.WithdrawalQO;
 import com.jsy.community.untils.wechat.*;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.BaseTrade;
+import com.zhsj.base.api.entity.CreateTradeEntity;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBasePayRpcService;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.basecommon.utils.MD5Util;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
@@ -104,6 +114,12 @@ public class WeChatPayController {
 
     private HttpClient httpClient;
 
+    @DubboReference(version = com.zhsj.base.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.base.api.constant.RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBasePayRpcService basePayRpcService;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
+
     /**
      * @Description: app下单并返回调起支付参数
      * @author: Hu
@@ -114,8 +130,39 @@ public class WeChatPayController {
     @PostMapping("/wxPay")
     // @Permit("community:payment:wxPay")
     public CommonResult wxPay(@RequestBody WeChatPayQO weChatPayQO) throws Exception {
-        if (weChatPayQO.getTradeFrom()==9||weChatPayQO.getTradeFrom()==2){
+        String orderNo = OrderNoUtil.getOrder();
+        if (weChatPayQO.getTradeFrom() == BusinessEnum.TradeFromEnum.HOUSING_RENTAL.getCode()
+                || weChatPayQO.getTradeFrom() == BusinessEnum.TradeFromEnum.SHOPPING_MALL.getCode()){
             weChatPayQO.setCommunityId(1L);
+            // 调用基础模块
+            CreateTradeEntity tradeEntity = new CreateTradeEntity();
+            // 服务调用方的订单号(商城的订单号/物业缴费的订单号等)
+            tradeEntity.setBusOrderNo(weChatPayQO.getServiceOrderNo());
+            // 付款方的id
+            tradeEntity.setSendUid(UserUtils.getEHomeUserId());
+            // 收款方的id
+            if (weChatPayQO.getTradeFrom() == BusinessEnum.TradeFromEnum.HOUSING_RENTAL.getCode()) {
+                AssetLeaseRecordEntity assetLeaseRecordEntity = assetLeaseRecordService.contractDetail(weChatPayQO.getServiceOrderNo());
+                UserDetail userDetail = baseUserInfoRpcService.getUserDetail(assetLeaseRecordEntity.getHomeOwnerUid());
+                weChatPayQO.setReceiveUid(userDetail.getId());
+            }
+            tradeEntity.setReceiveUid(weChatPayQO.getReceiveUid());
+            tradeEntity.setCno("RMB");
+            tradeEntity.setAmount(weChatPayQO.getAmount());
+            tradeEntity.setRemark(UserUtils.getUserInfo().getNickname() + "的" + BusinessEnum.TradeFromEnum.tradeMap.get(weChatPayQO.getTradeFrom()));
+            tradeEntity.setType(BusinessEnum.BaseOrderExpensesTypeEnum.getExpenses(weChatPayQO.getTradeFrom()));
+            tradeEntity.setTitle(BusinessEnum.TradeFromEnum.tradeMap.get(weChatPayQO.getTradeFrom()));
+            tradeEntity.setSource(BusinessEnum.BaseOrderSourceEnum.getSourceByCode(weChatPayQO.getTradeFrom()));
+            //签名
+            String string = JSON.toJSONString(tradeEntity);
+            Map map = JSON.parseObject(string, Map.class);
+            map.remove("sign");
+            map.put("communicationSecret", BusinessEnum.BaseOrderSourceEnum.getSecretByCode(weChatPayQO.getTradeFrom()));
+            String sign = MD5Util.signStr(map);
+            tradeEntity.setSign(MD5Util.getMd5Str(sign));
+            //创建交易，成功则返回trade，否则抛出异常
+            BaseTrade trade = basePayRpcService.createTrade(tradeEntity);
+            orderNo = trade.getSysOrderNo();
         }
         CommunityEntity entity = communityService.getCommunityNameById(weChatPayQO.getCommunityId());
         CompanyPayConfigEntity serviceConfig = null;
@@ -132,7 +179,7 @@ public class WeChatPayController {
         map.put("appid", WechatConfig.APPID);
         map.put("mchid",WechatConfig.MCH_ID);
         map.put("description", weChatPayQO.getDescriptionStr());
-        map.put("out_trade_no", OrderNoUtil.getOrder());
+        map.put("out_trade_no", orderNo);
         map.put("notify_url",wechatNotifyUrl+serviceConfig.getCompanyId());
         map.put("amount",hashMap);
         //hashMap.put("total",weChatPayQO.getAmount().multiply(new BigDecimal(100)));
@@ -194,7 +241,8 @@ public class WeChatPayController {
         }
         //新增数据库订单记录
         WeChatOrderEntity msg = new WeChatOrderEntity();
-        msg.setId((String) map.get("out_trade_no"));
+        msg.setId(String.valueOf(SnowFlake.nextId()));
+        msg.setOrderNo((String) map.get("out_trade_no"));
         msg.setUid(UserUtils.getUserId());
         msg.setServiceOrderNo(weChatPayQO.getServiceOrderNo());
         msg.setPayType(weChatPayQO.getTradeFrom());
@@ -249,25 +297,28 @@ public class WeChatPayController {
         Map<String, String> map = PublicConfig.notify(request ,response, WechatConfig.API_V3_KEY);
         log.info(String.valueOf(map));
         weChatService.orderStatus(map);
+        String orderNo = map.get("out_trade_no");
+        WeChatOrderEntity orderEntity = weChatService.getOrderByOrderNo(orderNo);
+        UserDetail userDetail = baseUserInfoRpcService.getUserDetail(orderEntity.getUid());
         if (map.get("attach")!=null){
             String[] split = map.get("attach").split(",");
-            //处理商城支付回调后的业务逻辑
             if (split[0].equals("2")){
-                shoppingMallService.completeShopOrder(map.get("out_trade_no"),map.get("transaction_id"),2);
+                //处理商城支付回调后的业务逻辑
+                basePayRpcService.thirdPay(orderNo, userDetail.getId(), 2, map.get("openid"));
+                // shoppingMallService.completeShopOrder(map.get("out_trade_no"),map.get("transaction_id"),2);
                 log.info("处理完成");
-            } else
-            //处理物业费支付回调后的业务逻辑
-            if (split[0].equals("4")){
-	            log.info("开始处理物业费订单：" + map.get("out_trade_no"));
-                Object ids = redisTemplate.opsForValue().get(PROPERTY_FEE + map.get("out_trade_no"));
+            } else if (split[0].equals("4")){
+                //处理物业费支付回调后的业务逻辑
+	            log.info("开始处理物业费订单：" + orderNo);
+                Object ids = redisTemplate.opsForValue().get(PROPERTY_FEE + orderNo);
                 if (ids == null){
-                    log.error("微信物业费订单回调处理异常，订单号：" + map.get("out_trade_no"));
+                    log.error("微信物业费订单回调处理异常，订单号：" + orderNo);
                     return;
                 }
                 String amount = map.get("amount");
 
                 log.info("账单ids：" + String.valueOf(ids).split(","));
-                propertyFinanceOrderService.updateOrderStatusBatch(1,map.get("out_trade_no"),String.valueOf(ids).split(","),new BigDecimal(amount).divide(new BigDecimal(100)));
+                propertyFinanceOrderService.updateOrderStatusBatch(1, orderNo,String.valueOf(ids).split(","),new BigDecimal(amount).divide(new BigDecimal(100)));
                 //获取一条账单，得到社区id
                 PropertyFinanceOrderEntity financeOrderEntity = propertyFinanceOrderService.findOne(Long.valueOf(String.valueOf(ids).split(",")[0]));
                 PropertyFinanceReceiptEntity receiptEntity = new PropertyFinanceReceiptEntity();
@@ -278,12 +329,11 @@ public class WeChatPayController {
                 receiptEntity.setReceiptMoney(new BigDecimal(split[2]));
                 propertyFinanceReceiptService.add(receiptEntity);
                 log.info("处理完成");
-            } else
-            //停车缴费后记业务
-            if (split[0].equals("8")){
+            } else if (split[0].equals("8")){
+                //停车缴费后记业务
                 CarOrderRecordEntity recordEntity = carService.findOne(Long.valueOf(split[1]));
                 recordEntity.setPayType(1);
-                recordEntity.setOrderNum(map.get("out_trade_no"));
+                recordEntity.setOrderNum(orderNo);
                 if (recordEntity!=null){
                     if (recordEntity.getType()==1){
                         carService.bindingMonthCar(recordEntity);
@@ -292,26 +342,26 @@ public class WeChatPayController {
                     }
                 }
                 log.info("处理完成");
-            } else
-            //房屋租赁业务逻辑
-            if (split[0].equals("9")){
-                AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordService.queryRecordByConId(split[1]);
+            } else if (split[0].equals("9")){
+                //房屋租赁业务逻辑
+                basePayRpcService.thirdPay(orderNo, userDetail.getId(), 2, map.get("openid"));
+                /*AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordService.queryRecordByConId(split[1]);
                 userAccountService.rentalIncome(leaseRecordEntity.getConId(), new BigDecimal(map.get("amount")).divide(new BigDecimal(100)),leaseRecordEntity.getHomeOwnerUid());
                 // 修改签章合同支付状态
-                Map<String, Object> houseMap = housingRentalOrderService.completeLeasingOrder(map.get("out_trade_no"), split[1]);
+                Map<String, Object> houseMap = housingRentalOrderService.completeLeasingOrder(orderNo, split[1]);
                 // 修改租房签约支付状态
-                assetLeaseRecordService.updateOperationPayStatus( split[1],1,new BigDecimal(map.get("amount")),map.get("out_trade_no"));
+                assetLeaseRecordService.updateOperationPayStatus( split[1],1,new BigDecimal(map.get("amount")), orderNo);
                 if(0 != (int)houseMap.get("code")){
                     throw new PaymentException((int)houseMap.get("code"),String.valueOf(map.get("msg")));
-                }
+                }*/
                 redisTemplate.delete(SIGNATURE+split[1]);
-                log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + map.get("out_trade_no"));
+                log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + orderNo);
                 log.info("租赁处理完成！");
             } else
                 //车辆临时缴费
                 if (split[0].equals("10")){
                     //修改车辆临时缴费订单状态
-                    carService.updateByOrder(split[1],new BigDecimal(map.get("amount")),map.get("out_trade_no"),1);
+                    carService.updateByOrder(split[1],new BigDecimal(map.get("amount")), orderNo,1);
                     log.info("车辆临时处理完成！");
                 }
         }

@@ -77,6 +77,15 @@ public interface IWeChatService extends IService<WeChatOrderEntity> {
     WeChatOrderEntity getOrderByQuery(WechatRefundQO wechatRefundQO);
 
     /**
+     * @author: Pipi
+     * @description: 根据订单编号查询订单
+     * @param orderNo: 订单编号
+     * @return: {@link WeChatOrderEntity}
+     * @date: 2021/12/22 10:18
+     **/
+    WeChatOrderEntity getOrderByOrderNo(String orderNo);
+
+    /**
      * @Description: 微信退款回调修改状态
      * @author: Hu
      * @since: 2021/9/18 16:02

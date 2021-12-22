@@ -1152,6 +1152,20 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     }
 
     /**
+     * @param conId : 合同Id
+     * @author: Pipi
+     * @description: 查询签约详情
+     * @return: {@link AssetLeaseRecordEntity}
+     * @date: 2021/12/22 11:31
+     **/
+    @Override
+    public AssetLeaseRecordEntity contractDetail(String conId) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("con_id", conId);
+        return assetLeaseRecordMapper.selectOne(queryWrapper);
+    }
+
+    /**
      * @param leaseRecordEntity:
      * @author: Pipi
      * @description: 设置签约倒计时和签约进程

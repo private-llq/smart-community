@@ -69,7 +69,9 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
      */
     @Override
     public void orderStatus(Map<String,String> map) {
-        WeChatOrderEntity entity = weChatMapper.selectById(map.get("out_trade_no"));
+        QueryWrapper<WeChatOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("order_no", map.get("out_trade_no"));
+        WeChatOrderEntity entity = weChatMapper.selectOne(queryWrapper);
         if (entity!=null){
             entity.setOrderStatus(2);
             entity.setArriveStatus(2);
@@ -121,6 +123,20 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
     @Override
     public WeChatOrderEntity getOrderByQuery(WechatRefundQO wechatRefundQO) {
         return weChatMapper.selectById(wechatRefundQO.getOrderNum());
+    }
+
+    /**
+     * @param orderNo : 订单编号
+     * @author: Pipi
+     * @description: 根据订单编号查询订单
+     * @return: {@link WeChatOrderEntity}
+     * @date: 2021/12/22 10:18
+     **/
+    @Override
+    public WeChatOrderEntity getOrderByOrderNo(String orderNo) {
+        QueryWrapper<WeChatOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("order_no", orderNo);
+        return weChatMapper.selectOne(queryWrapper);
     }
 
     /**

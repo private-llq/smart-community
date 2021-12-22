@@ -68,6 +68,15 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
 
     /**
      * @author: Pipi
+     * @description: 查询签约详情
+     * @param conId: 合同Id
+     * @return: {@link AssetLeaseRecordEntity}
+     * @date: 2021/12/22 11:31
+     **/
+    AssetLeaseRecordEntity contractDetail(String conId);
+
+    /**
+     * @author: Pipi
      * @description: 签章调用相关操作(发起签约/重新发起:31、完成签约:6、取消发起:32)
      * @param assetLeaseRecordEntity: 签约实体
      * @return: java.lang.Integer

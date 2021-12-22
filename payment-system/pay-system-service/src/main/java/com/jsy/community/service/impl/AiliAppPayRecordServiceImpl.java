@@ -40,9 +40,10 @@ public class AiliAppPayRecordServiceImpl implements AiliAppPayRecordService {
 	
 	//支付完成修改流水状态(支付完成)
 	@Override
-	public void completeAliAppPayRecord(String outTradeNo){
+	public void completeAliAppPayRecord(String outTradeNo, String tradeNo){
 		AiliAppPayRecordEntity ailiAppPayRecordEntity = new AiliAppPayRecordEntity();
 		ailiAppPayRecordEntity.setTradeStatus(PaymentEnum.TradeStatusEnum.ORDER_COMPLETED.getIndex());
+		ailiAppPayRecordEntity.setTradeNo(tradeNo);
 		int result = ailiAppPayRecordDao.update(ailiAppPayRecordEntity, new UpdateWrapper<AiliAppPayRecordEntity>().eq("order_no", outTradeNo));
 		if(result != 1){
 			throw new PaymentException(JSYError.INTERNAL.getCode(),"订单状态修改异常，请联系管理员");
@@ -122,21 +123,5 @@ public class AiliAppPayRecordServiceImpl implements AiliAppPayRecordService {
 		QueryWrapper<AiliAppPayRecordEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("order_no", orderNo);
 		return ailiAppPayRecordDao.delete(queryWrapper);
-	}
-
-	/**
-	 * @param orderNo : 修改订单支付状态
-	 * @author: Pipi
-	 * @description:
-	 * @return:
-	 * @date: 2021/12/21 18:47
-	 **/
-	@Override
-	public void updateOrderStatus(String orderNo) {
-		QueryWrapper<AiliAppPayRecordEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("order_no", orderNo);
-		AiliAppPayRecordEntity ailiAppPayRecordEntity = new AiliAppPayRecordEntity();
-		ailiAppPayRecordEntity.setTradeStatus(2);
-		ailiAppPayRecordDao.update(ailiAppPayRecordEntity, queryWrapper);
 	}
 }
