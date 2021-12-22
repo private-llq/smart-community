@@ -23,6 +23,8 @@ import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.lease.HouseLeaseSimpleVO;
 import com.jsy.community.vo.lease.HouseLeaseVO;
+import com.zhsj.base.api.domain.PayCallNotice;
+import com.zhsj.basecommon.vo.R;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
@@ -383,9 +385,15 @@ public class HouseLeaseController {
         return CommonResult.ok(assetLeaseRecordService.queryContractPreFillInfo(assetLeaseRecordEntity));
     }
 
-
+    /**
+     * @author: Pipi
+     * @description:
+     * @param r: 租房订单回调处理
+     * @return: {@link R< Void>}
+     * @date: 2021/12/21 17:29
+     **/
     @PostMapping("/v2/completeLeaseOrder")
-    public CommonResult completeLeaseOrder() {
-        return CommonResult.ok();
+    public R<Void> completeLeaseOrder(@RequestBody R<PayCallNotice> r) {
+        return assetLeaseRecordService.updateOperationPayStatus(r.getData()) ? R.ok() : R.fail();
     }
 }

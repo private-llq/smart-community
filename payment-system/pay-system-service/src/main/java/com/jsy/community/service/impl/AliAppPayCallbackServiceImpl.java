@@ -167,7 +167,6 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 	public void dealOrder(AiliAppPayRecordEntity order){
 		String orderNo = order.getOrderNo();
 		BigDecimal tradeAmount = order.getTradeAmount();
-
 		if (tradeAmount!=null){
 			tradeAmount = tradeAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
 		}
@@ -175,7 +174,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 		if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_EXPEND.getIndex().equals(order.getTradeType())){  // 支出
 			log.info("开始处理支出订单");
 			//支付订单修改状态完成
-			ailiAppPayRecordService.completeAliAppPayRecord(orderNo);
+			ailiAppPayRecordService.completeAliAppPayRecord(orderNo, order.getTradeNo());
 			log.info("支付宝回调 - 本地订单状态修改完成，订单号：" + orderNo);
 			String serviceOrderNo = order.getServiceOrderNo();
 			if(BusinessEnum.TradeFromEnum.SHOPPING_MALL.getCode().equals(order.getTradeName())){

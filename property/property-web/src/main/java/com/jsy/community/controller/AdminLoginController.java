@@ -13,6 +13,7 @@ import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.admin.AdminLoginQO;
 import com.jsy.community.util.MyCaptchaUtil;
+import com.jsy.community.utils.RSAUtil;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -155,7 +156,7 @@ public class AdminLoginController {
 			checkVerifyCode(form.getAccount(),form.getCode());
 			loginVo = baseAuthRpcService.propertyLogin(form.getAccount(), form.getCode(), "PHONE_CODE");
 		} else {
-			loginVo = baseAuthRpcService.propertyLogin(form.getAccount(), form.getPassword(), "PHONE_PWD");
+			loginVo = baseAuthRpcService.propertyLogin(form.getAccount(), RSAUtil.privateDecrypt(form.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), "PHONE_PWD");
 		}
 		log.info(form.getAccount() + "开始登录");
 		// 获取用户菜单

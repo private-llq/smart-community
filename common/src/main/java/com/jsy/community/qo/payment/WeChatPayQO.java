@@ -1,8 +1,10 @@
 package com.jsy.community.qo.payment;
 
+import com.jsy.community.qo.lease.AliAppPayQO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Map;
 
@@ -31,6 +33,12 @@ public class WeChatPayQO {
 
     @ApiModelProperty("停车缴费临时记录id")
     private Long communityId;
+
+    /**
+     * 收款方id
+     */
+    @NotNull(groups = AliAppPayQO.BalanceInvolvedGroup.class, message = "收款方id不能为空")
+    private Long receiveUid;
 
 
 }

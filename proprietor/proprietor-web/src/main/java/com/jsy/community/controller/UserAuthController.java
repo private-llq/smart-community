@@ -89,7 +89,7 @@ public class UserAuthController {
                     allowableValues = "1,2,3,4,5", paramType = "query")
     })
     @LoginIgnore
-    public CommonResult<Boolean> sendCode(@RequestParam String account) {
+    public CommonResult<Boolean> sendCode(@RequestParam String account, @RequestParam String type) {
         if (RegexUtils.isMobile(account)) {
             baseSmsRpcService.sendVerificationCode(account);
             return CommonResult.ok();

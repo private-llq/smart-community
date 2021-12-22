@@ -40,9 +40,10 @@ public class AiliAppPayRecordServiceImpl implements AiliAppPayRecordService {
 	
 	//支付完成修改流水状态(支付完成)
 	@Override
-	public void completeAliAppPayRecord(String outTradeNo){
+	public void completeAliAppPayRecord(String outTradeNo, String tradeNo){
 		AiliAppPayRecordEntity ailiAppPayRecordEntity = new AiliAppPayRecordEntity();
 		ailiAppPayRecordEntity.setTradeStatus(PaymentEnum.TradeStatusEnum.ORDER_COMPLETED.getIndex());
+		ailiAppPayRecordEntity.setTradeNo(tradeNo);
 		int result = ailiAppPayRecordDao.update(ailiAppPayRecordEntity, new UpdateWrapper<AiliAppPayRecordEntity>().eq("order_no", outTradeNo));
 		if(result != 1){
 			throw new PaymentException(JSYError.INTERNAL.getCode(),"订单状态修改异常，请联系管理员");

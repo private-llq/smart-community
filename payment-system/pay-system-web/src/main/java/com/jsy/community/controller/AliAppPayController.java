@@ -9,6 +9,7 @@ import com.jsy.community.constant.PaymentEnum;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.PayConfigureEntity;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
+import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.lease.AliAppPayQO;
@@ -17,9 +18,12 @@ import com.jsy.community.utils.AlipayUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.domain.BaseTrade;
 import com.zhsj.base.api.entity.CreateTradeEntity;
+import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBasePayRpcService;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.basecommon.utils.MD5Util;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import io.swagger.annotations.ApiOperation;
@@ -65,6 +69,9 @@ public class AliAppPayController {
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IPayConfigureService payConfigureService;
 
+	@DubboReference(version = Const.version, group = Const.group_lease, check = false)
+	private AssetLeaseRecordService assetLeaseRecordService;
+
 	/**
 	 * 收款方为公司时的收款方id
 	 */
@@ -80,6 +87,9 @@ public class AliAppPayController {
 	@DubboReference(version = com.zhsj.base.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.base.api.constant.RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
 	private IBasePayRpcService basePayRpcService;
 
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseUserInfoRpcService baseUserInfoRpcService;
+
 	/**
 	 * 涉及到用户余额的,需要调用基础模块
 	 * 不涉及的则走原有的正常支付流程
@@ -88,6 +98,7 @@ public class AliAppPayController {
 	@PostMapping("order")
 	// @Permit("community:payment:alipay:order")
 	public CommonResult getOrderStr(@RequestBody AliAppPayQO aliAppPayQO, HttpServletRequest req){
+		log.info("创建订单参数:{}", JSON.toJSONString(aliAppPayQO));
 		ValidatorUtils.validateEntity(aliAppPayQO,AliAppPayQO.addOrderGroup.class);
 		String orderNo = OrderNoUtil.getOrder();
 		// 租房和商家订单是涉及到房东或者商家余额的
@@ -102,6 +113,11 @@ public class AliAppPayController {
 			// 付款方的id
 			tradeEntity.setSendUid(UserUtils.getEHomeUserId());
 			// 收款方的id
+			if (aliAppPayQO.getTradeFrom() == BusinessEnum.TradeFromEnum.HOUSING_RENTAL.getCode()) {
+				AssetLeaseRecordEntity assetLeaseRecordEntity = assetLeaseRecordService.contractDetail(aliAppPayQO.getServiceOrderNo());
+				UserDetail userDetail = baseUserInfoRpcService.getUserDetail(assetLeaseRecordEntity.getHomeOwnerUid());
+				aliAppPayQO.setReceiveUid(userDetail.getId());
+			}
 			tradeEntity.setReceiveUid(aliAppPayQO.getReceiveUid());
 			tradeEntity.setCno("RMB");
 			tradeEntity.setAmount(aliAppPayQO.getTotalAmount());
@@ -115,7 +131,7 @@ public class AliAppPayController {
 			map.remove("sign");
 			map.put("communicationSecret", BusinessEnum.BaseOrderSourceEnum.getSecretByCode(aliAppPayQO.getTradeFrom()));
 			String sign = MD5Util.signStr(map);
-			tradeEntity.setSign(sign);
+			tradeEntity.setSign(MD5Util.getMd5Str(sign));
 			//创建交易，成功则返回trade，否则抛出异常
 			BaseTrade trade = basePayRpcService.createTrade(tradeEntity);
 			orderNo = trade.getSysOrderNo();
