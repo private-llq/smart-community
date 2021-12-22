@@ -1648,6 +1648,70 @@ public interface BusinessEnum {
 			return null;
 		}
 	}
+	/**
+	 * @author: Pipi
+	 * @description: 订单支出类型枚举
+	 * @date: 2021/12/20 15:07
+	 **/
+	enum BaseOrderRevenueTypeEnum {
+		SHOP(2, 33, "商城购物 - 收入"),
+		LIVING_EXPENSES(3, 65, "水电缴费 - 收入"),
+		PROPERTY_FEE(4, 129, "物业管理 - 收入"),
+		LEASE(9, 257, "房屋租赁 - 收入"),
+		PARKING_FEE(8, 513, "停车缴费 - 收入"),
+		TEMP_PARKING_FEE(10, 1025, "零时停车缴费 - 收入");
+		private Integer code;
+		private Integer expensesType;
+		private String name;
+
+		BaseOrderRevenueTypeEnum(Integer code, Integer expensesType, String name) {
+			this.code = code;
+			this.expensesType = expensesType;
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		public Integer getExpensesType() {
+			return expensesType;
+		}
+
+		public void setExpensesType(Integer expensesType) {
+			this.expensesType = expensesType;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public String toString() {
+			return "BaseOrderRevenueTypeEnum{" +
+					"code=" + code +
+					", expensesType=" + expensesType +
+					", name='" + name + '\'' +
+					'}';
+		}
+
+		public static Integer getExpenses(Integer code) {
+			for (BaseOrderRevenueTypeEnum value : BaseOrderRevenueTypeEnum.values()) {
+				if (value.getCode() == code) {
+					return value.getExpensesType();
+				}
+			}
+			return null;
+		}
+	}
 
 	/**
 	 * @author: Pipi

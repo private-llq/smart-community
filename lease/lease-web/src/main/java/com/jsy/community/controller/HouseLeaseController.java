@@ -394,7 +394,6 @@ public class HouseLeaseController {
      **/
     @PostMapping("/v2/completeLeaseOrder")
     public R<Void> completeLeaseOrder(@RequestBody R<PayCallNotice> r) {
-
-        return R.ok();
+        return assetLeaseRecordService.updateOperationPayStatus(r.getData()) ? R.ok() : R.fail();
     }
 }

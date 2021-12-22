@@ -123,4 +123,20 @@ public class AiliAppPayRecordServiceImpl implements AiliAppPayRecordService {
 		queryWrapper.eq("order_no", orderNo);
 		return ailiAppPayRecordDao.delete(queryWrapper);
 	}
+
+	/**
+	 * @param orderNo : 修改订单支付状态
+	 * @author: Pipi
+	 * @description:
+	 * @return:
+	 * @date: 2021/12/21 18:47
+	 **/
+	@Override
+	public void updateOrderStatus(String orderNo) {
+		QueryWrapper<AiliAppPayRecordEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("order_no", orderNo);
+		AiliAppPayRecordEntity ailiAppPayRecordEntity = new AiliAppPayRecordEntity();
+		ailiAppPayRecordEntity.setTradeStatus(2);
+		ailiAppPayRecordDao.update(ailiAppPayRecordEntity, queryWrapper);
+	}
 }

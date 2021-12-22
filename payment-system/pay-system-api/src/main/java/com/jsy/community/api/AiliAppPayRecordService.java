@@ -40,4 +40,13 @@ public interface AiliAppPayRecordService {
 	 * @date: 2021/9/16 17:50
 	 **/
 	Integer deleteByOrderNo(Long orderNo);
+
+	/**
+	 * @author: Pipi
+	 * @description:
+	 * @param orderNo: 修改订单支付状态
+	 * @return:
+	 * @date: 2021/12/21 18:47
+	 **/
+	void updateOrderStatus(String orderNo);
 }

@@ -10,6 +10,7 @@ import com.jsy.community.config.LeaseTopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.entity.*;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
@@ -28,9 +29,13 @@ import com.jsy.community.utils.signature.ZhsjUtil;
 import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.lease.HouseLeaseContractVO;
 import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.PayCallNotice;
+import com.zhsj.base.api.entity.TransferEntity;
 import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBasePayRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.basecommon.utils.MD5Util;
 import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -127,8 +132,17 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
     private IBaseUserInfoRpcService userInfoRpcService;
 
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBasePayRpcService basePayRpcService;
+
     @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check=false)
     private IImChatPublicPushRpcService iImChatPublicPushRpcService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IPayConfigureService payConfigureService;
+
+    @DubboReference(version = Const.version, group = Const.group_payment, check = false)
+    private HousingRentalOrderService housingRentalOrderService;
 
     /**
      * @param assetLeaseRecordEntity : 房屋租赁记录表实体
@@ -1554,6 +1568,72 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         } else {
             log.info("没有找到合同:{}相关的签约ID", conId);
         }
+    }
+
+    /**
+     * @param payCallNotice :
+     * @author: Pipi
+     * @description: 签约支付后的回调处理
+     * @return:
+     * @date: 2021/12/21 18:09
+     **/
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean updateOperationPayStatus(PayCallNotice payCallNotice) {
+        try {
+            String busOrderNo = payCallNotice.getBusOrderNo();
+            BigDecimal payAmount = payCallNotice.getPayAmount();
+            AssetLeaseRecordEntity leaseRecordEntity = queryRecordByConId(busOrderNo);
+            if (leaseRecordEntity != null && leaseRecordEntity.getOperation() == 32) {
+                log.info("房东已取消发起");
+                // 签约是房东取消发起状态,则退款,并且不修改合同签约的支付状态,同时删除支付订单
+                // TODO 退款功能需要测试
+                PayConfigureEntity serviceConfig;
+                serviceConfig = payConfigureService.getCompanyConfig(1L);
+                ConstClasses.AliPayDataEntity.setConfig(serviceConfig);
+                AlipayUtils.orderRefund(busOrderNo, payAmount);
+                ailiAppPayRecordService.deleteByOrderNo(Long.parseLong(busOrderNo));
+                return false;
+            } else {
+                // 修改签章合同支付状态
+                log.info("开始修改签章合同支付状态");
+                Map<String, Object> map = housingRentalOrderService.completeLeasingOrder(busOrderNo, leaseRecordEntity.getConId());
+                // 修改租房签约支付状态
+                log.info("开始修改租房签约支付状态");
+                updateOperationPayStatus(leaseRecordEntity.getConId(), 2, payAmount, busOrderNo);
+                if (0 != (int) map.get("code")) {
+                    log.info("修改签章合同支付状态失败");
+                    throw new PaymentException((int) map.get("code"), String.valueOf(map.get("msg")));
+                }
+                // 增加房东余额
+                log.info("开始修改房东余额");
+                TransferEntity transferEntity = new TransferEntity();
+                transferEntity.setSendUid(0L);
+                transferEntity.setSendPayPwd("");
+                UserDetail userDetail = userInfoRpcService.getUserDetail(leaseRecordEntity.getHomeOwnerUid());
+                transferEntity.setReceiveUid(userDetail.getId());
+                transferEntity.setCno("RMB");
+                transferEntity.setAmount(payAmount);
+                transferEntity.setRemark("房屋租金入账");
+                transferEntity.setType(BusinessEnum.BaseOrderRevenueTypeEnum.LEASE.getExpensesType());
+                transferEntity.setTitle("房屋租金入账");
+                transferEntity.setSource(BusinessEnum.BaseOrderSourceEnum.LEASE.getSource());
+                //签名
+                String string = JSON.toJSONString(transferEntity);
+                Map signMap = JSON.parseObject(string, Map.class);
+                map.remove("sign");
+                map.put("communicationSecret", BusinessEnum.BaseOrderSourceEnum.LEASE.getSecret());
+                String sign = com.zhsj.basecommon.utils.MD5Util.signStr(signMap);
+                transferEntity.setSign(MD5Util.getMd5Str(sign));
+                basePayRpcService.transfer(transferEntity);
+                // userAccountService.rentalIncome(leaseRecordEntity.getConId(), tradeAmount, leaseRecordEntity.getHomeOwnerUid());
+                log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + busOrderNo);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     /**

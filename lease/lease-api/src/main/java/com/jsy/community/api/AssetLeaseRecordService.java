@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.vo.lease.HouseLeaseContractVO;
+import com.zhsj.base.api.domain.PayCallNotice;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -82,6 +83,15 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
      * @date: 2021/9/9 18:24
      **/
     void updateOperationPayStatus(String conId, Integer payType, BigDecimal total,String orderNum);
+    
+    /**
+     * @author: Pipi
+     * @description: 签约支付后的回调处理
+     * @param payCallNotice: 
+     * @return:
+     * @date: 2021/12/21 18:09
+     **/
+    Boolean updateOperationPayStatus(PayCallNotice payCallNotice);
 
     /**
      * @author: Pipi

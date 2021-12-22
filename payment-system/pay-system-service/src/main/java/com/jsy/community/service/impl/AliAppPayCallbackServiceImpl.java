@@ -167,7 +167,6 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 	public void dealOrder(AiliAppPayRecordEntity order){
 		String orderNo = order.getOrderNo();
 		BigDecimal tradeAmount = order.getTradeAmount();
-
 		if (tradeAmount!=null){
 			tradeAmount = tradeAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
 		}
@@ -193,6 +192,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 				// 房屋押金/房租缴费
 				log.info("开始修改房屋押金/房租缴费订单状态，订单号：" + orderNo);
 				UserDetail userDetail = baseUserInfoRpcService.getUserDetail(order.getUserid());
+				ailiAppPayRecordService.updateOrderStatus(orderNo);
 				basePayRpcService.thirdPay(order.getOrderNo(), userDetail.getId(), 1, order.getBuyerId());
 				/*// 查询签约状态
 				AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordService.queryRecordByConId(serviceOrderNo);
