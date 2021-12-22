@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IProprietorService;
@@ -240,7 +239,7 @@ public class HouseController {
 		ValidatorUtils.validateEntity(houseBuildingTypeEntity,HouseBuildingTypeEntity.addHouseBuildingTypeGroup.class);
 		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
 		houseBuildingTypeEntity.setCommunityId(loginUser.getCommunityId());
-		houseBuildingTypeEntity.setCreateBy(UserUtils.getUserId());
+		houseBuildingTypeEntity.setCreateBy(UserUtils.getId());
 		return houseService.addHouseBuildingType(houseBuildingTypeEntity)
 			? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"新增楼宇分类失败");
 	}
@@ -260,7 +259,7 @@ public class HouseController {
 		ValidatorUtils.validateEntity(houseBuildingTypeEntity);
 		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
 		houseBuildingTypeEntity.setCommunityId(loginUser.getCommunityId());
-		houseBuildingTypeEntity.setUpdateBy(UserUtils.getUserId());
+		houseBuildingTypeEntity.setUpdateBy(UserUtils.getId());
 		return houseService.updateHouseBuildingType(houseBuildingTypeEntity)
 			? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改楼宇分类失败");
 	}
@@ -338,7 +337,7 @@ public class HouseController {
 //		//参数验证
 //		validFileSuffix(excel);
 //		Long adminCommunityId = UserUtils.getAdminCommunityId();
-//		String userId = UserUtils.getUserId();
+//		String userId = UserUtils.getId();
 //		ArrayList<HouseImportErrorVO> errorVos = new ArrayList<>(32);
 //		List<HouseEntity> houseEntities = houseExcelHandler.importHouseExcel(excel, errorVos);
 //		List<HouseEntity> allHouse = houseService.getAllHouse(adminCommunityId);
@@ -389,7 +388,7 @@ public class HouseController {
 		//参数验证
 		validFileSuffix(excel);
 		Long adminCommunityId = UserUtils.getAdminCommunityId();
-		String userId = UserUtils.getUserId();
+		String userId = UserUtils.getId();
 		ArrayList<HouseImportErrorVO> errorVos = new ArrayList<>(32);
 		List<HouseEntity> houseEntities = houseExcelHandler.importHouseExcel(excel, errorVos);
 		List<HouseEntity> allHouse = houseService.getAllHouse(adminCommunityId);
@@ -559,7 +558,7 @@ public class HouseController {
 		//参数验证
 		validFileSuffix(excel);
 		Long adminCommunityId = UserUtils.getAdminCommunityId();
-		String userId = UserUtils.getUserId();
+		String userId = UserUtils.getId();
 		ArrayList<BuildingImportErrorVO> errorVos = new ArrayList<>(32);
 		List<HouseEntity> houseEntities = houseExcelHandler.importBuildingExcel(excel, errorVos);
 		List<HouseEntity> allBuilding = houseService.selectAllBuilding(adminCommunityId);

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.PropertyException;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.*;
 import com.jsy.community.exception.JSYError;
@@ -15,8 +16,17 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
 import com.jsy.community.utils.MyPageUtils;
-import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.MenuPermission;
+import com.zhsj.base.api.domain.PermitRole;
+import com.zhsj.base.api.domain.RoleMenu;
+import com.zhsj.base.api.entity.UpdateRoleDto;
+import com.zhsj.base.api.rpc.IBaseMenuPermissionRpcService;
+import com.zhsj.base.api.rpc.IBaseMenuRpcService;
+import com.zhsj.base.api.rpc.IBasePermissionRpcService;
+import com.zhsj.base.api.rpc.IBaseRoleRpcService;
+import com.zhsj.base.api.vo.PageVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -25,10 +35,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -54,6 +65,21 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminUserService adminUserService;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseRoleRpcService baseRoleRpcService;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseMenuRpcService baseMenuRpcService;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseMenuPermissionRpcService baseMenuPermissionRpcService;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+	private IBasePermissionRpcService permissionRpcService;
+	
+	@Resource
+	private AdminRoleCompanyMapper adminRoleCompanyMapper;
 
 	@Autowired
 	private AdminCommunityMapper adminCommunityMapper;
@@ -175,13 +201,29 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 **/
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public boolean addRole(AdminRoleEntity adminRoleEntity){
-		adminRoleEntity.setId(SnowFlake.nextId());
-		//设置角色菜单
-		if(!CollectionUtils.isEmpty(adminRoleEntity.getMenuIds())){
-			setRoleMenus(adminRoleEntity.getMenuIds(),adminRoleEntity.getId());
+	public void addRole(AdminRoleEntity adminRoleEntity){
+//		adminRoleEntity.setId(SnowFlake.nextId());
+//		//设置角色菜单
+//		if(!CollectionUtils.isEmpty(adminRoleEntity.getMenuIds())){
+//			setRoleMenus(adminRoleEntity.getMenuIds(),adminRoleEntity.getId());
+//		}
+//		return adminRoleMapper.insert(adminRoleEntity) == 1;
+		PermitRole permitRole = baseRoleRpcService.createRole(adminRoleEntity.getName(), adminRoleEntity.getRemark(), BusinessConst.PROPERTY_ADMIN, 1460884237115367425L);
+		// 菜单分配给角色
+		baseMenuRpcService.menuJoinRole(adminRoleEntity.getMenuIds(), permitRole.getId(), 1460884237115367425L);
+		// 查询菜单和权限绑定关系
+		List<MenuPermission> menuPermissions = baseMenuPermissionRpcService.listByIds(adminRoleEntity.getMenuIds());
+		List<Long> permisIds = new ArrayList<>();
+		for (MenuPermission menuPermission : menuPermissions) {
+			permisIds.add(menuPermission.getPermisId());
 		}
-		return adminRoleMapper.insert(adminRoleEntity) == 1;
+		permissionRpcService.permitJoinRole(permisIds, permitRole.getId(), 1460884237115367425L);
+		// 新增角色和物业公司关联信息
+		AdminRoleCompanyEntity entity = new AdminRoleCompanyEntity();
+		entity.setId(SnowFlake.nextId());
+		entity.setCompanyId(adminRoleEntity.getCompanyId());
+		entity.setRoleId(permitRole.getId());
+		adminRoleCompanyMapper.insert(entity);
 	}
 
 	/**
@@ -192,8 +234,11 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2020/12/14
 	 **/
 	@Override
-	public boolean delRole(Long id, Long companyId){
-		return adminRoleMapper.delete(new QueryWrapper<AdminRoleEntity>().eq("id",id).eq("company_id",companyId)) == 1;
+	public void delRole(List<Long> roleIds, Long companyId){
+//		return adminRoleMapper.delete(new QueryWrapper<AdminRoleEntity>().eq("id",id).eq("company_id",companyId)) == 1;
+		baseRoleRpcService.deleteRole(roleIds);
+		// 删除角色和物业公司关联信息
+		adminRoleCompanyMapper.delete(new QueryWrapper<AdminRoleCompanyEntity>().eq("company_id", companyId).in("role_id", roleIds).eq("deleted", 0));
 	}
 
 	/**
@@ -205,15 +250,38 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 **/
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public boolean updateRole(AdminRoleQO adminRoleOQ){
-		AdminRoleEntity entity = new AdminRoleEntity();
-		BeanUtils.copyProperties(adminRoleOQ,entity);
-		entity.setCompanyId(null);
-		//更新角色菜单
-		if(!CollectionUtils.isEmpty(entity.getMenuIds())){
-			setRoleMenus(entity.getMenuIds(),entity.getId());
+	public void updateRole(AdminRoleQO adminRoleOQ){
+//		AdminRoleEntity entity = new AdminRoleEntity();
+//		BeanUtils.copyProperties(adminRoleOQ,entity);
+//		entity.setCompanyId(null);
+//		//更新角色菜单
+//		if(!CollectionUtils.isEmpty(entity.getMenuIds())){
+//			setRoleMenus(entity.getMenuIds(),entity.getId());
+//		}
+//		return adminRoleMapper.update(entity,new QueryWrapper<AdminRoleEntity>().eq("id",entity.getId()).eq("company_id",adminRoleOQ.getCompanyId())) == 1;
+		UpdateRoleDto updateRoleDto = new UpdateRoleDto();
+		updateRoleDto.setId(adminRoleOQ.getId());
+		updateRoleDto.setName(adminRoleOQ.getName());
+		if (org.apache.commons.lang3.StringUtils.isNotBlank(adminRoleOQ.getRemark())) {
+			updateRoleDto.setRemark(adminRoleOQ.getRemark());
 		}
-		return adminRoleMapper.update(entity,new QueryWrapper<AdminRoleEntity>().eq("id",entity.getId()).eq("company_id",adminRoleOQ.getCompanyId())) == 1;
+		updateRoleDto.setUpdateUid(1460884237115367425L);
+		// 修改角色
+		baseRoleRpcService.updateRole(updateRoleDto);
+		// 需要更改角色的菜单
+		if (adminRoleOQ.getMenuIds() != null && adminRoleOQ.getMenuIds().size() > 0) {
+			// 先移除绑定角色的菜单，再把新的菜单分配给角色(全删全增)
+			// 查询该角色关联的菜单id列表
+			List<RoleMenu> roleMenus = baseRoleRpcService.listAllRoleMenu(adminRoleOQ.getId());
+			List<Long> menuIdsList = new ArrayList<>();
+			for (RoleMenu roleMenu : roleMenus) {
+				menuIdsList.add(roleMenu.getMenuId());
+			}
+			// 移除角色下的菜单id列表
+			baseMenuRpcService.roleRemoveMenu(adminRoleOQ.getId(), menuIdsList);
+			// 新菜单分配给角色
+			baseMenuRpcService.menuJoinRole(adminRoleOQ.getMenuIds(), adminRoleOQ.getId(), 1460884237115367425L);
+		}
 	}
 
 	/**
@@ -224,29 +292,58 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2020/12/14
 	 **/
 	@Override
-	public PageInfo<AdminRoleEntity> queryPage(BaseQO<AdminRoleEntity> baseQO){
-		Page<AdminRoleEntity> page = new Page<>();
-		MyPageUtils.setPageAndSize(page,baseQO);
+	public PageVO<AdminRoleEntity> queryPage(BaseQO<AdminRoleEntity> baseQO){
+//		Page<AdminRoleEntity> page = new Page<>();
+//		MyPageUtils.setPageAndSize(page,baseQO);
+//		AdminRoleEntity query = baseQO.getQuery();
+//		QueryWrapper<AdminRoleEntity> queryWrapper = new QueryWrapper<>();
+//		queryWrapper.select("id,name,remark,create_time");
+//		queryWrapper.eq("company_id",query.getCompanyId());
+//		if(!StringUtils.isEmpty(query.getName())){
+//			queryWrapper.like("name",query.getName());
+//		}
+//		if(query.getId() != null){
+//			//查详情
+//			queryWrapper.eq("id",query.getId());
+//		}
+//		Page<AdminRoleEntity> pageData = adminRoleMapper.selectPage(page,queryWrapper);
+//		if(query.getId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
+//			//查菜单权限
+//			AdminRoleEntity entity = pageData.getRecords().get(0);
+//			entity.setMenuIds(adminRoleMapper.getRoleMenu(entity.getId()));
+//		}
+//		PageInfo<AdminRoleEntity> pageInfo = new PageInfo<>();
+//		BeanUtils.copyProperties(pageData,pageInfo);
+//		return pageInfo;
 		AdminRoleEntity query = baseQO.getQuery();
-		QueryWrapper<AdminRoleEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.select("id,name,remark,create_time");
-		queryWrapper.eq("company_id",query.getCompanyId());
-		if(!StringUtils.isEmpty(query.getName())){
-			queryWrapper.like("name",query.getName());
+		Page<AdminRoleEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page, baseQO);
+		
+		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(query.getName(), BusinessConst.PROPERTY_ADMIN, baseQO.getPage().intValue(), baseQO.getSize().intValue());
+		if (CollectionUtils.isEmpty(permitRolePageVO.getData())) {
+			return new PageVO<>();
 		}
-		if(query.getId() != null){
-			//查详情
-			queryWrapper.eq("id",query.getId());
+		
+		PageVO<AdminRoleEntity> pageVO = new PageVO<>();
+		// 补充数据
+		for (PermitRole permitRole : permitRolePageVO.getData()) {
+			AdminRoleCompanyEntity entity = adminRoleCompanyMapper.selectOne(new QueryWrapper<AdminRoleCompanyEntity>().eq("role_id", permitRole.getId()).eq("deleted", 0));
+			// 只返回本物业公司
+			if (entity.getCompanyId().equals(query.getCompanyId())) {
+				AdminRoleEntity adminRoleEntity = new AdminRoleEntity();
+				adminRoleEntity.setId(permitRole.getId());
+				adminRoleEntity.setIdStr(String.valueOf(permitRole.getId()));
+				adminRoleEntity.setName(permitRole.getName());
+				adminRoleEntity.setRemark(permitRole.getRemark());
+				adminRoleEntity.setCreateTime(LocalDateTime.parse(permitRole.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+				pageVO.getData().add(adminRoleEntity);
+			}
 		}
-		Page<AdminRoleEntity> pageData = adminRoleMapper.selectPage(page,queryWrapper);
-		if(query.getId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
-			//查菜单权限
-			AdminRoleEntity entity = pageData.getRecords().get(0);
-			entity.setMenuIds(adminRoleMapper.getRoleMenu(entity.getId()));
-		}
-		PageInfo<AdminRoleEntity> pageInfo = new PageInfo<>();
-		BeanUtils.copyProperties(pageData,pageInfo);
-		return pageInfo;
+		pageVO.setPageNum(permitRolePageVO.getPageNum());
+		pageVO.setPageSize(permitRolePageVO.getPageSize());
+		pageVO.setPages(permitRolePageVO.getPages());
+		pageVO.setTotal(permitRolePageVO.getTotal());
+		return pageVO;
 	}
 
 
@@ -260,34 +357,50 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 **/
 	@Override
 	public AdminRoleEntity queryRoleDetail(Long roleId, Long companyId) {
-		// 查询角色信息
-		QueryWrapper<AdminRoleEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("id", roleId);
-		queryWrapper.eq("company_id", companyId);
-		AdminRoleEntity adminRoleEntity = adminRoleMapper.selectOne(queryWrapper);
-		if (adminRoleEntity == null) {
-			return adminRoleEntity;
+//		// 查询角色信息
+//		QueryWrapper<AdminRoleEntity> queryWrapper = new QueryWrapper<>();
+//		queryWrapper.eq("id", roleId);
+//		queryWrapper.eq("company_id", companyId);
+//		AdminRoleEntity adminRoleEntity = adminRoleMapper.selectOne(queryWrapper);
+//		if (adminRoleEntity == null) {
+//			return adminRoleEntity;
+//		}
+//		// 查询分配的菜单列表
+//		List<Long> roleMenuIds = adminRoleMenuMapper.queryRoleMuneIdsByRoleId(roleId);
+//		/*QueryWrapper<AdminMenuEntity> menuEntityQueryWrapper = new QueryWrapper<>();
+//		menuEntityQueryWrapper.select("*, name as label");
+//		menuEntityQueryWrapper.in("id", roleMuneIds);
+//		List<AdminMenuEntity> adminMenuEntities = adminMenuMapper.selectList(menuEntityQueryWrapper);
+//		// 查询所有菜单
+//		QueryWrapper<AdminMenuEntity> menuEntityQueryWrapper = new QueryWrapper<>();
+//		menuEntityQueryWrapper.select("*, name as label");
+//		List<AdminMenuEntity> menuEntities = adminMenuMapper.selectList(menuEntityQueryWrapper);
+//		for (AdminMenuEntity menuEntity : menuEntities) {
+//			if (roleMuneIds.contains(menuEntity.getId())) {
+//				menuEntity.setChecked(true);
+//			} else {
+//				menuEntity.setChecked(false);
+//			}
+//		}
+//		List<AdminMenuEntity> returnMenuEntities = assemblyMenuData(adminMenuEntities);
+//		adminRoleEntity.setMenuList(returnMenuEntities);*/
+//		adminRoleEntity.setMenuIds(roleMenuIds);
+//		return adminRoleEntity;
+		AdminRoleEntity adminRoleEntity = new AdminRoleEntity();
+		// 查角色详情
+		PermitRole permitRole = baseRoleRpcService.getById(roleId);
+		// 查角色关联菜单id列表
+		List<RoleMenu> roleMenus = baseRoleRpcService.listAllRoleMenu(permitRole.getId());
+		List<Long> menuIds = new ArrayList<>();
+		for (RoleMenu roleMenu : roleMenus) {
+			menuIds.add(roleMenu.getMenuId());
 		}
-		// 查询分配的菜单列表
-		List<Long> roleMenuIds = adminRoleMenuMapper.queryRoleMuneIdsByRoleId(roleId);
-		/*QueryWrapper<AdminMenuEntity> menuEntityQueryWrapper = new QueryWrapper<>();
-		menuEntityQueryWrapper.select("*, name as label");
-		menuEntityQueryWrapper.in("id", roleMuneIds);
-		List<AdminMenuEntity> adminMenuEntities = adminMenuMapper.selectList(menuEntityQueryWrapper);
-		// 查询所有菜单
-		QueryWrapper<AdminMenuEntity> menuEntityQueryWrapper = new QueryWrapper<>();
-		menuEntityQueryWrapper.select("*, name as label");
-		List<AdminMenuEntity> menuEntities = adminMenuMapper.selectList(menuEntityQueryWrapper);
-		for (AdminMenuEntity menuEntity : menuEntities) {
-			if (roleMuneIds.contains(menuEntity.getId())) {
-				menuEntity.setChecked(true);
-			} else {
-				menuEntity.setChecked(false);
-			}
-		}
-		List<AdminMenuEntity> returnMenuEntities = assemblyMenuData(adminMenuEntities);
-		adminRoleEntity.setMenuList(returnMenuEntities);*/
-		adminRoleEntity.setMenuIds(roleMenuIds);
+		adminRoleEntity.setId(permitRole.getId());
+		adminRoleEntity.setIdStr(String.valueOf(permitRole.getId()));
+		adminRoleEntity.setName(permitRole.getName());
+		adminRoleEntity.setRemark(permitRole.getRemark());
+		adminRoleEntity.setCreateTime(LocalDateTime.parse(permitRole.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+		adminRoleEntity.setMenuIds(menuIds);
 		return adminRoleEntity;
 	}
 

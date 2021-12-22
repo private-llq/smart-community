@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICarEquipmentManageService;
 import com.jsy.community.api.ICarLocationService;
@@ -85,7 +84,7 @@ public class CarEquipmentManageController {
     @CarOperation(operation = "新增了【设备管理】")
     @Permit("community:property:carEquipmentManage:addEquipment")
     public CommonResult addEquipment(@RequestBody CarEquipMentQO carEquipMentQO){
-     boolean b =  equipmentManageService.addEquipment(carEquipMentQO,UserUtils.getAdminCommunityId(),UserUtils.getUserId());
+     boolean b =  equipmentManageService.addEquipment(carEquipMentQO,UserUtils.getAdminCommunityId(),UserUtils.getId());
      return CommonResult.ok("添加成功");
     }
     /**
@@ -100,7 +99,7 @@ public class CarEquipmentManageController {
     @CarOperation(operation = "编辑了【设备管理】")
     @Permit("community:property:carEquipmentManage:updateEquipment")
     public CommonResult updateEquipment(@RequestBody CarEquipMentQO carEquipMentQO){
-        boolean b =  equipmentManageService.updateEquipment(carEquipMentQO,UserUtils.getAdminCommunityId(),UserUtils.getUserId());
+        boolean b =  equipmentManageService.updateEquipment(carEquipMentQO,UserUtils.getAdminCommunityId(),UserUtils.getId());
         return CommonResult.ok("修改成功");
     }
 

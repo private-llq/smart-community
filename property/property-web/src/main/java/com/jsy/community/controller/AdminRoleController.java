@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.AdminRoleService;
 import com.jsy.community.api.IAdminConfigService;
@@ -44,7 +43,8 @@ public class AdminRoleController {
 	public CommonResult addRole(@RequestBody AdminRoleEntity adminRoleEntity){
 		ValidatorUtils.validateEntity(adminRoleEntity);
 		adminRoleEntity.setCompanyId(UserUtils.getAdminCompanyId());
-		return adminConfigService.addRole(adminRoleEntity) ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
+		adminConfigService.addRole(adminRoleEntity);
+		return CommonResult.ok("添加成功");
 	}
 	
 	/**
@@ -57,8 +57,9 @@ public class AdminRoleController {
 	@DeleteMapping("")
 	@businessLog(operation = "删除",content = "删除了【角色】")
 	@Permit("community:property:role")
-	public CommonResult delRole(@RequestParam("id") Long id){
-		return adminConfigService.delRole(id,UserUtils.getAdminCompanyId()) ? CommonResult.ok("删除成功") : CommonResult.error("删除失败");
+	public CommonResult delRole(@RequestParam("id") List<Long> roleIds){
+		adminConfigService.delRole(roleIds, UserUtils.getAdminCompanyId());
+		return CommonResult.ok("删除成功");
 	}
 	
 	/**
@@ -76,7 +77,8 @@ public class AdminRoleController {
 			return CommonResult.error("缺少ID");
 		}
 		adminRoleQO.setCompanyId(UserUtils.getAdminCompanyId());
-		return adminConfigService.updateRole(adminRoleQO) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+		adminConfigService.updateRole(adminRoleQO);
+		return  CommonResult.ok("操作成功");
 	}
 	
 	/**

@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IPropertyAdvanceDepositService;
@@ -108,7 +107,7 @@ public class PropertyAdvanceDepositController {
         ValidatorUtils.validateEntity(propertyAdvanceDepositEntity);
         AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
         propertyAdvanceDepositEntity.setCommunityId(loginUser.getCommunityId());
-        propertyAdvanceDepositEntity.setUpdateBy(UserUtils.getUserId());
+        propertyAdvanceDepositEntity.setUpdateBy(UserUtils.getId());
         return propertyAdvanceDepositService.updateRechargePropertyAdvanceDeposit(propertyAdvanceDepositEntity)
             ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改预存款充值余额失败");
     }
@@ -171,7 +170,7 @@ public class PropertyAdvanceDepositController {
         //参数验证
         validFileSuffix(excel);
         Long adminCommunityId = UserUtils.getAdminCommunityId();
-        String userId = UserUtils.getUserId();
+        String userId = UserUtils.getId();
         ArrayList<AdvanceDepositImportErrorVO> errorVos = new ArrayList<>(32);
         List<PropertyAdvanceDepositEntity> propertyAdvanceDepositEntities = advanceDepositExcelHandler.importAdvanceDepositExcel(excel, errorVos);
         List<HouseEntity> allHouse = houseService.getAllHouse(adminCommunityId);

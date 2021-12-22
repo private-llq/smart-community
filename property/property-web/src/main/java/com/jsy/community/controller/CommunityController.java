@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.IPropertyCompanyService;
@@ -111,7 +110,7 @@ public class CommunityController {
         // 设置默认的社区房屋层级模式
         communityEntity.setHouseLevelMode(1);
         // 新增数据
-        Long communityId = communityService.addCommunity(communityEntity, UserUtils.getUserId());
+        Long communityId = communityService.addCommunity(communityEntity, UserUtils.getId());
         // 获取登录用户数据
         AdminInfoVo adminUserInfo = UserUtils.getAdminUserInfo();
         adminUserInfo.getCommunityIdList().add(String.valueOf(communityId));

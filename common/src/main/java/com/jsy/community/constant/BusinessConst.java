@@ -411,5 +411,26 @@ public interface BusinessConst {
      * 一天的毫秒数
      */
     long ONE_DAY = 1000 * 60 * 60 * 24;
-
+    
+    //============ 用户登录类型 ===============
+    /**
+     * E到家用户端登录
+     */
+    String E_HOME = "e_home";
+    /**
+     * 商家后台
+     */
+    String SHOP_ADMIN = "shop_admin";
+    /**
+     * 物业后台
+     */
+    String PROPERTY_ADMIN = "property_admin";
+    /**
+     * 小区管理员（目前阶段主要用来区分 物业后台管理员，和小区管理员页面角色）
+     */
+    String COMMUNITY_ADMIN = "community_admin";
+    /**
+     * 大后台
+     */
+    String ULTIMATE_ADMIN = "ultimate_admin";
 }

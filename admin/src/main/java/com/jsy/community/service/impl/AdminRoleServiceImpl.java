@@ -2,6 +2,7 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.admin.AdminRoleCompanyEntity;
 import com.jsy.community.entity.admin.AdminRoleEntity;
 import com.jsy.community.mapper.AdminRoleCompanyMapper;
@@ -60,7 +61,7 @@ public class AdminRoleServiceImpl implements AdminRoleService {
     @Transactional(rollbackFor = Exception.class)
     public void addRole(AdminRoleQO adminRoleQO){
     
-        PermitRole permitRole = baseRoleRpcService.createRole(adminRoleQO.getName(), adminRoleQO.getRemark(), "property_admin", 1460884237115367425L);
+        PermitRole permitRole = baseRoleRpcService.createRole(adminRoleQO.getName(), adminRoleQO.getRemark(), BusinessConst.PROPERTY_ADMIN, 1460884237115367425L);
         // 菜单分配给角色
         baseMenuRpcService.menuJoinRole(adminRoleQO.getMenuIds(), permitRole.getId(), 1460884237115367425L);
         // 查询菜单和权限绑定关系
@@ -170,7 +171,7 @@ public class AdminRoleServiceImpl implements AdminRoleService {
         Page<AdminRoleEntity> page = new Page<>();
         MyPageUtils.setPageAndSize(page, baseQO);
     
-        PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(query.getName(), "property_admin", baseQO.getPage().intValue(), baseQO.getSize().intValue());
+        PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(query.getName(), BusinessConst.PROPERTY_ADMIN, baseQO.getPage().intValue(), baseQO.getSize().intValue());
         if (CollectionUtils.isEmpty(permitRolePageVO.getData())) {
             return new PageVO<>();
         }

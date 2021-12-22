@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.Desensitization;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IHouseInfoService;
@@ -129,7 +128,7 @@ public class PropertyRelationController {
         List<RelationImportErrVO> errorVos = new LinkedList<>();
         List<RelationImportQO> list = membersHandler.importRelation(excel,errorVos);
         //导入数据库返回其中错误信息
-        List<RelationImportErrVO> errVOList = propertyRelationService.importRelation(list,UserUtils.getAdminCommunityId(),UserUtils.getUserId());
+        List<RelationImportErrVO> errVOList = propertyRelationService.importRelation(list,UserUtils.getAdminCommunityId(),UserUtils.getId());
         for (RelationImportErrVO errVO : errVOList) {
             errorVos.add(errVO);
         }

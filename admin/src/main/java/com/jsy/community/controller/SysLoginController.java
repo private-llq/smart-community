@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.admin.AdminLoginQO;
@@ -164,13 +165,13 @@ public class SysLoginController {
 		// 判断是不是验证码登陆,如果是,判断验证码正不正确
 		if(!StringUtils.isEmpty(form.getCode())){
 			checkVerifyCode(form.getAccount(),form.getCode());
-			loginVo = baseAuthRpcService.login("ultimate_admin", form.getAccount(), form.getCode(), "PHONE_CODE");
+			loginVo = baseAuthRpcService.login(BusinessConst.ULTIMATE_ADMIN, form.getAccount(), form.getCode(), "PHONE_CODE");
 		} else {
-			loginVo = baseAuthRpcService.login("ultimate_admin", form.getAccount(), RSAUtil.privateDecrypt(form.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), "PHONE_PWD");
+			loginVo = baseAuthRpcService.login(BusinessConst.ULTIMATE_ADMIN, form.getAccount(), RSAUtil.privateDecrypt(form.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), "PHONE_PWD");
 		}
 		log.info(form.getAccount() + "开始登录");
 		// 获取用户菜单
-		List<PermitMenu> userMenu = baseMenuRpcService.all(loginVo.getUserInfo().getId(), "ultimate_admin");
+		List<PermitMenu> userMenu = baseMenuRpcService.all(loginVo.getUserInfo().getId(), BusinessConst.ULTIMATE_ADMIN);
 		
 		//返回VO
 		SysInfoVo sysInfoVo = new SysInfoVo();
@@ -179,7 +180,7 @@ public class SysLoginController {
 		sysInfoVo.setRealName(loginVo.getUserInfo().getNickName());
 		
 		// 获取用户角色
-		List<PermitRole> userRoles = baseRoleRpcService.listAllRolePermission(loginVo.getUserInfo().getId(), "ultimate_admin");
+		List<PermitRole> userRoles = baseRoleRpcService.listAllRolePermission(loginVo.getUserInfo().getId(), BusinessConst.ULTIMATE_ADMIN);
 		if (userRoles != null && userRoles.size() > 0) {
 			sysInfoVo.setRoleId(userRoles.get(0).getId());
 		}

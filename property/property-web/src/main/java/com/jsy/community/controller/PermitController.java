@@ -1,5 +1,6 @@
 package com.jsy.community.controller;
 
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.qo.MenuQO;
 import com.jsy.community.qo.PermissionQO;
 import com.jsy.community.qo.PermitQO;
@@ -71,8 +72,22 @@ public class PermitController {
     @PostMapping("/createRole")
     @LoginIgnore
     public CommonResult createRole(@RequestBody RoleQO roleQO) {
-        PermitRole permitRole = baseRoleRpcService.createRole(roleQO.getName(), roleQO.getRemark(), "ultimate_admin", roleQO.getCreateUid());
+        PermitRole permitRole = baseRoleRpcService.createRole(roleQO.getName(), roleQO.getRemark(), BusinessConst.ULTIMATE_ADMIN, roleQO.getCreateUid());
         return CommonResult.ok(permitRole);
+    }
+    
+    /**
+     * @Description: 删除菜单
+     * @author: DKS
+     * @since: 2021/12/22 11:58
+     * @Param: []
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @DeleteMapping("/deleteMenu")
+    @LoginIgnore
+    public CommonResult deleteMenu(List<Long> menuIds) {
+        baseMenuRpcService.deleteMenu(menuIds);
+        return CommonResult.ok();
     }
     
     /**
@@ -127,7 +142,7 @@ public class PermitController {
     @GetMapping("/getPermit")
     @LoginIgnore
     public CommonResult getPermit(PermissionQO permissionQO) {
-        PermitDto permit = permitRpcService.getPermit(String.valueOf(permissionQO.getUid()), permissionQO.getAccount(), "ultimate_admin");
+        PermitDto permit = permitRpcService.getPermit(String.valueOf(permissionQO.getUid()), permissionQO.getAccount(), BusinessConst.ULTIMATE_ADMIN);
         return CommonResult.ok(permit);
     }
     
@@ -141,7 +156,7 @@ public class PermitController {
     @GetMapping("/listAllRolePermission")
     @LoginIgnore
     public CommonResult listAllRolePermission(Long uid) {
-        List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(uid, "ultimate_admin");
+        List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(uid, BusinessConst.ULTIMATE_ADMIN);
         return CommonResult.ok(permitRoles);
     }
     

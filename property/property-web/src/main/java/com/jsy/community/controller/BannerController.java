@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IBannerService;
 import com.jsy.community.constant.Const;
@@ -168,7 +167,7 @@ public class BannerController {
 	@Permit("community:property:banner")
 	public CommonResult updateBanner(@RequestBody BannerQO bannerQO){
 		ValidatorUtils.validateEntity(bannerQO,BannerQO.updateBannerValidatedGroup.class);
-		bannerQO.setOperator(UserUtils.getUserId());
+		bannerQO.setOperator(UserUtils.getId());
 		bannerQO.setCommunityId(UserUtils.getAdminCommunityId());
 		return bannerService.updateBanner(bannerQO) ? CommonResult.ok("操作成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
 	}

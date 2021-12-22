@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.api.*;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.UserAuthEntity;
@@ -158,7 +159,7 @@ public class AdminLoginController {
 		}
 		log.info(form.getAccount() + "开始登录");
 		// 获取用户菜单
-		List<PermitMenu> userMenu = baseMenuRpcService.all(loginVo.getUserInfo().getId(), "property_admin");
+		List<PermitMenu> userMenu = baseMenuRpcService.all(loginVo.getUserInfo().getId(), BusinessConst.PROPERTY_ADMIN);
 		
 		//用户资料
 //		AdminUserEntity userData = adminUserService.queryByUid(String.valueOf(loginVo.getUserInfo().getId()));
@@ -182,7 +183,7 @@ public class AdminLoginController {
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"无社区管理权限，请联系管理员添加社区权限");
 		}*/
 		// 获取用户角色
-		List<PermitRole> userRoles = baseRoleRpcService.listAllRolePermission(loginVo.getUserInfo().getId(), "property_admin");
+		List<PermitRole> userRoles = baseRoleRpcService.listAllRolePermission(loginVo.getUserInfo().getId(), BusinessConst.PROPERTY_ADMIN);
 		adminInfoVo.setRoleId(userRoles.get(0).getId());
 		/*//判断登录类型 (根据拥有权限的小区数量等于1是小区管理员账号 否则是物业公司账号)
 		if(adminCommunityList.size() == 1){
@@ -246,10 +247,10 @@ public class AdminLoginController {
 		List communityIds = UserUtils.getAdminCommunityIdList();
 		UserUtils.validateCommunityId(communityId);
 		//用户资料
-		AdminUserEntity user = adminUserService.queryByUid(UserUtils.getUserId());
+		AdminUserEntity user = adminUserService.queryByUid(UserUtils.getId());
 		//用户菜单
 //		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getAdminRoleId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
-		List<PermitMenu> userMenu = baseMenuRpcService.all(adminId, "property_admin");
+		List<PermitMenu> userMenu = baseMenuRpcService.all(adminId, BusinessConst.COMMUNITY_ADMIN);
 		//设置小区级菜单
 		user.setMenuList(userMenu);
 		user.setCompanyId(UserUtils.getAdminCompanyId());

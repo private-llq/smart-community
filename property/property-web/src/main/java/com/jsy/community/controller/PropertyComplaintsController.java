@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IPropertyComplaintsService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
@@ -43,7 +42,7 @@ public class PropertyComplaintsController {
     @PostMapping("/complainFeedback")
     @Permit("community:property:propertyComplaints:complainFeedback")
     public CommonResult complainFeedback(@RequestBody ComplainFeedbackQO complainFeedbackQO){
-        complainFeedbackQO.setUid(UserUtils.getUserId());
+        complainFeedbackQO.setUid(UserUtils.getId());
         propertyComplaintsService.complainFeedback(complainFeedbackQO);
         return CommonResult.ok();
     }

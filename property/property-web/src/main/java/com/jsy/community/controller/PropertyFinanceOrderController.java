@@ -705,7 +705,7 @@ public class PropertyFinanceOrderController {
         //参数验证
         validFileSuffix(excel);
         Long adminCommunityId = UserUtils.getAdminCommunityId();
-        String userId = UserUtils.getUserId();
+        String userId = UserUtils.getId();
         ArrayList<FinanceImportErrorVO> errorVos = new ArrayList<>(32);
         List<PropertyFinanceOrderEntity> propertyFinanceOrderEntities = financeExcel.importFinanceExcel(excel, errorVos);
         List<HouseEntity> allHouse = houseService.getAllHouse(adminCommunityId);

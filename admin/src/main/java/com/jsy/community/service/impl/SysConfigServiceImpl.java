@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.sys.SysMenuEntity;
 import com.jsy.community.entity.sys.SysRoleEntity;
 import com.jsy.community.entity.sys.SysUserRoleEntity;
@@ -312,7 +313,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
 //		}
 //		int result = sysRoleMapper.insert(sysRoleEntity);
 //        return result == 1;
-		PermitRole permitRole = baseRoleRpcService.createRole(sysRoleEntity.getName(), sysRoleEntity.getRemark(), "ultimate_admin", 1460884237115367425L);
+		PermitRole permitRole = baseRoleRpcService.createRole(sysRoleEntity.getName(), sysRoleEntity.getRemark(), BusinessConst.ULTIMATE_ADMIN, 1460884237115367425L);
 		// 菜单分配给角色
 		baseMenuRpcService.menuJoinRole(sysRoleEntity.getMenuIds(), permitRole.getId(), 1460884237115367425L);
 		// 查询菜单和权限绑定关系
@@ -393,7 +394,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	public List<SysRoleEntity> listOfRole(){
 //		return sysRoleMapper.selectList(new QueryWrapper<SysRoleEntity>().select("*
 		List<SysRoleEntity> sysRoleEntities = new ArrayList<>();
-		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage("", "ultimate_admin", 0, 999999999);
+		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage("", BusinessConst.ULTIMATE_ADMIN, 0, 999999999);
 		for (PermitRole permitRole : permitRolePageVO.getData()) {
 			SysRoleEntity sysRoleEntity = new SysRoleEntity();
 			sysRoleEntity.setId(permitRole.getId());
@@ -440,7 +441,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
 		Page<SysRoleEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page, baseQO);
 		
-		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(query.getName(), "ultimate_admin", baseQO.getPage().intValue(), baseQO.getSize().intValue());
+		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(query.getName(), BusinessConst.ULTIMATE_ADMIN, baseQO.getPage().intValue(), baseQO.getSize().intValue());
 		if (CollectionUtils.isEmpty(permitRolePageVO.getData())) {
 			return new PageVO<>();
 		}

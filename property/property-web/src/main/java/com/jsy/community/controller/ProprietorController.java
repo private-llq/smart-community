@@ -2,7 +2,6 @@ package com.jsy.community.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.IpLimit;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IHouseService;
@@ -119,7 +118,7 @@ public class ProprietorController {
         Integer row = 0;
         if(CollectionUtil.isNotEmpty(proprietors)){
             //获取管理员姓名 用于标识每条业主数据的创建人
-            String adminRealName = iProprietorService.getAdminRealName(UserUtils.getUserId());
+            String adminRealName = iProprietorService.getAdminRealName(UserUtils.getId());
             //验证房屋编号
             validUserHouse(proprietors, houseList, errorVos, adminRealName);
             //在验证房屋编号后 数据集合如果不为空 就做数据库导入
@@ -395,7 +394,7 @@ public class ProprietorController {
     @Permit("community:property:proprietor")
     public CommonResult<Boolean> update(@RequestBody ProprietorQO qo) {
         ValidatorUtils.validateEntity(qo, ProprietorQO.PropertyUpdateValid.class);
-        return iProprietorService.update(qo, UserUtils.getUserId()) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        return iProprietorService.update(qo, UserUtils.getId()) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
     @PostMapping("/addUser")
@@ -405,7 +404,7 @@ public class ProprietorController {
     public CommonResult<Boolean> addUser(@RequestBody ProprietorQO qo) {
         qo.setCommunityId(UserUtils.getAdminCommunityId());
         ValidatorUtils.validateEntity(qo, ProprietorQO.PropertyAddValid.class);
-        iProprietorService.addUser(qo, UserUtils.getUserId());
+        iProprietorService.addUser(qo, UserUtils.getId());
         return CommonResult.ok("新增成功!");
     }
 

@@ -154,7 +154,7 @@ public class SysUserController {
 	 * @Date: 2021/10/13
 	 **/
 	@PostMapping("query")
-//	@Permit("community:admin:sys:user:query")
+	@Permit("community:admin:sys:user:query")
 	public CommonResult queryOperator(@RequestBody BaseQO<SysUserQO> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new SysUserQO());

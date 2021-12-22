@@ -2,6 +2,7 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.entity.admin.AdminUserCompanyEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
@@ -71,7 +72,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 		Page<AdminUserEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page, baseQO);
 		
-		PageVO<UserDetail> userDetailPageVO = userInfoRpcService.queryUser(query.getPhone(), "","property_admin", null, baseQO.getPage().intValue(), baseQO.getSize().intValue());
+		PageVO<UserDetail> userDetailPageVO = userInfoRpcService.queryUser(query.getPhone(), "", BusinessConst.PROPERTY_ADMIN, null, baseQO.getPage().intValue(), baseQO.getSize().intValue());
 		
 		if (CollectionUtils.isEmpty(userDetailPageVO.getData())) {
 			return new PageVO<>();
@@ -138,7 +139,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 		// 增加用户
 		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getPhone(), adminUserQO.getPassword());
 		// 增加登录类型范围为物业中台
-		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), "property_admin");
+		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN);
 		// 绑定用户和角色
 //		List<Long> roleIds = new ArrayList<>();
 //		roleIds.add(adminUserQO.getRoleId());
@@ -163,7 +164,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 	public void updateOperator(AdminUserQO adminUserQO){
 		//更新资料
 		baseUpdateUserRpcService.updateUserInfo(adminUserQO.getId(), adminUserQO.getNickName(),
-			adminUserQO.getPhone(), adminUserQO.getPassword(), "property_admin");
+			adminUserQO.getPhone(), adminUserQO.getPassword(), BusinessConst.PROPERTY_ADMIN);
 	}
 	
 	/**

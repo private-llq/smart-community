@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.sys.SysUserAuthEntity;
 import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.exception.JSYError;
@@ -409,7 +410,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		Page<SysUserEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page, baseQO);
 		
-		PageVO<UserDetail> userDetailPageVO = userInfoRpcService.queryUser(query.getPhone(), "", "ultimate_admin", query.getRoleId(), baseQO.getPage().intValue(), baseQO.getSize().intValue());
+		PageVO<UserDetail> userDetailPageVO = userInfoRpcService.queryUser(query.getPhone(), "", BusinessConst.ULTIMATE_ADMIN, query.getRoleId(), baseQO.getPage().intValue(), baseQO.getSize().intValue());
 		
 		if (CollectionUtils.isEmpty(userDetailPageVO.getData())) {
 			return new PageVO<>();
@@ -418,7 +419,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		// 补充数据
 		for (UserDetail userDetail : userDetailPageVO.getData()) {
 			SysUserEntity sysUserEntity = new SysUserEntity();
-			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(userDetail.getId(), "ultimate_admin");
+			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(userDetail.getId(), BusinessConst.ULTIMATE_ADMIN);
 			sysUserEntity.setId(userDetail.getId());
 			sysUserEntity.setIdStr(String.valueOf(userDetail.getId()));
 			sysUserEntity.setNickname(userDetail.getNickName());
@@ -448,7 +449,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		// 增加用户
 		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(sysUserQO.getNickName(), sysUserQO.getPhone(), sysUserQO.getPassword());
 		// 增加登录类型范围为物业大后台
-		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), "ultimate_admin");
+		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.ULTIMATE_ADMIN);
 		// 先移除大后台默认角色，再给用户添加角色
 		List<Long> roleId = new ArrayList<>();
 		roleId.add(1463327674104250369L);
@@ -469,7 +470,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	public void updateOperator(SysUserQO sysUserQO){
 		//更新资料
 		baseUpdateUserRpcService.updateUserInfo(sysUserQO.getId(), sysUserQO.getNickName(),
-			sysUserQO.getPhone(), sysUserQO.getPassword(), "ultimate_admin");
+			sysUserQO.getPhone(), sysUserQO.getPassword(), BusinessConst.ULTIMATE_ADMIN);
 	}
 	
 	/**

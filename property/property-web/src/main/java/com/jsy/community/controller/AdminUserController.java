@@ -115,7 +115,7 @@ public class AdminUserController {
 //		}
 //		AdminInfoVo adminInfo = UserUtils.getAdminInfo(token);
 //		sysUserEntity.setCreateUserName(adminInfo.getRealName());//邀请者姓名
-//		sysUserEntity.setCreateUserId(UserUtils.getUserId());//邀请者uid
+//		sysUserEntity.setCreateUserId(UserUtils.getId());//邀请者uid
 //		Map<String, String> resultMap = adminUserService.invitation(sysUserEntity);
 //		return Boolean.parseBoolean(resultMap.get("result")) ? CommonResult.ok() : CommonResult.error(JSYError.REQUEST_PARAM.getCode(),resultMap.get("reason"));
 //	}
@@ -225,7 +225,7 @@ public class AdminUserController {
 //		baseQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
 		baseQO.getQuery().setCommunityIdList(UserUtils.getAdminCommunityIdList());
 		baseQO.getQuery().setCompanyId(UserUtils.getAdminCompanyId());
-		baseQO.getQuery().setUid(UserUtils.getUserId());
+		baseQO.getQuery().setUid(UserUtils.getId());
 		return CommonResult.ok(adminUserService.queryOperator(baseQO));
 	}
 	
@@ -292,7 +292,7 @@ public class AdminUserController {
 	@GetMapping("/community/list")
 	@Permit("community:property:sys:user:community:list")
 	public CommonResult queryUserCommunityList(){
-		List<Long> adminCommunityIdList = adminConfigService.queryAdminCommunityIdListByUid(UserUtils.getUserId());
+		List<Long> adminCommunityIdList = adminConfigService.queryAdminCommunityIdListByUid(UserUtils.getId());
 		if(CollectionUtils.isEmpty(adminCommunityIdList)){
 			return CommonResult.ok("暂无数据");
 		}
@@ -316,7 +316,7 @@ public class AdminUserController {
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"图片格式错误");
 		}
 		String url = MinioUtils.upload(file, PropertyConsts.BUCKET_NAME_AVATAR);
-		boolean result = adminUserService.updateAvatar(url,UserUtils.getUserId());
+		boolean result = adminUserService.updateAvatar(url,UserUtils.getId());
 		return result ? CommonResult.ok(url,"操作成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
 
 
@@ -332,7 +332,7 @@ public class AdminUserController {
 	@GetMapping("info")
 	@Permit("community:property:sys:user:info")
 	public CommonResult queryPersonalData(){
-		return CommonResult.ok(adminUserService.queryPersonalData(UserUtils.getUserId()),"查询成功");
+		return CommonResult.ok(adminUserService.queryPersonalData(UserUtils.getId()),"查询成功");
 	}
 	
 	/**
@@ -350,7 +350,7 @@ public class AdminUserController {
 	@Permit("community:property:sys:user:password")
 	public CommonResult<Boolean> updatePassword(@RequestAttribute(value = "body") String body) {
 		ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
-		String uid = UserUtils.getUserId();
+		String uid = UserUtils.getId();
 		if(uid == null){  //忘记密码
 			ValidatorUtils.validateEntity(qo,ResetPasswordQO.forgetPassVGroup.class);
 		}else{  //在线修改密码
@@ -359,7 +359,7 @@ public class AdminUserController {
 		if (!qo.getPassword().equals(qo.getConfirmPassword())) {
 			throw new JSYException("两次密码不一致");
 		}
-		boolean b = adminUserService.updatePassword(qo,UserUtils.getUserId());
+		boolean b = adminUserService.updatePassword(qo,UserUtils.getId());
 		if(b){
 			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 			String authToken = request.getHeader("authToken");
@@ -396,7 +396,7 @@ public class AdminUserController {
 		
 
 		//从请求获取uid
-		String uid = UserUtils.getUserId();
+		String uid = UserUtils.getId();
 		//获取当前用户手机号
 		String oldMobile = adminUserService.queryMobileByUid(uid);
 		if(newMobile.equals(oldCode)){

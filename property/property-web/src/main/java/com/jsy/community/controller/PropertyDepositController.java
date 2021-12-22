@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyDepositService;
 import com.jsy.community.constant.BusinessConst;
@@ -75,7 +74,7 @@ public class PropertyDepositController {
         ValidatorUtils.validateEntity(propertyDepositEntity);
         AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
         propertyDepositEntity.setCommunityId(loginUser.getCommunityId());
-        propertyDepositEntity.setUpdateBy(UserUtils.getUserId());
+        propertyDepositEntity.setUpdateBy(UserUtils.getId());
         return propertyDepositService.updatePropertyDeposit(propertyDepositEntity)
             ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改物业押金账单失败");
     }
