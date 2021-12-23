@@ -32,6 +32,9 @@ public class UserInfoVo implements Serializable {
 	@ApiModelProperty("是否绑定支付宝1已绑定，0未绑定")
 	private Integer isBindAlipay;
 
+	@ApiModelProperty("是否绑定IOS1已绑定，0未绑定")
+	private Integer isBindIos;
+
 	@ApiModelProperty("是否设置支付密码1已绑定，0未绑定")
 	private Integer isBindPayPassword;
 
