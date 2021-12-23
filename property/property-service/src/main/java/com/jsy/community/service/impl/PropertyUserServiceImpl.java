@@ -97,16 +97,14 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 
 	@Override
 	public String selectUserUID(String phone, String username) {
-		QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("mobile",phone);
-		wrapper.eq("real_name",username);
-		UserEntity userEntity = baseMapper.selectOne(wrapper);
-		String UUID="";
-		if (userEntity!=null) {
-			UUID=userEntity.getUid();
+		Set<String> strings = baseUserInfoRpcService.queryRealUserDetail(phone, username);
+		if (!CollectionUtils.isEmpty(strings) && strings.size() != 1) {
+			throw new PropertyException("查找到的相关用户不唯一");
 		}
-
-
+		String UUID="";
+		if (!CollectionUtils.isEmpty(strings)) {
+			UUID = strings.iterator().next();
+		}
 		return UUID;
 	}
 
@@ -230,7 +228,7 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 				}
 			}
 		}
-		Integer count = baseMapper.queryFacePageListCount(baseQO.getQuery());
+		Integer count = userFaceMapper.queryFacePageListCount(baseQO.getQuery(), uidList);
 		count = count == null ? 0 : count;
 		pageInfo.setSize(baseQO.getSize());
 		pageInfo.setTotal(count);
@@ -387,7 +385,6 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 	@Transactional(rollbackFor = Exception.class)
 	public Integer addFace(UserEntity userEntity, Long communityId) {
 		// 查询用户信息
-		// TODO: 2021/12/22 需要刘金荣提供查询接口,主要是返回uid
 		Set<String> uidSet = baseUserInfoRpcService.queryRealUserDetail(userEntity.getMobile(), userEntity.getRealName());
 		if (CollectionUtils.isEmpty(uidSet)) {
 			throw new PropertyException("未找到该用户");

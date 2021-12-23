@@ -24,6 +24,7 @@ import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.property.ProprietorVO;
+import com.zhsj.base.api.entity.RealUserDetail;
 import jodd.util.StringUtil;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -636,11 +637,11 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
             createUidSet.add(houseEntity.getCreateBy());
             updateUidSet.add(houseEntity.getUpdateBy());
         }
-        Map<String, Map<String, String>> createUserMap = adminUserService.queryNameByUidBatch(createUidSet);
-        Map<String, Map<String, String>> updateUserMap = adminUserService.queryNameByUidBatch(updateUidSet);
+        Map<String, RealUserDetail> createUserMap = adminUserService.queryNameByUidBatch(createUidSet);
+        Map<String, RealUserDetail> updateUserMap = adminUserService.queryNameByUidBatch(updateUidSet);
         for (HouseEntity houseEntity : pageData.getRecords()) {
-            houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()) == null ? null : createUserMap.get(houseEntity.getCreateBy()).get("name"));
-            houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()) == null ? null : updateUserMap.get(houseEntity.getUpdateBy()).get("name"));
+            houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()) == null ? null : createUserMap.get(houseEntity.getCreateBy()).getRealName());
+            houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()) == null ? null : updateUserMap.get(houseEntity.getUpdateBy()).getRealName());
             // 补充pidStr
             houseEntity.setPidStr(String.valueOf(houseEntity.getPid()));
         }
@@ -1345,11 +1346,11 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
             createUidSet.add(houseEntity.getCreateBy());
             updateUidSet.add(houseEntity.getUpdateBy());
         }
-        Map<String, Map<String, String>> createUserMap = adminUserService.queryNameByUidBatch(createUidSet);
-        Map<String, Map<String, String>> updateUserMap = adminUserService.queryNameByUidBatch(updateUidSet);
+        Map<String, RealUserDetail> createUserMap = adminUserService.queryNameByUidBatch(createUidSet);
+        Map<String, RealUserDetail> updateUserMap = adminUserService.queryNameByUidBatch(updateUidSet);
         for (HouseEntity houseEntity : houseEntities) {
-            houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()) == null ? null : createUserMap.get(houseEntity.getCreateBy()).get("name"));
-            houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()) == null ? null : updateUserMap.get(houseEntity.getUpdateBy()).get("name"));
+            houseEntity.setCreateBy(createUserMap.get(houseEntity.getCreateBy()) == null ? null : createUserMap.get(houseEntity.getCreateBy()).getRealName());
+            houseEntity.setUpdateBy(updateUserMap.get(houseEntity.getUpdateBy()) == null ? null : updateUserMap.get(houseEntity.getUpdateBy()).getRealName());
         }
         return houseEntities;
     }

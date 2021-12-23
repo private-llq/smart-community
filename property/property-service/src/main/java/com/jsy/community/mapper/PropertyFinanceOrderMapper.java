@@ -257,7 +257,7 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      *@Return: java.util.List<>
      *@Date: 2021/8/24 15:55
      **/
-    List<CommunitySurveyEntity> chargeByDate(LocalDate startTime, LocalDate endTime, Long communityId);
+    List<CommunitySurveyEntity> chargeByDate(@Param("startTime") LocalDate startTime, @Param("endTime") LocalDate endTime, @Param("communityId") Long communityId);
 
     /**
      *@Author: DKS
@@ -265,7 +265,7 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      *@Param: startTime,endTime,communityId:
      *@Date: 2021/8/24 15:55
      **/
-    BigDecimal chargeByMonth(LocalDate startTime, LocalDate endTime, Long communityId);
+    BigDecimal chargeByMonth(@Param("startTime") LocalDate startTime, @Param("endTime") LocalDate endTime, @Param("communityId") Long communityId);
 
     /**
      *@Author: DKS

@@ -7,6 +7,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.PageInfo;
+import com.zhsj.base.api.entity.RealUserDetail;
 
 import java.util.Collection;
 import java.util.List;
@@ -171,7 +172,7 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/4/1
 	**/
-	Map<String,Map<String,String>> queryNameByUidBatch(Collection<String> uidList);
+	Map<String, RealUserDetail> queryNameByUidBatch(Collection<String> uidList);
 	
 	/**
 	 * @Description: 查询用户菜单id列表

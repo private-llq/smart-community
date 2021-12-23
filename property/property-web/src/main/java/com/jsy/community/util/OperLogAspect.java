@@ -62,8 +62,7 @@ public class OperLogAspect {
         Method method = signature.getMethod();
         //根据uid查询用户角色id
         String userId = UserUtils.getId();//用户id
-
-        Long roleId = adminUserRoleService.selectRoleIdByUserId(userId);
+        Long roleId = adminUserRoleService.selectRoleIdByUserId(userId, UserUtils.getAdminCompanyId());
 
 
         // 获取操作
