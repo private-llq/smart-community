@@ -36,6 +36,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,6 +173,8 @@ public class SysLoginController {
 		log.info(form.getAccount() + "开始登录");
 		// 获取用户菜单
 		List<PermitMenu> userMenu = baseMenuRpcService.all(loginVo.getUserInfo().getId(), BusinessConst.ULTIMATE_ADMIN);
+		// list排序
+		userMenu.sort(Comparator.comparing(PermitMenu::getSort));
 		
 		//返回VO
 		SysInfoVo sysInfoVo = new SysInfoVo();
@@ -186,7 +189,7 @@ public class SysLoginController {
 		}
 		
 		//设置菜单
-		if (userMenu != null && userMenu.size() > 0) {
+		if (userMenu.size() > 0) {
 			sysInfoVo.setMenuList(userMenu);
 		}
 		

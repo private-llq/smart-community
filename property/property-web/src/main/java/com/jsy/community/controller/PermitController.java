@@ -9,10 +9,8 @@ import com.jsy.community.vo.CommonResult;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.domain.MenuPermission;
 import com.zhsj.base.api.domain.PermitRole;
-import com.zhsj.base.api.rpc.IBaseMenuPermissionRpcService;
-import com.zhsj.base.api.rpc.IBaseMenuRpcService;
-import com.zhsj.base.api.rpc.IBasePermissionRpcService;
-import com.zhsj.base.api.rpc.IBaseRoleRpcService;
+import com.zhsj.base.api.entity.RealUserDetail;
+import com.zhsj.base.api.rpc.*;
 import com.zhsj.basecommon.PermitDto;
 import com.zhsj.basecommon.constant.BaseConstant;
 import com.zhsj.baseweb.annotation.LoginIgnore;
@@ -43,6 +41,10 @@ public class PermitController {
     private IPermitRpcService permitRpcService;
     @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
     private IBaseMenuPermissionRpcService baseMenuPermissionRpcService;
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseUserInfoRpcService userInfoRpcService;
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseAuthRpcService baseAuthRpcService;
 
     /***
      * @author: Pipi
@@ -185,5 +187,33 @@ public class PermitController {
     public CommonResult listByIds(@RequestParam List<Long> idList) {
         List<MenuPermission> menuPermissions = baseMenuPermissionRpcService.listByIds(idList);
         return CommonResult.ok(menuPermissions);
+    }
+    
+    /**
+     * @Description: 通过uid列表查询电话号码和真实姓名的接口
+     * @author: DKS
+     * @since: 2021/12/23 14:17
+     * @Param: [idList]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @GetMapping("/getRealUserDetailsByUid")
+    @LoginIgnore
+    public CommonResult getRealUserDetailsByUid(@RequestParam("idList") List<Long> idList) {
+        List<RealUserDetail> realUserDetailsByUid = userInfoRpcService.getRealUserDetailsByUid(idList);
+        return CommonResult.ok(realUserDetailsByUid);
+    }
+    
+    /**
+     * @Description: 增加登录类型范围
+     * @author: DKS
+     * @since: 2021/12/20 11:11
+     * @Param: [entityList]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @GetMapping("/addLoginTypeScope")
+    @LoginIgnore
+    public CommonResult addLoginTypeScope(@RequestParam("id") Long id) {
+        baseAuthRpcService.addLoginTypeScope(id, BusinessConst.COMMUNITY_ADMIN);
+        return CommonResult.ok();
     }
 }

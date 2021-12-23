@@ -231,12 +231,12 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	
 	/**
 	* @Description: 添加操作员
-	 * @Param: [adminUserEntity]
+	 * @Param: [adminUserQO]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2021/3/17
 	**/
-	void addOperator(AdminUserEntity adminUserEntity);
+	void addOperator(AdminUserQO adminUserQO);
 	
 	/**
 	* @Description: 编辑操作员
