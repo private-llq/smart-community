@@ -313,16 +313,16 @@ public class SysConfigServiceImpl implements ISysConfigService {
 //		}
 //		int result = sysRoleMapper.insert(sysRoleEntity);
 //        return result == 1;
-		PermitRole permitRole = baseRoleRpcService.createRole(sysRoleEntity.getName(), sysRoleEntity.getRemark(), BusinessConst.ULTIMATE_ADMIN, 1460884237115367425L);
+		PermitRole permitRole = baseRoleRpcService.createRole(sysRoleEntity.getName(), sysRoleEntity.getRemark(), BusinessConst.ULTIMATE_ADMIN, sysRoleEntity.getId());
 		// 菜单分配给角色
-		baseMenuRpcService.menuJoinRole(sysRoleEntity.getMenuIds(), permitRole.getId(), 1460884237115367425L);
+		baseMenuRpcService.menuJoinRole(sysRoleEntity.getMenuIds(), permitRole.getId(), sysRoleEntity.getId());
 		// 查询菜单和权限绑定关系
 		List<MenuPermission> menuPermissions = baseMenuPermissionRpcService.listByIds(sysRoleEntity.getMenuIds());
 		List<Long> permisIds = new ArrayList<>();
 		for (MenuPermission menuPermission : menuPermissions) {
 			permisIds.add(menuPermission.getPermisId());
 		}
-		permissionRpcService.permitJoinRole(permisIds, permitRole.getId(), 1460884237115367425L);
+		permissionRpcService.permitJoinRole(permisIds, permitRole.getId(), sysRoleEntity.getId());
 	}
 	
 	/**
@@ -349,7 +349,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Date: 2020/12/14
 	 **/
 	@Override
-	public void updateRole(SysRoleQO sysRoleOQ){
+	public void updateRole(SysRoleQO sysRoleOQ, Long id){
 //		SysRoleEntity entity = new SysRoleEntity();
 //		BeanUtils.copyProperties(sysRoleOQ,entity);
 //		//更新角色菜单
@@ -364,7 +364,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
 		if (org.apache.commons.lang3.StringUtils.isNotBlank(sysRoleOQ.getRemark())) {
 			updateRoleDto.setRemark(sysRoleOQ.getRemark());
 		}
-		updateRoleDto.setUpdateUid(1460884237115367425L);
+		updateRoleDto.setUpdateUid(id);
 		// 修改角色
 		baseRoleRpcService.updateRole(updateRoleDto);
 		// 需要更改角色的菜单
@@ -379,7 +379,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
 			// 移除角色下的菜单id列表
 			baseMenuRpcService.roleRemoveMenu(sysRoleOQ.getId(), menuIdsList);
 			// 新菜单分配给角色
-			baseMenuRpcService.menuJoinRole(sysRoleOQ.getMenuIds(), sysRoleOQ.getId(), 1460884237115367425L);
+			baseMenuRpcService.menuJoinRole(sysRoleOQ.getMenuIds(), sysRoleOQ.getId(), id);
 		}
     }
 	

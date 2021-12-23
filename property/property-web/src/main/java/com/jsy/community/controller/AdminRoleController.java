@@ -42,6 +42,7 @@ public class AdminRoleController {
 	@Permit("community:property:role")
 	public CommonResult addRole(@RequestBody AdminRoleEntity adminRoleEntity){
 		ValidatorUtils.validateEntity(adminRoleEntity);
+		adminRoleEntity.setId(Long.valueOf(UserUtils.getId()));
 		adminRoleEntity.setCompanyId(UserUtils.getAdminCompanyId());
 		adminConfigService.addRole(adminRoleEntity);
 		return CommonResult.ok("添加成功");
@@ -76,8 +77,9 @@ public class AdminRoleController {
 		if(adminRoleQO.getId() == null){
 			return CommonResult.error("缺少ID");
 		}
+		String id = UserUtils.getId();
 		adminRoleQO.setCompanyId(UserUtils.getAdminCompanyId());
-		adminConfigService.updateRole(adminRoleQO);
+		adminConfigService.updateRole(adminRoleQO, Long.valueOf(id));
 		return  CommonResult.ok("操作成功");
 	}
 	

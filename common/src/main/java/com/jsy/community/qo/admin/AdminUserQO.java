@@ -50,8 +50,11 @@ public class AdminUserQO implements Serializable {
 	// 公司ID
 	private Long companyId;
 
-	// 角色ID
+	// 物业角色ID
 	private Long roleId;
+	
+	// 小区角色ID
+	private Long communityRoleId;
 	
 	@ApiModelProperty(value = "物业公司名称")
 	private String companyName;

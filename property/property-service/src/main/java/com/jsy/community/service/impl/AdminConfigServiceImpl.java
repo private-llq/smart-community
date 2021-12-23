@@ -208,16 +208,18 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 //			setRoleMenus(adminRoleEntity.getMenuIds(),adminRoleEntity.getId());
 //		}
 //		return adminRoleMapper.insert(adminRoleEntity) == 1;
-		PermitRole permitRole = baseRoleRpcService.createRole(adminRoleEntity.getName(), adminRoleEntity.getRemark(), BusinessConst.PROPERTY_ADMIN, 1460884237115367425L);
+		PermitRole permitRole = baseRoleRpcService.createRole(adminRoleEntity.getName(), adminRoleEntity.getRemark(),
+			adminRoleEntity.getRoleType() == 1 ? BusinessConst.PROPERTY_ADMIN : BusinessConst.COMMUNITY_ADMIN, adminRoleEntity.getId());
 		// 菜单分配给角色
-		baseMenuRpcService.menuJoinRole(adminRoleEntity.getMenuIds(), permitRole.getId(), 1460884237115367425L);
+		baseMenuRpcService.menuJoinRole(adminRoleEntity.getMenuIds(), permitRole.getId(), adminRoleEntity.getId());
 		// 查询菜单和权限绑定关系
 		List<MenuPermission> menuPermissions = baseMenuPermissionRpcService.listByIds(adminRoleEntity.getMenuIds());
-		List<Long> permisIds = new ArrayList<>();
+		Set<Long> permisIds = new HashSet<>();
 		for (MenuPermission menuPermission : menuPermissions) {
 			permisIds.add(menuPermission.getPermisId());
 		}
-		permissionRpcService.permitJoinRole(permisIds, permitRole.getId(), 1460884237115367425L);
+		// 权限绑定到角色
+		permissionRpcService.permitJoinRole((List<Long>) permisIds, permitRole.getId(), adminRoleEntity.getId());
 		// 新增角色和物业公司关联信息
 		AdminRoleCompanyEntity entity = new AdminRoleCompanyEntity();
 		entity.setId(SnowFlake.nextId());
@@ -250,7 +252,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 **/
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void updateRole(AdminRoleQO adminRoleOQ){
+	public void updateRole(AdminRoleQO adminRoleOQ, Long id){
 //		AdminRoleEntity entity = new AdminRoleEntity();
 //		BeanUtils.copyProperties(adminRoleOQ,entity);
 //		entity.setCompanyId(null);
@@ -265,7 +267,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		if (org.apache.commons.lang3.StringUtils.isNotBlank(adminRoleOQ.getRemark())) {
 			updateRoleDto.setRemark(adminRoleOQ.getRemark());
 		}
-		updateRoleDto.setUpdateUid(1460884237115367425L);
+		updateRoleDto.setUpdateUid(id);
 		// 修改角色
 		baseRoleRpcService.updateRole(updateRoleDto);
 		// 需要更改角色的菜单
@@ -280,7 +282,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			// 移除角色下的菜单id列表
 			baseMenuRpcService.roleRemoveMenu(adminRoleOQ.getId(), menuIdsList);
 			// 新菜单分配给角色
-			baseMenuRpcService.menuJoinRole(adminRoleOQ.getMenuIds(), adminRoleOQ.getId(), 1460884237115367425L);
+			baseMenuRpcService.menuJoinRole(adminRoleOQ.getMenuIds(), adminRoleOQ.getId(), id);
 		}
 	}
 
@@ -319,7 +321,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		Page<AdminRoleEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page, baseQO);
 		
-		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(query.getName(), BusinessConst.PROPERTY_ADMIN, baseQO.getPage().intValue(), baseQO.getSize().intValue());
+		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(baseQO.getPage().intValue(), baseQO.getSize().intValue(), query.getName(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
 		if (CollectionUtils.isEmpty(permitRolePageVO.getData())) {
 			return new PageVO<>();
 		}

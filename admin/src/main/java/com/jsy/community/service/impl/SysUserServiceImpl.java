@@ -449,14 +449,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		// 增加用户
 		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(sysUserQO.getNickName(), sysUserQO.getPhone(), sysUserQO.getPassword());
 		// 增加登录类型范围为物业大后台
-		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.ULTIMATE_ADMIN);
+		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.ULTIMATE_ADMIN, false);
 		// 先移除大后台默认角色，再给用户添加角色
-		List<Long> roleId = new ArrayList<>();
-		roleId.add(1463327674104250369L);
-		baseRoleRpcService.roleRemoveToUser(roleId, userDetail.getId());
+//		List<Long> roleId = new ArrayList<>();
+//		roleId.add(1463327674104250369L);
+//		baseRoleRpcService.roleRemoveToUser(roleId, userDetail.getId());
 		List<Long> roleIds = new ArrayList<>();
 		roleIds.add(sysUserQO.getRoleId());
-		baseRoleRpcService.userJoinRole(roleIds, userDetail.getId(), 1460884237115367425L);
+		baseRoleRpcService.userJoinRole(roleIds, userDetail.getId(), sysUserQO.getId());
 	}
 	
 	/**
