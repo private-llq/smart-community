@@ -94,7 +94,9 @@ public class SmsSendRecordServiceImpl extends ServiceImpl<SmsSendRecordMapper, S
 		if (query.getCommunityId() != null) {
 			queryWrapper.eq("community_id", query.getCommunityId());
 		} else {
-			queryWrapper.in("community_id", adminCommunityIdList);
+			if (!CollectionUtils.isEmpty(adminCommunityIdList)) {
+				queryWrapper.in("community_id", adminCommunityIdList);
+			}
 		}
 		queryWrapper.orderByDesc("create_time");
 		Page<SmsSendRecordEntity> pageData = smsSendRecordMapper.selectPage(page, queryWrapper);

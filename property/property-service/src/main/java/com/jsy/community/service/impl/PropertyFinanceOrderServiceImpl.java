@@ -833,7 +833,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             DepositWrapper.eq("community_id", qo.getCommunityId());
         } else {
-            DepositWrapper.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                DepositWrapper.in("community_id", communityIdList);
+            }
         }
         DepositWrapper.eq("deleted", 0);
         // 查询一段时间内押金实体
@@ -872,7 +874,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             advanceDepositRecordWrapper.eq("community_id", qo.getCommunityId());
         } else {
-            advanceDepositRecordWrapper.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                advanceDepositRecordWrapper.in("community_id", communityIdList);
+            }
         }
         advanceDepositRecordWrapper.eq("deleted", 0);
         // 查询一段时间内预存款实体
@@ -913,7 +917,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             financeOrderWrapper.eq("community_id", qo.getCommunityId());
         } else {
-            financeOrderWrapper.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                financeOrderWrapper.in("community_id", communityIdList);
+            }
         }
         financeOrderWrapper.eq("deleted", 0);
         // 查询一段时间内小区账单实体
@@ -1300,7 +1306,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 communityIds.add(String.valueOf(qo.getCommunityId()));
                 FeeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIds, qo.getFeeRuleName());
             } else {
-                FeeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIdList, qo.getFeeRuleName());
+                if (!CollectionUtils.isEmpty(communityIdList)) {
+                    FeeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIdList, qo.getFeeRuleName());
+                }
             }
         }
 
@@ -1315,7 +1323,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             queryWrapper.eq("community_id", qo.getCommunityId());
         } else {
-            queryWrapper.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                queryWrapper.in("community_id", communityIdList);
+            }
         }
         if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             queryWrapper.in("fee_rule_id", FeeRuleIdList);
@@ -1351,7 +1361,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             query.eq("community_id", qo.getCommunityId());
         } else {
-            query.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                query.in("community_id", communityIdList);
+            }
         }
         if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             query.in("fee_rule_id", FeeRuleIdList);
@@ -1382,7 +1394,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             wrapper.eq("community_id", qo.getCommunityId());
         } else {
-            wrapper.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                wrapper.in("community_id", communityIdList);
+            }
         }
         if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             wrapper.in("fee_rule_id", FeeRuleIdList);
@@ -1413,7 +1427,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             entityQueryWrapper.eq("community_id", qo.getCommunityId());
         } else {
-            entityQueryWrapper.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                entityQueryWrapper.in("community_id", communityIdList);
+            }
         }
         if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             entityQueryWrapper.in("fee_rule_id", FeeRuleIdList);
@@ -1444,7 +1460,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             orderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
         } else {
-            orderEntityQueryWrapper.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                orderEntityQueryWrapper.in("community_id", communityIdList);
+            }
         }
         if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             orderEntityQueryWrapper.in("fee_rule_id", FeeRuleIdList);
@@ -1475,7 +1493,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             wrapper1.eq("community_id", qo.getCommunityId());
         } else {
-            wrapper1.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                wrapper1.in("community_id", communityIdList);
+            }
         }
         if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             wrapper1.in("fee_rule_id", FeeRuleIdList);
@@ -1506,7 +1526,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             queryWrapper1.eq("community_id", qo.getCommunityId());
         } else {
-            queryWrapper1.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                queryWrapper1.in("community_id", communityIdList);
+            }
         }
         if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             queryWrapper1.in("fee_rule_id", FeeRuleIdList);
