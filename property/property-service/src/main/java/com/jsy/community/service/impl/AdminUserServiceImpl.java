@@ -17,27 +17,25 @@ import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.admin.AdminCommunityEntity;
 import com.jsy.community.entity.admin.AdminUserAuthEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
-import com.jsy.community.entity.admin.AdminUserRoleEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.AdminCommunityMapper;
 import com.jsy.community.mapper.AdminUserAuthMapper;
 import com.jsy.community.mapper.AdminUserMapper;
-import com.jsy.community.mapper.AdminUserRoleMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.util.Constant;
 import com.jsy.community.util.SimpleMailSender;
 import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.RSAUtil;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.shiro.crypto.hash.Sha256Hash;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -81,10 +79,10 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	private AdminUserAuthMapper adminUserAuthMapper;
 
 	@Autowired
-	private AdminUserRoleMapper adminUserRoleMapper;
-
-	@Autowired
 	private AdminCommunityMapper adminCommunityMapper;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseAuthRpcService baseAuthRpcService;
 	
 	@Value("${propertyLoginExpireHour}")
 	private long loginExpireHour = 12;
@@ -546,36 +544,52 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	**/
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void addOperator(AdminUserEntity adminUserEntity){
-		//生成盐值并对密码加密
-		String salt = RandomStringUtils.randomAlphanumeric(20);
-		//生成UUID 和 ID
-		String uid = UserUtils.randomUUID();
-		adminUserEntity.setId(SnowFlake.nextId());
-		adminUserEntity.setUid(uid);
-		//t_admin_user用户资料表插入数据
-		adminUserEntity.setPassword(new Sha256Hash(RSAUtil.privateDecrypt(adminUserEntity.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), salt).toHex());
-//		adminUserEntity.setPassword(new Sha256Hash(adminUserEntity.getPassword(), salt).toHex());
-		adminUserEntity.setSalt(salt);
-		adminUserMapper.addOperator(adminUserEntity);
-		// TODO 变为添加角色
-		AdminUserRoleEntity adminUserRoleEntity = new AdminUserRoleEntity();
-		adminUserRoleEntity.setUid(uid);
-		adminUserRoleEntity.setRoleId(adminUserEntity.getRoleId());
-		adminUserRoleEntity.setCreateTime(LocalDateTime.now());
-		adminUserRoleMapper.insert(adminUserRoleEntity);
-//		//t_admin_user_menu添加菜单权限
-//		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
-		//t_admin_user_auth用户登录表插入数据
-		AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
-		BeanUtils.copyProperties(adminUserEntity,adminUserAuthEntity);
-		adminUserAuthMapper.createLoginUser(adminUserAuthEntity);
-//		//发短信通知，并发送初始密码
-//		SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
-		//添加社区权限
-		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
-			adminConfigService.updateAdminCommunityBatch(adminUserEntity.getCommunityIdList(),uid);
-		}
+	public void addOperator(AdminUserQO adminUserQO){
+//		//生成盐值并对密码加密
+//		String salt = RandomStringUtils.randomAlphanumeric(20);
+//		//生成UUID 和 ID
+//		String uid = UserUtils.randomUUID();
+//		adminUserEntity.setId(SnowFlake.nextId());
+//		adminUserEntity.setUid(uid);
+//		//t_admin_user用户资料表插入数据
+//		adminUserEntity.setPassword(new Sha256Hash(RSAUtil.privateDecrypt(adminUserEntity.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), salt).toHex());
+////		adminUserEntity.setPassword(new Sha256Hash(adminUserEntity.getPassword(), salt).toHex());
+//		adminUserEntity.setSalt(salt);
+//		adminUserMapper.addOperator(adminUserEntity);
+//		// TODO 变为添加角色
+//		AdminUserRoleEntity adminUserRoleEntity = new AdminUserRoleEntity();
+//		adminUserRoleEntity.setUid(uid);
+//		adminUserRoleEntity.setRoleId(adminUserEntity.getRoleId());
+//		adminUserRoleEntity.setCreateTime(LocalDateTime.now());
+//		adminUserRoleMapper.insert(adminUserRoleEntity);
+////		//t_admin_user_menu添加菜单权限
+////		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
+//		//t_admin_user_auth用户登录表插入数据
+//		AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
+//		BeanUtils.copyProperties(adminUserEntity,adminUserAuthEntity);
+//		adminUserAuthMapper.createLoginUser(adminUserAuthEntity);
+////		//发短信通知，并发送初始密码
+////		SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
+
+//		// 增加用户
+//		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getPhone(), adminUserQO.getPassword());
+//		// 增加登录类型范围为物业中台
+//		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN);
+//		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN);
+//		// 绑定用户和角色
+////		List<Long> roleIds = new ArrayList<>();
+////		roleIds.add(adminUserQO.getRoleId());
+////		baseRoleRpcService.userJoinRole(roleIds, userDetail.getId(), 1460884237115367425L);
+//		// 绑定用户和物业公司
+//		AdminUserCompanyEntity entity = new AdminUserCompanyEntity();
+//		entity.setId(SnowFlake.nextId());
+//		entity.setCompanyId(adminUserQO.getCompanyId());
+//		entity.setUid(String.valueOf(userDetail.getId()));
+//		adminUserCompanyMapper.insert(entity);
+//		//添加社区权限
+//		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
+//			adminConfigService.updateAdminCommunityBatch(adminUserEntity.getCommunityIdList(),uid);
+//		}
 	}
 	
 	/**

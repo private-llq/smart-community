@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.ICompanyPayConfigService;
@@ -13,16 +14,20 @@ import com.jsy.community.untils.OrderNoUtil;
 import com.jsy.community.untils.wechat.MyHttpClient;
 import com.jsy.community.untils.wechat.PublicConfig;
 import com.jsy.community.untils.wechat.WechatConfig;
+import com.jsy.community.untils.wechat.XmlUtil;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.WeChatVO;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.json.JSONObject;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.springframework.web.bind.annotation.*;
+import org.xmlpull.v1.XmlPullParserException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -87,7 +92,7 @@ public class WechatRefundController {
         Map hashMap = new LinkedHashMap();
         Map<Object, Object> map = new LinkedHashMap<>();
         //支付单号
-        map.put("out_trade_no", entity.getId());
+        map.put("out_trade_no", entity.getOrderNo());
         //退款单号
         map.put("out_refund_no", OrderNoUtil.getOrder());
         //回调地址
@@ -120,8 +125,14 @@ public class WechatRefundController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return CommonResult.ok(body);
+        log.info("退款接口响应结果:{}", body);
+        JSONObject jsonObject = JSONObject.fromObject(body);
+        WeChatVO weChatVO = JSON.parseObject(body, WeChatVO.class);
+        if ("SUCCESS".equals(weChatVO.getStatus()) || "PROCESSING".equals(weChatVO.getStatus())) {
+            return CommonResult.ok(true);
+        } else {
+            return CommonResult.error("申请退款失败:" + weChatVO.getMessage());
+        }
     }
 
 
@@ -146,7 +157,9 @@ public class WechatRefundController {
         //回调验证
         Map<String, String> map = PublicConfig.refundNotify(request ,response, WechatConfig.API_V3_KEY);
         if (map.get("refund_status").equals("SUCCESS")){
+            log.info("开始更新退款记录");
             weChatService.orderRefundStatus(map);
+            log.info("退款成功");
         } else {
             log.info("退款失败");
             log.info(map.get("refund_status"));

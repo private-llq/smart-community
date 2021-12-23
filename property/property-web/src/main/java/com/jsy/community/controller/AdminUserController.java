@@ -238,13 +238,13 @@ public class AdminUserController {
 	@PostMapping("")
 	@businessLog(operation = "新增",content = "新增了【操作员】")
 	@Permit("community:property:sys:user")
-	public CommonResult addOperator(@RequestBody AdminUserEntity adminUserEntity){
-		ValidatorUtils.validateEntity(adminUserEntity,AdminUserEntity.addOperatorValidatedGroup.class);
-		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
+	public CommonResult addOperator(@RequestBody AdminUserQO adminUserQO){
+		ValidatorUtils.validateEntity(adminUserQO,AdminUserEntity.addOperatorValidatedGroup.class);
+		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
 			//验证社区权限
-			UserUtils.validateCommunityIds(adminUserEntity.getCommunityIdList());
+			UserUtils.validateCommunityIds(adminUserQO.getCommunityIdList());
 		}
-		adminUserService.addOperator(adminUserEntity);
+		adminUserService.addOperator(adminUserQO);
 		return CommonResult.ok("添加成功");
 	}
 	

@@ -9,7 +9,6 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.admin.AdminCommunityEntity;
-import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.admin.AdminLoginQO;
 import com.jsy.community.util.MyCaptchaUtil;
@@ -18,7 +17,6 @@ import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.domain.PermitMenu;
@@ -34,7 +32,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
@@ -44,10 +41,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -161,6 +155,8 @@ public class AdminLoginController {
 		log.info(form.getAccount() + "开始登录");
 		// 获取用户菜单
 		List<PermitMenu> userMenu = baseMenuRpcService.all(loginVo.getUserInfo().getId(), BusinessConst.PROPERTY_ADMIN);
+		// list排序
+		userMenu.sort(Comparator.comparing(PermitMenu::getSort));
 		
 		//用户资料
 //		AdminUserEntity userData = adminUserService.queryByUid(String.valueOf(loginVo.getUserInfo().getId()));
@@ -243,26 +239,29 @@ public class AdminLoginController {
 	@Permit("community:property:sys:enter")
 	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
 		Long communityId = jsonObject.getLong("communityId");
-		UserInfoVo userInfo = UserUtils.getUserInfo();
-		Long adminId = userInfo.getId();
-		List communityIds = UserUtils.getAdminCommunityIdList();
+//		UserInfoVo userInfo = UserUtils.getUserInfo();
+//		Long adminId = userInfo.getId();
+//		List<String> communityIds = UserUtils.getAdminCommunityIdList();
 		UserUtils.validateCommunityId(communityId);
 		//用户资料
-		AdminUserEntity user = adminUserService.queryByUid(UserUtils.getId());
+//		AdminUserEntity user = adminUserService.queryByUid(UserUtils.getId());
+		AdminInfoVo adminInfoVo = UserUtils.getAdminInfo();
 		//用户菜单
 //		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getAdminRoleId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
-		List<PermitMenu> userMenu = baseMenuRpcService.all(adminId, BusinessConst.COMMUNITY_ADMIN);
+		List<PermitMenu> userMenu = baseMenuRpcService.all(Long.valueOf(adminInfoVo.getUid()), BusinessConst.COMMUNITY_ADMIN);
 		//设置小区级菜单
-		user.setMenuList(userMenu);
-		user.setCompanyId(UserUtils.getAdminCompanyId());
+		adminInfoVo.setMenuList(userMenu);
 		//设置小区ID
-		user.setCommunityId(communityId);
-		user.setCommunityIdList(communityIds);
+		adminInfoVo.setCommunityId(communityId);
+//		adminInfoVo.setCommunityIdList(communityIds);
+		
 		//创建token，保存redisIShopLeaseService
 //		String token = adminUserTokenService.createToken(user);
 //		user.setToken(token);
-		AdminInfoVo adminInfoVo = new AdminInfoVo();
-		BeanUtils.copyProperties(user,adminInfoVo);
+//		BeanUtils.copyProperties(user,adminInfoVo);
+		redisTemplate.opsForValue().set("Admin:Login:" + adminInfoVo.getToken(), JSON.toJSONString(adminInfoVo), loginExpireHour, TimeUnit.HOURS);//登录token
+		redisTemplate.opsForValue().set("Admin:LoginAccount:" + adminInfoVo.getMobile(), adminInfoVo.getToken(), loginExpireHour, TimeUnit.HOURS);//登录账户key的value设为token
+		
 		adminInfoVo.setUid(null);
 		adminInfoVo.setStatus(null);
 		return CommonResult.ok(adminInfoVo);

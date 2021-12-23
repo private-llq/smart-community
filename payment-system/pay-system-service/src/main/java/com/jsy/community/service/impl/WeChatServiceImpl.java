@@ -35,7 +35,9 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
 
     @Override
     public WeChatOrderEntity getOrderOne(String msg) {
-        return weChatMapper.selectById(msg);
+        QueryWrapper<WeChatOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("order_no", msg);
+        return weChatMapper.selectOne(queryWrapper);
     }
 
     @Override
@@ -88,7 +90,9 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
      */
     @Override
     public void orderRefundStatus(Map<String,String> map) {
-        WeChatOrderEntity entity = weChatMapper.selectById(map.get("out_trade_no"));
+        QueryWrapper<WeChatOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("order_no", map.get("out_trade_no"));
+        WeChatOrderEntity entity = weChatMapper.selectOne(queryWrapper);
         if (entity!=null){
             entity.setOrderStatus(3);
             entity.setArriveStatus(3);

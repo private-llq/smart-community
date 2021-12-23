@@ -1,6 +1,5 @@
 package com.jsy.community.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.StrUtil;
@@ -14,7 +13,6 @@ import com.jsy.community.api.*;
 import com.jsy.community.config.ProprietorTopicNameEntity;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
 import com.jsy.community.dto.signature.SignatureUserDTO;
 import com.jsy.community.entity.*;
 import com.jsy.community.exception.JSYError;
@@ -27,14 +25,15 @@ import com.jsy.community.qo.proprietor.LoginQO;
 import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.*;
-import com.jsy.community.utils.hardware.xu.XUFaceUtil;
 import com.jsy.community.utils.imutils.entity.ImResponseEntity;
 import com.jsy.community.vo.*;
 import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.BaseThirdPlatform;
 import com.zhsj.base.api.entity.RealInfoDto;
 import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.rpc.IThirdRpcService;
 import com.zhsj.base.api.vo.LoginVo;
 import com.zhsj.base.api.vo.ThirdBindStatusVo;
 import com.zhsj.baseweb.support.LoginUser;
@@ -150,6 +149,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 
     @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check=false)
     private IImChatPublicPushRpcService iImChatPublicPushRpcService;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IThirdRpcService thirdRpcService;
 
     private long expire = 60 * 60 * 24 * 7; //暂时
 
@@ -292,6 +294,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         // 调用基础用户模块获取三方绑定状态
         ThirdBindStatusVo thirdBindStatus = baseUserInfoRpcService.getThirdBindStatus(loginVo.getUserInfo().getId());
+        List<BaseThirdPlatform> baseThirdPlatforms = thirdRpcService.allBindThird(loginVo.getUserInfo().getId());
+        Integer bindIosStatus = 0;
+        if (!CollectionUtils.isEmpty(baseThirdPlatforms)) {
+            List<BaseThirdPlatform> ios = baseThirdPlatforms.stream().filter(baseThirdPlatform -> baseThirdPlatform.getThirdPlatformType().equals("IOS")).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(ios)) {
+                bindIosStatus = 1;
+            }
+        }
         // 调用基础用户模块获取支付密码设置状态
         Boolean payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(loginVo.getUserInfo().getId());
         Boolean passwordStatus = baseUserInfoRpcService.getLoginPasswordStatus(loginVo.getUserInfo().getId(), qo.getAccount());
@@ -305,6 +315,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         userInfoVo.setIsBindPayPassword(payPasswordStatus != null && payPasswordStatus ? 1 : 0);
         userInfoVo.setIsBindPassword(passwordStatus != null && passwordStatus ? 1 : 0);
+        userInfoVo.setIsBindIos(bindIosStatus);
         userInfoVo.setMobile(loginVo.getUserInfo().getPhone());
         userInfoVo.setUid(loginVo.getUserInfo().getAccount());
         userInfoVo.setUroraTags(getUroraTags(userInfoVo.getUid()));
@@ -698,10 +709,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         thirdBindStatus.setAliPayBind(false);
         Boolean payPasswordStatus = false;
         Boolean passwordStatus = false;
+        Integer bindIosStatus = 0;
         RealInfoDto idCardRealInfo = new RealInfoDto();
         if (loginVo.getUserInfo().getId() != null) {
             // 调用基础用户模块获取三方绑定状态
             thirdBindStatus = baseUserInfoRpcService.getThirdBindStatus(loginVo.getUserInfo().getId());
+            List<BaseThirdPlatform> baseThirdPlatforms = thirdRpcService.allBindThird(loginVo.getUserInfo().getId());
+            if (!CollectionUtils.isEmpty(baseThirdPlatforms)) {
+                List<BaseThirdPlatform> ios = baseThirdPlatforms.stream().filter(baseThirdPlatform -> baseThirdPlatform.getThirdPlatformType().equals("IOS")).collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(ios)) {
+                    bindIosStatus = 1;
+                }
+            }
             // 调用基础用户模块获取支付密码设置状态
             payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(loginVo.getUserInfo().getId());
             passwordStatus = baseUserInfoRpcService.getLoginPasswordStatus(loginVo.getUserInfo().getId(), loginVo.getUserInfo().getPhone());
@@ -719,6 +738,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         if (userInfoVo.getIsBindMobile()==1){
             userInfoVo.setIsBindPayPassword(payPasswordStatus != null && payPasswordStatus ? 1 : 0);
             userInfoVo.setIsBindPassword(passwordStatus != null && passwordStatus ? 1 : 0);
+            userInfoVo.setIsBindIos(bindIosStatus);
             userInfoVo.setMobile(loginVo.getUserInfo().getPhone());
             userInfoVo.setUroraTags(getUroraTags(userInfoVo.getUid()));
             userInfoVo.setNickname(loginVo.getUserInfo().getNickName());
@@ -1653,52 +1673,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     public List<String> queryUidOfNameLike(List<String> uids, String nameLike) {
         return userMapper.queryUidOfNameLike(uids, nameLike);
-    }
-
-    /**
-     * @Description: 删除业主人脸
-     * @author: Hu
-     * @since: 2021/8/24 16:59
-     * @Param: [userId]
-     * @return: void
-     */
-    @Override
-    public void deleteFaceAvatar(String userId) {
-        userMapper.deleteFaceAvatar(userId);
-    }
-
-
-    //保存人脸
-    @Override
-    @Transactional
-    // TODO: 2021/12/17 人脸需要修改的,到时候一起修改了
-    public void saveFace(String userId, String faceUrl) {
-        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
-        if (userEntity != null) {
-            userEntity.setFaceUrl(faceUrl);
-            userMapper.updateById(userEntity);
-            if (userEntity.getFaceEnableStatus() == 1) {
-                // 修改人脸之后,查询相关社区及相关社区设备列表
-                QueryWrapper<HouseMemberEntity> queryWrapper = new QueryWrapper<>();
-                queryWrapper.eq("uid", userId);
-                List<HouseMemberEntity> houseMemberEntities = houseMemberMapper.selectList(queryWrapper);
-                if (!CollectionUtils.isEmpty(houseMemberEntities)) {
-                    List<Long> communityIds = houseMemberEntities.stream().map(HouseMemberEntity::getCommunityId).collect(Collectors.toList());
-                    // 然后同步人脸
-                    propertyUserService.saveFace(userEntity, communityIds);
-                }
-            }
-        }
-    }
-
-    // TODO: 2021/12/17 人脸需要修改的,到时候一起修改了
-    @Override
-    public String getFace(String userId) {
-        UserEntity entity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
-        if (entity != null) {
-            return entity.getFaceUrl();
-        }
-        throw new ProprietorException("当前用户不存在！");
     }
 
     @Override

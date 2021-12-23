@@ -140,6 +140,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getPhone(), adminUserQO.getPassword());
 		// 增加登录类型范围为物业中台
 		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN);
+		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN);
 		// 绑定用户和角色
 //		List<Long> roleIds = new ArrayList<>();
 //		roleIds.add(adminUserQO.getRoleId());

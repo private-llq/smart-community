@@ -102,11 +102,11 @@ public interface PropertyUserService extends IService<UserEntity> {
 	Integer addFace(UserEntity userEntity, Long communityId);
 	/**
 	 * @author: Pipi
-	 * @description: app用户修改人脸照片
+	 * @description: 下发用户人脸是数据操作
 	 * @param userEntity:
      * @param communityIds:
 	 * @return: void
 	 * @date: 2021/10/8 17:58
 	 **/
-	void saveFace(UserEntity userEntity, List<Long> communityIds);
+	void syncFace(UserEntity userEntity, List<Long> communityIds);
 }

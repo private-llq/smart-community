@@ -200,7 +200,6 @@ public class HouseController {
 	**/
 	@ApiOperation("【楼宇房屋】查询")
 	@GetMapping("/getHouse")
-	@businessLog(operation = "删除",content = "删除了【楼宇房屋】")
 	@Permit("community:property:house:getHouse")
 	public CommonResult getHouse(){
 		return CommonResult.ok(houseService.getHouse(UserUtils.getAdminCommunityId()));
