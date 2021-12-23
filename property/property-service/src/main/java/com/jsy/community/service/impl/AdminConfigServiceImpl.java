@@ -329,14 +329,16 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		for (PermitRole permitRole : permitRolePageVO.getData()) {
 			AdminRoleCompanyEntity entity = adminRoleCompanyMapper.selectOne(new QueryWrapper<AdminRoleCompanyEntity>().eq("role_id", permitRole.getId()).eq("deleted", 0));
 			// 只返回本物业公司
-			if (entity.getCompanyId().equals(query.getCompanyId())) {
-				AdminRoleEntity adminRoleEntity = new AdminRoleEntity();
-				adminRoleEntity.setId(permitRole.getId());
-				adminRoleEntity.setIdStr(String.valueOf(permitRole.getId()));
-				adminRoleEntity.setName(permitRole.getName());
-				adminRoleEntity.setRemark(permitRole.getRemark());
-				adminRoleEntity.setCreateTime(LocalDateTime.parse(permitRole.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-				pageVO.getData().add(adminRoleEntity);
+			if (entity != null) {
+				if (entity.getCompanyId().equals(query.getCompanyId())) {
+					AdminRoleEntity adminRoleEntity = new AdminRoleEntity();
+					adminRoleEntity.setId(permitRole.getId());
+					adminRoleEntity.setIdStr(String.valueOf(permitRole.getId()));
+					adminRoleEntity.setName(permitRole.getName());
+					adminRoleEntity.setRemark(permitRole.getRemark());
+					adminRoleEntity.setCreateTime(LocalDateTime.parse(permitRole.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+					pageVO.getData().add(adminRoleEntity);
+				}
 			}
 		}
 		pageVO.setPageNum(permitRolePageVO.getPageNum());
