@@ -5,6 +5,7 @@ import com.jsy.community.entity.admin.AdminRoleEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
 import com.jsy.community.service.AdminRoleService;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.Permit;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,7 @@ public class AdminRoleController {
 	@businessLog(operation = "新增",content = "新增了【中台角色】")
 	@Permit("community:admin:admin:role:insert")
 	public CommonResult addRole(@RequestBody AdminRoleQO adminRoleQO){
+		adminRoleQO.setId(Long.valueOf(UserUtils.getId()));
 		adminRoleService.addRole(adminRoleQO);
 		return CommonResult.ok("添加成功");
 	}
@@ -68,7 +70,8 @@ public class AdminRoleController {
 		if(adminRoleQO.getId() == null){
 			return CommonResult.error("缺少ID");
 		}
-		adminRoleService.updateRole(adminRoleQO);
+		String id = UserUtils.getId();
+		adminRoleService.updateRole(adminRoleQO, Long.valueOf(id));
 		return CommonResult.ok("修改成功");
 	}
 

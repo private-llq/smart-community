@@ -89,7 +89,7 @@ public interface ISysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	void updateRole(SysRoleQO sysRoleQO);
+	void updateRole(SysRoleQO sysRoleQO, Long id);
 	
 	/**
 	* @Description: 角色列表

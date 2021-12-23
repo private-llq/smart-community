@@ -61,16 +61,16 @@ public class AdminRoleServiceImpl implements AdminRoleService {
     @Transactional(rollbackFor = Exception.class)
     public void addRole(AdminRoleQO adminRoleQO){
     
-        PermitRole permitRole = baseRoleRpcService.createRole(adminRoleQO.getName(), adminRoleQO.getRemark(), BusinessConst.PROPERTY_ADMIN, 1460884237115367425L);
+        PermitRole permitRole = baseRoleRpcService.createRole(adminRoleQO.getName(), adminRoleQO.getRemark(), BusinessConst.PROPERTY_ADMIN, adminRoleQO.getId());
         // 菜单分配给角色
-        baseMenuRpcService.menuJoinRole(adminRoleQO.getMenuIds(), permitRole.getId(), 1460884237115367425L);
+        baseMenuRpcService.menuJoinRole(adminRoleQO.getMenuIds(), permitRole.getId(), adminRoleQO.getId());
         // 查询菜单和权限绑定关系
         List<MenuPermission> menuPermissions = baseMenuPermissionRpcService.listByIds(adminRoleQO.getMenuIds());
         List<Long> permisIds = new ArrayList<>();
         for (MenuPermission menuPermission : menuPermissions) {
             permisIds.add(menuPermission.getPermisId());
         }
-        permissionRpcService.permitJoinRole(permisIds, permitRole.getId(), 1460884237115367425L);
+        permissionRpcService.permitJoinRole(permisIds, permitRole.getId(), adminRoleQO.getId());
         // 新增角色和物业公司关联信息
         AdminRoleCompanyEntity entity = new AdminRoleCompanyEntity();
         entity.setId(SnowFlake.nextId());
@@ -102,7 +102,7 @@ public class AdminRoleServiceImpl implements AdminRoleService {
      **/
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateRole(AdminRoleQO adminRoleOQ){
+    public void updateRole(AdminRoleQO adminRoleOQ, Long id){
 //        AdminRoleEntity entity = new AdminRoleEntity();
 //        BeanUtils.copyProperties(adminRoleOQ,entity);
 //        entity.setCompanyId(null);
@@ -117,7 +117,7 @@ public class AdminRoleServiceImpl implements AdminRoleService {
         if (org.apache.commons.lang3.StringUtils.isNotBlank(adminRoleOQ.getRemark())) {
             updateRoleDto.setRemark(adminRoleOQ.getRemark());
         }
-        updateRoleDto.setUpdateUid(1460884237115367425L);
+        updateRoleDto.setUpdateUid(id);
         // 修改角色
         baseRoleRpcService.updateRole(updateRoleDto);
         // 需要更改角色的菜单
@@ -132,7 +132,7 @@ public class AdminRoleServiceImpl implements AdminRoleService {
             // 移除角色下的菜单id列表
             baseMenuRpcService.roleRemoveMenu(adminRoleOQ.getId(), menuIdsList);
             // 新菜单分配给角色
-            baseMenuRpcService.menuJoinRole(adminRoleOQ.getMenuIds(), adminRoleOQ.getId(), 1460884237115367425L);
+            baseMenuRpcService.menuJoinRole(adminRoleOQ.getMenuIds(), adminRoleOQ.getId(), id);
         }
     }
 

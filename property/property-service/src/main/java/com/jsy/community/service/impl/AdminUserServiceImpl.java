@@ -10,16 +10,19 @@ import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.IOrganizationService;
 import com.jsy.community.api.PropertyException;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.admin.AdminCommunityEntity;
 import com.jsy.community.entity.admin.AdminUserAuthEntity;
+import com.jsy.community.entity.admin.AdminUserCompanyEntity;
 import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.AdminCommunityMapper;
 import com.jsy.community.mapper.AdminUserAuthMapper;
+import com.jsy.community.mapper.AdminUserCompanyMapper;
 import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
@@ -30,7 +33,9 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseAuthRpcService;
+import com.zhsj.base.api.rpc.IBaseRoleRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -81,8 +86,14 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Autowired
 	private AdminCommunityMapper adminCommunityMapper;
 	
+	@Resource
+	private AdminUserCompanyMapper adminUserCompanyMapper;
+	
 	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
 	private IBaseAuthRpcService baseAuthRpcService;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseRoleRpcService baseRoleRpcService;
 	
 	@Value("${propertyLoginExpireHour}")
 	private long loginExpireHour = 12;
@@ -571,25 +582,32 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 ////		//发短信通知，并发送初始密码
 ////		SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
 
-//		// 增加用户
-//		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getPhone(), adminUserQO.getPassword());
-//		// 增加登录类型范围为物业中台
-//		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN);
-//		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN);
-//		// 绑定用户和角色
-////		List<Long> roleIds = new ArrayList<>();
-////		roleIds.add(adminUserQO.getRoleId());
-////		baseRoleRpcService.userJoinRole(roleIds, userDetail.getId(), 1460884237115367425L);
-//		// 绑定用户和物业公司
-//		AdminUserCompanyEntity entity = new AdminUserCompanyEntity();
-//		entity.setId(SnowFlake.nextId());
-//		entity.setCompanyId(adminUserQO.getCompanyId());
-//		entity.setUid(String.valueOf(userDetail.getId()));
-//		adminUserCompanyMapper.insert(entity);
-//		//添加社区权限
-//		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
-//			adminConfigService.updateAdminCommunityBatch(adminUserEntity.getCommunityIdList(),uid);
-//		}
+		// 增加用户
+		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getPhone(), adminUserQO.getPassword());
+		// 增加登录类型范围为物业中台管理员和小区管理员
+		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, false);
+		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN, false);
+		// 绑定用户和角色
+		List<Long> roleIds = new ArrayList<>();
+		if (adminUserQO.getCommunityRoleId() != null) {
+			if (adminUserQO.getRoleId() == null) {
+				throw new PropertyException("传入小区角色时，请同时传入物业角色！");
+			}
+			// TODO:给定的物业角色是否包含小区列表的菜单
+			roleIds.add(adminUserQO.getCommunityRoleId());
+		}
+		roleIds.add(adminUserQO.getRoleId());
+		baseRoleRpcService.userJoinRole(roleIds, userDetail.getId(), Long.valueOf(adminUserQO.getUid()));
+		// 绑定用户和物业公司
+		AdminUserCompanyEntity entity = new AdminUserCompanyEntity();
+		entity.setId(SnowFlake.nextId());
+		entity.setCompanyId(adminUserQO.getCompanyId());
+		entity.setUid(String.valueOf(userDetail.getId()));
+		adminUserCompanyMapper.insert(entity);
+		//添加社区权限
+		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
+			adminConfigService.updateAdminCommunityBatch(adminUserQO.getCommunityIdList(), String.valueOf(userDetail.getId()));
+		}
 	}
 	
 	/**

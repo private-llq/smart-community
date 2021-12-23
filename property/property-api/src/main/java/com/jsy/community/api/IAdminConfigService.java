@@ -82,7 +82,7 @@ public interface IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	void updateRole(AdminRoleQO adminRoleQO);
+	void updateRole(AdminRoleQO adminRoleQO, Long id);
 	
 	/**
 	* @Description: 角色列表 分页查询

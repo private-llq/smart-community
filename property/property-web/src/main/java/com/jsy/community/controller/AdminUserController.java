@@ -244,6 +244,8 @@ public class AdminUserController {
 			//验证社区权限
 			UserUtils.validateCommunityIds(adminUserQO.getCommunityIdList());
 		}
+		adminUserQO.setCompanyId(UserUtils.getAdminCompanyId());
+		adminUserQO.setUid(UserUtils.getId());
 		adminUserService.addOperator(adminUserQO);
 		return CommonResult.ok("添加成功");
 	}

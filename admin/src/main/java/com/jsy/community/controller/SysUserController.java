@@ -10,6 +10,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.qo.sys.SysUserQO;
 import com.jsy.community.service.ISysUserService;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.base.api.constant.RpcConst;
@@ -174,6 +175,7 @@ public class SysUserController {
 	@businessLog(operation = "新增",content = "新增了【操作员】")
 	@Permit("community:admin:sys:user:add")
 	public CommonResult addOperator(@RequestBody SysUserQO sysUserQO){
+		sysUserQO.setId(Long.valueOf(UserUtils.getId()));
 		sysUserService.addOperator(sysUserQO);
 		return CommonResult.ok("添加成功");
 	}
