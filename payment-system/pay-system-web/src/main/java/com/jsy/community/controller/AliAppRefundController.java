@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 /**
  * @program: com.jsy.community
  * @description: 支付宝退款
@@ -25,8 +27,8 @@ public class AliAppRefundController {
 
 
     @PostMapping("refund")
-    public CommonResult refund(@RequestBody String orderNo){
-        AiliAppPayRecordEntity ailiAppPayRecordEntity =  aliAppRefundService.selectByOrder(orderNo);
+    public CommonResult refund(@RequestBody Map<String, String> orderNo){
+        AiliAppPayRecordEntity ailiAppPayRecordEntity =  aliAppRefundService.selectByOrder(orderNo.get("orderNo"));
         if (ailiAppPayRecordEntity != null) {
             aliAppRefundService.refund(ailiAppPayRecordEntity);
             return CommonResult.ok();

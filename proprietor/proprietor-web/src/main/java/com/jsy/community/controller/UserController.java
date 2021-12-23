@@ -8,6 +8,7 @@ import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.UserEntity;
+import com.jsy.community.entity.UserFaceEntity;
 import com.jsy.community.entity.UserHouseEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
@@ -64,6 +65,9 @@ public class UserController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserHouseService userHouseService;
+
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private UserFaceService userFaceService;
 
     
     private static final String BUCKETNAME_ID_CARD = "id-card"; //暂时写死  后面改到配置文件中  BUCKETNAME命名规范：只能小写，数字，-
@@ -241,16 +245,16 @@ public class UserController {
     @ApiOperation("查询上传的人脸")
     @GetMapping("getFace")
     // @Permit("community:proprietor:user:getFace")
-    public CommonResult<String> getFace() {
-        String face = userService.getFace(UserUtils.getUserId());
-        return CommonResult.ok(face,"查询成功！");
+    public CommonResult<?> getFace() {
+        UserFaceEntity face = userFaceService.queryByUid(UserUtils.getUserId());
+        return CommonResult.ok(face == null ? null: face.getFaceUrl(),"查询成功！");
     }
 
     @ApiOperation("修改用户人脸接口")
     @PutMapping("saveFace")
     // @Permit("community:proprietor:user:saveFace")
     public CommonResult saveFace(@RequestParam String faceUrl) {
-        userService.saveFace(UserUtils.getUserId(),faceUrl);
+        userFaceService.saveUserFace(UserUtils.getUserId(),faceUrl);
         return CommonResult.ok();
     }
 
@@ -361,7 +365,7 @@ public class UserController {
     @DeleteMapping("deleteFaceAvatar")
     // @Permit("community:proprietor:user:deleteFaceAvatar")
     public CommonResult deleteFaceAvatar() {
-        userService.deleteFaceAvatar(UserUtils.getUserId());
+        userFaceService.deleteUserFace(UserUtils.getUserId());
         return CommonResult.ok();
     }
 

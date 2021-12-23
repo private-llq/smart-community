@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import okhttp3.HttpUrl;
 import org.apache.commons.io.IOUtils;
@@ -39,6 +40,7 @@ import java.util.*;
  * @author: Hu
  * @create: 2021-01-21 16:56
  **/
+@Slf4j
 public class PublicConfig {
     //请求网关
     private static final String url_prex = "https://api.mch.weixin.qq.com";
@@ -103,9 +105,7 @@ public class PublicConfig {
 //            case "/v3/pay/transactions/h5"://返回h5支付的链接
 //                return JSONObject.fromObject(body).getString("h5_url");
 //        }
-
-
-        System.out.println("body"+body);
+        log.info("微信下单结果:{}", body);
         return JSONObject.fromObject(body).getString("prepay_id");
     }
 
