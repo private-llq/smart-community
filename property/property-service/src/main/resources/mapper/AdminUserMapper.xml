@@ -46,15 +46,6 @@
 <!--		where mobile = #{mobile}-->
 <!--	</select>-->
 
-	<!-- uid批量查姓名 -->
-	<select id="queryNameByUidBatch" resultType="Map">
-		select uid,real_name as name from t_admin_user
-		where uid in
-		<foreach collection="uidList" item="item" open="(" close=")" separator=",">
-			#{item}
-		</foreach>
-	</select>
-
 	<!-- 编辑操作员 -->
 	<update id="updateOperator">
 		update t_admin_user u

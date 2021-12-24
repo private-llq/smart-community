@@ -16,6 +16,7 @@ import com.jsy.community.qo.proprietor.BannerQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.entity.RealUserDetail;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -162,13 +163,13 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerEntity> i
 			updateUidSet.add(bannerEntity.getUpdateBy());
 			publishUidSet.add(bannerEntity.getPublishBy());
 		}
-		Map<String, Map<String,String>> createUserMap = adminUserService.queryNameByUidBatch(createUidSet);
-		Map<String, Map<String,String>> updateUserMap = adminUserService.queryNameByUidBatch(updateUidSet);
-		Map<String, Map<String,String>> publishUserMap = adminUserService.queryNameByUidBatch(publishUidSet);
+		Map<String, RealUserDetail> createUserMap = adminUserService.queryNameByUidBatch(createUidSet);
+		Map<String, RealUserDetail> updateUserMap = adminUserService.queryNameByUidBatch(updateUidSet);
+		Map<String, RealUserDetail> publishUserMap = adminUserService.queryNameByUidBatch(publishUidSet);
 		for(BannerEntity bannerEntity : pageData.getRecords()){
-			bannerEntity.setCreateBy(createUserMap.get(bannerEntity.getCreateBy()) == null ? null : createUserMap.get(bannerEntity.getCreateBy()).get("name"));
-			bannerEntity.setUpdateBy(updateUserMap.get(bannerEntity.getUpdateBy()) == null ? null : updateUserMap.get(bannerEntity.getUpdateBy()).get("name"));
-			bannerEntity.setPublishBy(publishUserMap.get(bannerEntity.getPublishBy()) == null ? null : publishUserMap.get(bannerEntity.getPublishBy()).get("name"));
+			bannerEntity.setCreateBy(createUserMap.get(bannerEntity.getCreateBy()) == null ? null : createUserMap.get(bannerEntity.getCreateBy()).getRealName());
+			bannerEntity.setUpdateBy(updateUserMap.get(bannerEntity.getUpdateBy()) == null ? null : updateUserMap.get(bannerEntity.getUpdateBy()).getRealName());
+			bannerEntity.setPublishBy(publishUserMap.get(bannerEntity.getPublishBy()) == null ? null : publishUserMap.get(bannerEntity.getPublishBy()).getRealName());
 		}
 		PageInfo<BannerEntity> pageInfo = new PageInfo<>();
 		BeanUtils.copyProperties(pageData,pageInfo);

@@ -16,6 +16,9 @@ import com.jsy.community.entity.proprietor.VoteUserEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealUserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.amqp.AmqpException;
@@ -28,6 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @program: com.jsy.community
@@ -61,6 +66,9 @@ public class PropertyVoteServiceImpl extends ServiceImpl<PropertyVoteMapper,Vote
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
 
 
 
@@ -170,18 +178,18 @@ public class PropertyVoteServiceImpl extends ServiceImpl<PropertyVoteMapper,Vote
     @Override
     public List<VoteUserEntity> getOne(Long id) {
         Set<String> ids = new HashSet<>();
-        HashMap<String, String> map = new HashMap<>();
         List<VoteUserEntity> entityList = propertyVoteUserMapper.selectList(new QueryWrapper<VoteUserEntity>().eq("vote_id", id));
         for (VoteUserEntity voteUserEntity : entityList) {
             ids.add(voteUserEntity.getUid());
         }
         if (ids.size()!=0){
-            List<UserEntity> list = userMapper.listAuthUserInfo(ids);
-            for (UserEntity userEntity : list) {
-                map.put(userEntity.getUid(),userEntity.getRealName());
-            }
+            List<RealUserDetail> realUserDetails = baseUserInfoRpcService.getRealUserDetails(ids);
+            Map<String, RealUserDetail> realUserDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
             for (VoteUserEntity entity : entityList) {
-                entity.setRealName(map.get(entity.getUid()));
+                RealUserDetail realUserDetail = realUserDetailMap.get(entity.getUid());
+                if (realUserDetail != null) {
+                    entity.setRealName(realUserDetail.getRealName());
+                }
             }
         }
         return entityList;

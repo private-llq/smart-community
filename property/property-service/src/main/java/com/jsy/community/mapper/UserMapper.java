@@ -24,7 +24,7 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * @Date 2021/5/10 9:49
 	 * @Param [ids]
 	 **/
-	List<UserEntity> listAuthUserInfo(Collection<String> ids);
+	List<UserEntity> listAuthUserInfo(@Param("ids") Collection<String> ids);
 
 	/**
 	 * @author: Pipi

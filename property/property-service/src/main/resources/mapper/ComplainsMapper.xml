@@ -21,27 +21,53 @@
                 and c.feedback_time &lt;= #{query.feedbackTimeOut}
             </if>
             <if test="query.keyWord!=null and query.keyWord!=''">
-                and (u.real_name like concat("%",#{query.keyWord},"%") or c.serial_number like concat("%",#{query.keyWord},"%") or u.mobile like concat("%",#{query.keyWord},"%"))
+                and (c.serial_number like concat("%",#{query.keyWord},"%")
+                    <if test="uidList != null and uidList.size() > 0">
+                        or c.uid in <foreach collection="uidList" open="(" close=")" separator="," item="uid">
+                            #{uid}
+                        </foreach>
+                        or c.feedback_by in <foreach collection="uidList" open="(" close=")" separator="," item="uid">
+                            #{uid}
+                        </foreach>
+                    </if>
+                )
             </if>
         </where>
     </sql>
 
 
     <select id="listAll" resultMap="ComplainMap">
-        select c.id as id,c.type as type,c.content as content,
-        c.complain_time as complainTime,c.images as images,
-        c.status as status,u.mobile as mobile,u.real_name as name,
-        c.feedback_content as feedbackContent,feedback_time as feedbackTime,
-        a.real_name as feedbackName,c.serial_number as serialNumber
-         from t_complain c join t_user u on c.uid=u.uid
-         left join t_admin_user a on c.feedback_by=a.uid
+        select
+               c.id as id,
+               c.uid as uid,
+               c.feedback_by as feedbackBy,
+               c.type as type,
+               c.content as content,
+               c.complain_time as complainTime,
+               c.images as images,
+               c.status as status,
+               c.feedback_content as feedbackContent,
+               feedback_time as feedbackTime,
+               c.serial_number as serialNumber
+         from t_complain c
          <include refid="query"></include>
          order by c.complain_time desc limit #{page},#{size}
     </select>
     <select id="findTotel" resultType="java.lang.Long">
-        select count(*) from  t_complain c join t_user u on c.uid=u.uid
-         left join t_admin_user a on c.feedback_by=a.uid
-        <include refid="query"></include>
+        select count(*) from  (select
+        c.id as id,
+        c.uid as uid,
+        c.feedback_by as feedbackBy,
+        c.type as type,
+        c.content as content,
+        c.complain_time as complainTime,
+        c.images as images,
+        c.status as status,
+        c.feedback_content as feedbackContent,
+        feedback_time as feedbackTime,
+        c.serial_number as serialNumber
+        from t_complain c
+        <include refid="query"></include>) as a
     </select>
     <resultMap id="ComplainMap" type="com.jsy.community.vo.ComplainVO">
         <result property="id" column="id"/>

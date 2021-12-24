@@ -94,16 +94,6 @@ public interface AdminUserMapper extends BaseMapper<AdminUserEntity> {
 	String queryMobileByUid(String uid);
 	
 	/**
-	 * @Description: uid批量查姓名
-	 * @Param: [list]
-	 * @Return: com.jsy.community.entity.admin.AdminUserEntity
-	 * @Author: chq459799974
-	 * @Date: 2021/3/25
-	 **/
-	@MapKey("uid")
-	Map<String, Map<String,String>> queryNameByUidBatch(Collection<String> uidList);
-	
-	/**
 	* @Description: 根据id查uid
 	 * @Param: [id]
 	 * @Return: java.lang.String

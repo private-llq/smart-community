@@ -50,6 +50,6 @@ public interface CarOrderMapper extends BaseMapper<CarOrderEntity> {
 	 *@Param: startTime,endTime,communityId:
 	 *@Date: 2021/9/3 15:23
 	 **/
-	BigDecimal carPositionByMonth(LocalDate startTime, LocalDate endTime, Long communityId);
+	BigDecimal carPositionByMonth(@Param("startTime") LocalDate startTime, @Param("endTime") LocalDate endTime, @Param("communityId") Long communityId);
 
 }
