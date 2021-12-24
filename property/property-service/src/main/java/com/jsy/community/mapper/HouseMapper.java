@@ -216,7 +216,7 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @Date: 2021/4/23
 	**/
 	@MapKey("houseId")
-	Map<Long,HouseEntity> queryIdAndHouseMap(Collection<Long> houseIds);
+	Map<Long,HouseEntity> queryIdAndHouseMap(@Param("list") Collection<Long> houseIds);
 
 
 	/**

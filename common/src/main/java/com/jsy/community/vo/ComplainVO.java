@@ -42,4 +42,6 @@ public class ComplainVO extends BaseVO {
     private LocalDateTime feedbackTime;
     @ApiModelProperty(value = "1，已回复，0未回复")
     private Integer status;
+    private String uid;
+    private String feedbackBy;
 }

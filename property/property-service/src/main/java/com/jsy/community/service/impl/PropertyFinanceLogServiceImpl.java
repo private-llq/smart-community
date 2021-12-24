@@ -14,12 +14,16 @@ import com.jsy.community.qo.property.FinanceLogQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author DKS
@@ -34,6 +38,9 @@ public class PropertyFinanceLogServiceImpl extends ServiceImpl<PropertyFinanceLo
 	
 	@Autowired
 	private AdminUserMapper adminUserMapper;
+
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseUserInfoRpcService baseUserInfoRpcService;
 	
 	/**
 	 * @author DKS
@@ -65,9 +72,10 @@ public class PropertyFinanceLogServiceImpl extends ServiceImpl<PropertyFinanceLo
 		
 		// 模糊查询用户名
 		if (query.getUserName() != null) {
-			List<String> uidList = adminUserMapper.queryUidListByRealName(query.getUserName());
-			if (uidList.size() > 0) {
-				queryWrapper.in("user_id", uidList);
+			// TODO: 2021/12/23 等待刘金荣解决
+			Set<String> strings = baseUserInfoRpcService.queryRealUserDetail(null, query.getUserName());
+			if (strings.size() > 0) {
+				queryWrapper.in("user_id", strings);
 			} else {
 				queryWrapper.eq("user_id", 0);
 			}
