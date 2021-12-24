@@ -93,6 +93,8 @@ public interface IAdminConfigService {
 	**/
 	PageVO<AdminRoleEntity> queryPage(BaseQO<AdminRoleEntity> baseQO);
 
+	PageVO<AdminRoleEntity> queryPageAll(BaseQO<AdminRoleEntity> baseQO);
+
 	/**
 	 * @author: Pipi
 	 * @description: 查询角色详情

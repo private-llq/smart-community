@@ -27,6 +27,7 @@ public class AdminRoleEntity extends BaseEntity {
 	
 	private Long createBy;//创建人
 	private Long updateBy;//修改人
+	private Integer scope;// 范围
 	
 	@TableField(exist = false)
 	private List<Long> menuIds;//菜单ID列表

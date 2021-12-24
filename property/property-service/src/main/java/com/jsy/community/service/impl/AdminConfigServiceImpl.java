@@ -329,6 +329,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		PageVO<AdminRoleEntity> pageVO = new PageVO<>();
 		// 补充数据
 		for (PermitRole permitRole : permitRolePageVO.getData()) {
+			// 已排除系统默认角色
 			AdminRoleCompanyEntity entity = adminRoleCompanyMapper.selectOne(new QueryWrapper<AdminRoleCompanyEntity>().eq("role_id", permitRole.getId()).eq("deleted", 0));
 			// 只返回本物业公司
 			if (entity != null) {
@@ -343,13 +344,89 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 				}
 			}
 		}
-		pageVO.setPageNum(permitRolePageVO.getPageNum());
+		pageVO.setPageNum(baseQO.getPage());
 		pageVO.setPageSize(permitRolePageVO.getPageSize());
-		pageVO.setPages(permitRolePageVO.getPages());
-		pageVO.setTotal(permitRolePageVO.getTotal());
+		pageVO.setPages((permitRolePageVO.getTotal()-2) > 0 ? new Double(Math.ceil((permitRolePageVO.getTotal()-2)/permitRolePageVO.getPageSize())).longValue() : 0);
+		pageVO.setTotal(permitRolePageVO.getTotal()-2);
 		return pageVO;
 	}
 
+	/**
+	 * @Description: 角色列表 分页查询
+	 * @Param: []
+	 * @Return: java.util.List<com.jsy.community.entity.sys.SysRoleEntity>
+	 * @Author: chq459799974
+	 * @Date: 2020/12/14
+	 **/
+	@Override
+	public PageVO<AdminRoleEntity> queryPageAll(BaseQO<AdminRoleEntity> baseQO){
+//		Page<AdminRoleEntity> page = new Page<>();
+//		MyPageUtils.setPageAndSize(page,baseQO);
+//		AdminRoleEntity query = baseQO.getQuery();
+//		QueryWrapper<AdminRoleEntity> queryWrapper = new QueryWrapper<>();
+//		queryWrapper.select("id,name,remark,create_time");
+//		queryWrapper.eq("company_id",query.getCompanyId());
+//		if(!StringUtils.isEmpty(query.getName())){
+//			queryWrapper.like("name",query.getName());
+//		}
+//		if(query.getId() != null){
+//			//查详情
+//			queryWrapper.eq("id",query.getId());
+//		}
+//		Page<AdminRoleEntity> pageData = adminRoleMapper.selectPage(page,queryWrapper);
+//		if(query.getId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
+//			//查菜单权限
+//			AdminRoleEntity entity = pageData.getRecords().get(0);
+//			entity.setMenuIds(adminRoleMapper.getRoleMenu(entity.getId()));
+//		}
+//		PageInfo<AdminRoleEntity> pageInfo = new PageInfo<>();
+//		BeanUtils.copyProperties(pageData,pageInfo);
+//		return pageInfo;
+		AdminRoleEntity query = baseQO.getQuery();
+		Page<AdminRoleEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page, baseQO);
+
+		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(baseQO.getPage().intValue(), baseQO.getSize().intValue(), query.getName(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
+		if (CollectionUtils.isEmpty(permitRolePageVO.getData())) {
+			return new PageVO<>();
+		}
+
+		PageVO<AdminRoleEntity> pageVO = new PageVO<>();
+		// 补充数据
+		for (PermitRole permitRole : permitRolePageVO.getData()) {
+			if (permitRole.getId() == 1463327674070695937L || permitRole.getId() == 1467739062281084931L) {
+				AdminRoleEntity adminRoleEntity = new AdminRoleEntity();
+				adminRoleEntity.setId(permitRole.getId());
+				adminRoleEntity.setIdStr(String.valueOf(permitRole.getId()));
+				adminRoleEntity.setName(permitRole.getName());
+				adminRoleEntity.setRemark(permitRole.getRemark());
+				adminRoleEntity.setScope(permitRole.getScope());
+				adminRoleEntity.setCreateTime(LocalDateTime.parse(permitRole.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+				pageVO.getData().add(adminRoleEntity);
+			} else {
+				// 已排除系统默认角色
+				AdminRoleCompanyEntity entity = adminRoleCompanyMapper.selectOne(new QueryWrapper<AdminRoleCompanyEntity>().eq("role_id", permitRole.getId()).eq("deleted", 0));
+				// 只返回本物业公司
+				if (entity != null) {
+					if (entity.getCompanyId().equals(query.getCompanyId())) {
+						AdminRoleEntity adminRoleEntity = new AdminRoleEntity();
+						adminRoleEntity.setId(permitRole.getId());
+						adminRoleEntity.setIdStr(String.valueOf(permitRole.getId()));
+						adminRoleEntity.setName(permitRole.getName());
+						adminRoleEntity.setRemark(permitRole.getRemark());
+						adminRoleEntity.setScope(permitRole.getScope());
+						adminRoleEntity.setCreateTime(LocalDateTime.parse(permitRole.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+						pageVO.getData().add(adminRoleEntity);
+					}
+				}
+			}
+		}
+		pageVO.setPageNum(baseQO.getPage());
+		pageVO.setPageSize(permitRolePageVO.getPageSize());
+		pageVO.setPages((permitRolePageVO.getTotal()-2) > 0 ? new Double(Math.ceil((permitRolePageVO.getTotal()-2)/permitRolePageVO.getPageSize())).longValue() : 0);
+		pageVO.setTotal(permitRolePageVO.getTotal()-2);
+		return pageVO;
+	}
 
 	/**
 	 * @param roleId : 角色ID

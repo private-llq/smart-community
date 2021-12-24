@@ -10,6 +10,7 @@ import com.jsy.community.qo.admin.AdminRoleQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.basecommon.constant.BaseUserConstant;
 import com.zhsj.baseweb.annotation.Permit;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
@@ -98,6 +99,16 @@ public class AdminRoleController {
 		}
 		baseQO.getQuery().setCompanyId(UserUtils.getAdminCompanyId());
 		return CommonResult.ok(adminConfigService.queryPage(baseQO),"查询成功");
+	}
+
+	@PostMapping("/pageAll")
+	@Permit("community:property:role:pageAll")
+	public CommonResult queryPageAll(@RequestBody BaseQO<AdminRoleEntity> baseQO){
+		if(baseQO.getQuery() == null){
+			baseQO.setQuery(new AdminRoleEntity());
+		}
+		baseQO.getQuery().setCompanyId(UserUtils.getAdminCompanyId());
+		return CommonResult.ok(adminConfigService.queryPageAll(baseQO),"查询成功");
 	}
 
 	@PostMapping("/selectAllRole")
