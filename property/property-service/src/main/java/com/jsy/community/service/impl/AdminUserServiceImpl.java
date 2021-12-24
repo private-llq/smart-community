@@ -35,7 +35,6 @@ import com.zhsj.base.api.domain.PermitRole;
 import com.zhsj.base.api.entity.RealUserDetail;
 import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseAuthRpcService;
-import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.rpc.IBaseRoleRpcService;
 import com.zhsj.base.api.rpc.IBaseUpdateUserRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
@@ -489,15 +488,15 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	}
 	
 	/**
-	* @Description: 操作员条件查询
+	 * @Description: 操作员条件查询
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.utils.PageInfo
 	 * @Author: chq459799974
 	 * @Date: 2021/3/16
-	**/
+	 **/
 	@Override
-	public PageInfo queryOperator(BaseQO<AdminUserQO> baseQO){
-		AdminUserQO query = baseQO.getQuery();
+	public PageVO<AdminUserEntity> queryOperator(BaseQO<AdminUserQO> baseQO){
+//		AdminUserQO query = baseQO.getQuery();
 		/*AdminUserQO query = baseQO.getQuery();
 		Page<AdminUserEntity> page = new Page();
 		MyPageUtils.setPageAndSize(page,baseQO);
@@ -506,7 +505,6 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		Integer menuCount = null;
 		if(query.getId() != null){
 			queryWrapper.eq("id",query.getId());
-			//TODO 换成查角色 回显到详情
 //			String uid = adminUserMapper.queryUidById(query.getId());
 //			menuCount = adminConfigService.countUserMenu(uid);
 		}
@@ -536,36 +534,103 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 				}
 			}
 		}*/
-		List<AdminUserEntity> adminUserEntities = adminUserMapper.queryPageUserEntity(query, (baseQO.getPage() - 1) * baseQO.getSize(), baseQO.getSize());
-		Integer integer = adminUserMapper.countPageUserEntity(query);
-		if (integer == null) {
-			integer = 0;
+//		List<AdminUserEntity> adminUserEntities = adminUserMapper.queryPageUserEntity(query, (baseQO.getPage() - 1) * baseQO.getSize(), baseQO.getSize());
+//		Integer integer = adminUserMapper.countPageUserEntity(query);
+//		if (integer == null) {
+//			integer = 0;
+//		}
+//		if (!CollectionUtils.isEmpty(adminUserEntities)) {
+//			Set<String> uidList = adminUserEntities.stream().map(AdminUserEntity::getUid).collect(Collectors.toSet());
+//			List<AdminCommunityEntity> adminCommunityEntities = adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("community_id, uid").in("uid", uidList));
+//			if (!CollectionUtils.isEmpty(adminCommunityEntities)) {
+//				HashMap<String, List<String>> userCommunityIdMap = new HashMap<>();
+//				for (AdminCommunityEntity adminCommunityEntity : adminCommunityEntities) {
+//					if (userCommunityIdMap.containsKey(adminCommunityEntity.getUid())) {
+//						userCommunityIdMap.get(adminCommunityEntity.getUid()).add(String.valueOf(adminCommunityEntity.getCommunityId()));
+//					} else {
+//						List<String> communityIdSet = new ArrayList<>();
+//						communityIdSet.add(String.valueOf(adminCommunityEntity.getCommunityId()));
+//						userCommunityIdMap.put(adminCommunityEntity.getUid(), communityIdSet);
+//					}
+//				}
+//				for (AdminUserEntity adminUserEntity : adminUserEntities) {
+//					adminUserEntity.setCommunityIdList(userCommunityIdMap.get(adminUserEntity.getUid()));
+//				}
+//			}
+//		}
+//		PageInfo<AdminUserEntity> pageInfo = new PageInfo<>();
+//		pageInfo.setRecords(adminUserEntities);
+//		pageInfo.setTotal(integer);
+//		pageInfo.setSize(baseQO.getSize());
+//		pageInfo.setCurrent(baseQO.getPage());
+//		return pageInfo;
+		
+		AdminUserQO query = baseQO.getQuery();
+		Page<AdminUserEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page, baseQO);
+		
+		PageVO<UserDetail> userDetailPageVO = userInfoRpcService.queryUser(query.getMobile(), query.getNickName(), query.getRoleId(),
+			baseQO.getPage().intValue(), baseQO.getSize().intValue(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
+		
+		if (CollectionUtils.isEmpty(userDetailPageVO.getData())) {
+			return new PageVO<>();
 		}
-		if (!CollectionUtils.isEmpty(adminUserEntities)) {
-			Set<String> uidList = adminUserEntities.stream().map(AdminUserEntity::getUid).collect(Collectors.toSet());
-			List<AdminCommunityEntity> adminCommunityEntities = adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("community_id, uid").in("uid", uidList));
-			if (!CollectionUtils.isEmpty(adminCommunityEntities)) {
-				HashMap<String, List<String>> userCommunityIdMap = new HashMap<>();
-				for (AdminCommunityEntity adminCommunityEntity : adminCommunityEntities) {
-					if (userCommunityIdMap.containsKey(adminCommunityEntity.getUid())) {
-						userCommunityIdMap.get(adminCommunityEntity.getUid()).add(String.valueOf(adminCommunityEntity.getCommunityId()));
-					} else {
-						List<String> communityIdSet = new ArrayList<>();
-						communityIdSet.add(String.valueOf(adminCommunityEntity.getCommunityId()));
-						userCommunityIdMap.put(adminCommunityEntity.getUid(), communityIdSet);
-					}
-				}
-				for (AdminUserEntity adminUserEntity : adminUserEntities) {
-					adminUserEntity.setCommunityIdList(userCommunityIdMap.get(adminUserEntity.getUid()));
-				}
+
+//		List<Long> companyIds = new ArrayList<>();
+//		List<Long> uIds = new ArrayList<>();
+//		// 模糊查物业公司名称
+//		if (org.apache.commons.lang3.StringUtils.isNotBlank(query.getCompanyName())) {
+//			List<PropertyCompanyEntity> propertyCompanyEntities = propertyCompanyMapper.selectList(new QueryWrapper<PropertyCompanyEntity>().select("id").like("name", query.getCompanyName()));
+//			for (PropertyCompanyEntity propertyCompanyEntity : propertyCompanyEntities) {
+//				companyIds.add(propertyCompanyEntity.getId());
+//			}
+//			// 根据物业公司id查出Uid
+//			if (companyIds.size() > 0) {
+//				List<AdminUserCompanyEntity> entityList = adminUserCompanyMapper.selectList(new QueryWrapper<AdminUserCompanyEntity>().in("company_id", companyIds).eq("deleted", 0));
+//				for (AdminUserCompanyEntity adminUserCompanyEntity : entityList) {
+//					uIds.add(Long.valueOf(adminUserCompanyEntity.getUid()));
+//				}
+//			}
+//			if (uIds.size() == 0) {
+//				return new PageVO<>();
+//			}
+//		}
+//		if (uIds.size() > 0) {
+//			userDetailPageVO.getData().removeIf(userDetail -> !uIds.contains(userDetail.getId()));
+//		}
+		PageVO<AdminUserEntity> pageVO = new PageVO<>();
+		// 补充数据
+		for (UserDetail userDetail : userDetailPageVO.getData()) {
+			AdminUserEntity adminUserEntity = new AdminUserEntity();
+			// 补充物业公司名称
+//			AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", userDetail.getId()).eq("deleted", 0));
+//			if (entity != null) {
+//				PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(entity.getCompanyId());
+//				if (companyEntity != null) {
+//					adminUserEntity.setCompanyName(companyEntity.getName());
+//				}
+//			}
+			// 查角色
+			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
+			StringBuilder sb = new StringBuilder();
+			for (PermitRole permitRole : permitRoles) {
+				sb.append(permitRole.getName()).append(",");
 			}
+			
+			adminUserEntity.setId(userDetail.getId());
+			adminUserEntity.setIdStr(String.valueOf(userDetail.getId()));
+			adminUserEntity.setNickName(userDetail.getNickName());
+			adminUserEntity.setPermitRoles(permitRoles);
+			adminUserEntity.setRoleName(sb.deleteCharAt(sb.length()-1).toString());
+			adminUserEntity.setMobile(userDetail.getPhone());
+			adminUserEntity.setCreateTime(LocalDateTime.parse(userDetail.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+			pageVO.getData().add(adminUserEntity);
 		}
-		PageInfo<AdminUserEntity> pageInfo = new PageInfo<>();
-		pageInfo.setRecords(adminUserEntities);
-		pageInfo.setTotal(integer);
-		pageInfo.setSize(baseQO.getSize());
-		pageInfo.setCurrent(baseQO.getPage());
-		return pageInfo;
+		pageVO.setPageNum(userDetailPageVO.getPageNum());
+		pageVO.setPageSize(userDetailPageVO.getPageSize());
+		pageVO.setPages(userDetailPageVO.getPages());
+		pageVO.setTotal(userDetailPageVO.getTotal());
+		return pageVO;
 	}
 	
 	/**
@@ -605,7 +670,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 ////		SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
 
 		// 增加用户
-		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getPhone(), adminUserQO.getPassword());
+		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getMobile(), adminUserQO.getPassword());
 		// 增加登录类型范围为物业中台管理员和小区管理员
 		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, false);
 		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN, false);
@@ -633,22 +698,22 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	}
 	
 	/**
-	* @Description: 编辑操作员
-	 * @Param: [adminUserEntity]
+	 * @Description: 编辑操作员
+	 * @Param: [adminUserQO]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2021/3/17
-	**/
+	 **/
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void updateOperator(AdminUserEntity adminUserEntity){
-		//查询uid
+	public void updateOperator(AdminUserQO adminUserQO, Long id){
+		/*//查询uid
 		UserEntity user = adminUserMapper.queryUidById(adminUserEntity.getId());
 		if(user == null){
 			throw new PropertyException("用户不存在！");
 		}
 		//更新密码
-		/*if(!StringUtils.isEmpty(adminUserEntity.getPassword())){
+		if(!StringUtils.isEmpty(adminUserEntity.getPassword())){
 			//生成盐值并对密码加密
 			String salt = RandomStringUtils.randomAlphanumeric(20);
 			String password = new Sha256Hash(RSAUtil.privateDecrypt(adminUserEntity.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), salt).toHex();
@@ -659,39 +724,91 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			adminUserAuthEntity.setSalt(salt);
 			adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("mobile",user.getMobile()));
 		}*/
+		
 		//更新社区权限
-		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
-			adminConfigService.updateAdminCommunityBatch(adminUserEntity.getCommunityIdList(),user.getUid());
+		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
+			adminConfigService.updateAdminCommunityBatch(adminUserQO.getCommunityIdList(), String.valueOf(adminUserQO.getId()));
 			//刷新token中的社区权限
-			String token = String.valueOf(redisTemplate.opsForValue().get("Admin:LoginAccount:" + user.getMobile()));
+			String token = String.valueOf(redisTemplate.opsForValue().get("Admin:LoginAccount:" + adminUserQO.getMobile()));
 			String tokenValue = String.valueOf(redisTemplate.opsForValue().get("Admin:Login:" + token));
 			AdminUserEntity userData = JSONObject.parseObject(tokenValue,AdminUserEntity.class);
 			//如果此时token刚好过期，则不操作
 			if(userData != null){
-				userData.setCommunityIdList(adminUserEntity.getCommunityIdList());
+				userData.setCommunityIdList(adminUserQO.getCommunityIdList());
 				redisTemplate.opsForValue().set("Admin:Login:" + token , JSON.toJSONString(userData) , loginExpireHour ,TimeUnit.HOURS);
-				redisTemplate.opsForValue().set("Admin:LoginAccount:" + user.getMobile() , token , loginExpireHour ,TimeUnit.HOURS);
+				redisTemplate.opsForValue().set("Admin:LoginAccount:" + adminUserQO.getMobile() , token , loginExpireHour ,TimeUnit.HOURS);
 			}
 		}
+		
+		if (adminUserQO.getCommunityRoleId() != null) {
+			if (adminUserQO.getRoleId() == null) {
+				throw new PropertyException("传入小区角色时，请同时传入物业角色！");
+			}
+			// 查询角色
+			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(adminUserQO.getId(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
+			Set<Long> roleIdSet = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
+			QueryWrapper<AdminRoleCompanyEntity> adminRoleCompanyEntityQueryWrapper = new QueryWrapper<>();
+			adminRoleCompanyEntityQueryWrapper.eq("company_id", adminUserQO.getCompanyId());
+			adminRoleCompanyEntityQueryWrapper.in("role_id", roleIdSet);
+			adminRoleCompanyEntityQueryWrapper.last("limit 2");
+			List<AdminRoleCompanyEntity> adminRoleCompanyEntities = adminRoleCompanyMapper.selectList(adminRoleCompanyEntityQueryWrapper);
+			List<Long> roles = new ArrayList<>();
+			for (AdminRoleCompanyEntity adminRoleCompanyEntity : adminRoleCompanyEntities) {
+				roles.add(adminRoleCompanyEntity.getRoleId());
+			}
+			// 移除角色
+			baseRoleRpcService.roleRemoveToUser(roles, adminUserQO.getId());
+			// 增加角色
+			List<Long> addRoles = new ArrayList<>();
+			addRoles.add(adminUserQO.getRoleId());
+			addRoles.add(adminUserQO.getCommunityRoleId());
+			baseRoleRpcService.userJoinRole(addRoles, adminUserQO.getId(), id);
+			// 更新资料
+			baseUpdateUserRpcService.updateUserInfo(adminUserQO.getId(), adminUserQO.getNickName(),
+				adminUserQO.getMobile(), adminUserQO.getPassword(), BusinessConst.COMMUNITY_ADMIN);
+		} else {
+			// 没有小区角色，只是物业端更新
+			// 查询角色
+			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(adminUserQO.getId(), BusinessConst.PROPERTY_ADMIN);
+			Set<Long> roleIdSet = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
+			QueryWrapper<AdminRoleCompanyEntity> adminRoleCompanyEntityQueryWrapper = new QueryWrapper<>();
+			adminRoleCompanyEntityQueryWrapper.eq("company_id", adminUserQO.getCompanyId());
+			adminRoleCompanyEntityQueryWrapper.in("role_id", roleIdSet);
+			adminRoleCompanyEntityQueryWrapper.last("limit 1");
+			AdminRoleCompanyEntity adminRoleCompanyEntity = adminRoleCompanyMapper.selectOne(adminRoleCompanyEntityQueryWrapper);
+			List<Long> roles = new ArrayList<>();
+			roles.add(adminRoleCompanyEntity.getRoleId());
+			// 移除角色
+			baseRoleRpcService.roleRemoveToUser(roles, adminUserQO.getId());
+			// 增加角色
+			List<Long> addRoles = new ArrayList<>();
+			addRoles.add(adminUserQO.getRoleId());
+			baseRoleRpcService.userJoinRole(addRoles, adminUserQO.getId(), id);
+			// 更新资料
+			baseUpdateUserRpcService.updateUserInfo(adminUserQO.getId(), adminUserQO.getNickName(),
+				adminUserQO.getMobile(), adminUserQO.getPassword(), BusinessConst.PROPERTY_ADMIN);
+		}
+		
+		
 		//修改手机号
-		if(!StringUtils.isEmpty(adminUserEntity.getMobile()) && !adminUserEntity.getMobile().equals(user.getMobile())){
-			//用户是否已注册
-			boolean exists = checkUserExists(adminUserEntity.getMobile());
-			if(exists){
-				throw new PropertyException(JSYError.DUPLICATE_KEY.getCode(),"该手机号已被注册");
-			}
-			//更换手机号操作
-			boolean b = changeMobile(adminUserEntity.getMobile(), user.getMobile());
-			if(b){
-				//旧手机账号退出登录
-				UserUtils.destroyToken("Admin:Login",String.valueOf(redisTemplate.opsForValue().get("Admin:LoginAccount:" + user.getMobile())));
-				UserUtils.destroyToken("Admin:LoginAccount",user.getMobile());
-			}
-		}
+//		if(!StringUtils.isEmpty(adminUserEntity.getMobile()) && !adminUserEntity.getMobile().equals(user.getMobile())){
+//			//用户是否已注册
+//			boolean exists = checkUserExists(adminUserEntity.getMobile());
+//			if(exists){
+//				throw new PropertyException(JSYError.DUPLICATE_KEY.getCode(),"该手机号已被注册");
+//			}
+//			//更换手机号操作
+//			boolean b = changeMobile(adminUserEntity.getMobile(), user.getMobile());
+//			if(b){
+//				//旧手机账号退出登录
+//				UserUtils.destroyToken("Admin:Login",String.valueOf(redisTemplate.opsForValue().get("Admin:LoginAccount:" + user.getMobile())));
+//				UserUtils.destroyToken("Admin:LoginAccount",user.getMobile());
+//			}
+//		}
 		//更新菜单权限
 //		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
 		//更新资料
-		adminUserMapper.updateOperator(adminUserEntity);
+//		adminUserMapper.updateOperator(adminUserEntity);
 	}
 	
 	/**
@@ -702,14 +819,17 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 * @Date: 2021/10/13
 	 */
 	public void deleteOperator(Long id) {
-		AdminUserEntity adminUserEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("id", id));
-		if (adminUserEntity == null) {
-			throw new PropertyException(JSYError.OPERATOR_INFORMATION_NOT_OBTAINED.getCode(),"未获取到操作员信息");
-		}
-		int i = adminUserMapper.deleteById(id);
-		if (i != 1) {
-			throw new PropertyException(JSYError.INTERNAL.getCode(),"删除失败");
-		}
+//		AdminUserEntity adminUserEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("id", id));
+//		if (adminUserEntity == null) {
+//			throw new PropertyException(JSYError.OPERATOR_INFORMATION_NOT_OBTAINED.getCode(),"未获取到操作员信息");
+//		}
+//		int i = adminUserMapper.deleteById(id);
+//		if (i != 1) {
+//			throw new PropertyException(JSYError.INTERNAL.getCode(),"删除失败");
+//		}
+		baseAuthRpcService.cancellation(id);
+		// 删除的同时也要删除用户和物业公司绑定关系
+		adminUserCompanyMapper.delete(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", id).eq("deleted", 0));
 	}
 	
 //	/**
