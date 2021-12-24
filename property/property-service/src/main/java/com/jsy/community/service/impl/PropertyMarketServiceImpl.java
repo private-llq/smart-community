@@ -18,14 +18,18 @@ import com.jsy.community.qo.property.PropertyMarketQO;
 import com.jsy.community.qo.proprietor.ProprietorMarketQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.proprietor.ProprietorMarketVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealUserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import jodd.util.StringUtil;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @DubboService(version = Const.version, group = Const.group_property)
 public class PropertyMarketServiceImpl extends ServiceImpl<PropertyMarketMapper, ProprietorMarketEntity> implements IPropertyMarketService {
@@ -43,6 +47,9 @@ public class PropertyMarketServiceImpl extends ServiceImpl<PropertyMarketMapper,
 
    @Autowired
    private PropertyMarketCategoryMapper categoryMapper;
+
+   @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+   private IBaseUserInfoRpcService baseUserInfoRpcService;
 
 //    /**
 //     * @Description: 发布商品信息
@@ -174,19 +181,29 @@ public class PropertyMarketServiceImpl extends ServiceImpl<PropertyMarketMapper,
         page1 =(baseQO.getPage()-1)*baseQO.getSize();
         PropertyMarketQO query = baseQO.getQuery();
         ArrayList<ProprietorMarketVO> arrayList = new ArrayList<>();
-
-        List<ProprietorMarketEntity> list =  marketMapper.selectMarketAllPage(query,page1,baseQO.getSize());
+        Set<String> uidSet = new HashSet<>();
+        if (StringUtil.isNotBlank(query.getRealName())) {
+            uidSet = baseUserInfoRpcService.queryRealUserDetail(query.getRealName(), query.getRealName());
+        }
+        List<ProprietorMarketEntity> list =  marketMapper.selectMarketAllPage(query,page1,baseQO.getSize(), uidSet);
+        Set<String> resultUidSet = list.stream().map(ProprietorMarketEntity::getUid).collect(Collectors.toSet());
+        List<RealUserDetail> realUserDetails = baseUserInfoRpcService.getRealUserDetails(resultUidSet);
+        Map<String, RealUserDetail> realUserDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
         for (ProprietorMarketEntity li : list){
             ProprietorMarketVO marketVO = new ProprietorMarketVO();
+            RealUserDetail realUserDetail = realUserDetailMap.get(li.getUid());
             BeanUtils.copyProperties(li,marketVO);
+            if (realUserDetail != null) {
+                marketVO.setRealName(realUserDetail.getRealName());
+            }
             arrayList.add(marketVO);
         }
-        Long total = marketMapper.findTotals(query);
+        Long total = marketMapper.findTotals(query, uidSet);
         HashMap<String, Object> map = new HashMap<>();
         map.put("total",total);
         map.put("list",arrayList);
 
-        marketMapper.findCount();
+        // marketMapper.findCount();
         return map;
     }
 
@@ -277,9 +294,16 @@ public class PropertyMarketServiceImpl extends ServiceImpl<PropertyMarketMapper,
 
         ArrayList<ProprietorMarketVO> arrayList = new ArrayList<>();
         List<ProprietorMarketEntity> list =  marketMapper.selectMarketBlacklist(page1,baseQO.getSize());
+        Set<String> resultUidSet = list.stream().map(ProprietorMarketEntity::getUid).collect(Collectors.toSet());
+        List<RealUserDetail> realUserDetails = baseUserInfoRpcService.getRealUserDetails(resultUidSet);
+        Map<String, RealUserDetail> realUserDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
         for (ProprietorMarketEntity li : list){
             ProprietorMarketVO marketVO = new ProprietorMarketVO();
+            RealUserDetail realUserDetail = realUserDetailMap.get(li.getUid());
             BeanUtils.copyProperties(li,marketVO);
+            if (realUserDetail != null) {
+                marketVO.setRealName(realUserDetail.getRealName());
+            }
             arrayList.add(marketVO);
         }
         Long total = marketMapper.findCount();

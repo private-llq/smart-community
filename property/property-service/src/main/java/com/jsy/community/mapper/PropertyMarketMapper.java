@@ -7,6 +7,7 @@ import com.jsy.community.qo.proprietor.ProprietorMarketQO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper
@@ -37,7 +38,12 @@ public interface PropertyMarketMapper extends BaseMapper<ProprietorMarketEntity>
      * @Author: Tian
      * @Date: 2021/8/23-10:48
      **/
-    List<ProprietorMarketEntity> selectMarketAllPage(@Param("query") PropertyMarketQO query,@Param("page") Long page, @Param("size") Long size);
+    List<ProprietorMarketEntity> selectMarketAllPage(
+            @Param("query") PropertyMarketQO query,
+            @Param("page") Long page,
+            @Param("size") Long size,
+            @Param("uidSet") Collection<?> uidSet
+            );
 
     /**
      * @Description: 查询所有发布的商品的条数
@@ -47,7 +53,7 @@ public interface PropertyMarketMapper extends BaseMapper<ProprietorMarketEntity>
      * @Date: 2021/8/23-10:50
      *
      * @param query*/
-    Long findTotals(@Param("query") PropertyMarketQO query);
+    Long findTotals(@Param("query") PropertyMarketQO query, @Param("uidSet") Collection<?> uidSet);
 
 //    /**
 //     * @Description: 热门商品

@@ -141,13 +141,15 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 							order.setBuyerId(buyerId);
 							//处理订单
 							dealOrder(order);
+							return "success";
 						}
 					}
 				}
 			}else{
 				log.error("支付宝系统订单：" + paramsMap.get("out_trade_no") + "不存在！");
+				return "failure";
 			}
-			return "success";
+			return "failure";
 		} else {
 			log.error("支付宝系统订单：" + paramsMap.get("out_trade_no") + "验签失败");
 //			return "false";
