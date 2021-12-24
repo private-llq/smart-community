@@ -260,12 +260,14 @@ public class AdminUserController {
 	@PutMapping("")
 	@businessLog(operation = "编辑",content = "更新了【操作员】")
 	@Permit("community:property:sys:user")
-	public CommonResult updateOperator(@RequestBody AdminUserEntity adminUserEntity){
-		if(!CollectionUtils.isEmpty(adminUserEntity.getCommunityIdList())){
+	public CommonResult updateOperator(@RequestBody AdminUserQO adminUserQO){
+		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
 			//验证社区权限
-			UserUtils.validateCommunityIds(adminUserEntity.getCommunityIdList());
+			UserUtils.validateCommunityIds(adminUserQO.getCommunityIdList());
 		}
-		adminUserService.updateOperator(adminUserEntity);
+		String id = UserUtils.getId();
+		adminUserQO.setCompanyId(UserUtils.getAdminCompanyId());
+		adminUserService.updateOperator(adminUserQO, Long.valueOf(id));
 		return CommonResult.ok("操作成功");
 	}
 	

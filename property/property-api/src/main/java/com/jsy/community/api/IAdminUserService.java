@@ -6,8 +6,8 @@ import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
-import com.jsy.community.utils.PageInfo;
 import com.zhsj.base.api.entity.RealUserDetail;
+import com.zhsj.base.api.vo.PageVO;
 
 import java.util.Collection;
 import java.util.List;
@@ -228,7 +228,7 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/16
 	**/
-	PageInfo queryOperator(BaseQO<AdminUserQO> baseQO);
+	PageVO<AdminUserEntity> queryOperator(BaseQO<AdminUserQO> baseQO);
 	
 	/**
 	* @Description: 添加操作员
@@ -240,13 +240,13 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	void addOperator(AdminUserQO adminUserQO);
 	
 	/**
-	* @Description: 编辑操作员
-	 * @Param: [adminUserEntity]
+	 * @Description: 编辑操作员
+	 * @Param: [adminUserQO]
 	 * @Return: boolean
 	 * @Author: chq459799974
 	 * @Date: 2021/3/18
-	**/
-	void updateOperator(AdminUserEntity adminUserEntity);
+	 **/
+	void updateOperator(AdminUserQO adminUserQO, Long id);
 	
 	/**
 	 * @Description: 删除操作员

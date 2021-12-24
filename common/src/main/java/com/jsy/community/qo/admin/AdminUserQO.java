@@ -36,7 +36,7 @@ public class AdminUserQO implements Serializable {
 	private String nickName;
 	
 	@ApiModelProperty(value = "电话号码")
-	private String phone;
+	private String mobile;
 	
 	// 密码
 	private String password;

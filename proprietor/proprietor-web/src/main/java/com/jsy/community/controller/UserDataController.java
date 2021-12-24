@@ -2,7 +2,6 @@ package com.jsy.community.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IUserAccountService;
 import com.jsy.community.api.IUserDataService;
 import com.jsy.community.constant.Const;
@@ -17,8 +16,6 @@ import com.jsy.community.vo.UserInfoVo;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.rpc.IBaseUpdateUserRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
-import com.zhsj.base.api.rpc.IBaseWalletRpcService;
-import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import jodd.util.StringUtil;
@@ -28,8 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.UnsupportedEncodingException;
 import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
