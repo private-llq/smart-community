@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
 import com.jsy.community.utils.RegexUtils;
 import com.zhsj.base.api.domain.PermitMenu;
+import com.zhsj.base.api.domain.PermitRole;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -100,7 +101,7 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 昵称
 	 */
-	private String nickname;
+	private String nickName;
 	
 	/**
 	 * 真实姓名
@@ -212,7 +213,7 @@ public class AdminUserEntity extends BaseEntity {
 	// 角色Id
 	@TableField(exist = false)
 	@NotNull(groups = {addOperatorValidatedGroup.class}, message = "角色Id不能为空")
-	private Long roleId;
+	private List<PermitRole> permitRoles;
 
 	// 角色Id
 	@TableField(exist = false)

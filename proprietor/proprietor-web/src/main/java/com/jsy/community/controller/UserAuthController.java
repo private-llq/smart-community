@@ -14,11 +14,9 @@ import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
 import com.zhsj.base.api.constant.RpcConst;
-import com.zhsj.base.api.domain.BaseThirdPlatform;
 import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import com.zhsj.base.api.rpc.IBaseSmsRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
-import com.zhsj.base.api.rpc.IThirdRpcService;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.support.ContextHolder;
 import com.zhsj.baseweb.support.LoginUser;
@@ -31,12 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 

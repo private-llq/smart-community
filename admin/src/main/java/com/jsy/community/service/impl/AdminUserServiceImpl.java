@@ -72,7 +72,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 		Page<AdminUserEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page, baseQO);
 		
-		PageVO<UserDetail> userDetailPageVO = userInfoRpcService.queryUser(query.getPhone(), "", BusinessConst.PROPERTY_ADMIN, null, baseQO.getPage().intValue(), baseQO.getSize().intValue());
+		PageVO<UserDetail> userDetailPageVO = userInfoRpcService.queryUser(query.getMobile(), "", BusinessConst.PROPERTY_ADMIN, null, baseQO.getPage().intValue(), baseQO.getSize().intValue());
 		
 		if (CollectionUtils.isEmpty(userDetailPageVO.getData())) {
 			return new PageVO<>();
@@ -114,7 +114,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 			}
 			adminUserEntity.setId(userDetail.getId());
 			adminUserEntity.setIdStr(String.valueOf(userDetail.getId()));
-			adminUserEntity.setNickname(userDetail.getNickName());
+			adminUserEntity.setNickName(userDetail.getNickName());
 			adminUserEntity.setMobile(userDetail.getPhone());
 			adminUserEntity.setCreateTime(LocalDateTime.parse(userDetail.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 			pageVO.getData().add(adminUserEntity);
@@ -137,7 +137,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 	@Transactional(rollbackFor = Exception.class)
 	public void addOperator(AdminUserQO adminUserQO){
 		// 增加用户
-		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getPhone(), adminUserQO.getPassword());
+		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getMobile(), adminUserQO.getPassword());
 		// 增加登录类型范围为物业中台
 		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN);
 		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN);
@@ -165,7 +165,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 	public void updateOperator(AdminUserQO adminUserQO){
 		//更新资料
 		baseUpdateUserRpcService.updateUserInfo(adminUserQO.getId(), adminUserQO.getNickName(),
-			adminUserQO.getPhone(), adminUserQO.getPassword(), BusinessConst.PROPERTY_ADMIN);
+			adminUserQO.getMobile(), adminUserQO.getPassword(), BusinessConst.PROPERTY_ADMIN);
 	}
 	
 	/**

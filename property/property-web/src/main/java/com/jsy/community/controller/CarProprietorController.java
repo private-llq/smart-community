@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICarProprietorService;
 import com.jsy.community.constant.Const;
