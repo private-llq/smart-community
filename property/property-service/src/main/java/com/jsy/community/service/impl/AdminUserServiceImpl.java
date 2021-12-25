@@ -16,10 +16,8 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.admin.AdminRoleCompanyEntity;
-import com.jsy.community.entity.admin.AdminUserAuthEntity;
-import com.jsy.community.entity.admin.AdminUserCompanyEntity;
-import com.jsy.community.entity.admin.AdminUserEntity;
+import com.jsy.community.entity.UserLivingExpensesAccountEntity;
+import com.jsy.community.entity.admin.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
@@ -39,6 +37,7 @@ import com.zhsj.base.api.rpc.IBaseRoleRpcService;
 import com.zhsj.base.api.rpc.IBaseUpdateUserRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.PageVO;
+import com.zhsj.basecommon.constant.BaseUserConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -599,6 +598,15 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 //			userDetailPageVO.getData().removeIf(userDetail -> !uIds.contains(userDetail.getId()));
 //		}
 		PageVO<AdminUserEntity> pageVO = new PageVO<>();
+		Set<Long> idSet = userDetailPageVO.getData().stream().map(UserDetail::getId).collect(Collectors.toSet());
+		List<AdminCommunityEntity> adminCommunityEntities = adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("community_id, uid").in("uid", idSet));
+		Map<String, List<String>> map = new HashMap<>();
+		if (!CollectionUtils.isEmpty(adminCommunityEntities)) {
+			map = adminCommunityEntities.stream()
+					.collect(Collectors.groupingBy(AdminCommunityEntity::getUid,
+							Collectors.mapping(AdminCommunityEntity::getCommunityId, Collectors.toList())));
+		}
+
 		// 补充数据
 		for (UserDetail userDetail : userDetailPageVO.getData()) {
 			AdminUserEntity adminUserEntity = new AdminUserEntity();
@@ -614,9 +622,15 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
 			StringBuilder sb = new StringBuilder();
 			for (PermitRole permitRole : permitRoles) {
+				if (permitRole.getScope() == BaseUserConstant.Login.DataBasePermitScope.PROPERTY_ADMIN) {
+					adminUserEntity.setRoleId(String.valueOf(permitRole.getId()));
+				}
+				if (permitRole.getScope() == BaseUserConstant.Login.DataBasePermitScope.COMMUNITY_ADMIN) {
+					adminUserEntity.setCommunityRoleId(String.valueOf(permitRole.getId()));
+				}
 				sb.append(permitRole.getName()).append(",");
 			}
-			
+			adminUserEntity.setCommunityIdList(map.get(String.valueOf(userDetail.getId())));
 			adminUserEntity.setId(userDetail.getId());
 			adminUserEntity.setIdStr(String.valueOf(userDetail.getId()));
 			adminUserEntity.setNickName(userDetail.getNickName());

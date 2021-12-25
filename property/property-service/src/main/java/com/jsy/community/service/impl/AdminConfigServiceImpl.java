@@ -421,6 +421,22 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 				}
 			}
 		}
+		List<AdminRoleEntity> data = new ArrayList<>();
+		if (query.getRoleType() == 1) {
+			for (AdminRoleEntity datum : pageVO.getData()) {
+				if (datum.getScope() == 8) {
+					data.add(datum);
+				}
+			}
+		}
+		if (query.getRoleType() == 2) {
+			for (AdminRoleEntity datum : pageVO.getData()) {
+				if (datum.getScope() == 16) {
+					data.add(datum);
+				}
+			}
+		}
+		pageVO.setData(data);
 		pageVO.setPageNum(baseQO.getPage());
 		pageVO.setPageSize(permitRolePageVO.getPageSize());
 		pageVO.setPages((permitRolePageVO.getTotal()-2) > 0 ? new Double(Math.ceil((permitRolePageVO.getTotal()-2)/permitRolePageVO.getPageSize())).longValue() : 0);
@@ -789,7 +805,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	public Integer addAdminCommunity(String uid, Long communityId) {
 		AdminCommunityEntity adminCommunityEntity = new AdminCommunityEntity();
 		adminCommunityEntity.setUid(uid);
-		adminCommunityEntity.setCommunityId(communityId);
+		adminCommunityEntity.setCommunityId(String.valueOf(communityId));
 		return adminCommunityMapper.insert(adminCommunityEntity);
 	}
 

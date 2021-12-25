@@ -213,7 +213,7 @@ public class AdminLoginController {
 		// 获取token
 		List<String> communityIdList = new ArrayList<>();
 		for(AdminCommunityEntity entity : adminCommunityList){
-			communityIdList.add(String.valueOf(entity.getCommunityId()));
+			communityIdList.add(entity.getCommunityId());
 		}
 		adminInfoVo.setCommunityIdList(communityIdList);
 //		String token = adminUserTokenService.createToken(userData);
@@ -249,6 +249,8 @@ public class AdminLoginController {
 		//用户菜单
 //		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getAdminRoleId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
 		List<PermitMenu> userMenu = baseMenuRpcService.all(Long.valueOf(adminInfoVo.getUid()), BusinessConst.COMMUNITY_ADMIN);
+		// list排序
+		userMenu.sort(Comparator.comparing(PermitMenu::getSort));
 		//设置小区级菜单
 		adminInfoVo.setMenuList(userMenu);
 		//设置小区ID

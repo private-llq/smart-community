@@ -5,6 +5,7 @@ import com.jsy.community.api.AdminRoleService;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminRoleEntity;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
 import com.jsy.community.utils.UserUtils;
@@ -104,8 +105,8 @@ public class AdminRoleController {
 	@PostMapping("/pageAll")
 	@Permit("community:property:role:pageAll")
 	public CommonResult queryPageAll(@RequestBody BaseQO<AdminRoleEntity> baseQO){
-		if(baseQO.getQuery() == null){
-			baseQO.setQuery(new AdminRoleEntity());
+		if(baseQO.getQuery() == null || baseQO.getQuery().getRoleType() == null){
+			throw new JSYException("角色类型(1.物业 2.小区)不能为空");
 		}
 		baseQO.getQuery().setCompanyId(UserUtils.getAdminCompanyId());
 		return CommonResult.ok(adminConfigService.queryPageAll(baseQO),"查询成功");
@@ -115,9 +116,7 @@ public class AdminRoleController {
 	@Permit("community:property:role:selectAllRole")
 	public CommonResult selectAllRole(){
 		Long adminCommunityId = UserUtils.getAdminCommunityId();
-	  List<AdminRoleEntity> list=adminRoleService.selectAllRole(adminCommunityId);
-
-
+	  	List<AdminRoleEntity> list=adminRoleService.selectAllRole(adminCommunityId);
 		return CommonResult.ok(list,"查询成功");
 	}
 

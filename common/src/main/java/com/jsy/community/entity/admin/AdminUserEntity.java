@@ -230,6 +230,14 @@ public class AdminUserEntity extends BaseEntity {
 	@ApiModelProperty(value = "应用菜单名称")
 	@TableField(exist = false)
 	private String menuName;
+
+	// 物业角色ID
+	@TableField(exist = false)
+	private String roleId;
+
+	// 小区角色ID
+	@TableField(exist = false)
+	private String communityRoleId;
 	
 	/**
 	 * 注册邀请传参验证
