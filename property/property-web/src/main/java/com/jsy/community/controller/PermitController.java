@@ -144,7 +144,7 @@ public class PermitController {
     @GetMapping("/getPermit")
     @LoginIgnore
     public CommonResult getPermit(PermissionQO permissionQO) {
-        PermitDto permit = permitRpcService.getPermit(String.valueOf(permissionQO.getUid()), permissionQO.getAccount(), BusinessConst.ULTIMATE_ADMIN);
+        PermitDto permit = permitRpcService.getPermit(String.valueOf(permissionQO.getUid()), permissionQO.getAccount(), BusinessConst.PROPERTY_ADMIN);
         return CommonResult.ok(permit);
     }
     

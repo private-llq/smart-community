@@ -70,8 +70,10 @@ public class AdminMenuController {
 	@GetMapping("/page")
 	@Permit("community:property:menu:page")
 	public CommonResult MenuPage(Integer roleType){
+		Map<String, Object> returnMap = new HashMap<>();
 		String id = UserUtils.getId();
 		List<PermitMenu> permitMenus = adminConfigService.MenuPage(roleType, Long.valueOf(id));
-		return CommonResult.ok(permitMenus,"查询成功");
+		returnMap.put("allMenu", permitMenus);
+		return CommonResult.ok(returnMap,"查询成功");
 	}
 }

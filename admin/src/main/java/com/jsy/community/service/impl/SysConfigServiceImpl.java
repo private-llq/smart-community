@@ -19,8 +19,11 @@ import com.jsy.community.service.ISysConfigService;
 import com.jsy.community.utils.MyPageUtils;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.domain.MenuPermission;
+import com.zhsj.base.api.domain.PermitMenu;
 import com.zhsj.base.api.domain.PermitRole;
 import com.zhsj.base.api.domain.RoleMenu;
+import com.zhsj.base.api.entity.AddMenuDto;
+import com.zhsj.base.api.entity.UpdateMenuDto;
 import com.zhsj.base.api.entity.UpdateRoleDto;
 import com.zhsj.base.api.rpc.IBaseMenuPermissionRpcService;
 import com.zhsj.base.api.rpc.IBaseMenuRpcService;
@@ -29,7 +32,6 @@ import com.zhsj.base.api.rpc.IBaseRoleRpcService;
 import com.zhsj.base.api.vo.PageVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -126,32 +128,47 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Date: 2020/12/14
 	**/
 	@Override
-	public boolean addMenu(SysMenuEntity sysMenuEntity){
-		if(sysMenuEntity.getPid() != null && sysMenuEntity.getPid() != 0){ //①非顶级节点，查找父节点，确保数据严密性
-			SysMenuEntity parent = sysMenuMapper.findParent(sysMenuEntity.getPid());
-			if(parent == null){
-				return false;
-			}
-			if(0 == parent.getBelongTo()){//父级是顶级节点
-				sysMenuEntity.setBelongTo(parent.getId());
-			}else{ //父级也是子级
-				sysMenuEntity.setBelongTo(parent.getBelongTo());//同步父节点的顶级节点
-			}
-		}else { //②顶级节点
-			sysMenuEntity.setPid(0L);
-			sysMenuEntity.setBelongTo(0L);
-		}
-		int result = 0;
-		if(sysMenuEntity.getSort() == null){
-			result = sysMenuMapper.addMenu(sysMenuEntity);
-		}else{
-			result = sysMenuMapper.insert(sysMenuEntity);
-		}
-		if(result == 1){
-			cacheMenuToRedis(); //刷新redis
-			return true;
-		}
-		return false;
+	public void addMenu(SysMenuEntity sysMenuEntity){
+//		if(sysMenuEntity.getPid() != null && sysMenuEntity.getPid() != 0){ //①非顶级节点，查找父节点，确保数据严密性
+//			SysMenuEntity parent = sysMenuMapper.findParent(sysMenuEntity.getPid());
+//			if(parent == null){
+//				return false;
+//			}
+//			if(0 == parent.getBelongTo()){//父级是顶级节点
+//				sysMenuEntity.setBelongTo(parent.getId());
+//			}else{ //父级也是子级
+//				sysMenuEntity.setBelongTo(parent.getBelongTo());//同步父节点的顶级节点
+//			}
+//		}else { //②顶级节点
+//			sysMenuEntity.setPid(0L);
+//			sysMenuEntity.setBelongTo(0L);
+//		}
+//		int result = 0;
+//		if(sysMenuEntity.getSort() == null){
+//			result = sysMenuMapper.addMenu(sysMenuEntity);
+//		}else{
+//			result = sysMenuMapper.insert(sysMenuEntity);
+//		}
+//		if(result == 1){
+//			cacheMenuToRedis(); //刷新redis
+//			return true;
+//		}
+//		return false;
+		AddMenuDto addMenuDto = new AddMenuDto();
+		addMenuDto.setLoginType(sysMenuEntity.getLoginType() == 1 ? BusinessConst.ULTIMATE_ADMIN : sysMenuEntity.getLoginType() == 2 ? BusinessConst.PROPERTY_ADMIN : BusinessConst.COMMUNITY_ADMIN);
+		addMenuDto.setName(sysMenuEntity.getName());
+		addMenuDto.setIcon(sysMenuEntity.getIcon());
+		addMenuDto.setPath(sysMenuEntity.getPath());
+		addMenuDto.setSort(sysMenuEntity.getSort());
+		addMenuDto.setPid(sysMenuEntity.getPid());
+		addMenuDto.setType(sysMenuEntity.getType());
+		addMenuDto.setUid(sysMenuEntity.getId());
+		// 新增菜单
+		PermitMenu permitMenu = baseMenuRpcService.addMenu(addMenuDto);
+		// 绑定菜单到默认角色
+		List<Long> menuIds = new ArrayList<>();
+		menuIds.add(permitMenu.getId());
+		baseMenuRpcService.menuJoinRole(menuIds, sysMenuEntity.getLoginType() == 1 ? 1463327674104250369L : sysMenuEntity.getLoginType() == 2 ? 1463327674070695937L : 1467739062281084931L , 1460884237115367425L);
 	}
 	
 	//寻找顶级菜单ID
@@ -174,19 +191,22 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Date: 2020/12/14
 	**/
 	@Override
-	public boolean delMenu(Long id){
-		List<Long> idList = new LinkedList<>(); // 级联出的要删除的id
-		idList.add(id);
-//		List<Long> subIdList = sysMenuMapper.getSubIdList(Arrays.asList(id));
-//		setDeleteIds(idList, subIdList);
-//		int result = sysMenuMapper.deleteBatchIds(idList);
-		int result = sysMenuMapper.deleteById(id);
-		sysMenuMapper.delete(new QueryWrapper<SysMenuEntity>().eq("belong_to",id));
-		if(result == 1){
-			cacheMenuToRedis(); //刷新redis
-			return true;
-		}
-		return false;
+	public void delMenu(Long id){
+//		List<Long> idList = new LinkedList<>(); // 级联出的要删除的id
+//		idList.add(id);
+////		List<Long> subIdList = sysMenuMapper.getSubIdList(Arrays.asList(id));
+////		setDeleteIds(idList, subIdList);
+////		int result = sysMenuMapper.deleteBatchIds(idList);
+//		int result = sysMenuMapper.deleteById(id);
+//		sysMenuMapper.delete(new QueryWrapper<SysMenuEntity>().eq("belong_to",id));
+//		if(result == 1){
+//			cacheMenuToRedis(); //刷新redis
+//			return true;
+//		}
+//		return false;
+		List<Long> menuIds = new ArrayList<>();
+		menuIds.add(id);
+		baseMenuRpcService.deleteMenu(menuIds);
 	}
 	
 	//组装全部需要删除的id
@@ -206,15 +226,26 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Date: 2020/12/14
 	**/
 	@Override
-	public boolean updateMenu(SysMenuQO sysMenuQO){
-		SysMenuEntity entity = new SysMenuEntity();
-		BeanUtils.copyProperties(sysMenuQO,entity);
-		int result = sysMenuMapper.updateById(entity);
-		if(result == 1){
-			cacheMenuToRedis(); //刷新redis
-			return true;
-		}
-		return false;
+	public void updateMenu(SysMenuQO sysMenuQO){
+//		SysMenuEntity entity = new SysMenuEntity();
+//		BeanUtils.copyProperties(sysMenuQO,entity);
+//		int result = sysMenuMapper.updateById(entity);
+//		if(result == 1){
+//			cacheMenuToRedis(); //刷新redis
+//			return true;
+//		}
+//		return false;
+		UpdateMenuDto updateMenuDto = new UpdateMenuDto();
+		updateMenuDto.setId(sysMenuQO.getId());
+		updateMenuDto.setLoginType(sysMenuQO.getLoginType() == 1 ? BusinessConst.ULTIMATE_ADMIN : sysMenuQO.getLoginType() == 2 ? BusinessConst.PROPERTY_ADMIN : BusinessConst.COMMUNITY_ADMIN);
+		updateMenuDto.setName(sysMenuQO.getName());
+		updateMenuDto.setIcon(sysMenuQO.getIcon());
+		updateMenuDto.setPath(sysMenuQO.getPath());
+		updateMenuDto.setSort(sysMenuQO.getSort());
+		updateMenuDto.setPid(sysMenuQO.getPid());
+		updateMenuDto.setUid(sysMenuQO.getUpdateId());
+		
+		baseMenuRpcService.updateMenu(updateMenuDto);
 	}
 	
 	/**

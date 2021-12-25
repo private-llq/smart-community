@@ -28,6 +28,7 @@ public class SysMenuEntity extends BaseEntity {
 	@JsonIgnore
 	private Long belongTo;//顶级菜单id
 	private Integer type;//类型 1.目录 2.菜单 3.按钮
+	private Integer loginType;// 登录类型 1.大后台 2.物业 3.小区
 	
 	@TableField(exist = false)
 	private List<SysMenuEntity> childrenList;//子菜单

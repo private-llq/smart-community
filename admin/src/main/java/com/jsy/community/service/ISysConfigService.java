@@ -25,7 +25,7 @@ public interface ISysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
-	boolean addMenu(SysMenuEntity sysMenuEntity);
+	void addMenu(SysMenuEntity sysMenuEntity);
 	
 	/**
 	* @Description: 级联删除
@@ -34,7 +34,7 @@ public interface ISysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	boolean delMenu(Long id);
+	void delMenu(Long id);
 	
 	/**
 	 * @Description: 修改菜单
@@ -43,7 +43,7 @@ public interface ISysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
-	boolean updateMenu(SysMenuQO sysMenuQO);
+	void updateMenu(SysMenuQO sysMenuQO);
 	
 	/**
 	 * @Description: 菜单列表
