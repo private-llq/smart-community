@@ -528,8 +528,10 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		// 查角色关联菜单id列表
 		List<RoleMenu> roleMenus = baseRoleRpcService.listAllRoleMenu(permitRole.getId());
 		List<Long> menuIds = new ArrayList<>();
+		List<String> menuIdsStr = new ArrayList<>();
 		for (RoleMenu roleMenu : roleMenus) {
 			menuIds.add(roleMenu.getMenuId());
+			menuIdsStr.add(String.valueOf(roleMenu.getMenuId()));
 		}
 		adminRoleEntity.setId(permitRole.getId());
 		adminRoleEntity.setIdStr(String.valueOf(permitRole.getId()));
@@ -537,6 +539,9 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		adminRoleEntity.setRemark(permitRole.getRemark());
 		adminRoleEntity.setCreateTime(LocalDateTime.parse(permitRole.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		adminRoleEntity.setMenuIds(menuIds);
+		adminRoleEntity.setMenuIdsStr(menuIdsStr);
+		adminRoleEntity.setScope(permitRole.getScope());
+		adminRoleEntity.setRoleType(permitRole.getScope());
 		return adminRoleEntity;
 	}
 
