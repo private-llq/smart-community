@@ -1,9 +1,11 @@
 package com.jsy.community.service.impl;
+import com.google.common.collect.Lists;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.PropertyException;
@@ -43,6 +45,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author chq459799974
@@ -202,7 +205,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 * @Date: 2020/12/14
 	 **/
 	@Override
-	@Transactional(rollbackFor = Exception.class)
+	@LcnTransaction
 	public void addRole(AdminRoleEntity adminRoleEntity){
 //		adminRoleEntity.setId(SnowFlake.nextId());
 //		//设置角色菜单
@@ -211,17 +214,19 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 //		}
 //		return adminRoleMapper.insert(adminRoleEntity) == 1;
 		PermitRole permitRole = baseRoleRpcService.createRole(adminRoleEntity.getName(), adminRoleEntity.getRemark(),
-			adminRoleEntity.getRoleType() == 1 ? BusinessConst.PROPERTY_ADMIN : BusinessConst.COMMUNITY_ADMIN, adminRoleEntity.getId());
+			adminRoleEntity.getRoleType() == BaseUserConstant.Login.DataBasePermitScope.PROPERTY_ADMIN ? BusinessConst.PROPERTY_ADMIN : BusinessConst.COMMUNITY_ADMIN, adminRoleEntity.getId());
 		// 菜单分配给角色
 		baseMenuRpcService.menuJoinRole(adminRoleEntity.getMenuIds(), permitRole.getId(), adminRoleEntity.getId());
 		// 查询菜单和权限绑定关系
 		List<MenuPermission> menuPermissions = baseMenuPermissionRpcService.listByIds(adminRoleEntity.getMenuIds());
-		Set<Long> permisIds = new HashSet<>();
-		for (MenuPermission menuPermission : menuPermissions) {
-			permisIds.add(menuPermission.getPermisId());
+		if (!CollectionUtils.isEmpty(menuPermissions)) {
+			Set<Long> permisIds = new HashSet<>();
+			for (MenuPermission menuPermission : menuPermissions) {
+				permisIds.add(menuPermission.getPermisId());
+			}
+			// 权限绑定到角色
+			permissionRpcService.permitJoinRole(permisIds, permitRole.getId(), adminRoleEntity.getId());
 		}
-		// 权限绑定到角色
-		permissionRpcService.permitJoinRole((List<Long>) permisIds, permitRole.getId(), adminRoleEntity.getId());
 		// 新增角色和物业公司关联信息
 		AdminRoleCompanyEntity entity = new AdminRoleCompanyEntity();
 		entity.setId(SnowFlake.nextId());
@@ -322,14 +327,46 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		AdminRoleEntity query = baseQO.getQuery();
 		Page<AdminRoleEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page, baseQO);
-		
-		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(baseQO.getPage().intValue(), baseQO.getSize().intValue(), query.getName(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
+
+		// 查出所有
+		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(baseQO.getPage().intValue(), 9999, query.getName(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
 		if (CollectionUtils.isEmpty(permitRolePageVO.getData())) {
 			return new PageVO<>();
 		}
-		
-		PageVO<AdminRoleEntity> pageVO = new PageVO<>();
-		// 补充数据
+		Set<Long> roleIdSet = permitRolePageVO.getData().stream().map(PermitRole::getId).collect(Collectors.toSet());
+		List<AdminRoleCompanyEntity> roleCompanyEntityList = adminRoleCompanyMapper.selectList(new QueryWrapper<AdminRoleCompanyEntity>().in("role_id", roleIdSet));
+		if (!CollectionUtils.isEmpty(roleCompanyEntityList)) {
+			List<Long> companyRoleIdSet = roleCompanyEntityList.stream().map(AdminRoleCompanyEntity::getRoleId).collect(Collectors.toList());
+			List<PermitRole> permitRoleList = new ArrayList<>();
+			for (PermitRole permitRole : permitRolePageVO.getData()) {
+				if (companyRoleIdSet.contains(permitRole.getId())) {
+					permitRoleList.add(permitRole);
+				}
+			}
+			List<AdminRoleEntity> result = new ArrayList<>();
+			int end = baseQO.getSize() * baseQO.getPage() < permitRoleList.size() ? (int) (baseQO.getSize() * baseQO.getPage()) : permitRoleList.size();
+			for (int i = (int) (baseQO.getPage() - 1); i < end; i++) {
+				AdminRoleEntity adminRoleEntity = new AdminRoleEntity();
+				adminRoleEntity.setId(permitRoleList.get(i).getId());
+				adminRoleEntity.setIdStr(String.valueOf(permitRoleList.get(i).getId()));
+				adminRoleEntity.setName(permitRoleList.get(i).getName());
+				adminRoleEntity.setRemark(permitRoleList.get(i).getRemark());
+				adminRoleEntity.setCreateTime(LocalDateTime.parse(permitRoleList.get(i).getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+				result.add(adminRoleEntity);
+			}
+			PageVO<AdminRoleEntity> pageVO = new PageVO<>();
+			pageVO.setPageNum(baseQO.getPage());
+			pageVO.setPageSize(baseQO.getSize());
+			Long pages = permitRoleList.size() > 0 ? new Double(Math.ceil(permitRoleList.size() / baseQO.getSize())).longValue() : 0;
+			pageVO.setPages(pages);
+			pageVO.setTotal((long) permitRoleList.size());
+			pageVO.setData(result);
+			return pageVO;
+		} else {
+			return new PageVO<>();
+		}
+
+		/*// 补充数据
 		for (PermitRole permitRole : permitRolePageVO.getData()) {
 			// 已排除系统默认角色
 			AdminRoleCompanyEntity entity = adminRoleCompanyMapper.selectOne(new QueryWrapper<AdminRoleCompanyEntity>().eq("role_id", permitRole.getId()).eq("deleted", 0));
@@ -350,7 +387,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		pageVO.setPageSize(permitRolePageVO.getPageSize());
 		pageVO.setPages((permitRolePageVO.getTotal()-2) > 0 ? new Double(Math.ceil((permitRolePageVO.getTotal()-2)/permitRolePageVO.getPageSize())).longValue() : 0);
 		pageVO.setTotal(permitRolePageVO.getTotal()-2);
-		return pageVO;
+		return pageVO;*/
 	}
 
 	/**

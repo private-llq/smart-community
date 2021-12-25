@@ -6,6 +6,7 @@ import com.jsy.community.api.IAppMenuService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.AppMenuEntity;
 import com.jsy.community.mapper.AppMenuMapper;
+import com.jsy.community.mapper.AppVersionMapper;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -25,6 +26,9 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	
 	@Autowired
 	private AppMenuMapper appMenuMapper;
+
+	@Autowired
+	private AppVersionMapper appVersionMapper;
 	
 	/**
 	 * 首页展示的菜单数   本来原先需求是说每个社区首页展示的菜单数可有物业控制(可以有1个2个3个...)   最新产品暂定的需求：每个社区首页最多有3个菜单  其中有个菜单是固定的(我的房屋) pS:应该在社区入驻的同事为其添加一条菜单(我的房屋)   应该是写在大后台的
@@ -74,6 +78,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	 * @return: java.util.List<com.jsy.community.entity.AppMenuEntity>
 	 */
 	public List<AppMenuEntity> listAppMenu(Long communityId, Integer sysType, String version) {
+//		appVersionMapper.selectList();
 		List<AppMenuEntity> appMenuEntities = appMenuMapper.listAppMenu(communityId, 9);
 
 		return appMenuEntities;

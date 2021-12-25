@@ -74,6 +74,6 @@ public class AdminMenuController {
 		String id = UserUtils.getId();
 		List<PermitMenu> permitMenus = adminConfigService.MenuPage(roleType, Long.valueOf(id));
 		returnMap.put("allMenu", permitMenus);
-		return CommonResult.ok(returnMap,"查询成功");
+		return CommonResult.ok(returnMap);
 	}
 }

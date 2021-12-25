@@ -496,75 +496,6 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 **/
 	@Override
 	public PageVO<AdminUserEntity> queryOperator(BaseQO<AdminUserQO> baseQO){
-//		AdminUserQO query = baseQO.getQuery();
-		/*AdminUserQO query = baseQO.getQuery();
-		Page<AdminUserEntity> page = new Page();
-		MyPageUtils.setPageAndSize(page,baseQO);
-		QueryWrapper<AdminUserEntity> queryWrapper = new QueryWrapper<AdminUserEntity>().select("id,uid,real_name,mobile,create_time");
-		//是否查详情
-		Integer menuCount = null;
-		if(query.getId() != null){
-			queryWrapper.eq("id",query.getId());
-//			String uid = adminUserMapper.queryUidById(query.getId());
-//			menuCount = adminConfigService.countUserMenu(uid);
-		}
-		
-		if(!StringUtils.isEmpty(query.getName())){
-			queryWrapper.and(wrapper -> wrapper
-				.like("real_name",query.getName())
-				.or().like("mobile",query.getName())
-			);
-		}
-		queryWrapper.orderByDesc("create_time");
-		Page<AdminUserEntity> pageData = adminUserMapper.selectPage(page,queryWrapper);
-
-		if(CollectionUtils.isEmpty(pageData.getRecords())){
-			return new PageInfo<>();
-		}
-		Set<String> uidSet = pageData.getRecords().stream().map(adminUserEntity -> adminUserEntity.getUid()).collect(Collectors.toSet());
-		List<AdminUserRoleEntity> userRoleEntities = adminUserRoleMapper.queryByUids(uidSet, query.getCompanyId());
-		if (!CollectionUtils.isEmpty(userRoleEntities)) {
-			for (AdminUserEntity record : pageData.getRecords()) {
-				for (AdminUserRoleEntity userRoleEntity : userRoleEntities) {
-					if (record.getUid().equals(userRoleEntity.getUid())) {
-						record.setRoleId(userRoleEntity.getRoleId());
-						record.setRoleName(userRoleEntity.getRoleName());
-						break;
-					}
-				}
-			}
-		}*/
-//		List<AdminUserEntity> adminUserEntities = adminUserMapper.queryPageUserEntity(query, (baseQO.getPage() - 1) * baseQO.getSize(), baseQO.getSize());
-//		Integer integer = adminUserMapper.countPageUserEntity(query);
-//		if (integer == null) {
-//			integer = 0;
-//		}
-//		if (!CollectionUtils.isEmpty(adminUserEntities)) {
-//			Set<String> uidList = adminUserEntities.stream().map(AdminUserEntity::getUid).collect(Collectors.toSet());
-//			List<AdminCommunityEntity> adminCommunityEntities = adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("community_id, uid").in("uid", uidList));
-//			if (!CollectionUtils.isEmpty(adminCommunityEntities)) {
-//				HashMap<String, List<String>> userCommunityIdMap = new HashMap<>();
-//				for (AdminCommunityEntity adminCommunityEntity : adminCommunityEntities) {
-//					if (userCommunityIdMap.containsKey(adminCommunityEntity.getUid())) {
-//						userCommunityIdMap.get(adminCommunityEntity.getUid()).add(String.valueOf(adminCommunityEntity.getCommunityId()));
-//					} else {
-//						List<String> communityIdSet = new ArrayList<>();
-//						communityIdSet.add(String.valueOf(adminCommunityEntity.getCommunityId()));
-//						userCommunityIdMap.put(adminCommunityEntity.getUid(), communityIdSet);
-//					}
-//				}
-//				for (AdminUserEntity adminUserEntity : adminUserEntities) {
-//					adminUserEntity.setCommunityIdList(userCommunityIdMap.get(adminUserEntity.getUid()));
-//				}
-//			}
-//		}
-//		PageInfo<AdminUserEntity> pageInfo = new PageInfo<>();
-//		pageInfo.setRecords(adminUserEntities);
-//		pageInfo.setTotal(integer);
-//		pageInfo.setSize(baseQO.getSize());
-//		pageInfo.setCurrent(baseQO.getPage());
-//		return pageInfo;
-		
 		AdminUserQO query = baseQO.getQuery();
 		Page<AdminUserEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page, baseQO);
@@ -576,28 +507,6 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			return new PageVO<>();
 		}
 
-//		List<Long> companyIds = new ArrayList<>();
-//		List<Long> uIds = new ArrayList<>();
-//		// 模糊查物业公司名称
-//		if (org.apache.commons.lang3.StringUtils.isNotBlank(query.getCompanyName())) {
-//			List<PropertyCompanyEntity> propertyCompanyEntities = propertyCompanyMapper.selectList(new QueryWrapper<PropertyCompanyEntity>().select("id").like("name", query.getCompanyName()));
-//			for (PropertyCompanyEntity propertyCompanyEntity : propertyCompanyEntities) {
-//				companyIds.add(propertyCompanyEntity.getId());
-//			}
-//			// 根据物业公司id查出Uid
-//			if (companyIds.size() > 0) {
-//				List<AdminUserCompanyEntity> entityList = adminUserCompanyMapper.selectList(new QueryWrapper<AdminUserCompanyEntity>().in("company_id", companyIds).eq("deleted", 0));
-//				for (AdminUserCompanyEntity adminUserCompanyEntity : entityList) {
-//					uIds.add(Long.valueOf(adminUserCompanyEntity.getUid()));
-//				}
-//			}
-//			if (uIds.size() == 0) {
-//				return new PageVO<>();
-//			}
-//		}
-//		if (uIds.size() > 0) {
-//			userDetailPageVO.getData().removeIf(userDetail -> !uIds.contains(userDetail.getId()));
-//		}
 		PageVO<AdminUserEntity> pageVO = new PageVO<>();
 		Set<Long> idSet = userDetailPageVO.getData().stream().map(UserDetail::getId).collect(Collectors.toSet());
 		List<AdminCommunityEntity> adminCommunityEntities = adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("community_id, uid").in("uid", idSet));
@@ -611,14 +520,6 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		// 补充数据
 		for (UserDetail userDetail : userDetailPageVO.getData()) {
 			AdminUserEntity adminUserEntity = new AdminUserEntity();
-			// 补充物业公司名称
-//			AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", userDetail.getId()).eq("deleted", 0));
-//			if (entity != null) {
-//				PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(entity.getCompanyId());
-//				if (companyEntity != null) {
-//					adminUserEntity.setCompanyName(companyEntity.getName());
-//				}
-//			}
 			// 查角色
 			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
 			StringBuilder sb = new StringBuilder();
@@ -636,7 +537,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			adminUserEntity.setIdStr(String.valueOf(userDetail.getId()));
 			adminUserEntity.setNickName(userDetail.getNickName());
 			adminUserEntity.setPermitRoles(permitRoles);
-			adminUserEntity.setRoleName(sb.deleteCharAt(sb.length()-1).toString());
+			adminUserEntity.setRoleName(sb.length() > 0 ? sb.deleteCharAt(sb.length()-1).toString() : "");
 			adminUserEntity.setMobile(userDetail.getPhone());
 			adminUserEntity.setCreateTime(LocalDateTime.parse(userDetail.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 			pageVO.getData().add(adminUserEntity);
@@ -683,21 +584,22 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 //		adminUserAuthMapper.createLoginUser(adminUserAuthEntity);
 ////		//发短信通知，并发送初始密码
 ////		SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
-
-		// 增加用户
-		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getMobile(), adminUserQO.getPassword());
-		// 增加登录类型范围为物业中台管理员和小区管理员
-		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, false);
-		// 绑定用户和角色
+// 绑定用户和角色
 		List<Long> roleIds = new ArrayList<>();
 		if (adminUserQO.getCommunityRoleId() != null) {
 			if (adminUserQO.getRoleId() == null) {
 				throw new PropertyException("传入小区角色时，请同时传入物业角色！");
 			}
-			baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN, false);
 			// TODO:给定的物业角色是否包含小区列表的菜单
 			roleIds.add(adminUserQO.getCommunityRoleId());
 		}
+		// 增加用户
+		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getMobile(), RSAUtil.privateDecrypt(adminUserQO.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)));
+		if (adminUserQO.getCommunityRoleId() != null) {
+			baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN, false);
+		}
+		// 增加登录类型范围为物业中台管理员和小区管理员
+		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, false);
 		roleIds.add(adminUserQO.getRoleId());
 		baseRoleRpcService.userJoinRole(roleIds, userDetail.getId(), Long.valueOf(adminUserQO.getUid()));
 		// 绑定用户和物业公司
@@ -795,10 +697,11 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			adminRoleCompanyEntityQueryWrapper.in("role_id", roleIdSet);
 			adminRoleCompanyEntityQueryWrapper.last("limit 1");
 			AdminRoleCompanyEntity adminRoleCompanyEntity = adminRoleCompanyMapper.selectOne(adminRoleCompanyEntityQueryWrapper);
-			List<Long> roles = new ArrayList<>();
-			roles.add(adminRoleCompanyEntity.getRoleId());
+			if (adminRoleCompanyEntity != null) {
+				roleIdSet.add(adminRoleCompanyEntity.getRoleId());
+			}
 			// 移除角色
-			baseRoleRpcService.roleRemoveToUser(roles, adminUserQO.getId());
+			baseRoleRpcService.roleRemoveToUser(roleIdSet, adminUserQO.getId());
 			// 增加角色
 			List<Long> addRoles = new ArrayList<>();
 			addRoles.add(adminUserQO.getRoleId());
