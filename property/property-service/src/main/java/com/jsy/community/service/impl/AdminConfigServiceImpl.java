@@ -27,6 +27,7 @@ import com.zhsj.base.api.rpc.IBaseMenuRpcService;
 import com.zhsj.base.api.rpc.IBasePermissionRpcService;
 import com.zhsj.base.api.rpc.IBaseRoleRpcService;
 import com.zhsj.base.api.vo.PageVO;
+import com.zhsj.basecommon.constant.BaseUserConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -424,14 +425,14 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		List<AdminRoleEntity> data = new ArrayList<>();
 		if (query.getRoleType() == 1) {
 			for (AdminRoleEntity datum : pageVO.getData()) {
-				if (datum.getScope() == 8) {
+				if (datum.getScope() == BaseUserConstant.Login.DataBasePermitScope.PROPERTY_ADMIN) {
 					data.add(datum);
 				}
 			}
 		}
 		if (query.getRoleType() == 2) {
 			for (AdminRoleEntity datum : pageVO.getData()) {
-				if (datum.getScope() == 16) {
+				if (datum.getScope() == BaseUserConstant.Login.DataBasePermitScope.COMMUNITY_ADMIN) {
 					data.add(datum);
 				}
 			}
