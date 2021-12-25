@@ -31,10 +31,13 @@ public class AdminRoleEntity extends BaseEntity {
 	
 	@TableField(exist = false)
 	private List<Long> menuIds;//菜单ID列表
+	
+	@TableField(exist = false)
+	private List<String> menuIdsStr;//菜单ID列表str
 
 	@TableField(exist = false)
 	private List<AdminMenuEntity> menuList;//菜单ID列表
 
 	@TableField(exist = false)
-	private Integer roleType;// 角色类型(1.物业 2.小区)
+	private Integer roleType;// 角色类型(8.物业 16.小区)
 }

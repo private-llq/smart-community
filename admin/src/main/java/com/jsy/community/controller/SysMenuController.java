@@ -4,7 +4,6 @@ import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.sys.SysMenuEntity;
 import com.jsy.community.qo.sys.SysMenuQO;
 import com.jsy.community.service.ISysConfigService;
-import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.LoginIgnore;
@@ -39,7 +38,7 @@ public class SysMenuController {
 	@businessLog(operation = "新增",content = "新增了【系统菜单】")
 	public CommonResult addMenu(@RequestBody SysMenuEntity sysMenuEntity){
 		ValidatorUtils.validateEntity(sysMenuEntity);
-		sysMenuEntity.setId(Long.valueOf(UserUtils.getId()));
+		sysMenuEntity.setId(1460884237115367425L);
 		sysConfigService.addMenu(sysMenuEntity);
 		return CommonResult.ok("新增成功");
 	}
@@ -70,7 +69,7 @@ public class SysMenuController {
 	@PutMapping("update")
 	@businessLog(operation = "编辑",content = "更新了【系统菜单】")
 	public CommonResult updateMenu(@RequestBody SysMenuQO sysMenuQO){
-		sysMenuQO.setUpdateId(Long.valueOf(UserUtils.getId()));
+		sysMenuQO.setUpdateId(1460884237115367425L);
 		sysConfigService.updateMenu(sysMenuQO);
 		return CommonResult.ok("修改成功");
 	}
