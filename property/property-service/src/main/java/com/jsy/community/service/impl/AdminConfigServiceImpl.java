@@ -220,7 +220,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			permisIds.add(menuPermission.getPermisId());
 		}
 		// 权限绑定到角色
-		permissionRpcService.permitJoinRole((List<Long>) permisIds, permitRole.getId(), adminRoleEntity.getId());
+		permissionRpcService.permitJoinRole(permisIds, permitRole.getId(), adminRoleEntity.getId());
 		// 新增角色和物业公司关联信息
 		AdminRoleCompanyEntity entity = new AdminRoleCompanyEntity();
 		entity.setId(SnowFlake.nextId());

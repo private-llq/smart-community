@@ -41,10 +41,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author chq459799974
@@ -349,10 +346,11 @@ public class SysConfigServiceImpl implements ISysConfigService {
 		baseMenuRpcService.menuJoinRole(sysRoleEntity.getMenuIds(), permitRole.getId(), sysRoleEntity.getId());
 		// 查询菜单和权限绑定关系
 		List<MenuPermission> menuPermissions = baseMenuPermissionRpcService.listByIds(sysRoleEntity.getMenuIds());
-		List<Long> permisIds = new ArrayList<>();
+		Set<Long> permisIds = new HashSet<>();
 		for (MenuPermission menuPermission : menuPermissions) {
 			permisIds.add(menuPermission.getPermisId());
 		}
+		// 将权限添加到角色
 		permissionRpcService.permitJoinRole(permisIds, permitRole.getId(), sysRoleEntity.getId());
 	}
 	
