@@ -73,8 +73,10 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	 * @Param: [communityId]
 	 * @return: java.util.List<com.jsy.community.entity.AppMenuEntity>
 	 */
-	public List<AppMenuEntity> listAppMenu(Long communityId) {
-		return appMenuMapper.listAppMenu(communityId,9);
+	public List<AppMenuEntity> listAppMenu(Long communityId, Integer sysType, String version) {
+		List<AppMenuEntity> appMenuEntities = appMenuMapper.listAppMenu(communityId, 9);
+
+		return appMenuEntities;
 	}
 
 

@@ -42,7 +42,7 @@ public interface IAppMenuService extends IService<AppMenuEntity> {
 	 * @Param:
 	 * @return:
 	 */
-	List<AppMenuEntity> listAppMenu(Long communityId);
+	List<AppMenuEntity> listAppMenu(Long communityId, Integer sysType, String version);
 
 	/**
 	 * @Description: 更多菜单   v2版

@@ -728,7 +728,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 	 */
 	@Override
 	public List<PermitMenu> MenuPage(Integer roleType, Long id) {
-		List<PermitMenu> permitMenus = baseMenuRpcService.all(id, roleType == 1 ? BusinessConst.PROPERTY_ADMIN : BusinessConst.COMMUNITY_ADMIN);
+		List<PermitMenu> permitMenus = baseMenuRpcService.all(id, roleType == 8 ? BusinessConst.PROPERTY_ADMIN : BusinessConst.COMMUNITY_ADMIN);
 		// list排序
 		permitMenus.sort(Comparator.comparing(PermitMenu::getSort));
 		return permitMenus;

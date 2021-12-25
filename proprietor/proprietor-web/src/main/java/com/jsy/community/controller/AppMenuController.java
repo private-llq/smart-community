@@ -61,8 +61,11 @@ public class AppMenuController {
 	@GetMapping("/listIndexMenu/v2")
 	// @Permit("community:proprietor:menu:listIndexMenu:v2")
 	@LoginIgnore
-	public CommonResult listIndexMenu2(@ApiParam(value = "社区id") @RequestParam Long communityId) {
-		List<AppMenuEntity> list = appMenuService.listAppMenu(communityId);
+	public CommonResult listIndexMenu2(@ApiParam(value = "社区id") @RequestParam("communityId") Long communityId,
+									   @ApiParam(value = "系统类型") @RequestParam("sysType") Integer sysType,
+									   @ApiParam(value = "版本号") @RequestParam("version") String version
+									   ) {
+		List<AppMenuEntity> list = appMenuService.listAppMenu(communityId, sysType, version);
 		return CommonResult.ok(list);
 
 	}

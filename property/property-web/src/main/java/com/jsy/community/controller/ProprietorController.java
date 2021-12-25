@@ -21,6 +21,9 @@ import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.property.ProprietorVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
@@ -70,6 +73,9 @@ public class ProprietorController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private PropertyUserService iUserService;
 
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
+
     /**
      * [2021.3.16] 根据物业端需求改造完成
      * 下载录入业主信息excel、模板
@@ -118,7 +124,11 @@ public class ProprietorController {
         Integer row = 0;
         if(CollectionUtil.isNotEmpty(proprietors)){
             //获取管理员姓名 用于标识每条业主数据的创建人
-            String adminRealName = iProprietorService.getAdminRealName(UserUtils.getId());
+            RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(UserUtils.getId());
+            String adminRealName = "";
+            if (idCardRealInfo != null) {
+                adminRealName = idCardRealInfo.getIdCardName();
+            }
             //验证房屋编号
             validUserHouse(proprietors, houseList, errorVos, adminRealName);
             //在验证房屋编号后 数据集合如果不为空 就做数据库导入

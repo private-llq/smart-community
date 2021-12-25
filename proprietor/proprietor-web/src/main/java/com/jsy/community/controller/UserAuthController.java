@@ -350,9 +350,9 @@ public class UserAuthController {
     public CommonResult<Boolean> resetPassword(@RequestBody ResetPasswordQO qo) {
 //        ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
         ValidatorUtils.validateEntity(qo, ResetPasswordQO.forgetPassVGroup.class);
-        if (!qo.getPassword().equals(qo.getConfirmPassword())) {
+        /*if (!qo.getPassword().equals(qo.getConfirmPassword())) {
             throw new JSYException("两次密码不一致");
-        }
+        }*/
         baseAuthRpcService.resetPhoneLoginPassword(qo.getAccount(), qo.getCode(), qo.getPassword());
         return CommonResult.ok();
     }

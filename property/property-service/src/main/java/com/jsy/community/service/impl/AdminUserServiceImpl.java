@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.IOrganizationService;
@@ -656,7 +657,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 * @Date: 2021/3/17
 	**/
 	@Override
-	@Transactional(rollbackFor = Exception.class)
+	@LcnTransaction
 	public void addOperator(AdminUserQO adminUserQO){
 //		//生成盐值并对密码加密
 //		String salt = RandomStringUtils.randomAlphanumeric(20);
@@ -683,12 +684,6 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 //		adminUserAuthMapper.createLoginUser(adminUserAuthEntity);
 ////		//发短信通知，并发送初始密码
 ////		SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
-
-		// 增加用户
-		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getMobile(), RSAUtil.privateDecrypt(adminUserQO.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)));
-		// 增加登录类型范围为物业中台管理员和小区管理员
-		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, false);
-		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN, false);
 		// 绑定用户和角色
 		List<Long> roleIds = new ArrayList<>();
 		if (adminUserQO.getCommunityRoleId() != null) {
@@ -698,6 +693,12 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			// TODO:给定的物业角色是否包含小区列表的菜单
 			roleIds.add(adminUserQO.getCommunityRoleId());
 		}
+		// 增加用户
+		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getMobile(), RSAUtil.privateDecrypt(adminUserQO.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)));
+		// 增加登录类型范围为物业中台管理员和小区管理员
+		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, false);
+		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN, false);
+
 		roleIds.add(adminUserQO.getRoleId());
 		baseRoleRpcService.userJoinRole(roleIds, userDetail.getId(), Long.valueOf(adminUserQO.getUid()));
 		// 绑定用户和物业公司
@@ -761,18 +762,22 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			}
 			// 查询角色
 			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(adminUserQO.getId(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
-			Set<Long> roleIdSet = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
-			QueryWrapper<AdminRoleCompanyEntity> adminRoleCompanyEntityQueryWrapper = new QueryWrapper<>();
-			adminRoleCompanyEntityQueryWrapper.eq("company_id", adminUserQO.getCompanyId());
-			adminRoleCompanyEntityQueryWrapper.in("role_id", roleIdSet);
-			adminRoleCompanyEntityQueryWrapper.last("limit 2");
-			List<AdminRoleCompanyEntity> adminRoleCompanyEntities = adminRoleCompanyMapper.selectList(adminRoleCompanyEntityQueryWrapper);
-			List<Long> roles = new ArrayList<>();
-			for (AdminRoleCompanyEntity adminRoleCompanyEntity : adminRoleCompanyEntities) {
-				roles.add(adminRoleCompanyEntity.getRoleId());
+			if (!CollectionUtils.isEmpty(permitRoles)) {
+				Set<Long> roleIdSet = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
+				QueryWrapper<AdminRoleCompanyEntity> adminRoleCompanyEntityQueryWrapper = new QueryWrapper<>();
+				adminRoleCompanyEntityQueryWrapper.eq("company_id", adminUserQO.getCompanyId());
+				adminRoleCompanyEntityQueryWrapper.in("role_id", roleIdSet);
+				adminRoleCompanyEntityQueryWrapper.last("limit 2");
+				List<AdminRoleCompanyEntity> adminRoleCompanyEntities = adminRoleCompanyMapper.selectList(adminRoleCompanyEntityQueryWrapper);
+				if (!CollectionUtils.isEmpty(adminRoleCompanyEntities)) {
+					List<Long> roles = new ArrayList<>();
+					for (AdminRoleCompanyEntity adminRoleCompanyEntity : adminRoleCompanyEntities) {
+						roles.add(adminRoleCompanyEntity.getRoleId());
+					}
+					// 移除角色
+					baseRoleRpcService.roleRemoveToUser(roles, adminUserQO.getId());
+				}
 			}
-			// 移除角色
-			baseRoleRpcService.roleRemoveToUser(roles, adminUserQO.getId());
 			// 增加角色
 			List<Long> addRoles = new ArrayList<>();
 			addRoles.add(adminUserQO.getRoleId());
@@ -780,7 +785,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			baseRoleRpcService.userJoinRole(addRoles, adminUserQO.getId(), id);
 			// 更新资料
 			baseUpdateUserRpcService.updateUserInfo(adminUserQO.getId(), adminUserQO.getNickName(),
-				adminUserQO.getMobile(), adminUserQO.getPassword(), BusinessConst.COMMUNITY_ADMIN);
+				adminUserQO.getMobile(), null, BusinessConst.COMMUNITY_ADMIN);
 		} else {
 			// 没有小区角色，只是物业端更新
 			// 查询角色
@@ -801,7 +806,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			baseRoleRpcService.userJoinRole(addRoles, adminUserQO.getId(), id);
 			// 更新资料
 			baseUpdateUserRpcService.updateUserInfo(adminUserQO.getId(), adminUserQO.getNickName(),
-				adminUserQO.getMobile(), adminUserQO.getPassword(), BusinessConst.PROPERTY_ADMIN);
+				adminUserQO.getMobile(), null, BusinessConst.PROPERTY_ADMIN);
 		}
 		
 		
