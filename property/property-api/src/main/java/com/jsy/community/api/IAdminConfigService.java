@@ -8,6 +8,7 @@ import com.jsy.community.entity.admin.AdminUserRoleEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
+import com.zhsj.base.api.domain.PermitMenu;
 import com.zhsj.base.api.vo.PageVO;
 
 import java.util.List;
@@ -55,6 +56,15 @@ public interface IAdminConfigService {
 	 * @Date: 2020/12/14
 	 **/
 	List<AdminMenuEntity> listOfMenu();
+	
+	/**
+	 * @Description: 根据角色类型查询所有菜单
+	 * @author: DKS
+	 * @since: 2021/12/25 9:23
+	 * @Param: [roleType, id]
+	 * @return: java.util.List<com.zhsj.base.api.domain.PermitMenu>
+	 */
+	List<PermitMenu> MenuPage(Integer roleType, Long id);
 	
 	//==================================================== Role角色 ===============================================================
 	/**

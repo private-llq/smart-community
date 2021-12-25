@@ -1,12 +1,14 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IAdminConfigService;
 import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.admin.AdminMenuEntity;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.base.api.domain.PermitMenu;
 import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,4 +59,19 @@ public class AdminMenuController {
 	}
 	
 	//=================================== 物业端新版 end ============================
+	
+	/**
+	 * @Description: 根据角色类型查询物业或者小区菜单
+	 * @author: DKS
+	 * @since: 2021/12/25 9:32
+	 * @Param: [roleType]
+	 * @return: com.jsy.community.vo.CommonResult
+	 */
+	@GetMapping("/page")
+	@Permit("community:property:menu:page")
+	public CommonResult MenuPage(Integer roleType){
+		String id = UserUtils.getId();
+		List<PermitMenu> permitMenus = adminConfigService.MenuPage(roleType, Long.valueOf(id));
+		return CommonResult.ok(permitMenus,"查询成功");
+	}
 }

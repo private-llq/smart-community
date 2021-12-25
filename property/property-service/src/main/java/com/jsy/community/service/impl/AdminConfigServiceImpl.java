@@ -19,6 +19,7 @@ import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.domain.MenuPermission;
+import com.zhsj.base.api.domain.PermitMenu;
 import com.zhsj.base.api.domain.PermitRole;
 import com.zhsj.base.api.domain.RoleMenu;
 import com.zhsj.base.api.entity.UpdateRoleDto;
@@ -715,6 +716,21 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			return queryMenu();//从mysql获取
 		}
 		return list;
+	}
+	
+	/**
+	 * @Description: 根据角色类型查询所有菜单
+	 * @author: DKS
+	 * @since: 2021/12/25 9:23
+	 * @Param: [roleType, id]
+	 * @return: java.util.List<com.zhsj.base.api.domain.PermitMenu>
+	 */
+	@Override
+	public List<PermitMenu> MenuPage(Integer roleType, Long id) {
+		List<PermitMenu> permitMenus = baseMenuRpcService.all(id, roleType == 1 ? BusinessConst.PROPERTY_ADMIN : BusinessConst.COMMUNITY_ADMIN);
+		// list排序
+		permitMenus.sort(Comparator.comparing(PermitMenu::getSort));
+		return permitMenus;
 	}
 
 	/**
