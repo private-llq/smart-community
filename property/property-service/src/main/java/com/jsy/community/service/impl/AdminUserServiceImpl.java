@@ -16,7 +16,6 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.UserLivingExpensesAccountEntity;
 import com.jsy.community.entity.admin.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
@@ -687,13 +686,13 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getMobile(), adminUserQO.getPassword());
 		// 增加登录类型范围为物业中台管理员和小区管理员
 		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, false);
-		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN, false);
 		// 绑定用户和角色
 		List<Long> roleIds = new ArrayList<>();
 		if (adminUserQO.getCommunityRoleId() != null) {
 			if (adminUserQO.getRoleId() == null) {
 				throw new PropertyException("传入小区角色时，请同时传入物业角色！");
 			}
+			baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN, false);
 			// TODO:给定的物业角色是否包含小区列表的菜单
 			roleIds.add(adminUserQO.getCommunityRoleId());
 		}
