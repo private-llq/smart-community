@@ -624,24 +624,6 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void updateOperator(AdminUserQO adminUserQO, Long id){
-		/*//查询uid
-		UserEntity user = adminUserMapper.queryUidById(adminUserEntity.getId());
-		if(user == null){
-			throw new PropertyException("用户不存在！");
-		}
-		//更新密码
-		if(!StringUtils.isEmpty(adminUserEntity.getPassword())){
-			//生成盐值并对密码加密
-			String salt = RandomStringUtils.randomAlphanumeric(20);
-			String password = new Sha256Hash(RSAUtil.privateDecrypt(adminUserEntity.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), salt).toHex();
-			// String password = new Sha256Hash(adminUserEntity.getPassword(), salt).toHex();
-			//更新
-			AdminUserAuthEntity adminUserAuthEntity = new AdminUserAuthEntity();
-			adminUserAuthEntity.setPassword(password);
-			adminUserAuthEntity.setSalt(salt);
-			adminUserAuthMapper.update(adminUserAuthEntity, new UpdateWrapper<AdminUserAuthEntity>().eq("mobile",user.getMobile()));
-		}*/
-		
 		//更新社区权限
 		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
 			adminConfigService.updateAdminCommunityBatch(adminUserQO.getCommunityIdList(), String.valueOf(adminUserQO.getId()));
@@ -691,17 +673,19 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			// 没有小区角色，只是物业端更新
 			// 查询角色
 			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(adminUserQO.getId(), BusinessConst.PROPERTY_ADMIN);
-			Set<Long> roleIdSet = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
-			QueryWrapper<AdminRoleCompanyEntity> adminRoleCompanyEntityQueryWrapper = new QueryWrapper<>();
-			adminRoleCompanyEntityQueryWrapper.eq("company_id", adminUserQO.getCompanyId());
-			adminRoleCompanyEntityQueryWrapper.in("role_id", roleIdSet);
-			adminRoleCompanyEntityQueryWrapper.last("limit 1");
-			AdminRoleCompanyEntity adminRoleCompanyEntity = adminRoleCompanyMapper.selectOne(adminRoleCompanyEntityQueryWrapper);
-			if (adminRoleCompanyEntity != null) {
-				roleIdSet.add(adminRoleCompanyEntity.getRoleId());
+			if (!CollectionUtils.isEmpty(permitRoles)) {
+				Set<Long> roleIdSet = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
+				QueryWrapper<AdminRoleCompanyEntity> adminRoleCompanyEntityQueryWrapper = new QueryWrapper<>();
+				adminRoleCompanyEntityQueryWrapper.eq("company_id", adminUserQO.getCompanyId());
+				adminRoleCompanyEntityQueryWrapper.in("role_id", roleIdSet);
+				adminRoleCompanyEntityQueryWrapper.last("limit 1");
+				AdminRoleCompanyEntity adminRoleCompanyEntity = adminRoleCompanyMapper.selectOne(adminRoleCompanyEntityQueryWrapper);
+				if (adminRoleCompanyEntity != null) {
+					roleIdSet.add(adminRoleCompanyEntity.getRoleId());
+				}
+				// 移除角色
+				baseRoleRpcService.roleRemoveToUser(roleIdSet, adminUserQO.getId());
 			}
-			// 移除角色
-			baseRoleRpcService.roleRemoveToUser(roleIdSet, adminUserQO.getId());
 			// 增加角色
 			List<Long> addRoles = new ArrayList<>();
 			addRoles.add(adminUserQO.getRoleId());
@@ -710,27 +694,6 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			baseUpdateUserRpcService.updateUserInfo(adminUserQO.getId(), adminUserQO.getNickName(),
 				adminUserQO.getMobile(), null, BusinessConst.PROPERTY_ADMIN);
 		}
-		
-		
-		//修改手机号
-//		if(!StringUtils.isEmpty(adminUserEntity.getMobile()) && !adminUserEntity.getMobile().equals(user.getMobile())){
-//			//用户是否已注册
-//			boolean exists = checkUserExists(adminUserEntity.getMobile());
-//			if(exists){
-//				throw new PropertyException(JSYError.DUPLICATE_KEY.getCode(),"该手机号已被注册");
-//			}
-//			//更换手机号操作
-//			boolean b = changeMobile(adminUserEntity.getMobile(), user.getMobile());
-//			if(b){
-//				//旧手机账号退出登录
-//				UserUtils.destroyToken("Admin:Login",String.valueOf(redisTemplate.opsForValue().get("Admin:LoginAccount:" + user.getMobile())));
-//				UserUtils.destroyToken("Admin:LoginAccount",user.getMobile());
-//			}
-//		}
-		//更新菜单权限
-//		adminConfigService.setUserMenus(adminUserEntity.getMenuIdList(), uid);
-		//更新资料
-//		adminUserMapper.updateOperator(adminUserEntity);
 	}
 	
 	/**

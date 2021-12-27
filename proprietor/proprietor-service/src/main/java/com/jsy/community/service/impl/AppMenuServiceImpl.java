@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAppMenuService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.AppMenuEntity;
+import com.jsy.community.entity.AppVersionEntity;
 import com.jsy.community.mapper.AppMenuMapper;
 import com.jsy.community.mapper.AppVersionMapper;
+import jodd.util.StringUtil;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -78,7 +80,23 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	 * @return: java.util.List<com.jsy.community.entity.AppMenuEntity>
 	 */
 	public List<AppMenuEntity> listAppMenu(Long communityId, Integer sysType, String version) {
-//		appVersionMapper.selectList();
+		Integer paySupport = 0;
+		if (sysType != null && sysType == 2 && StringUtil.isNotBlank(version)) {
+			QueryWrapper<AppVersionEntity> versionEntityQueryWrapper = new QueryWrapper<>();
+			versionEntityQueryWrapper.eq("sys_version", version);
+			versionEntityQueryWrapper.eq("sys_type", sysType);
+			AppVersionEntity appVersionEntity = appVersionMapper.selectOne(versionEntityQueryWrapper);
+			paySupport = appVersionEntity.getPaySupport();
+		}
+		QueryWrapper<AppVersionEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("sys_version", "v2");
+		if (sysType != null && sysType == 2 && paySupport == 0) {
+			queryWrapper.ne("id", 14L);
+			queryWrapper.ne("id", 15L);
+		}
+		queryWrapper.orderByAsc("id");
+		queryWrapper.last("limit 9");
+		appVersionMapper.selectList(queryWrapper);
 		List<AppMenuEntity> appMenuEntities = appMenuMapper.listAppMenu(communityId, 9);
 
 		return appMenuEntities;

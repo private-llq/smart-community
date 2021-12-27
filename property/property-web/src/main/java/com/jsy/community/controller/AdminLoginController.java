@@ -10,6 +10,7 @@ import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.admin.AdminCommunityEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.admin.AdminLoginQO;
 import com.jsy.community.util.MyCaptchaUtil;
 import com.jsy.community.utils.RSAUtil;
@@ -34,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -181,6 +183,9 @@ public class AdminLoginController {
 		}*/
 		// 获取用户角色
 		List<PermitRole> userRoles = baseRoleRpcService.listAllRolePermission(loginVo.getUserInfo().getId(), BusinessConst.PROPERTY_ADMIN);
+		if (CollectionUtils.isEmpty(userRoles)) {
+			throw new JSYException("请联系管理员赋予角色权限");
+		}
 		adminInfoVo.setRoleId(userRoles.get(0).getId());
 		/*//判断登录类型 (根据拥有权限的小区数量等于1是小区管理员账号 否则是物业公司账号)
 		if(adminCommunityList.size() == 1){

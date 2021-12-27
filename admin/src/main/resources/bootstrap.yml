@@ -199,6 +199,11 @@ dubbo:
   provider:
     retries: 0
     timeout: 99999
+
+
+---
+spring:
+  profiles: dev
 # 分布式事务配置
 tx-lcn:
   client:
@@ -207,11 +212,6 @@ tx-lcn:
     loadbalancer:
       dtx:
         enabled: true
-
----
-spring:
-  profiles: dev
-
 eureka:
   client:
     service-url:
@@ -224,6 +224,13 @@ eureka:
 ---
 spring:
   profiles: test
+tx-lcn:
+  client:
+    manager-address: 192.168.1.182:8070
+  ribbon:
+    loadbalancer:
+      dtx:
+        enabled: true
 eureka:
   client:
     service-url:

@@ -157,7 +157,10 @@
 				<configuration>
 					<!-- springboot main方法入口 -->
 					<mainClass>com.jsy.community.AdminApp</mainClass>
-					<layout>ZIP</layout>
+<!--					<layout>ZIP</layout>-->
+					<outputDirectory>
+						${basedir}../../../jar
+					</outputDirectory>
 				</configuration>
 				<executions>
 					<execution>
