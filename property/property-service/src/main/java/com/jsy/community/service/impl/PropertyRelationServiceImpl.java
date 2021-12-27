@@ -16,6 +16,10 @@ import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.HouseMemberVO;
 import com.jsy.community.vo.property.RelationImportErrVO;
 import com.jsy.community.vo.property.RelationImportQO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +51,9 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
 
 
 
@@ -174,9 +181,10 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
     @Override
     @Transactional
     public void save(HouseMemberEntity houseMemberEntity,String uid) {
-        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("mobile", houseMemberEntity.getMobile()));
-        if (userEntity!=null){
-            houseMemberEntity.setUid(userEntity.getUid());
+        UserDetail userDetailByPhone = baseUserInfoRpcService.getUserDetailByPhone(houseMemberEntity.getMobile());
+        // UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("mobile", houseMemberEntity.getMobile()));
+        if (userDetailByPhone!=null){
+            houseMemberEntity.setUid(userDetailByPhone.getAccount());
         }
         houseMemberEntity.setId(SnowFlake.nextId());
         propertyRelationMapper.insert(houseMemberEntity);
@@ -190,8 +198,8 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
             proprietorMapper.insert(entity);
 
             UserHouseEntity userHouseEntity = new UserHouseEntity();
-            if (userEntity!=null){
-                userHouseEntity.setUid(userEntity.getUid());
+            if (userDetailByPhone!=null){
+                userHouseEntity.setUid(userDetailByPhone.getAccount());
             }
             userHouseEntity.setCommunityId(houseMemberEntity.getCommunityId());
             userHouseEntity.setHouseId(houseMemberEntity.getHouseId());

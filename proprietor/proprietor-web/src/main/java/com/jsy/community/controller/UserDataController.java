@@ -109,7 +109,7 @@ public class UserDataController {
         try {
             String s = new String(nickname.getBytes("GBK"));
             if(!"".equals(nickname)&&nickname!=null){
-                if (s.length()<2||s.length()>16){
+                if (s.length()<2||s.length()>32){
                     return CommonResult.error("请输入2到16个字符，可使用英文、数字、汉字！");
                 }
                 if (BadWordUtil2.isContaintBadWord(nickname,BadWordUtil2.minMatchTYpe)){
