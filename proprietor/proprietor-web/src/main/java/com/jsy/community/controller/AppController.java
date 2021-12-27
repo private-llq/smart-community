@@ -92,12 +92,10 @@ public class AppController {
 	@LoginIgnore
 	// @Permit("community:proprietor:app:version")
 	public CommonResult updateAppVersion(@RequestBody AppVersionEntity appVersionEntity){
-		if(appVersionEntity.getId() == null){
-			return CommonResult.error("请传入id");
-		}
+		ValidatorUtils.validateEntity(appVersionEntity);
 		appVersionEntity.setCreateTime(null);
 		appVersionEntity.setSysType(null);
-		return appVersionService.updateById(appVersionEntity) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
+		return appVersionService.updateAppVersion(appVersionEntity) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
 	
 	@ApiOperation("删除APP版本")
