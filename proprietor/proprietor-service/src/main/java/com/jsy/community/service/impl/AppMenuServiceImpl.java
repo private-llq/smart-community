@@ -88,18 +88,17 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 			AppVersionEntity appVersionEntity = appVersionMapper.selectOne(versionEntityQueryWrapper);
 			paySupport = appVersionEntity.getPaySupport();
 		}
-		QueryWrapper<AppVersionEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("sys_version", "v2");
+		QueryWrapper<AppMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("version", "v2");
 		if (sysType != null && sysType == 2 && paySupport == 0) {
 			queryWrapper.ne("id", 14L);
 			queryWrapper.ne("id", 15L);
 		}
 		queryWrapper.orderByAsc("id");
 		queryWrapper.last("limit 9");
-		appVersionMapper.selectList(queryWrapper);
-		List<AppMenuEntity> appMenuEntities = appMenuMapper.listAppMenu(communityId, 9);
+		// List<AppMenuEntity> appMenuEntities = appMenuMapper.listAppMenu(communityId,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 9);
 
-		return appMenuEntities;
+		return appMenuMapper.selectList(queryWrapper);
 	}
 
 
