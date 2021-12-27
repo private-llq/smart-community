@@ -89,6 +89,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 	**/
 	@Override
 	public String dealCallBack(Map<String, String> paramsMap){
+		log.info("开始处理回调订单");
 		CommunityEntity entity = communityService.getCommunityNameById(Long.parseLong(paramsMap.get("passback_params")));
 //		CommunityEntity entity = communityService.getCommunityNameById(1L);
 		PayConfigureEntity serviceConfig;
@@ -166,7 +167,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 	**/
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void dealOrder(AiliAppPayRecordEntity order){
+	public Boolean dealOrder(AiliAppPayRecordEntity order){
 		String orderNo = order.getOrderNo();
 		BigDecimal tradeAmount = order.getTradeAmount();
 		if (tradeAmount!=null){
@@ -184,6 +185,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 				UserDetail userDetail = baseUserInfoRpcService.getUserDetail(order.getUserid());
 				log.info("调用基础支付模块");
 				basePayRpcService.thirdPay(order.getOrderNo(), userDetail.getId(), 1, order.getBuyerId());
+				return true;
 				/*log.info("开始修改商城订单状态，订单号：" + orderNo);
 				Map<String, Object> shopOrderDealMap = shoppingMallService.completeShopOrder(orderNo,order.getTradeNo(),1);
 				if(0 != (int)shopOrderDealMap.get("code")){
@@ -195,6 +197,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 				log.info("开始修改房屋押金/房租缴费订单状态，订单号：" + orderNo);
 				UserDetail userDetail = baseUserInfoRpcService.getUserDetail(order.getUserid());
 				basePayRpcService.thirdPay(order.getOrderNo(), userDetail.getId(), 1, order.getBuyerId());
+				return true;
 				/*// 查询签约状态
 				AssetLeaseRecordEntity leaseRecordEntity = assetLeaseRecordService.queryRecordByConId(serviceOrderNo);
 				if (leaseRecordEntity != null && leaseRecordEntity.getOperation() == 32) {
@@ -227,7 +230,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 				String ids = redisTemplate.opsForValue().get("PropertyFee:" + orderNo);
 				if (StringUtils.isEmpty(ids)) {
 					log.error("回调处理物业费失败，账单ids未找到，已支付订单号：" + orderNo);
-					return;
+					return false;
 				}
 				//查询一条账单，获取社区id
 				PropertyFinanceOrderEntity financeOrderEntity = propertyFinanceOrderService.findOne(Long.valueOf(ids.split(",")[0]));
@@ -241,6 +244,7 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 				propertyFinanceReceiptService.add(receiptEntity);
 				//修改物业费账单
 				propertyFinanceOrderService.updateOrderStatusBatch(2, orderNo, ids.split(","), tradeAmount);
+				return true;
 			} else if (BusinessEnum.TradeFromEnum.PARKING_PAYMENT.getCode().equals(order.getTradeName())){
 				log.info("开始修改停车账单状态，订单号：" + orderNo);
 				CarOrderRecordEntity entity = carService.findOne(Long.parseLong(serviceOrderNo));
@@ -254,14 +258,17 @@ public class AliAppPayCallbackServiceImpl implements AliAppPayCallbackService {
 					}
 				}
 				log.info("处理完成");
+				return true;
 			} else if (PaymentEnum.TradeFromEnum.TEMPORARY_CAR_PAYMENT.getIndex().equals(order.getTradeName())) {
 				carService.updateByOrder(order.getServiceOrderNo(),order.getTradeAmount(),orderNo,2);
 				log.info("处理完成");
+				return true;
 			}
 		}else if(PaymentEnum.TradeTypeEnum.TRADE_TYPE_INCOME.getIndex().equals(order.getTradeType())){  // 提现
 			log.info("开始处理提现订单");
 			log.info("提现订单处理完成");
 		}
+		return true;
 	}
 	
 }

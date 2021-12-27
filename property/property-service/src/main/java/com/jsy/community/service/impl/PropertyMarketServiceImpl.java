@@ -26,6 +26,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -187,8 +188,11 @@ public class PropertyMarketServiceImpl extends ServiceImpl<PropertyMarketMapper,
         }
         List<ProprietorMarketEntity> list =  marketMapper.selectMarketAllPage(query,page1,baseQO.getSize(), uidSet);
         Set<String> resultUidSet = list.stream().map(ProprietorMarketEntity::getUid).collect(Collectors.toSet());
-        List<RealUserDetail> realUserDetails = baseUserInfoRpcService.getRealUserDetails(resultUidSet);
-        Map<String, RealUserDetail> realUserDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
+        Map<String, RealUserDetail> realUserDetailMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(resultUidSet)) {
+            List<RealUserDetail> realUserDetails = baseUserInfoRpcService.getRealUserDetails(resultUidSet);
+            realUserDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
+        }
         for (ProprietorMarketEntity li : list){
             ProprietorMarketVO marketVO = new ProprietorMarketVO();
             RealUserDetail realUserDetail = realUserDetailMap.get(li.getUid());
@@ -295,8 +299,12 @@ public class PropertyMarketServiceImpl extends ServiceImpl<PropertyMarketMapper,
         ArrayList<ProprietorMarketVO> arrayList = new ArrayList<>();
         List<ProprietorMarketEntity> list =  marketMapper.selectMarketBlacklist(page1,baseQO.getSize());
         Set<String> resultUidSet = list.stream().map(ProprietorMarketEntity::getUid).collect(Collectors.toSet());
-        List<RealUserDetail> realUserDetails = baseUserInfoRpcService.getRealUserDetails(resultUidSet);
-        Map<String, RealUserDetail> realUserDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
+        Map<String, RealUserDetail> realUserDetailMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(resultUidSet)) {
+            List<RealUserDetail> realUserDetails = baseUserInfoRpcService.getRealUserDetails(resultUidSet);
+            realUserDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
+        }
+
         for (ProprietorMarketEntity li : list){
             ProprietorMarketVO marketVO = new ProprietorMarketVO();
             RealUserDetail realUserDetail = realUserDetailMap.get(li.getUid());
