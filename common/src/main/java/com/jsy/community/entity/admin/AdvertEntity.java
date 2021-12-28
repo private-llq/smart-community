@@ -74,6 +74,6 @@ public class AdvertEntity {
     /**
      * 逻辑删除
      */
-    @TableLogic
+    @TableLogic(value = "0",delval = "1")
     private Integer deleted;
 }
