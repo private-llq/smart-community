@@ -89,6 +89,7 @@ public class UserFaceServiceImpl extends ServiceImpl<UserFaceMapper, UserFaceEnt
             // 下发人脸数据到设备
             syncUserFace(faceUrl, uid);
         }
+        userFaceMapper.insert(userFaceEntity);
         return true;
     }
 

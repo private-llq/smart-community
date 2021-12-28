@@ -42,7 +42,6 @@
                thm.mobile,
                thm.relation
         from  t_house_member thm
-            join t_user tu on thm.uid=tu.uid
         where thm.deleted=0
           and thm.house_id = #{houseId}
           and thm.community_id = #{communityId}

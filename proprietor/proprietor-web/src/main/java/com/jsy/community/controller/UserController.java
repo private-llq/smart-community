@@ -255,7 +255,7 @@ public class UserController {
     @PutMapping("saveFace")
     // @Permit("community:proprietor:user:saveFace")
     public CommonResult saveFace(@RequestParam String faceUrl) {
-        userFaceService.saveUserFace(UserUtils.getUserId(),faceUrl);
+        userFaceService.saveUserFace(faceUrl, UserUtils.getUserId());
         return CommonResult.ok();
     }
 
