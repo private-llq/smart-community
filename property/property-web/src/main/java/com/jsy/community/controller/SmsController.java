@@ -770,7 +770,7 @@ public class SmsController {
             e.printStackTrace();
         }
         if (response == null) {
-            return CommonResult.error("扫码支付失败");
+            return CommonResult.error("支付宝扫码支付出错");
         }
         
         if(response.isSuccess()){
@@ -832,7 +832,7 @@ public class SmsController {
         } catch (AlipayApiException e) {
             log.error("支付宝扫码支付错误" + e);
         }
-        String qrCode = "";
+        String qrCode;
         if(response.isSuccess()){
             System.out.println("调用成功");
             qrCode = response.getQrCode();
