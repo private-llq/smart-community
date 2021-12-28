@@ -73,5 +73,5 @@ public class AdvertDto {
     /**
      * 广告位置路径全名
      */
-    private String fullName;
+    private String positionName;
 }

@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -11,6 +12,7 @@ import com.jsy.community.mapper.AdvertMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AddAdvertQO;
 import com.jsy.community.qo.admin.AdvertQO;
+import com.jsy.community.service.AdminException;
 import com.jsy.community.service.AdvertService;
 import com.jsy.community.vo.property.PageVO;
 import lombok.extern.slf4j.Slf4j;
@@ -44,10 +46,16 @@ public class AdvertServiceImpl extends ServiceImpl<AdvertMapper, AdvertEntity> i
     public boolean insertAdvert(AddAdvertQO param) {
         log.info("param= {}", param);
         AdvertEntity entity = new AdvertEntity();
+        AdvertEntity advertEntity = getOne(new LambdaQueryWrapper<AdvertEntity>().eq(AdvertEntity::getDisplayPosition, param.getDisplayPosition())
+                .eq(AdvertEntity::getSort, param.getSort()));
+        if (ObjectUtil.isNotNull(advertEntity)) {
+            log.error("该顺序已被选择");
+            throw new AdminException("该顺序已被选择，请重新指定顺序！");
+        }
         BeanUtils.copyProperties(param, entity);
         LocalDateTime now = LocalDateTime.now();
         entity.setAdvertId(IdUtil.simpleUUID())
-                .setSort(sort(param.getDisplayPosition(), param.getSort()))
+                .setSort(param.getSort())
                 .setCreateTime(now)
                 .setUpdateTime(now);
         return save(entity);

@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 public class AddAdvertPositionQO {
 
     @NotBlank
-    private String name;
+    private String positionName;
 
     @NotNull
     private Integer pid;
