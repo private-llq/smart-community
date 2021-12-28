@@ -86,7 +86,9 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 			versionEntityQueryWrapper.eq("sys_version", version);
 			versionEntityQueryWrapper.eq("sys_type", sysType);
 			AppVersionEntity appVersionEntity = appVersionMapper.selectOne(versionEntityQueryWrapper);
-			paySupport = appVersionEntity.getPaySupport();
+			if (appVersionEntity != null) {
+				paySupport = appVersionEntity.getPaySupport();
+			}
 		}
 		QueryWrapper<AppMenuEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("version", "v2");
