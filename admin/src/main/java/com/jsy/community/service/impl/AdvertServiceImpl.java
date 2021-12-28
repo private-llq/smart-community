@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.dto.advert.AdvertDto;
 import com.jsy.community.entity.admin.AdvertEntity;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.AdvertMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AddAdvertQO;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.management.JMException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,8 +51,8 @@ public class AdvertServiceImpl extends ServiceImpl<AdvertMapper, AdvertEntity> i
         AdvertEntity advertEntity = getOne(new LambdaQueryWrapper<AdvertEntity>().eq(AdvertEntity::getDisplayPosition, param.getDisplayPosition())
                 .eq(AdvertEntity::getSort, param.getSort()));
         if (ObjectUtil.isNotNull(advertEntity)) {
-            log.error("该顺序已被选择");
-            throw new AdminException("该顺序已被选择，请重新指定顺序！");
+            log.error("该顺序已被 id= {} 选择", advertEntity.getId());
+            throw new AdminException("该顺序已被其他广告占用，请重新选择顺序");
         }
         BeanUtils.copyProperties(param, entity);
         LocalDateTime now = LocalDateTime.now();
