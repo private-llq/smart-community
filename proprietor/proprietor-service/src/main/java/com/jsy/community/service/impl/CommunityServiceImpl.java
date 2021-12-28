@@ -206,7 +206,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		//如果身份是业主的小区只有一个那么直接返回
 		if (userCommunityIds.size()==1){
 			CommunityEntity communityEntity1 = communityMapper.selectById(userHouseList.get(0));
-			communityEntity1.setHouseId(communityHouseMap.get(communityEntity1.getId()));
+			if (communityEntity1 != null) {
+				communityEntity1.setHouseId(communityHouseMap.get(communityEntity1.getId()));
+			}
 			return communityEntity1;
 		}
 		//那个大于1代表有多个，通过金纬度获取最近的小区
