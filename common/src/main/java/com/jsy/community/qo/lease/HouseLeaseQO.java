@@ -176,7 +176,7 @@ public class HouseLeaseQO implements Serializable {
 
 
     @ApiModelProperty(value = "房主称呼")
-    @Length(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class,  UpdateWholeLeaseHouse.class}, min = 2, max = 4, message = "请输入一个正确的称呼!2~4字符")
+    @Length(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class,  UpdateWholeLeaseHouse.class}, min = 1, max = 4, message = "请输入一个正确的称呼!1~4字符")
     @NotBlank(groups = {AddWholeLeaseHouse.class, AddSingleRoomLeaseHouse.class, AddCombineLeaseHouse.class}, message = "房主称呼不能为空")
     private String appellation;
 
