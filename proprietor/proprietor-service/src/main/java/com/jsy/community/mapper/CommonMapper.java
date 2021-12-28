@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 
 import com.jsy.community.entity.FullTextSearchEntity;
 import com.jsy.community.entity.RegionEntity;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public interface CommonMapper {
      * @param pageSize  每页显示条数
      * @return          返回 城市下面的 id + 社区名称
      */
-    List<Map<String, Object>> getAllCommunityFormCityId(Long id, Integer page, Integer pageSize);
+    List<Map<String, Object>> getAllCommunityFormCityId(@Param("id") Long id, @Param("page") Integer page, @Param("pageSize") Integer pageSize);
 
     /**
      * 根据社区id 查询 所有的楼栋或单元

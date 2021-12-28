@@ -106,25 +106,19 @@ public class UserDataController {
     @ApiOperation("修改个人名称")
     // @Permit("community:proprietor:userdata:updateUserNickName")
     public CommonResult updateUserNickName(@RequestParam("nickname") String nickname){
-        try {
-            String s = new String(nickname.getBytes("GBK"));
-            if(!"".equals(nickname)&&nickname!=null){
-                if (s.length()<2||s.length()>32){
-                    return CommonResult.error("请输入2到16个字符，可使用英文、数字、汉字！");
-                }
-                if (BadWordUtil2.isContaintBadWord(nickname,BadWordUtil2.minMatchTYpe)){
-                    return CommonResult.error("该名称不可用：名称中存在敏感字！");
-                }
-                Pattern pattern = Pattern.compile(regex);
-                if (pattern.matcher(nickname).find()){
-                    return CommonResult.error("名称不能包含特殊字符！");
-                }
-            }else {
-                return CommonResult.error("名称不能为空！");
+        if(StringUtil.isNotBlank(nickname)){
+            if (getWordCount(nickname) < 2 || getWordCount(nickname) > 32){
+                return CommonResult.error("请输入2到16个字符，可使用英文、数字、汉字！");
             }
-
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            if (BadWordUtil2.isContaintBadWord(nickname,BadWordUtil2.minMatchTYpe)){
+                return CommonResult.error("该名称不可用：名称中存在敏感字！");
+            }
+            Pattern pattern = Pattern.compile(regex);
+            if (pattern.matcher(nickname).find()){
+                return CommonResult.error("名称不能包含特殊字符！");
+            }
+        }else {
+            return CommonResult.error("名称不能为空！");
         }
         /*String userId = UserUtils.getUserId();
         UserDataQO dataQO = new UserDataQO();
@@ -137,7 +131,30 @@ public class UserDataController {
                 true);
         return CommonResult.ok();
     }
-    
+
+    /**
+     * @author: Pipi
+     * @description: 获取字符串字符长度
+     * @param s:
+     * @return: {@link int}
+     * @date: 2021/12/28 14:02
+     **/
+    public static int getWordCount(String s)
+    {
+        int length = 0;
+        for(int i = 0; i < s.length(); i++)
+        {
+            int ascii = Character.codePointAt(s, i);
+            if(ascii >= 0 && ascii <=255)
+                length++;
+            else
+                length += 2;
+
+        }
+        return length;
+
+    }
+
     /**
     * @Description: 账号安全状态查询
      * @Param: []
