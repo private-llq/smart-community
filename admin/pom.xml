@@ -159,7 +159,7 @@
 					<mainClass>com.jsy.community.AdminApp</mainClass>
 <!--					<layout>ZIP</layout>-->
 					<outputDirectory>
-						${basedir}../../../jar
+						${basedir}../../jar
 					</outputDirectory>
 				</configuration>
 				<executions>
