@@ -1678,9 +1678,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     @Override
     public Integer userIsRealAuth(String userId) {
         if (baseUserInfoRpcService.getIdCardRealInfo(userId) == null) {
-            return 2;
-        } else {
             return 0;
+        } else {
+            return 2;
         }
         // return userMapper.getRealAuthStatus(userId);
     }

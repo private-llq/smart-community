@@ -58,10 +58,8 @@ public class UserHouseController {
     // @Permit("community:proprietor:user:house:details")
     public CommonResult details(@RequestBody UserHouseQO userHouseQO){
         Integer status = userService.userIsRealAuth(UserUtils.getUserId());
-        if (status!=null){
-            if (status==0||status.equals(0)){
-                return CommonResult.error(40001,"未实名认证");
-            }
+        if (status != 2){
+            return CommonResult.error(40001,"未实名认证");
         }
         //查询所有权限
         HouseMemberEntity houseMemberEntity = userHouseService.selectByUser(userHouseQO.getCommunityId(),userHouseQO.getHouseId(),UserUtils.getUserId());
