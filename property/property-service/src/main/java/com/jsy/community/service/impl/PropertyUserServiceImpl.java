@@ -83,6 +83,7 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 		if (idCardRealInfo != null) {
 			userEntity.setRealName(idCardRealInfo.getIdCardName());
 			userEntity.setIdCard(idCardRealInfo.getIdCardNumber());
+			userEntity.setIsRealAuth(1);
 		}
 		/*QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("uid",uid);
