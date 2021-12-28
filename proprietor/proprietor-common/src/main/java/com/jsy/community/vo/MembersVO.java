@@ -18,6 +18,8 @@ public class MembersVO implements Serializable {
      */
     private Long id;
 
+    private String uid;
+
     /**
      * name
      */

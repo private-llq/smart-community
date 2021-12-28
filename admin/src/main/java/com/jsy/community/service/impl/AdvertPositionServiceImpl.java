@@ -32,7 +32,7 @@ public class AdvertPositionServiceImpl extends ServiceImpl<AdvertPositionMapper,
         BeanUtils.copyProperties(param, entity);
         LocalDateTime now = LocalDateTime.now();
         entity.setSort(sort(param.getPid(), param.getSort()))
-                .setFullName(getFullName(param.getPid(), param.getName()))
+                .setFullName(getFullName(param.getPid(), param.getPositionName()))
                 .setCreateTime(now)
                 .setUpdateTime(now);
         return save(entity);
@@ -58,7 +58,7 @@ public class AdvertPositionServiceImpl extends ServiceImpl<AdvertPositionMapper,
         StringBuilder stb = new StringBuilder(name);
         while (0 != pid) {
             AdvertPositionEntity parent = getById(pid);
-            name = stb.insert(0, parent.getName()+"-").toString();
+            name = stb.insert(0, parent.getPositionName()+"-").toString();
             pid = parent.getPid();
         }
         return name;

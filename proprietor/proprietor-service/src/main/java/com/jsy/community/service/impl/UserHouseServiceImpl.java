@@ -18,6 +18,7 @@ import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.MembersVO;
 import com.jsy.community.vo.UserHouseVO;
 import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealUserDetail;
 import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.UserImVo;
@@ -34,6 +35,8 @@ import org.springframework.util.CollectionUtils;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author chq459799974
@@ -597,13 +600,29 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 			//当前登录人员为业主
 			UserHouseVO userHouseVO = houseMemberMapper.selectLoginUser(userId, userHouseQO.getCommunityId(), userHouseQO.getHouseId(), 1);
+			UserDetail userDetail = userInfoRpcService.getUserDetail(userId);
+			if (userDetail != null) {
+				userHouseVO.setAvatarUrl(userDetail.getAvatarThumbnail());
+			}
 			userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(userHouseVO.getRelation()));
 			userHouseVO.setHouseSite(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
 			userHouseVO.setCommunityText(communityEntity.getName());
 
 			//查询房屋下所有成员
 			List<MembersVO> voList = houseMemberMapper.selectRelation(userHouseQO.getCommunityId(), userHouseQO.getHouseId(), 0);
+			Set<String> uidSet = voList.stream().map(MembersVO::getUid).collect(Collectors.toSet());
+			Map<String, RealUserDetail> map = new HashMap<>();
+			if (!CollectionUtils.isEmpty(uidSet)) {
+				List<RealUserDetail> realUserDetails = userInfoRpcService.getRealUserDetails(uidSet);
+				if (!CollectionUtils.isEmpty(realUserDetails)) {
+					map = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
+				}
+			}
 			for (MembersVO membersVO : voList) {
+				RealUserDetail realUserDetails = map.get(membersVO.getUid());
+				if (realUserDetails != null) {
+					membersVO.setAvatarUrl(realUserDetails.getAvatarThumbnail());
+				}
 				if (!membersVO.getRelation().equals(1)){
 					membersVO.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(membersVO.getRelation()));
 					list.add(membersVO);

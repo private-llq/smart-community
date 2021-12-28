@@ -17,7 +17,7 @@
         a.update_time,
         a.notes,
         a.deleted,
-        ap.full_name
+        ap.position_name
     FROM
         t_advert a,
 	    t_advert_position ap

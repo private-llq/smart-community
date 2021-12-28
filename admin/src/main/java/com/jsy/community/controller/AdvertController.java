@@ -8,6 +8,7 @@ import com.jsy.community.qo.admin.AdvertQO;
 import com.jsy.community.qo.admin.Id;
 import com.jsy.community.service.AdvertService;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,7 +34,7 @@ public class AdvertController {
      * @return 广告列表
      */
     @PostMapping("/page")
-//    @Permit("community:admin:advert:page")
+    @Permit("community:admin:advert:page")
     public CommonResult page(@RequestBody AdvertQO qo) {
         return CommonResult.ok(advertService.toPage(qo));
     }
@@ -44,7 +45,7 @@ public class AdvertController {
      * @return 广告信息
      */
     @PostMapping("/getOneById")
-//    @Permit("community:admin:advert:getOneById")
+    @Permit("community:admin:advert:getOneById")
     public CommonResult getOne (@RequestBody AdvertQO qo) {
         return CommonResult.ok(advertService.getOne(new LambdaQueryWrapper<AdvertEntity>().eq(AdvertEntity::getAdvertId, qo.getAdvertId())));
     }
@@ -55,7 +56,7 @@ public class AdvertController {
      * @return boolean
      */
     @PostMapping("/insert")
-//    @Permit("community:admin:advert:insert")
+    @Permit("community:admin:advert:insert")
     public CommonResult insert(@RequestBody AddAdvertQO qo) {
         return CommonResult.ok(advertService.insertAdvert(qo) ? "添加成功" : "添加失败");
     }
@@ -66,7 +67,7 @@ public class AdvertController {
      * @return boolean
      */
     @PostMapping("/update")
-//    @Permit("community:admin:advert:update")
+    @Permit("community:admin:advert:update")
     public CommonResult update(@RequestBody AdvertEntity entity) {
         return CommonResult.ok(advertService.updateAdvert(entity) ? "修改成功" : "修改失败");
     }
@@ -76,7 +77,7 @@ public class AdvertController {
      * @return 广告列表
      */
     @PostMapping("/getList")
-//    @Permit("community:admin:advert:getList")
+    @Permit("community:admin:advert:getList")
     public CommonResult getAll() {
         return CommonResult.ok(advertService.list());
     }
@@ -87,7 +88,7 @@ public class AdvertController {
      * @return
      */
     @PostMapping("/deleteById")
-//    @Permit("community:admin:advert:deleteById")
+    @Permit("community:admin:advert:deleteById")
     public CommonResult delete(@RequestBody Id id) {
         return CommonResult.ok(advertService.removeById(id.getId()) ? "删除成功" : "删除失败");
     }
@@ -98,7 +99,7 @@ public class AdvertController {
      * @return
      */
     @PostMapping("/deleteList")
-//    @Permit("community:admin:advert:deleteList")
+    @Permit("community:admin:advert:deleteList")
     public CommonResult deleteList(@RequestBody AdvertIdList ids) {
         return CommonResult.ok(advertService.removeByIds(ids.getIds()) ? "删除成功" : "删除失败");
     }
