@@ -156,7 +156,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     public String addLeaseRecord(AssetLeaseRecordEntity assetLeaseRecordEntity) {
         // 检查租户是否实名认证
         Integer integer = userService.userIsRealAuth(assetLeaseRecordEntity.getTenantUid());
-        if (integer <= 0) {
+        if (integer != 2) {
             throw new LeaseException(JSYError.NO_REAL_NAME_AUTH);
         }
         // 检查签约是否已经存在(未完成签约或已签约但是还没到期的签约)
