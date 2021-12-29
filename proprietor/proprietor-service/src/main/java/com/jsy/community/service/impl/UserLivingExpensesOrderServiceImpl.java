@@ -5,25 +5,20 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.api.UserLivingExpensesOrderService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.UserLivingExpensesAccountEntity;
 import com.jsy.community.entity.UserLivingExpensesOrderEntity;
+import com.jsy.community.mapper.UserLivingExpensesAccountMapper;
 import com.jsy.community.mapper.UserLivingExpensesOrderMapper;
 import com.jsy.community.utils.SnowFlake;
-import com.zhsj.base.api.constant.RpcConst;
-import com.zhsj.base.api.entity.RealUserDetail;
-import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.basecommon.enums.ErrorEnum;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -39,8 +34,8 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 	@Autowired
 	private UserLivingExpensesOrderMapper userLivingExpensesOrderMapper;
 	
-	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
-	private IBaseUserInfoRpcService userInfoRpcService;
+	@Autowired
+	private UserLivingExpensesAccountMapper accountMapper;
 	
 	/**
 	 * @Description: 新增生活缴费订单记录
@@ -67,13 +62,19 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 	 * @return: java.util.List<com.jsy.community.entity.UserLivingExpensesOrderEntity>
 	 */
 	@Override
-	public List<UserLivingExpensesOrderEntity> getListOfUserLivingExpensesOrder(UserLivingExpensesOrderEntity userLivingExpensesOrderEntity) {
+	public Map<String, List<UserLivingExpensesOrderEntity>> getListOfUserLivingExpensesOrder(UserLivingExpensesOrderEntity userLivingExpensesOrderEntity) {
+		
 		QueryWrapper<UserLivingExpensesOrderEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.select("*,DATE_FORMAT(create_time,'%Y-%m') as monthTime");
 		queryWrapper.eq("uid", userLivingExpensesOrderEntity.getUid());
 		queryWrapper.eq("deleted", 0);
-		if (StringUtils.isNotBlank(userLivingExpensesOrderEntity.getItemCode())) {
-			queryWrapper.eq("item_code", userLivingExpensesOrderEntity.getItemCode());
+		// 是否查分类
+		if (StringUtils.isNotBlank(userLivingExpensesOrderEntity.getCategoryId())) {
+			List<UserLivingExpensesAccountEntity> userLivingExpensesAccountEntities = accountMapper.selectList(new QueryWrapper<UserLivingExpensesAccountEntity>().eq("category_id", userLivingExpensesOrderEntity.getCategoryId()));
+			Set<String> accounts = userLivingExpensesAccountEntities.stream().map(UserLivingExpensesAccountEntity::getAccount).collect(Collectors.toSet());
+			queryWrapper.in("bill_key", accounts);
 		}
+		// 是否查月份
 		if (userLivingExpensesOrderEntity.getQueryTime() != null) {
 			LocalDate endTime = userLivingExpensesOrderEntity.getQueryTime().with(TemporalAdjusters.lastDayOfMonth());
 			queryWrapper.ge("create_time", userLivingExpensesOrderEntity.getQueryTime());
@@ -81,17 +82,36 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		}
 		List<UserLivingExpensesOrderEntity> userLivingExpensesOrderEntities = userLivingExpensesOrderMapper.selectList(queryWrapper);
 		if (CollectionUtils.isEmpty(userLivingExpensesOrderEntities)) {
-			return new ArrayList<>();
+			return new HashMap<>();
 		}
-		Set<String> uidSet = userLivingExpensesOrderEntities.stream().map(UserLivingExpensesOrderEntity::getUid).collect(Collectors.toSet());
-		List<RealUserDetail> userDetails = userInfoRpcService.getRealUserDetails(uidSet);
-		Map<String, RealUserDetail> userDetailMap = userDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
+		
+		Set<String> accounts = userLivingExpensesOrderEntities.stream().map(UserLivingExpensesOrderEntity::getBillKey).collect(Collectors.toSet());
+		List<UserLivingExpensesAccountEntity> userLivingExpensesAccountEntityByAccount = accountMapper.selectList(new QueryWrapper<UserLivingExpensesAccountEntity>().in("account", accounts));
+		// 查询生活缴费户号列表
+		Map<String, UserLivingExpensesAccountEntity> userLivingExpensesAccountEntityMap = userLivingExpensesAccountEntityByAccount.stream()
+			.collect(Collectors.toMap(UserLivingExpensesAccountEntity::getAccount, Function.identity()));
+		
+		// 补充数据
 		for (UserLivingExpensesOrderEntity entity : userLivingExpensesOrderEntities) {
-			RealUserDetail realUserDetail = userDetailMap.get(entity.getUid());
-			entity.setUserName(realUserDetail.getNickName());
-			entity.setMobile(realUserDetail.getPhone());
+			UserLivingExpensesAccountEntity userLivingExpensesAccountEntity = userLivingExpensesAccountEntityMap.get(entity.getBillKey());
+			// 补充户号
+			entity.setAccount(userLivingExpensesAccountEntity.getAccount());
+			// 补充户主
+			entity.setHouseholder(userLivingExpensesAccountEntity.getHouseholder());
+			// 补充分类名称
+			entity.setCategory(userLivingExpensesAccountEntity.getCategory());
 		}
-		return userLivingExpensesOrderEntities;
+		
+		// 根据月份封装返回数据
+		Map<String, List<UserLivingExpensesOrderEntity>> resultMaps = userLivingExpensesOrderEntities.stream()
+			.collect(Collectors.groupingBy(UserLivingExpensesOrderEntity::getMonthTime,
+				Collectors.mapping(Function.identity(), Collectors.toList())));
+		
+		if (CollectionUtils.isEmpty(resultMaps)) {
+			return new HashMap<>();
+		}
+		
+		return resultMaps;
 	}
 	
 	/**
@@ -107,6 +127,16 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		if (userLivingExpensesOrderEntity == null) {
 			throw new ProprietorException("未找到生活缴费记录");
 		}
+		// 补充返回字段
+		UserLivingExpensesAccountEntity account = accountMapper.selectOne(new QueryWrapper<UserLivingExpensesAccountEntity>().eq("account", userLivingExpensesOrderEntity.getBillKey()));
+		// 缴费状态
+		userLivingExpensesOrderEntity.setOrderStatusName(userLivingExpensesOrderEntity.getOrderStatus() == 0 ? "订单创建成功" : userLivingExpensesOrderEntity.getOrderStatus() == 1 ? "支付成功"
+			: userLivingExpensesOrderEntity.getOrderStatus() == 2 ? "支付失败" : userLivingExpensesOrderEntity.getOrderStatus() == 3 ? "销账成功" : userLivingExpensesOrderEntity.getOrderStatus() == 4 ? "销账失败" :
+			userLivingExpensesOrderEntity.getOrderStatus() == 8 ? "实时退款" : "未知状态");
+		// 户主
+		userLivingExpensesOrderEntity.setHouseholder(account.getHouseholder());
+		// 缴费单位
+		userLivingExpensesOrderEntity.setCompany(account.getCompany());
 		return userLivingExpensesOrderEntity;
 	}
 }

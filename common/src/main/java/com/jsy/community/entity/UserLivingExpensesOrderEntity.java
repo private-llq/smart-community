@@ -79,6 +79,12 @@ public class UserLivingExpensesOrderEntity extends BaseEntity {
     private String transacNo;
     
     /**
+     * 分类id
+     */
+    @TableField(exist = false)
+    private String categoryId;
+    
+    /**
      * 查询时间
      */
     @TableField(exist = false)
@@ -87,9 +93,39 @@ public class UserLivingExpensesOrderEntity extends BaseEntity {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate queryTime;
     
+    /**
+     * 户号
+     */
     @TableField(exist = false)
-    private String userName;
+    private String account;
     
+    /**
+     * 户主
+     */
     @TableField(exist = false)
-    private String mobile;
+    private String householder;
+    
+    /**
+     * 分类名称
+     */
+    @TableField(exist = false)
+    private String category;
+    
+    /**
+     * 账单状态;0:订单创建成功;1:支付成功;2:支付失败;3:销账成功;4:销账失败;5:未知状态;8:实时退款
+     */
+    @TableField(exist = false)
+    private String orderStatusName;
+    
+    /**
+     * 公司名称
+     */
+    @TableField(exist = false)
+    private String company;
+    
+    /**
+     * 年-月时间
+     */
+    @TableField(exist = false)
+    private String monthTime;
 }

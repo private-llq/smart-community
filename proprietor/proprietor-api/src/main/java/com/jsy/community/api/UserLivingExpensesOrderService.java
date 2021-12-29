@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserLivingExpensesOrderEntity;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: Pipi
@@ -29,7 +30,7 @@ public interface UserLivingExpensesOrderService extends IService<UserLivingExpen
 	 * @Param: [userLivingExpensesOrderEntity]
 	 * @return: java.util.List<com.jsy.community.entity.UserLivingExpensesOrderEntity>
 	 */
-	List<UserLivingExpensesOrderEntity> getListOfUserLivingExpensesOrder(UserLivingExpensesOrderEntity userLivingExpensesOrderEntity);
+	Map<String, List<UserLivingExpensesOrderEntity>> getListOfUserLivingExpensesOrder(UserLivingExpensesOrderEntity userLivingExpensesOrderEntity);
 	
 	/**
 	 * @Description: 查询生活缴费记录详情
