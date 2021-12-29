@@ -1,9 +1,16 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 /**
  * @Author: Pipi
@@ -55,7 +62,7 @@ public class UserLivingExpensesOrderEntity extends BaseEntity {
      */
     private String fullParam;
     /**
-     * 账单状态;0:订单创建成;1:支付成功;2:支付失败;3:销账成功;4:销账失败;5:未知状态;8:实时退款
+     * 账单状态;0:订单创建成功;1:支付成功;2:支付失败;3:销账成功;4:销账失败;5:未知状态;8:实时退款
      */
     private Integer orderStatus;
     /**
@@ -70,4 +77,19 @@ public class UserLivingExpensesOrderEntity extends BaseEntity {
      * 受理流水号
      */
     private String transacNo;
+    
+    /**
+     * 查询时间
+     */
+    @TableField(exist = false)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate queryTime;
+    
+    @TableField(exist = false)
+    private String userName;
+    
+    @TableField(exist = false)
+    private String mobile;
 }
