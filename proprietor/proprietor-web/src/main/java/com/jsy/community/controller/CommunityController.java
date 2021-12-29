@@ -67,7 +67,9 @@ public class CommunityController {
 	@PostMapping("locate")
 	// @Permit("community:proprietor:community:locate")
 	public CommonResult<CommunityEntity> locate(@RequestBody Map<String,Double> location){
-		return CommonResult.ok(iCommunityService.locateCommunityV2(UserUtils.getUserId(),location));
+		CommunityEntity communityEntity = iCommunityService.locateCommunityV2(UserUtils.getUserId(), location);
+		log.info("社区定位返回结果:{}", communityEntity);
+		return CommonResult.ok(communityEntity);
 	}
 
 	@ApiOperation("获取当前小区的物业公司信息")

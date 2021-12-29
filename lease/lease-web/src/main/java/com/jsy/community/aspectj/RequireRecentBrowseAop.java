@@ -47,7 +47,7 @@ public class RequireRecentBrowseAop extends BaseAop {
             return proceed;
         }
         //保存用户浏览数据
-        houseRecentService.saveLeaseBrowse(proceed, (String) httpServletRequest.getAttribute(UserUtils.USER_KEY));
+        houseRecentService.saveLeaseBrowse(proceed, UserUtils.getUserId());
         return proceed;
     }
 

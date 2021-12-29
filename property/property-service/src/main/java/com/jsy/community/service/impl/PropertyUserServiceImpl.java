@@ -81,10 +81,13 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 			userEntity.setSex(userDetail.getSex());
 		}
 		if (idCardRealInfo != null) {
+			log.info("用户详情实名");
 			userEntity.setRealName(idCardRealInfo.getIdCardName());
 			userEntity.setIdCard(idCardRealInfo.getIdCardNumber());
-			userEntity.setIsRealAuth(1);
+			userEntity.setIsRealAuth(2);
 		}
+		log.info("用户详情:{}", userEntity);
+
 		/*QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("uid",uid);
 		UserEntity userEntity = baseMapper.selectOne(wrapper);*/
