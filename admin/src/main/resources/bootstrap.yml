@@ -32,6 +32,8 @@ spring:
       name: common,common-service,common-web  #配置文件名字   dev是环境
       profile: ${spring.profiles.active} #环境  组成完整的文件名：gateway-service-dev.yml
       label: master #主分支
+      username: ecf50273a250499a9ec28953c2c494ab
+      password: ecf50273a250499a9ec28953c2c494ab
 
   redis:
     port: 6379
