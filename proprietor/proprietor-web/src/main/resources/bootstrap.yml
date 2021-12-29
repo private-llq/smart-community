@@ -37,6 +37,8 @@ spring:
       discovery:
         enabled: true #开启springcloudconfig服务端的服务发现
         service-id: base-config-server #config-server服务的名称
+        username: ecf50273a250499a9ec28953c2c494ab
+        password: ecf50273a250499a9ec28953c2c494ab
       #你要拉取具体的哪个配置文件
       name: proprietor-web,common,common-service,common-web  #配置文件名字   dev是环境
       profile: ${spring.profiles.active} #环境  组成完整的文件名：gateway-service-dev.yml
@@ -112,7 +114,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://222.178.213.183:36366/eureka
+      defaultZone: ${server.eureka-service-address}
   instance:
     hostname: ${spring.cloud.client.ip-address}
     prefer-ip-address: true
