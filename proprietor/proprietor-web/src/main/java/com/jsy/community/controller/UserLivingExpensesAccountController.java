@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @Author: Pipi
- * @Description:
+ * @Description: 生活缴费账户控制器
  * @Date: 2021/12/3 16:49
  * @Version: 1.0
  **/
@@ -59,17 +59,15 @@ public class UserLivingExpensesAccountController {
      **/
     @PostMapping("/v2/modifyAccount")
     public CommonResult<?> modifyAccount(@RequestBody UserLivingExpensesAccountEntity accountEntity) {
+        ValidatorUtils.validateEntity(accountEntity);
+        if (accountEntity.getBusinessFlow() == 1) {
+            throw new JSYException(ConstError.BAD_REQUEST, "直缴业务不用绑定,请走直接缴费接口");
+        }
         if (accountEntity.getId() == null) {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "账号ID不能为空");
         }
         accountEntity.setUid(UserUtils.getUserId());
-        UserLivingExpensesAccountEntity originalAccountEntity = accountService.queryAccountById(accountEntity);
-        if (originalAccountEntity == null) {
-            throw new JSYException(JSYError.DATA_LOST);
-        }
-        if (!accountEntity.getAccount().equals(originalAccountEntity.getAccount()) || !accountEntity.getItemCode().equals(originalAccountEntity.getItemCode())) {
-            // 如果户号或者项目有改变,需要重新查询账单信息,同时删除原有未缴费账单
-        }
+        accountService.modifyAccount(accountEntity);
         return CommonResult.ok();
     }
 }
