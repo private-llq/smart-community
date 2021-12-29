@@ -10,6 +10,8 @@ import com.jsy.community.api.UserLivingExpensesAccountService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserLivingExpensesAccountEntity;
 import com.jsy.community.entity.UserLivingExpensesBillEntity;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.UserLivingExpensesAccountMapper;
 import com.jsy.community.mapper.UserLivingExpensesBillMapper;
 import com.jsy.community.qo.cebbank.CebQueryBillInfoQO;
@@ -58,53 +60,9 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
         if (accountEntity.getBusinessFlow() == 1) {
             throw new ProprietorException("直缴业务不用绑定,请走直接缴费接口");
         } else if (accountEntity.getBusinessFlow() == 0 || accountEntity.getBusinessFlow() == 2) {
-            CebQueryBillInfoQO billInfoQO = new CebQueryBillInfoQO();
-            billInfoQO.setSessionId(cebBankService.getCebBankSessionId(accountEntity.getMobile(), accountEntity.getDeviceType()));
-            billInfoQO.setType(accountEntity.getCategoryId());
-            billInfoQO.setCityName(accountEntity.getCityName());
-            billInfoQO.setItemCode(accountEntity.getItemId());
-            billInfoQO.setItemId(accountEntity.getItemCode());
-            billInfoQO.setBillKey(accountEntity.getAccount());
-            billInfoQO.setFlag("1");
-            billInfoQO.setPollingTimes("1");
-            billInfoQO.setDeviceType(accountEntity.getDeviceType());
-            billInfoQO.setBusinessFlow(accountEntity.getBusinessFlow());
-            CebQueryBillInfoVO cebQueryBillInfoVO = cebBankService.queryBillInfo(billInfoQO);
-            if (cebQueryBillInfoVO != null) {
-                if (!CollectionUtils.isEmpty(cebQueryBillInfoVO.getBillQueryResultModel().getBillQueryResultDataModelList())) {
-                    CebBillQueryResultDataModelVO resultDataModelVO = cebQueryBillInfoVO.getBillQueryResultModel().getBillQueryResultDataModelList().get(0);
-                    String originalCustomerName = resultDataModelVO.getOriginalCustomerName();
-                    accountEntity.setHouseholder(StringUtil.isNotBlank(originalCustomerName) ? originalCustomerName : resultDataModelVO.getCustomerName());
-                    accountEntity.setAddress(cebQueryBillInfoVO.getBillQueryResultModel().getItem7());
-
-                    UserLivingExpensesBillEntity billEntity = new UserLivingExpensesBillEntity();
-                    billEntity.setItemId(accountEntity.getItemId());
-                    billEntity.setItemCode(accountEntity.getItemCode());
-                    billEntity.setBillKey(accountEntity.getAccount());
-                    billEntity.setBillAmount(resultDataModelVO.getPayAmount());
-                    billEntity.setQueryAcqSsn(cebQueryBillInfoVO.getQueryAcqSsn());
-                    billEntity.setCustomerName(accountEntity.getHouseholder());
-                    billEntity.setContactNo(resultDataModelVO.getContractNo());
-                    billEntity.setBalance(resultDataModelVO.getBalance());
-                    billEntity.setBeginDate(resultDataModelVO.getBeginDate());
-                    billEntity.setEndDate(resultDataModelVO.getEndDate());
-                    billEntity.setFieldA(resultDataModelVO.getFiled1());
-                    billEntity.setFieldB(resultDataModelVO.getFiled2());
-                    billEntity.setFieldC(resultDataModelVO.getFiled3());
-                    billEntity.setFieldD(resultDataModelVO.getFiled4());
-                    billEntity.setFieldE(resultDataModelVO.getFiled5());
-                    billEntity.setBillStatus(0);
-                    CebCreatePaymentBillParamsModelVO createPaymentBillParamsModelVO = cebQueryBillInfoVO.getBillQueryResultModel().getCreatePaymentBillParamsModel();
-                    if (createPaymentBillParamsModelVO != null) {
-                        billEntity.setRangLimit(createPaymentBillParamsModelVO.getRangLimit());
-                        billEntity.setChooseAmount(createPaymentBillParamsModelVO.getChooseAmount());
-                    }
-                    billEntity.setId(SnowFlake.nextId());
-                    billMapper.insert(billEntity);
-                }
-            } else {
-                throw new ProprietorException("缴费信息查询失败");
-            }
+            // 查询用户信息和账单,并添加
+            CebQueryBillInfoVO cebQueryBillInfoVO = queryBillInfo(accountEntity);
+            addBill(accountEntity, cebQueryBillInfoVO);
         } else {
             throw new ProprietorException("业务流程不明确");
         }
@@ -139,5 +97,114 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
         queryWrapper.eq("id", accountEntity.getId());
         queryWrapper.eq("uid", accountEntity.getUid());
         return accountMapper.selectOne(queryWrapper);
+    }
+
+    /**
+     * @param accountEntity : 账户信息实体
+     * @author: Pipi
+     * @description: 修改账户信息
+     * @return: {@link Boolean}
+     * @date: 2021/12/28 17:41
+     **/
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean modifyAccount(UserLivingExpensesAccountEntity accountEntity) {
+        UserLivingExpensesAccountEntity recordAccountEntity = queryAccountById(accountEntity);
+        if (recordAccountEntity == null) {
+            throw new ProprietorException(JSYError.DATA_LOST);
+        }
+        if (!accountEntity.getAccount().equals(recordAccountEntity.getAccount()) || !accountEntity.getItemCode().equals(recordAccountEntity.getItemCode())) {
+            // 如果户号或者项目有改变,需要重新查询账单信息,同时删除原有未缴费账单
+            // 删除该用户的该户号的账单
+            QueryWrapper<UserLivingExpensesBillEntity> billEntityQueryWrapper = new QueryWrapper<>();
+            billEntityQueryWrapper.eq("uid", accountEntity.getUid());
+            if (!accountEntity.getItemCode().equals(recordAccountEntity.getItemCode())) {
+                // 修改了项目
+                billEntityQueryWrapper.eq("item_code", recordAccountEntity.getItemCode());
+            }
+            if (accountEntity.getAccount().equals(recordAccountEntity.getAccount())) {
+                // 修改了户号
+                billEntityQueryWrapper.eq("bill_key", recordAccountEntity.getAccount());
+            }
+            billEntityQueryWrapper.eq("bill_status", 0);
+            billMapper.delete(billEntityQueryWrapper);
+            // 查询用户信息和账单,并添加
+            CebQueryBillInfoVO cebQueryBillInfoVO = queryBillInfo(accountEntity);
+            addBill(accountEntity, cebQueryBillInfoVO);
+        } else {
+            // 修改了分组
+            recordAccountEntity.setGroupId(accountEntity.getGroupId());
+            accountMapper.updateById(recordAccountEntity);
+        }
+        return true;
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 查询缴费账单信息
+     * @param accountEntity:
+     * @return: {@link CebQueryBillInfoVO}
+     * @date: 2021/12/28 18:14
+     **/
+    protected CebQueryBillInfoVO queryBillInfo(UserLivingExpensesAccountEntity accountEntity) {
+        CebQueryBillInfoQO billInfoQO = new CebQueryBillInfoQO();
+        billInfoQO.setSessionId(cebBankService.getCebBankSessionId(accountEntity.getMobile(), accountEntity.getDeviceType()));
+        billInfoQO.setType(accountEntity.getCategoryId());
+        billInfoQO.setCityName(accountEntity.getCityName());
+        billInfoQO.setItemCode(accountEntity.getItemId());
+        billInfoQO.setItemId(accountEntity.getItemCode());
+        billInfoQO.setBillKey(accountEntity.getAccount());
+        billInfoQO.setFlag("1");
+        billInfoQO.setPollingTimes("1");
+        billInfoQO.setDeviceType(accountEntity.getDeviceType());
+        billInfoQO.setBusinessFlow(accountEntity.getBusinessFlow());
+        return cebBankService.queryBillInfo(billInfoQO);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 增加账单
+     * @param cebQueryBillInfoVO:
+     * @return: {@link Boolean}
+     * @date: 2021/12/28 18:16
+     **/
+    protected Boolean addBill(UserLivingExpensesAccountEntity accountEntity, CebQueryBillInfoVO cebQueryBillInfoVO) {
+        if (cebQueryBillInfoVO != null) {
+            if (!CollectionUtils.isEmpty(cebQueryBillInfoVO.getBillQueryResultModel().getBillQueryResultDataModelList())) {
+                CebBillQueryResultDataModelVO resultDataModelVO = cebQueryBillInfoVO.getBillQueryResultModel().getBillQueryResultDataModelList().get(0);
+                String originalCustomerName = resultDataModelVO.getOriginalCustomerName();
+                accountEntity.setHouseholder(StringUtil.isNotBlank(originalCustomerName) ? originalCustomerName : resultDataModelVO.getCustomerName());
+                accountEntity.setAddress(cebQueryBillInfoVO.getBillQueryResultModel().getItem7());
+
+                UserLivingExpensesBillEntity billEntity = new UserLivingExpensesBillEntity();
+                billEntity.setItemId(accountEntity.getItemId());
+                billEntity.setItemCode(accountEntity.getItemCode());
+                billEntity.setBillKey(accountEntity.getAccount());
+                billEntity.setBillAmount(resultDataModelVO.getPayAmount());
+                billEntity.setQueryAcqSsn(cebQueryBillInfoVO.getQueryAcqSsn());
+                billEntity.setCustomerName(accountEntity.getHouseholder());
+                billEntity.setContactNo(resultDataModelVO.getContractNo());
+                billEntity.setBalance(resultDataModelVO.getBalance());
+                billEntity.setBeginDate(resultDataModelVO.getBeginDate());
+                billEntity.setEndDate(resultDataModelVO.getEndDate());
+                billEntity.setFieldA(resultDataModelVO.getFiled1());
+                billEntity.setFieldB(resultDataModelVO.getFiled2());
+                billEntity.setFieldC(resultDataModelVO.getFiled3());
+                billEntity.setFieldD(resultDataModelVO.getFiled4());
+                billEntity.setFieldE(resultDataModelVO.getFiled5());
+                billEntity.setBillStatus(0);
+                CebCreatePaymentBillParamsModelVO createPaymentBillParamsModelVO = cebQueryBillInfoVO.getBillQueryResultModel().getCreatePaymentBillParamsModel();
+                if (createPaymentBillParamsModelVO != null) {
+                    billEntity.setRangLimit(createPaymentBillParamsModelVO.getRangLimit());
+                    billEntity.setChooseAmount(createPaymentBillParamsModelVO.getChooseAmount());
+                }
+                billEntity.setId(SnowFlake.nextId());
+                billMapper.insert(billEntity);
+                return true;
+            }
+        } else {
+            throw new ProprietorException(6001, "缴费信息查询失败");
+        }
+        return false;
     }
 }

@@ -4,6 +4,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.api.client.util.Value;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.UpdateBasic;
 import com.jsy.community.utils.imutils.open.EncryptHelper;
@@ -20,8 +21,8 @@ import java.util.Map;
 @Component
 public class CallUtil {
 
-//    @Value("${imUrl}")
-    public static String imUrl = "https://im.zhsj.co:8090";
+    @Value("${imUrl}")
+    public static String imUrl = "https://api.zhsj.co:8090";
 
     public static void sign(Map<String, Object> json) {
         json.put(EncryptHelper.SECURITY_SECRET, EncryptHelper.SECRET_KEY);

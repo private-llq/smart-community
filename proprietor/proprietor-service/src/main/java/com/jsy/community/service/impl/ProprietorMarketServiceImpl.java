@@ -205,7 +205,7 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
     @Override
     public ProprietorMarketEntity findOne(Long id) {
         ProprietorMarketEntity marketEntity =  marketMapper.selectMarketOne(id);
-        if (StringUtil.isNotBlank(marketEntity.getUid())) {
+        if (marketEntity != null && StringUtil.isNotBlank(marketEntity.getUid())) {
             UserDetail userDetail = baseUserInfoRpcService.getUserDetail(marketEntity.getUid());
             if (userDetail != null) {
                 marketEntity.setNickName(userDetail.getNickName());
