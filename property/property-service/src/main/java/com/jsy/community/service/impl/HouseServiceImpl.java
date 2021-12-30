@@ -26,6 +26,7 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.property.ProprietorVO;
 import com.zhsj.base.api.entity.RealUserDetail;
 import jodd.util.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -46,6 +47,7 @@ import java.util.*;
  * @author qq459799974
  * @since 2020-11-20
  */
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_property)
 public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> implements IHouseService {
 
@@ -403,12 +405,12 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
         if (BusinessConst.BUILDING_TYPE_BUILDING == entity.getType()) {
             //禁止手动修改楼栋pid
             houseEntity.setPid(null);
-            //解绑原有单元
-            houseMapper.unitUnBindBuilding(houseEntity.getId());
-            //绑定新单元列表
-            if (!CollectionUtils.isEmpty(houseEntity.getUnitIdList())) {
-                houseMapper.unitBindBuilding(houseEntity.getUnitIdList(), entity);
-            }
+//            //解绑原有单元
+//            houseMapper.unitUnBindBuilding(houseEntity.getId());
+//            //绑定新单元列表
+//            if (!CollectionUtils.isEmpty(houseEntity.getUnitIdList())) {
+//                houseMapper.unitBindBuilding(houseEntity.getUnitIdList(), entity);
+//            }
             //若楼栋名称或楼宇分类或总楼层有修改，同步修改单元和房屋冗余的楼栋名称
             if (!StringUtils.isEmpty(houseEntity.getName()) || !StringUtils.isEmpty(houseEntity.getTotalFloor())) {
                 //设置对应名称
@@ -423,6 +425,18 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
                 List<Long> subUnitIdList = houseMapper.getSubIdList(Arrays.asList(houseEntity.getId()));
                 if (!CollectionUtils.isEmpty(subUnitIdList)) {
                     List<Long> subRoomIdList = houseMapper.getSubIdList(subUnitIdList);
+                    // 如果要修改总楼层数（totalFloor）需要判断是否有比总楼层数还高的房屋
+                    if (!StringUtils.isEmpty(houseEntity.getTotalFloor())) {
+                        if (!CollectionUtils.isEmpty(subRoomIdList)) {
+                            List<HouseEntity> houseEntities = houseMapper.selectList(new QueryWrapper<HouseEntity>()
+                                .eq("type", 4).eq("deleted", 0).in("id", subRoomIdList));
+                            for (HouseEntity house : houseEntities) {
+                                if (house.getFloor() > houseEntity.getTotalFloor()) {
+                                    throw new PropertyException(JSYError.FLOOR_BEYOND.getCode(), "总楼层低于房屋楼层，无法修改！");
+                                }
+                            }
+                        }
+                    }
                     subUnitIdList.addAll(subRoomIdList);
                     //同步修改子节点
                     houseMapper.updateSub(subUnitIdList, entity);
@@ -460,7 +474,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
                 HouseEntity unitEntity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("id", houseEntity.getPid()).eq("community_id", houseEntity.getCommunityId()));
                 HouseEntity buildingEntity = houseMapper.selectOne(new QueryWrapper<HouseEntity>().eq("id", unitEntity.getPid()).eq("community_id", houseEntity.getCommunityId()));
                 if (houseEntity.getFloor() > unitEntity.getTotalFloor() || houseEntity.getFloor() > buildingEntity.getTotalFloor()) {
-                    throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "房屋楼层不能高于楼栋总楼层");
+                    throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "楼栋总楼层不能低于房屋楼层");
                 }
                 //设置对应单元名称
                 houseEntity.setUnit(unitEntity.getUnit());
