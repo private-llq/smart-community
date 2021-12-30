@@ -3,8 +3,8 @@ package com.jsy.community.controller;
 import com.jsy.community.api.UserLivingExpensesOrderService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserLivingExpensesOrderEntity;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
-import com.zhsj.baseweb.annotation.LoginIgnore;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,11 +29,9 @@ public class UserLivingExpensesOrderController {
      * @return: com.jsy.community.vo.CommonResult
      */
     @PostMapping("/v2/addOrder")
-    @LoginIgnore
 //    @Permit("community:proprietor:livingExpensesOrder:v2:addOrder")
     public CommonResult addUserLivingExpensesOrder(@RequestBody UserLivingExpensesOrderEntity userLivingExpensesOrderEntity) {
-//        userLivingExpensesOrderEntity.setUid(UserUtils.getUserId());
-        userLivingExpensesOrderEntity.setUid("123");
+        userLivingExpensesOrderEntity.setUid(UserUtils.getUserId());
         String id = orderService.addUserLivingExpensesOrder(userLivingExpensesOrderEntity);
         return id == null ? CommonResult.error("添加失败") : CommonResult.ok(id, "添加成功");
     }
@@ -46,11 +44,9 @@ public class UserLivingExpensesOrderController {
      * @return: com.jsy.community.vo.CommonResult<?>
      */
     @PostMapping("/v2/orderList")
-    @LoginIgnore
 //    @Permit("community:proprietor:livingExpensesOrder:v2:orderList")
     public CommonResult<?> orderList(@RequestBody UserLivingExpensesOrderEntity userLivingExpensesOrderEntity) {
-//        userLivingExpensesOrderEntity.setUid(UserUtils.getUserId());
-        userLivingExpensesOrderEntity.setUid("123");
+        userLivingExpensesOrderEntity.setUid(UserUtils.getUserId());
         return CommonResult.ok(orderService.getListOfUserLivingExpensesOrder(userLivingExpensesOrderEntity));
     }
     
@@ -62,7 +58,6 @@ public class UserLivingExpensesOrderController {
      * @return: com.jsy.community.vo.CommonResult<?>
      */
     @GetMapping("/v2/orderDetail")
-    @LoginIgnore
 //    @Permit("community:proprietor:livingExpensesOrder:v2:orderDetail")
     public CommonResult<?> orderDetail(Long id) {
         return CommonResult.ok(orderService.getById(id));
