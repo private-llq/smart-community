@@ -29,7 +29,7 @@ public interface IAdminUserService{
 	 * @Param: [adminUserEntity]
 	 * @return: void
 	 */
-	void addOperator(AdminUserQO adminUserQO);
+	Integer addOperator(AdminUserQO adminUserQO);
 	
 	/**
 	 * @Description: 编辑操作员

@@ -151,7 +151,7 @@ public interface ISysUserService extends IService<SysUserEntity> {
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
-	void addOperator(SysUserQO sysUserQO);
+	Integer addOperator(SysUserQO sysUserQO);
 	
 	/**
 	 * @Description: 编辑操作员

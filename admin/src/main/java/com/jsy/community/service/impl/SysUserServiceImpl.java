@@ -33,6 +33,7 @@ import com.zhsj.base.api.rpc.IBaseRoleRpcService;
 import com.zhsj.base.api.rpc.IBaseUpdateUserRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.PageVO;
+import com.zhsj.basecommon.exception.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -445,9 +446,25 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	 * @Date: 2021/10/13
 	 **/
 	@Override
-	public void addOperator(SysUserQO sysUserQO){
+	public Integer addOperator(SysUserQO sysUserQO){
+		// 判断是新增(1)的还是原有(2)的
+		int result = 1;
 		// 增加用户
-		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(sysUserQO.getNickName(), sysUserQO.getPhone(), sysUserQO.getPassword());
+		UserDetail userDetail = null;
+		try {
+			userDetail = baseAuthRpcService.userPhoneRegister(sysUserQO.getNickName(), sysUserQO.getPhone(), sysUserQO.getPassword());
+		} catch (BaseException e) {
+			// 手机号是否已经注册
+			if (e.getErrorEnum().getCode() == 103) {
+				userDetail = new UserDetail();
+				Set<Long> uid = userInfoRpcService.queryRealUserDetailByUid(sysUserQO.getPhone(), "");
+				userDetail.setId(uid.iterator().next());
+				result = 2;
+			}
+		}
+		if (userDetail == null) {
+			throw new AdminException("用户添加失败");
+		}
 		// 增加登录类型范围为物业大后台
 		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.ULTIMATE_ADMIN, false);
 		// 先移除大后台默认角色，再给用户添加角色
@@ -457,6 +474,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		List<Long> roleIds = new ArrayList<>();
 		roleIds.add(sysUserQO.getRoleId());
 		baseRoleRpcService.userJoinRole(roleIds, userDetail.getId(), sysUserQO.getId());
+		return result;
 	}
 	
 	/**

@@ -39,6 +39,7 @@ import com.zhsj.base.api.rpc.IBaseUpdateUserRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.PageVO;
 import com.zhsj.basecommon.constant.BaseUserConstant;
+import com.zhsj.basecommon.exception.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -558,7 +559,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	**/
 	@Override
 	@LcnTransaction
-	public void addOperator(AdminUserQO adminUserQO){
+	public Integer addOperator(AdminUserQO adminUserQO){
 //		//生成盐值并对密码加密
 //		String salt = RandomStringUtils.randomAlphanumeric(20);
 //		//生成UUID 和 ID
@@ -585,6 +586,27 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 ////		//发短信通知，并发送初始密码
 ////		SmsUtil.sendSmsPassword(adminUserEntity.getMobile(), randomPass);
 // 绑定用户和角色
+		// 判断是新增(1)的还是原有(2)的
+		int result = 1;
+		// 增加用户
+		UserDetail userDetail = null;
+		
+		try {
+			// 增加用户
+			userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getMobile(), RSAUtil.privateDecrypt(adminUserQO.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)));
+		} catch (BaseException e) {
+			// 手机号是否已经注册
+			if (e.getErrorEnum().getCode() == 103) {
+				userDetail = new UserDetail();
+				Set<Long> uid = userInfoRpcService.queryRealUserDetailByUid(adminUserQO.getMobile(), "");
+				userDetail.setId(uid.iterator().next());
+				result = 2;
+			}
+		}
+		if (userDetail == null) {
+			throw new PropertyException("用户添加失败");
+		}
+		
 		List<Long> roleIds = new ArrayList<>();
 		if (adminUserQO.getCommunityRoleId() != null) {
 			if (adminUserQO.getRoleId() == null) {
@@ -593,8 +615,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			// TODO:给定的物业角色是否包含小区列表的菜单
 			roleIds.add(adminUserQO.getCommunityRoleId());
 		}
-		// 增加用户
-		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getMobile(), RSAUtil.privateDecrypt(adminUserQO.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)));
+		
 		if (adminUserQO.getCommunityRoleId() != null) {
 			baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN, false);
 		}
@@ -612,6 +633,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
 			adminConfigService.updateAdminCommunityBatch(adminUserQO.getCommunityIdList(), String.valueOf(userDetail.getId()));
 		}
+		return result;
 	}
 	
 	/**

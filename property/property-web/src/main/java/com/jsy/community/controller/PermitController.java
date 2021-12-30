@@ -216,4 +216,17 @@ public class PermitController {
         baseAuthRpcService.addLoginTypeScope(id, type);
         return CommonResult.ok();
     }
+    
+    /**
+     * @Description: 根据号码查询uid
+     * @author: DKS
+     * @since: 2021/12/30 15:21
+     * @Param: [phone]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @GetMapping("/queryRealUserDetailByUid")
+    @LoginIgnore
+    public CommonResult queryRealUserDetailByUid(String phone) {
+        return CommonResult.ok(userInfoRpcService.queryRealUserDetailByUid(phone, ""));
+    }
 }
