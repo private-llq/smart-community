@@ -213,7 +213,7 @@ public class PermitController {
     @GetMapping("/addLoginTypeScope")
     @LoginIgnore
     public CommonResult addLoginTypeScope(@RequestParam("id") Long id, String type) {
-        baseAuthRpcService.addLoginTypeScope(id, BusinessConst.COMMUNITY_ADMIN);
+        baseAuthRpcService.addLoginTypeScope(id, type);
         return CommonResult.ok();
     }
 }
