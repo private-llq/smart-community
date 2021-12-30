@@ -154,8 +154,6 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
         HashMap<String, Object> map = new HashMap<>();
         map.put("total",total);
         map.put("list",arrayList);
-        System.out.println(list);
-        System.out.println(total);
         return map;
 
     }

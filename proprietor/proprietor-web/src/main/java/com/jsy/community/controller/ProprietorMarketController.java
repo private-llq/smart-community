@@ -152,7 +152,7 @@ public class ProprietorMarketController {
      * @Date: 2021/8/21-15:44
      **/
     @GetMapping("/SelectOneMarket")
-    @ApiOperation("查询用户已发布或已下架的商品")
+    @ApiOperation("查询单条商品详情")
     // @Permit("community:proprietor:market:SelectOneMarket")
     public CommonResult SelectOneMarket(@RequestParam("id") Long id){
         ProprietorMarketEntity marketVO =  marketService.findOne(id);
