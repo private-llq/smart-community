@@ -241,13 +241,13 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
         page1 =(baseQO.getPage()-1)*baseQO.getSize();
 
         ArrayList<ProprietorMarketVO> arrayList = new ArrayList<>();
-        List<ProprietorMarketQO> list =  marketMapper.selectMarketLikePage(page1,baseQO.getSize());
+        List<ProprietorMarketQO> list =  marketMapper.selectMarketLikePage(page1,baseQO.getSize(),baseQO.getQuery());
         for (ProprietorMarketQO li : list){
             ProprietorMarketVO marketVO = new ProprietorMarketVO();
             BeanUtils.copyProperties(li,marketVO);
             arrayList.add(marketVO);
         }
-        Long total = marketMapper.findLikeTotals();
+        Long total = marketMapper.findLikeTotals(baseQO.getQuery());
         HashMap<String, Object> map = new HashMap<>();
         map.put("total",total);
         map.put("list",arrayList);

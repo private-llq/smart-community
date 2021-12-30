@@ -273,6 +273,7 @@ public class PropertyMarketServiceImpl extends ServiceImpl<PropertyMarketMapper,
         }else
         {
             marketEntity.setShield(STATE_ONE);
+            marketEntity.setState(0);
         }
         return marketMapper.update(marketEntity,new UpdateWrapper<ProprietorMarketEntity>().eq("id",id)) == 1;
     }

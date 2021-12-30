@@ -21,6 +21,7 @@
        <result column="phone" property="phone"/>
        <result column="images" property="images"/>
        <result column="shield" property="shield"/>
+       <result column="remove" property="remove"></result>
 
        <result column="labelName" property="labelName"/>
        <result column="categoryName" property="categoryName"/>
@@ -37,13 +38,14 @@
                tm.negotiable,  tm.state, tm.category_id as categoryId,tm.label_id as labelId,
                tm.click as click, tm.phone as phone,tm.images as images,tm.shield as shield,
                tm.deleted as deleted, tm.create_time as createTime,tm.update_time as updateTime,
-               tpml.label as labelName,tpmc.category  as categoryName
+               tpml.label as labelName,tpmc.category  as categoryName,tm.remove
         from t_proprietor_market tm
         left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
         left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
             where tm.deleted = 0
             and tm.state = #{query.state}
             and tm.uid = #{query.uid}
+            and tm.community_id= #{query.communityId}
         order by tm.create_time desc
         limit #{page},#{size}
     </select>
@@ -54,7 +56,7 @@
         where tm.deleted = 0
           and tm.state =#{query.state}
           and tm.uid = #{query.uid}
-
+          and tm.community_id= #{query.communityId}
     </select>
 
 
@@ -64,7 +66,6 @@
         where tm.deleted = 0
           and tm.state =1
           and tm.category_id=#{query.categoryId}
-          and tm.shield= 0
     </select>
 
     <!--所有发布商品-->
@@ -80,7 +81,7 @@
         where tm.deleted = 0
           and tm.state = 1
           and tm.category_id=#{query.categoryId}
-          and tm.shield= 0
+          and tm.community_id= #{query.communityId}
         order by tm.create_time desc
         limit #{page},#{size}
     </select>
@@ -88,7 +89,7 @@
         select count(*) from t_proprietor_market tm
         where tm.deleted = 0
           and tm.state =1
-          and tm.shield= 0
+          and tm.community_id= #{query.communityId}
     </select>
 
     <select id="selectMarketLikePage" resultType="com.jsy.community.qo.proprietor.ProprietorMarketQO">
@@ -102,7 +103,7 @@
                  left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
         where tm.deleted = 0
           and tm.state = 1
-          and tm.shield= 0
+          and tm.community_id= #{query.communityId}
         order by tm.click desc
         limit #{page},#{size}
     </select>

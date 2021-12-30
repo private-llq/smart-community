@@ -33,7 +33,7 @@
 
 
     <update id="deleteBlacklist" >
-        update t_proprietor_market tm set tm.remove = 1 where tm.id = #{id}
+        update t_proprietor_market tm set tm.remove = 1 AND  tm.state = 0 where tm.id = #{id}
     </update>
 
 
