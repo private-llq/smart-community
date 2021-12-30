@@ -1,6 +1,7 @@
 package com.jsy.community.exception;
 
 import com.jsy.community.constant.ConstError;
+import com.zhsj.basecommon.enums.ErrorEnum;
 import com.zhsj.basecommon.exception.BaseException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,5 +28,9 @@ public class JSYException extends BaseException {
     public JSYException(JSYError error) {
         super(error.getCode(), error.getMessage());
         this.code = error.getCode();
+    }
+    
+    public JSYException(ErrorEnum errorEnum) {
+        super(errorEnum);
     }
 }

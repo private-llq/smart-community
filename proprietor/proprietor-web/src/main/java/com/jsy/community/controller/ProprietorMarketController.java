@@ -54,6 +54,7 @@ public class ProprietorMarketController {
     // @Permit("community:proprietor:market:addMarket")
     public CommonResult addMarket(@RequestBody ProprietorMarketQO marketQO){
         String userId = UserUtils.getUserId();
+        ValidatorUtils.validateEntity(marketQO,ProprietorMarketQO.proprietorMarketValidated.class);
         if (marketQO.getNegotiable()==0){   //选择不面议  价格不能小于0
             if (marketQO.getPrice()==null){
                 throw new JSYException("价格有误,请重新输入");
@@ -65,6 +66,12 @@ public class ProprietorMarketController {
         }else {
             marketQO.setPrice(new BigDecimal(0));  //面议价格设为0
         }
+        String[] split = marketQO.getImages().split(",");
+        if (split.length>3){
+            throw new JSYException("图片最多上次三张");
+        }
+
+
         boolean b = marketService.addMarket(marketQO,userId);
         return CommonResult.ok("发布成功");
     }
@@ -81,6 +88,7 @@ public class ProprietorMarketController {
    // @Permit("community:proprietor:market:updateMarket")
     public CommonResult updateMarket(@RequestBody ProprietorMarketQO marketQO){
         String userId = UserUtils.getUserId();
+       ValidatorUtils.validateEntity(marketQO,ProprietorMarketQO.proprietorMarketValidated.class);
        if (marketQO.getNegotiable()==0){   //选择不面议  价格不能小于0
            if (marketQO.getPrice()==null){
                throw new JSYException("价格有误,请重新输入");
@@ -91,6 +99,10 @@ public class ProprietorMarketController {
            }
        }else {
            marketQO.setPrice(new BigDecimal(0));  //面议价格设为0
+       }
+       String[] split = marketQO.getImages().split(",");
+       if (split.length>3){
+           throw new JSYException("图片最多上次三张");
        }
         boolean b = marketService.updateMarket(marketQO,userId);
         return CommonResult.ok("修改成功");
