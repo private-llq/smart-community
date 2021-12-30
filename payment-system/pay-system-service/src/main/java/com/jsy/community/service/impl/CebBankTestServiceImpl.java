@@ -115,7 +115,7 @@ public class CebBankTestServiceImpl implements CebBankTestService {
         HttpResponseModel responseModel = new HttpResponseModel();
         billInfoQO.setPollingTimes("1");
         billInfoQO.setFlag("2");
-        billInfoQO.setQryAcqSsn("n20211125180148-885Kz0");
+        billInfoQO.setQryAcqSsn("n20211230142040-m9DU5K");
         responseModel = CebBankContributionUtil.queryBillInfo(billInfoQO);
         /*for (Integer i = 1; i <= 5; i++) {
             billInfoQO.setPollingTimes(i.toString());

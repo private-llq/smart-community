@@ -393,6 +393,7 @@ public class HouseLeaseController {
      * @date: 2021/12/21 17:29
      **/
     @PostMapping("/v2/completeLeaseOrder")
+    @LoginIgnore
     public R<Void> completeLeaseOrder(@RequestBody R<PayCallNotice> r) {
         return assetLeaseRecordService.updateOperationPayStatus(r.getData()) ? R.ok() : R.fail();
     }

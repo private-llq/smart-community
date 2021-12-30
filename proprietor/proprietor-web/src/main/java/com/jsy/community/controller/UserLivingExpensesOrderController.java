@@ -2,7 +2,9 @@ package com.jsy.community.controller;
 
 import com.jsy.community.api.UserLivingExpensesOrderService;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.UserLivingExpensesBillEntity;
 import com.jsy.community.entity.UserLivingExpensesOrderEntity;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -31,10 +33,10 @@ public class UserLivingExpensesOrderController {
     @PostMapping("/v2/addOrder")
     @LoginIgnore
 //    @Permit("community:proprietor:livingExpensesOrder:v2:addOrder")
-    public CommonResult addUserLivingExpensesOrder(@RequestBody UserLivingExpensesOrderEntity userLivingExpensesOrderEntity) {
+    public CommonResult addUserLivingExpensesOrder(@RequestBody UserLivingExpensesBillEntity billEntity) {
 //        userLivingExpensesOrderEntity.setUid(UserUtils.getUserId());
-        userLivingExpensesOrderEntity.setUid("123");
-        String id = orderService.addUserLivingExpensesOrder(userLivingExpensesOrderEntity);
+        billEntity.setUid(UserUtils.getUserId());
+        String id = orderService.addUserLivingExpensesOrder(billEntity);
         return id == null ? CommonResult.error("添加失败") : CommonResult.ok(id, "添加成功");
     }
     

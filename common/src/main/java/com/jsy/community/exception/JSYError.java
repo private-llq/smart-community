@@ -11,6 +11,8 @@ import com.jsy.community.constant.ConstError;
 public enum JSYError {
 	/**
 	 * 错误请求
+	 * code的定义:物业模块1,租赁模块2,业主模块3,支付模块4,大后台5
+	 * 第二位统一为6,然后从001开始计数,例如物业模块第一个就为16001
 	 */
 	BAD_REQUEST(ConstError.BAD_REQUEST, "错误的请求"),
 	UNAUTHORIZED(ConstError.UNAUTHORIZED, "未认证"),
@@ -26,6 +28,12 @@ public enum JSYError {
 	OPERATOR_INFORMATION_NOT_OBTAINED(ConstError.BAD_REQUEST, "未获取到操作员信息!"),
 	NO_AUTH_HOUSE(ConstError.NO_AUTH_HOUSE, "房屋待认证!"),
 	DATA_LOST(ConstError.DATA_LOST,"数据不存在！"),
+
+	// 支付模块
+	THIRD_FAILED(46001, "第三方服务调用失败!"),
+
+
+
 	NOT_ENOUGH(ConstError.NOT_ENOUGH,"余额不足！");
 
 

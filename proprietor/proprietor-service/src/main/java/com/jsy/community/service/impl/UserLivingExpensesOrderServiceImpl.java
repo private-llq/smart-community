@@ -1,22 +1,32 @@
 package com.jsy.community.service.impl;
+import java.math.BigDecimal;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.CebBankService;
 import com.jsy.community.api.ProprietorException;
 import com.jsy.community.api.UserLivingExpensesOrderService;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserLivingExpensesAccountEntity;
+import com.jsy.community.entity.UserLivingExpensesBillEntity;
 import com.jsy.community.entity.UserLivingExpensesOrderEntity;
 import com.jsy.community.mapper.UserLivingExpensesAccountMapper;
 import com.jsy.community.mapper.UserLivingExpensesOrderMapper;
+import com.jsy.community.qo.cebbank.CebBillQueryResultDataModelQO;
+import com.jsy.community.qo.cebbank.CebCreateCashierDeskQO;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.cebbank.CebCashierDeskVO;
 import com.zhsj.basecommon.enums.ErrorEnum;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.function.Function;
@@ -36,6 +46,9 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 	
 	@Autowired
 	private UserLivingExpensesAccountMapper accountMapper;
+
+	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
+	private CebBankService cebBankService;
 	
 	/**
 	 * @Description: 新增生活缴费订单记录
@@ -45,12 +58,62 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 	 * @return: java.lang.String
 	 */
 	@Override
-	public String addUserLivingExpensesOrder(UserLivingExpensesOrderEntity userLivingExpensesOrderEntity) {
+	public String addUserLivingExpensesOrder(UserLivingExpensesBillEntity billEntity) {
+		UserLivingExpensesOrderEntity userLivingExpensesOrderEntity = new UserLivingExpensesOrderEntity();
 		userLivingExpensesOrderEntity.setId(SnowFlake.nextId());
+		// 添加本地订单数据
+		userLivingExpensesOrderEntity.setUid(billEntity.getUid());
+		userLivingExpensesOrderEntity.setItemId(billEntity.getItemId());
+		userLivingExpensesOrderEntity.setItemCode(billEntity.getItemCode());
+		userLivingExpensesOrderEntity.setBillKey(billEntity.getBillKey());
+		userLivingExpensesOrderEntity.setBillId(billEntity.getId().toString());
+		userLivingExpensesOrderEntity.setBillAmount(new BigDecimal(billEntity.getBillAmount()));
+		userLivingExpensesOrderEntity.setPayAmount(billEntity.getPayAmount());
+		userLivingExpensesOrderEntity.setCustomerName(billEntity.getCustomerName());
+		userLivingExpensesOrderEntity.setContactNo(billEntity.getContactNo());
+		userLivingExpensesOrderEntity.setOrderStatus(BusinessEnum.CebbankOrderStatusEnum.INIT.getCode());
 		int insert = userLivingExpensesOrderMapper.insert(userLivingExpensesOrderEntity);
-		if (insert == 0) {
-			throw new ProprietorException(ErrorEnum.ADD_FAIL);
+		// 组装支付服务需要的参数
+		CebCreateCashierDeskQO deskQO = new CebCreateCashierDeskQO();
+		deskQO.setMerOrderNo(userLivingExpensesOrderEntity.getId().toString());
+		deskQO.setMerOrderDate(LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE));
+		deskQO.setPayAmount(billEntity.getPayAmount());
+		deskQO.setPaymentItemCode(billEntity.getItemCode());
+		deskQO.setPaymentItemId(billEntity.getItemId());
+		deskQO.setBillKey(billEntity.getBillKey());
+		deskQO.setSessionId("");
+		if (billEntity.getBillAmount() != null) {
+			deskQO.setBillAmount(new BigDecimal(billEntity.getBillAmount()));
 		}
+		deskQO.setQueryAcqSsn(billEntity.getQueryAcqSsn());
+		deskQO.setCustomerName(billEntity.getCustomerName());
+		deskQO.setContractNo(billEntity.getContactNo());
+		deskQO.setFiled1(billEntity.getFieldA());
+		deskQO.setFiled2(billEntity.getFieldB());
+		deskQO.setFiled3(billEntity.getFieldC());
+		deskQO.setFiled4(billEntity.getFieldD());
+		deskQO.setFiled5(billEntity.getFieldE());
+		deskQO.setAppName("E到家");
+		deskQO.setAppVersion("1.0.0");
+
+		CebBillQueryResultDataModelQO resultDataModelQO = new CebBillQueryResultDataModelQO();
+		resultDataModelQO.setContractNo(billEntity.getContactNo());
+//		resultDataModelQO.setCustomerName("");
+//		resultDataModelQO.setOriginalCustomerName("");
+		resultDataModelQO.setBalance(billEntity.getBalance());
+		resultDataModelQO.setPayAmount(billEntity.getPayAmount().toString());
+		resultDataModelQO.setBeginDate(billEntity.getBeginDate());
+		resultDataModelQO.setEndDate(billEntity.getEndDate());
+		resultDataModelQO.setFiled1(billEntity.getFieldA());
+		resultDataModelQO.setFiled2(billEntity.getFieldB());
+		resultDataModelQO.setFiled3(billEntity.getFieldC());
+		resultDataModelQO.setFiled4(billEntity.getFieldD());
+		resultDataModelQO.setFiled5(billEntity.getFieldE());
+		deskQO.setBillQueryResultDataModel(JSON.toJSONString(resultDataModelQO));
+		deskQO.setType(billEntity.getType());
+		deskQO.setDeviceType(billEntity.getDeviceType());
+		// 调用支付服务下单
+		CebCashierDeskVO cashierDesk = cebBankService.createCashierDesk(deskQO);
 		return String.valueOf(userLivingExpensesOrderEntity.getId());
 	}
 	

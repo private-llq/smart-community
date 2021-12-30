@@ -1775,4 +1775,84 @@ public interface BusinessEnum {
 			}
 		}
 	}
+
+	/**
+	 * 通用缴费枚举
+	 */
+	enum PaymentStatusEnum{
+		UNPAID(0, "未缴费"),
+		PAID(1, "已缴费");
+		private Integer code;
+		private String name;
+
+		PaymentStatusEnum(Integer code, String name) {
+			this.code = code;
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public static final List<Map<String, Object>> payList = new ArrayList<>();
+		public static final Map<Integer, String> payMap = new HashMap<>();
+
+		static {
+			for (PaymentStatusEnum trade : PaymentStatusEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", trade.getCode());
+				map.put("name", trade.getName());
+				payList.add(map);
+				payMap.put(trade.getCode(), trade.getName());
+			}
+		}
+	}
+
+	/**
+	 * 光大云缴费订单状态枚举
+	 */
+	enum CebbankOrderStatusEnum {
+		INIT(0, "订单创建成功"),
+		SUCCESSFUL_PAYMENT(1, "支付成功"),
+		PAYMENT_FAILURE(2, "支付失败"),
+		SUCCESSFUL_CANCELLATION(3, "销账成功"),
+		CANCELLATION_FAILURE(4, "销账失败"),
+		UNKNOWN_STATUS(5, "未知状态"),
+		REAL_TIME_REFUNDS(8, "实时退款");
+		private Integer code;
+		private String name;
+
+		CebbankOrderStatusEnum(Integer code, String name) {
+			this.code = code;
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+	}
 }

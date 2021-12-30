@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.UserLivingExpensesBillEntity;
 import com.jsy.community.entity.UserLivingExpensesOrderEntity;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public interface UserLivingExpensesOrderService extends IService<UserLivingExpen
 	 * @Param: [userLivingExpensesOrderEntity]
 	 * @return: java.lang.String
 	 */
-	String addUserLivingExpensesOrder(UserLivingExpensesOrderEntity userLivingExpensesOrderEntity);
+	String addUserLivingExpensesOrder(UserLivingExpensesBillEntity billEntity);
 	
 	/**
 	 * @Description: 查询当前用户生活缴费记录列表

@@ -1,7 +1,12 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 /**
  * @Author: Pipi
@@ -23,6 +28,7 @@ public class UserLivingExpensesBillEntity extends BaseEntity {
     /**
      * 户号
      */
+    @NotBlank(message = "缴费户号不能为空")
     private String billKey;
     /**
      * 用户uid
@@ -83,4 +89,23 @@ public class UserLivingExpensesBillEntity extends BaseEntity {
 
     private String rangLimit;
     private String chooseAmount;
+
+    /**
+     * 支付金额
+     */
+    @NotNull(message = "支付金额不能为空")
+    @TableField(exist = false)
+    private BigDecimal payAmount;
+
+    /**
+     * 终端类型
+     */
+    @NotBlank(message = "终端类型不能为空;1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序")
+    @TableField(exist = false)
+    private String deviceType;
+
+    // 手机充值标记-必填
+    // 手机充值该字段必传1。手机充值时可以不用传filed,qryAcnSsn,contractNo、这些5接口没有返回的值
+    @TableField(exist = false)
+    private String type;
 }

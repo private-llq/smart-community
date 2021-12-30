@@ -21,6 +21,7 @@ import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.ControlVO;
 import com.jsy.community.vo.UserInfoVo;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -77,6 +78,7 @@ public class UserController {
     
     @ApiOperation("更新极光regId")
     @PutMapping("regId")
+    @LoginIgnore({"00000tourist"})
     // @Permit("community:proprietor:user:regId")
     public CommonResult updateUserRegId(@RequestParam String regId){
         return CommonResult.ok("离线推送设备id设置成功");
@@ -508,6 +510,7 @@ public class UserController {
 
     @ApiOperation("获取权限")
     @GetMapping("/control")
+    @LoginIgnore({"00000tourist"})
     // @Permit("community:proprietor:user:control")
     public CommonResult control(@RequestParam("communityId") Long communityId) {
         ControlVO control = userService.control(communityId, UserUtils.getUserId());

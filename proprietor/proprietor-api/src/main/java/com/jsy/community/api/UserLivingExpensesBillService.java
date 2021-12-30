@@ -10,4 +10,13 @@ import com.jsy.community.entity.UserLivingExpensesBillEntity;
  * @Version: 1.0
  **/
 public interface UserLivingExpensesBillService extends IService<UserLivingExpensesBillEntity> {
+
+    /**
+     * @author: Pipi
+     * @description: 查询缴费账单
+     * @param billEntity: 账单查询条件
+     * @return: {@link UserLivingExpensesBillEntity}
+     * @date: 2021/12/30 9:15
+     **/
+    UserLivingExpensesBillEntity queryBill(UserLivingExpensesBillEntity billEntity);
 }

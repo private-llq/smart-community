@@ -1009,6 +1009,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                             || leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.REAPPLY.getCode()
                             || leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.EXPIRED.getCode()
                     ) {
+                        UserDetail userDetail = userInfoRpcService.getUserDetail(leaseRecordEntity.getTenantUid());
+                        leaseRecordEntity.setRealName(userDetail.getNickName());
+                        leaseRecordEntity.setAvatarUrl(userDetail.getAvatarThumbnail());
                         leaseRecordEntity.setImageUrl(CollectionUtils.isEmpty(houseImgList) ? null : houseImgList.get(0));
                         leaseRecordEntity.setTitle(houseLeaseEntity.getHouseTitle());
                         leaseRecordEntity.setPrice(houseLeaseEntity.getHousePrice());

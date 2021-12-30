@@ -6,6 +6,7 @@ import com.jsy.community.api.PaymentException;
 import com.jsy.community.config.CebBankExConfig;
 import com.jsy.community.config.service.CebBankEntity;
 import com.jsy.community.constant.Const;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.cebbank.*;
 import com.jsy.community.qo.unionpay.HttpResponseModel;
 import com.jsy.community.untils.cebbank.CebBankContributionUtil;
@@ -20,6 +21,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
 
@@ -37,6 +39,24 @@ import java.util.concurrent.*;
 @Slf4j
 @DubboService(version = Const.version, group = Const.group_payment)
 public class CebBankServiceImpl implements CebBankService {
+
+    /**
+     * 光大云缴费支付回调地址
+     */
+    @Value("${cebBankCallbackUrl}")
+    private String cebBankCallbackUrl;
+
+    /**
+     * 光大云缴费退款通知地址
+     */
+    @Value("${cebBankRefundUrl}")
+    private String cebBankRefundUrl;
+
+    /**
+     * 光大云缴费支付完成用于前端页面跳转地址
+     */
+    @Value("${cebBankRedirectUrl}")
+    private String cebBankRedirectUrl;
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -116,7 +136,7 @@ public class CebBankServiceImpl implements CebBankService {
     public CebQueryCityContributionCategoryVO queryCityContributionCategory(CebQueryCityContributionCategoryQO categoryQO) {
         HttpResponseModel responseModel = CebBankContributionUtil.queryCityContributionCategory(categoryQO);
         if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
-            throw new PaymentException("查询城市下缴费类别失败");
+            throw new PaymentException(JSYError.THIRD_FAILED);
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         return JSON.parseObject(respData, CebQueryCityContributionCategoryVO.class);
@@ -157,10 +177,13 @@ public class CebBankServiceImpl implements CebBankService {
         HttpResponseModel responseModel = new HttpResponseModel();
         // 获取查询账单的参数条件
         List<CebQueryPaymentBillParamModelVO> cebQueryPaymentBillParamModelVOS = new ArrayList<>();
+        // 从缓存取数据
         String cebBankParamString = redisTemplate.opsForValue().get("cebBankParam:" + billInfoQO.getItemId());
         if (StringUtil.isNotBlank(cebBankParamString)) {
+            // 加载缓存数据
             cebQueryPaymentBillParamModelVOS = JSON.parseArray(cebBankParamString, CebQueryPaymentBillParamModelVO.class);
         } else {
+            // 没有缓存,调用第三方接口获取查询条件
             CebQueryContributionProjectQO projectQO = new CebQueryContributionProjectQO();
             projectQO.setSessionId(billInfoQO.getSessionId());
             projectQO.setCityName(billInfoQO.getCityName());
@@ -189,7 +212,11 @@ public class CebBankServiceImpl implements CebBankService {
                                     // 下拉框
                                     String[] optionsList = paramModelVO.getListBoxOptions().split("\\|");
                                     String[] options = optionsList[0].split("=");
-                                    billInfoQO.setFiled1(options[1]);
+                                    // 为了测试的特殊处理,水费的账期,在测试时要取第二个
+                                    if ("153505".equals(billInfoQO.getItemCode())) {
+                                        options = optionsList[2].split("=");
+                                    }
+                                    billInfoQO.setFiled1(options[0]);
                                 } else {
                                     // 文本框,没传给默认值
                                     billInfoQO.setFiled1("200");
@@ -206,7 +233,7 @@ public class CebBankServiceImpl implements CebBankService {
                                     // 下拉框
                                     String[] optionsList = paramModelVO.getListBoxOptions().split("\\|");
                                     String[] options = optionsList[0].split("=");
-                                    billInfoQO.setFiled2(options[1]);
+                                    billInfoQO.setFiled2(options[0]);
                                 } else {
                                     // 文本框,没传给默认值
                                     billInfoQO.setFiled2("200");
@@ -223,7 +250,7 @@ public class CebBankServiceImpl implements CebBankService {
                                     // 下拉框
                                     String[] optionsList = paramModelVO.getListBoxOptions().split("\\|");
                                     String[] options = optionsList[0].split("=");
-                                    billInfoQO.setFiled3(options[1]);
+                                    billInfoQO.setFiled3(options[0]);
                                 } else {
                                     // 文本框,没传给默认值
                                     billInfoQO.setFiled3("200");
@@ -240,7 +267,7 @@ public class CebBankServiceImpl implements CebBankService {
                                     // 下拉框
                                     String[] optionsList = paramModelVO.getListBoxOptions().split("\\|");
                                     String[] options = optionsList[0].split("=");
-                                    billInfoQO.setFiled4(options[1]);
+                                    billInfoQO.setFiled4(options[0]);
                                 } else {
                                     // 文本框,没传给默认值
                                     billInfoQO.setFiled4("200");
@@ -257,7 +284,7 @@ public class CebBankServiceImpl implements CebBankService {
                                     // 下拉框
                                     String[] optionsList = paramModelVO.getListBoxOptions().split("\\|");
                                     String[] options = optionsList[0].split("=");
-                                    billInfoQO.setFiled5(options[1]);
+                                    billInfoQO.setFiled5(options[0]);
                                 } else {
                                     // 文本框,没传给默认值
                                     billInfoQO.setFiled5("200");
@@ -276,7 +303,7 @@ public class CebBankServiceImpl implements CebBankService {
         }
         for (Integer i = 1; i <= 5; i++) {
             if (i > 1) {
-                billInfoQO.setPollingTimes(i.toString());
+                billInfoQO.setPollingTimes(String.valueOf((i - 1)));
                 billInfoQO.setFlag("2");
                 responseModel = CebBankContributionUtil.queryBillInfo(billInfoQO);
                 /*if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
@@ -374,13 +401,16 @@ public class CebBankServiceImpl implements CebBankService {
      * @return: {@link CebCashierDeskVO}
      * @date: 2021/11/23 18:21
      **/
-    /*@Override
+    @Override
     public CebCashierDeskVO createCashierDesk(CebCreateCashierDeskQO deskQO) {
+        deskQO.setNotifyUrl(cebBankCallbackUrl);
+        deskQO.setRedirectUrl(cebBankRedirectUrl);
+        deskQO.setRefundUrl(cebBankRefundUrl);
         HttpResponseModel responseModel = CebBankContributionUtil.createCashierDesk(deskQO);
         if (responseModel == null || !"200".equals(responseModel.getRespCode())) {
             throw new PaymentException("创建收银台失败");
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         return JSON.parseObject(respData, CebCashierDeskVO.class);
-    }*/
+    }
 }

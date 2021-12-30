@@ -35,10 +35,13 @@ import javax.annotation.Resource;
 public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLivingExpensesAccountMapper, UserLivingExpensesAccountEntity> implements UserLivingExpensesAccountService {
     @Autowired
     private UserLivingExpensesAccountMapper accountMapper;
+
     @Autowired
     private UserLivingExpensesBillMapper billMapper;
+
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private CebBankService cebBankService;
+
     @Resource
     private RedisTemplate<String, String> redisTemplate;
     /**
@@ -172,11 +175,12 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
                 accountEntity.setAddress(cebQueryBillInfoVO.getBillQueryResultModel().getItem7());
 
                 UserLivingExpensesBillEntity billEntity = new UserLivingExpensesBillEntity();
+                billEntity.setUid(accountEntity.getUid());
                 billEntity.setItemId(accountEntity.getItemId());
                 billEntity.setItemCode(accountEntity.getItemCode());
                 billEntity.setBillKey(accountEntity.getAccount());
                 billEntity.setBillAmount(resultDataModelVO.getPayAmount());
-                billEntity.setQueryAcqSsn(cebQueryBillInfoVO.getQueryAcqSsn());
+                billEntity.setQueryAcqSsn(cebQueryBillInfoVO.getQryAcqSsn());
                 billEntity.setCustomerName(accountEntity.getHouseholder());
                 billEntity.setContactNo(resultDataModelVO.getContractNo());
                 billEntity.setBalance(resultDataModelVO.getBalance());

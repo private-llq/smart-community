@@ -100,5 +100,5 @@ public interface CebBankService {
      * @return: {@link CebCashierDeskVO}
      * @date: 2021/11/23 18:21
      **/
-//    CebCashierDeskVO createCashierDesk(CebCreateCashierDeskQO deskQO);
+    CebCashierDeskVO createCashierDesk(CebCreateCashierDeskQO deskQO);
 }

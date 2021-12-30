@@ -146,7 +146,9 @@ public class UserDataController {
         {
             int ascii = Character.codePointAt(s, i);
             if(ascii >= 0 && ascii <=255)
-                length++;
+                // 因为你猜的原因,这里非英文也算是2个字符,不再只算一个字符
+                // length++;
+                length += 2;
             else
                 length += 2;
 

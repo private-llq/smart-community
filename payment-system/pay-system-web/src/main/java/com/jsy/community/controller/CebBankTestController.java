@@ -103,11 +103,12 @@ public class CebBankTestController {
      * @date: 2021/11/23 17:14
      **/
     @PostMapping("/v2/queryBillInfo")
+    @LoginIgnore
     public CommonResult queryBillInfo(@RequestBody CebQueryBillInfoQO billInfoQO) {
         String sessionId = getCebBankSessionId();
         billInfoQO.setSessionId(sessionId);
-        billInfoQO.setItemCode("172805");
-        billInfoQO.setBillKey("051245000023");
+        billInfoQO.setItemCode("110205");
+        billInfoQO.setBillKey("7309050536");
 //        billInfoQO.setFlag("1");
         billInfoQO.setDeviceType("1");
         return CommonResult.ok(cebBankService.queryBillInfo(billInfoQO));

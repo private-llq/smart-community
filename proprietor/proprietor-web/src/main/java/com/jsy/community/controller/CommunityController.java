@@ -9,6 +9,7 @@ import com.jsy.community.qo.CommunityQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -65,6 +66,7 @@ public class CommunityController {
 	**/
 	@ApiOperation("社区定位")
 	@PostMapping("locate")
+	@LoginIgnore({"00000tourist"})
 	// @Permit("community:proprietor:community:locate")
 	public CommonResult<CommunityEntity> locate(@RequestBody Map<String,Double> location){
 		CommunityEntity communityEntity = iCommunityService.locateCommunityV2(UserUtils.getUserId(), location);

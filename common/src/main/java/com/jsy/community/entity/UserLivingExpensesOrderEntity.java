@@ -44,7 +44,7 @@ public class UserLivingExpensesOrderEntity extends BaseEntity {
     /**
      * 账单金额(分)
      */
-    private String billAmount;
+    private BigDecimal billAmount;
     /**
      * 支付金额
      */
