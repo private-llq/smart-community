@@ -246,6 +246,7 @@ public class AliAppPayController {
 	@GetMapping("/v2/checkPayTradeStatus")
 	// @Permit("community:payment:alipay:v2:checkPayTradeStatus")
 	public CommonResult checkPayTradeStatus(@RequestParam("orderNo") String orderNo, @RequestParam("serviceOrderNo") String serviceOrderNo) {
+		log.info("参数:{}::::::::::,{}", orderNo, serviceOrderNo);
 		Boolean aliStatus = ailiAppPayRecordService.checkPayTradeStatus(orderNo, serviceOrderNo);
 		Boolean wechatStatus = weChatService.checkPayStatus(orderNo, serviceOrderNo);
 		return aliStatus || wechatStatus ? CommonResult.ok(true,"查询成功") : CommonResult.ok(false,"查询成功");

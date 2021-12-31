@@ -1511,10 +1511,11 @@ public interface BusinessEnum {
 		LEASE(9, "房屋租金", "com.zhsj.house", "44=0~_[!,,kc9CJEaI$dlU[lPcEOVfdU"),
 		PROPERTY_FEE(4, "物业管理", "com.zhsj.property", "EKaSmjtJ[gb%=Q%p9gtyHZ|$|.|#c(,)"),
 		PARKING_FEE(8, "停车缴费", "com.zhsj.parkingFee", ";X3WN#y-wvc4]:-^q~%*O_0-[c*2*i)C");
-		private Integer code;
-		private String name;
-		private String source;
-		private String secret;
+
+		private final Integer code;
+		private final String name;
+		private final String source;
+		private final String secret;
 
 		BaseOrderSourceEnum(Integer code, String name, String source, String secret) {
 			this.code = code;
@@ -1527,32 +1528,16 @@ public interface BusinessEnum {
 			return code;
 		}
 
-		public void setCode(Integer code) {
-			this.code = code;
-		}
-
 		public String getName() {
 			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
 		}
 
 		public String getSource() {
 			return source;
 		}
 
-		public void setSource(String source) {
-			this.source = source;
-		}
-
 		public String getSecret() {
 			return secret;
-		}
-
-		public void setSecret(String secret) {
-			this.secret = secret;
 		}
 
 		@Override

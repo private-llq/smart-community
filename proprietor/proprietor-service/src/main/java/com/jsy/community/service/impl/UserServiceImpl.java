@@ -36,6 +36,7 @@ import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.rpc.IThirdRpcService;
 import com.zhsj.base.api.vo.LoginVo;
 import com.zhsj.base.api.vo.ThirdBindStatusVo;
+import com.zhsj.base.api.vo.UserImVo;
 import com.zhsj.baseweb.support.LoginUser;
 import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
 import lombok.extern.slf4j.Slf4j;

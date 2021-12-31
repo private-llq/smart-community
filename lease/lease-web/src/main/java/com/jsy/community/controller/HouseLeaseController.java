@@ -394,7 +394,7 @@ public class HouseLeaseController {
      **/
     @PostMapping("/v2/completeLeaseOrder")
     @LoginIgnore
-    public R<Void> completeLeaseOrder(@RequestBody R<PayCallNotice> r) {
-        return assetLeaseRecordService.updateOperationPayStatus(r.getData()) ? R.ok() : R.fail();
+    public void completeLeaseOrder(@RequestBody R<PayCallNotice> r) {
+        Boolean aBoolean = assetLeaseRecordService.updateOperationPayStatus(r.getData());
     }
 }

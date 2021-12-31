@@ -1383,8 +1383,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
             CommunityEntity communityEntity = communityService.getCommunityNameById(leaseRecordEntity.getCommunityId());
             //租客
-            UserIMEntity userIM = userImService.selectUid(leaseRecordEntity.getTenantUid());
-            UserEntity user = userService.getUser(leaseRecordEntity.getTenantUid());
+            UserImVo eHomeUserIm = userInfoRpcService.getEHomeUserIm(leaseRecordEntity.getTenantUid());
+            /*UserIMEntity userIM = userImService.selectUid(leaseRecordEntity.getTenantUid());
+            UserEntity user = userService.getUser(leaseRecordEntity.getTenantUid());*/
 
             //房东
 //            UserIMEntity userIMEntity = userImService.selectUid(leaseRecordEntity.getHomeOwnerUid());
@@ -1598,9 +1599,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateOperationPayStatus(PayCallNotice payCallNotice) {
         try {
-            String busOrderNo = payCallNotice.getBusOrderNo();
+            String sysOrderNo = payCallNotice.getSysOrderNo();
             BigDecimal payAmount = payCallNotice.getPayAmount();
-            AssetLeaseRecordEntity leaseRecordEntity = queryRecordByConId(busOrderNo);
+            AssetLeaseRecordEntity leaseRecordEntity = queryRecordByConId(sysOrderNo);
             if (leaseRecordEntity != null && leaseRecordEntity.getOperation() == 32) {
                 log.info("房东已取消发起");
                 // 签约是房东取消发起状态,则退款,并且不修改合同签约的支付状态,同时删除支付订单
@@ -1608,16 +1609,16 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 PayConfigureEntity serviceConfig;
                 serviceConfig = payConfigureService.getCompanyConfig(1L);
                 ConstClasses.AliPayDataEntity.setConfig(serviceConfig);
-                AlipayUtils.orderRefund(busOrderNo, payAmount);
-                ailiAppPayRecordService.deleteByOrderNo(Long.parseLong(busOrderNo));
+                AlipayUtils.orderRefund(sysOrderNo, payAmount);
+                ailiAppPayRecordService.deleteByOrderNo(Long.parseLong(sysOrderNo));
                 return false;
             } else {
                 // 修改签章合同支付状态
                 log.info("开始修改签章合同支付状态");
-                Map<String, Object> map = housingRentalOrderService.completeLeasingOrder(busOrderNo, leaseRecordEntity.getConId());
+                Map<String, Object> map = housingRentalOrderService.completeLeasingOrder(sysOrderNo, leaseRecordEntity.getConId());
                 // 修改租房签约支付状态
                 log.info("开始修改租房签约支付状态");
-                updateOperationPayStatus(leaseRecordEntity.getConId(), 2, payAmount, busOrderNo);
+                updateOperationPayStatus(leaseRecordEntity.getConId(), 2, payAmount, sysOrderNo);
                 if (0 != (int) map.get("code")) {
                     log.info("修改签章合同支付状态失败");
                     throw new PaymentException((int) map.get("code"), String.valueOf(map.get("msg")));
@@ -1625,26 +1626,27 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 // 增加房东余额
                 log.info("开始修改房东余额");
                 TransferEntity transferEntity = new TransferEntity();
-                transferEntity.setSendUid(0L);
-                transferEntity.setSendPayPwd("");
+                transferEntity.setSendUid(1456196574147923970L);
+                transferEntity.setSendPayPwd("1234");
                 UserDetail userDetail = userInfoRpcService.getUserDetail(leaseRecordEntity.getHomeOwnerUid());
                 transferEntity.setReceiveUid(userDetail.getId());
                 transferEntity.setCno("RMB");
-                transferEntity.setAmount(payAmount);
+                transferEntity.setAmount(payAmount.setScale(2));
                 transferEntity.setRemark("房屋租金入账");
                 transferEntity.setType(BusinessEnum.BaseOrderRevenueTypeEnum.LEASE.getExpensesType());
                 transferEntity.setTitle("房屋租金入账");
                 transferEntity.setSource(BusinessEnum.BaseOrderSourceEnum.LEASE.getSource());
-                //签名
-                String string = JSON.toJSONString(transferEntity);
-                Map signMap = JSON.parseObject(string, Map.class);
-                map.remove("sign");
-                map.put("communicationSecret", BusinessEnum.BaseOrderSourceEnum.LEASE.getSecret());
-                String sign = com.zhsj.basecommon.utils.MD5Util.signStr(signMap);
+
+                Map signMap = (Map) JSONObject.toJSON(transferEntity);
+                signMap.put("communicationSecret", BusinessEnum.BaseOrderSourceEnum.LEASE.getSecret());
+                String sign = MD5Util.signStr(signMap);
+                log.info("communicationSecret --> {}", BusinessEnum.BaseOrderSourceEnum.LEASE.getSecret());
+                log.info("签名==========:{},{}", sign, MD5Util.getMd5Str(sign));
                 transferEntity.setSign(MD5Util.getMd5Str(sign));
                 basePayRpcService.transfer(transferEntity);
+                basePayRpcService.receiveCall(payCallNotice.getSysOrderNo());
                 // userAccountService.rentalIncome(leaseRecordEntity.getConId(), tradeAmount, leaseRecordEntity.getHomeOwnerUid());
-                log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + busOrderNo);
+                log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + sysOrderNo);
             }
         } catch (Exception e) {
             e.printStackTrace();
