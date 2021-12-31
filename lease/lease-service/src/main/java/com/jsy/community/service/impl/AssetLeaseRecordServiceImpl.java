@@ -994,7 +994,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 QueryWrapper<HouseLeaseEntity> houseLeaseEntityQueryWrapper = new QueryWrapper<>();
                 houseLeaseEntityQueryWrapper.eq("id", assetLeaseRecordEntity.getAssetId());
                 houseLeaseEntity = houseLeaseMapper.selectOne(houseLeaseEntityQueryWrapper);
-                if (houseLeaseEntity == null) {
+                if (houseLeaseEntity != null) {
                     List<String> houseImgList = houseLeaseMapper.queryHouseAllImgById(houseLeaseEntity.getHouseImageId());
                     // 朝向
                     houseLeaseEntity.setHouseDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(houseLeaseEntity.getHouseDirectionId())));
