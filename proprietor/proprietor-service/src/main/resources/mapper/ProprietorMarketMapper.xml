@@ -43,9 +43,14 @@
         left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
         left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
             where tm.deleted = 0
-            and tm.state = #{query.state}
+            and tm.remove = 0
             and tm.uid = #{query.uid}
-            and tm.community_id= #{query.communityId}
+        <if test="query.communityId!=null and query.communityId!=''">
+            and tm.community_id=#{query.communityId}
+        </if>
+        <if test="query.state !=null and query.state !='' or query.state==0">
+            AND state= #{query.state,jdbcType=INTEGER}
+        </if>
         order by tm.create_time desc
         limit #{page},#{size}
     </select>
@@ -54,9 +59,14 @@
     <select id="findTotal" resultType="java.lang.Long">
         select count(*) from t_proprietor_market tm
         where tm.deleted = 0
-          and tm.state =#{query.state}
+          and tm.remove = 0
           and tm.uid = #{query.uid}
-          and tm.community_id= #{query.communityId}
+        <if test="query.communityId!=null and query.communityId!=''">
+            and tm.community_id=#{query.communityId}
+        </if>
+        <if test="query.state !=null and query.state !='' or query.state==0">
+            AND state= #{query.state,jdbcType=INTEGER}
+        </if>
     </select>
 
 
@@ -65,7 +75,13 @@
         select count(*) from t_proprietor_market tm
         where tm.deleted = 0
           and tm.state =1
-          and tm.category_id=#{query.categoryId}
+          and tm.remove = 0
+        <if test="query.categoryId!=null and query.categoryId!=''">
+            and tm.category_id=#{query.categoryId}
+        </if>
+        <if test="query.communityId!=null and query.communityId!=''">
+            and tm.community_id=#{query.communityId}
+        </if>
     </select>
 
     <!--所有发布商品-->
@@ -80,8 +96,13 @@
                  left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
         where tm.deleted = 0
           and tm.state = 1
-          and tm.category_id=#{query.categoryId}
-          and tm.community_id= #{query.communityId}
+          and tm.remove = 0
+        <if test="query.categoryId!=null and query.categoryId!=''">
+            and tm.category_id=#{query.categoryId}
+        </if>
+        <if test="query.communityId!=null and query.communityId!=''">
+            and tm.community_id=#{query.communityId}
+        </if>
         order by tm.create_time desc
         limit #{page},#{size}
     </select>
@@ -89,7 +110,10 @@
         select count(*) from t_proprietor_market tm
         where tm.deleted = 0
           and tm.state =1
-          and tm.community_id= #{query.communityId}
+          and tm.remove = 0
+        <if test="query.communityId!=null and query.communityId!=''">
+            and tm.community_id=#{query.communityId}
+        </if>
     </select>
 
     <select id="selectMarketLikePage" resultType="com.jsy.community.qo.proprietor.ProprietorMarketQO">
@@ -102,8 +126,11 @@
                  left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
                  left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
         where tm.deleted = 0
+          and tm.remove = 0
           and tm.state = 1
-          and tm.community_id= #{query.communityId}
+        <if test="query.communityId!=null and query.communityId!=''">
+            and tm.community_id=#{query.communityId}
+        </if>
         order by tm.click desc
         limit #{page},#{size}
     </select>
@@ -135,6 +162,7 @@
                  left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
                  left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
         where tm.id=#{id}
+          and tm.remove = 0
     </select>
 
 </mapper>
