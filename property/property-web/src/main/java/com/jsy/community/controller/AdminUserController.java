@@ -246,8 +246,8 @@ public class AdminUserController {
 		}
 		adminUserQO.setCompanyId(UserUtils.getAdminCompanyId());
 		adminUserQO.setUid(UserUtils.getId());
-		adminUserService.addOperator(adminUserQO);
-		return CommonResult.ok("添加成功");
+		Integer integer = adminUserService.addOperator(adminUserQO);
+		return CommonResult.ok(integer == 1 ? "添加成功" : "请使用原账号的密码登录");
 	}
 	
 	/**

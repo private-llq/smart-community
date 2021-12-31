@@ -12,6 +12,7 @@ import com.jsy.community.qo.proprietor.ProprietorMarketQO;
 import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.utils.imutils.open.StringUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
@@ -152,7 +153,7 @@ public class ProprietorMarketController {
      * @Date: 2021/8/21-15:44
      **/
     @GetMapping("/SelectOneMarket")
-    @ApiOperation("查询用户已发布或已下架的商品")
+    @ApiOperation("查询单条商品详情")
     // @Permit("community:proprietor:market:SelectOneMarket")
     public CommonResult SelectOneMarket(@RequestParam("id") Long id){
         ProprietorMarketEntity marketVO =  marketService.findOne(id);
@@ -178,7 +179,11 @@ public class ProprietorMarketController {
             System.out.println("首页");
             return CommonResult.ok(map,"查询成功");
         }
-
+        if (StringUtils.isEmpty(baseQO.getQuery().getCategoryId())){
+            Map<String,Object> map =  marketService.selectMarketLikePage(baseQO);
+            System.out.println("r热门1");
+            return CommonResult.ok(map,"查询成功");
+        }
         ProprietorMarketCategoryEntity categoryEntity =  categoryService.findOne(baseQO.getQuery().getCategoryId());
         if (categoryEntity.getCategory().equals(CATEGORY_NAME)){
             Map<String,Object> map = marketService.selectMarketLikePage(baseQO);//热门商品

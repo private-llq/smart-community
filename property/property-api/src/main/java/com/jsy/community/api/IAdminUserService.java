@@ -237,7 +237,7 @@ public interface IAdminUserService extends IService<AdminUserEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/17
 	**/
-	void addOperator(AdminUserQO adminUserQO);
+	Integer addOperator(AdminUserQO adminUserQO);
 	
 	/**
 	 * @Description: 编辑操作员

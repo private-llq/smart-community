@@ -149,7 +149,7 @@ public interface HouseMapper extends BaseMapper<HouseEntity> {
 	 * @Author: chq459799974
 	 * @Date: 2021/3/13
 	**/
-	void updateSub(@Param("list")List list, @Param("entity")HouseEntity entity);
+	Integer updateSub(@Param("list")List list, @Param("entity")HouseEntity entity);
 	
 	/**
 	* @Description: 修改楼栋、单元、房屋

@@ -176,8 +176,8 @@ public class SysUserController {
 	@Permit("community:admin:sys:user:add")
 	public CommonResult addOperator(@RequestBody SysUserQO sysUserQO){
 		sysUserQO.setId(Long.valueOf(UserUtils.getId()));
-		sysUserService.addOperator(sysUserQO);
-		return CommonResult.ok("添加成功");
+		Integer integer = sysUserService.addOperator(sysUserQO);
+		return CommonResult.ok(integer == 1 ? "添加成功" : "请使用原账号的密码登录");
 	}
 	
 	/**

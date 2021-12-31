@@ -2,6 +2,7 @@ package com.jsy.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.proprietor.ProprietorMarketEntity;
+import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.ProprietorMarketQO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -11,7 +12,7 @@ import java.util.List;
 @Mapper
 public interface ProprietorMarketMapper extends BaseMapper<ProprietorMarketEntity> {
     /**
-     * @Description: 分页查询发布商品
+     * @Description: 分页当前用户查询发布商品
      * @Param: [page, size, query]
      * @Return: java.util.List<com.jsy.community.entity.proprietor.ProprietorMarketEntity>
      * @Author: Tian
@@ -50,7 +51,12 @@ public interface ProprietorMarketMapper extends BaseMapper<ProprietorMarketEntit
      * @Date: 2021/8/23-10:50
      *
      * @param query*/
+
     Long findTotals(@Param("query") ProprietorMarketQO query);
+
+
+
+
 
     /**
      * @Description: 热门商品
@@ -59,7 +65,7 @@ public interface ProprietorMarketMapper extends BaseMapper<ProprietorMarketEntit
      * @Author: Tian
      * @Date: 2021/8/26-14:30
      **/
-    List<ProprietorMarketQO> selectMarketLikePage(@Param("page") Long page, @Param("size") Long size);
+    List<ProprietorMarketQO> selectMarketLikePage(@Param("page") Long page, @Param("size") Long size, @Param("query") ProprietorMarketQO query);
     /**
      * @Description: 热门商品条数
      * @Param: [baseQO]
@@ -67,7 +73,7 @@ public interface ProprietorMarketMapper extends BaseMapper<ProprietorMarketEntit
      * @Author: Tian
      * @Date: 2021/8/26-14:30
      **/
-    Long findLikeTotals();
+    Long findLikeTotals(@Param("query") ProprietorMarketQO query);
 
     /**
      * @Description: 查询单条商品详细信息

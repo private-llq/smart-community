@@ -54,8 +54,8 @@ public class AdminUserController {
 	@businessLog(operation = "新增",content = "新增了【账号管理】")
 	@Permit("community:admin:account:insert")
 	public CommonResult addOperator(@RequestBody AdminUserQO adminUserQO){
-		adminUserService.addOperator(adminUserQO);
-		return CommonResult.ok("添加成功");
+		Integer integer = adminUserService.addOperator(adminUserQO);
+		return CommonResult.ok(integer == 1 ? "添加成功" : "请使用原账号的密码登录");
 	}
 	
 	/**

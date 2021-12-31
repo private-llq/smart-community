@@ -10,6 +10,7 @@ import com.jsy.community.mapper.AdminUserCompanyMapper;
 import com.jsy.community.mapper.PropertyCompanyMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
+import com.jsy.community.service.AdminException;
 import com.jsy.community.service.IAdminUserService;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.SnowFlake;
@@ -20,6 +21,7 @@ import com.zhsj.base.api.rpc.IBaseRoleRpcService;
 import com.zhsj.base.api.rpc.IBaseUpdateUserRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.PageVO;
+import com.zhsj.basecommon.exception.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author DKS
@@ -135,9 +138,26 @@ public class AdminUserServiceImpl implements IAdminUserService {
 	 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void addOperator(AdminUserQO adminUserQO){
+	public Integer addOperator(AdminUserQO adminUserQO){
+		// 判断是新增(1)的还是原有(2)的
+		int result = 1;
 		// 增加用户
-		UserDetail userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getMobile(), adminUserQO.getPassword());
+		UserDetail userDetail = null;
+		
+		try {
+			userDetail = baseAuthRpcService.userPhoneRegister(adminUserQO.getNickName(), adminUserQO.getMobile(), adminUserQO.getPassword());
+		} catch (BaseException e) {
+			// 手机号是否已经注册
+			if (e.getErrorEnum().getCode() == 103) {
+				userDetail = new UserDetail();
+				Set<Long> uid = userInfoRpcService.queryRealUserDetailByUid(adminUserQO.getMobile(), "");
+				userDetail.setId(uid.iterator().next());
+				result = 2;
+			}
+		}
+		if (userDetail == null) {
+			throw new AdminException("用户添加失败");
+		}
 		// 增加登录类型范围为物业中台
 		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN);
 		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN);
@@ -151,6 +171,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 		entity.setCompanyId(adminUserQO.getCompanyId());
 		entity.setUid(String.valueOf(userDetail.getId()));
 		adminUserCompanyMapper.insert(entity);
+		return result;
 	}
 	
 	/**

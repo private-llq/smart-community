@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.jsy.community.constant.ConstError;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
+import com.zhsj.basecommon.enums.ErrorEnum;
 
 /**
  * 物业端异常类
@@ -25,5 +26,9 @@ public class PropertyException extends JSYException {
 	
 	public PropertyException(JSYError error) {
 		super(error);
+	}
+	
+	public PropertyException(ErrorEnum errorEnum) {
+		super(errorEnum);
 	}
 }
