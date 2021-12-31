@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserLivingExpensesBillEntity;
 import com.jsy.community.entity.UserLivingExpensesOrderEntity;
+import com.jsy.community.vo.CebCallbackVO;
 import com.jsy.community.vo.CebCashierDeskVO;
 
 import java.util.List;
@@ -42,4 +43,13 @@ public interface UserLivingExpensesOrderService extends IService<UserLivingExpen
 	 * @return: com.jsy.community.entity.UserLivingExpensesOrderEntity
 	 */
 	UserLivingExpensesOrderEntity getById(Long id);
+
+	/**
+	 * @author: Pipi
+	 * @description: 完成云缴费订单
+	 * @param cebCallbackVO: 云缴费返回参数
+	 * @return: {@link Boolean}
+	 * @date: 2021/12/31 16:39
+	 **/
+	Boolean completeCebOrder(CebCallbackVO cebCallbackVO);
 }

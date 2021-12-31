@@ -1816,8 +1816,8 @@ public interface BusinessEnum {
 		CANCELLATION_FAILURE(4, "销账失败"),
 		UNKNOWN_STATUS(5, "未知状态"),
 		REAL_TIME_REFUNDS(8, "实时退款");
-		private Integer code;
-		private String name;
+		private final Integer code;
+		private final String name;
 
 		CebbankOrderStatusEnum(Integer code, String name) {
 			this.code = code;
@@ -1828,16 +1828,21 @@ public interface BusinessEnum {
 			return code;
 		}
 
-		public void setCode(Integer code) {
-			this.code = code;
-		}
-
 		public String getName() {
 			return name;
 		}
 
-		public void setName(String name) {
-			this.name = name;
+		public static final List<Map<String, Object>> cebbankOrderStatusList = new ArrayList<>();
+		public static final Map<Integer, String> cebbankOrderStatusMap = new HashMap<>();
+
+		static {
+			for (PaymentStatusEnum trade : PaymentStatusEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", trade.getCode());
+				map.put("name", trade.getName());
+				cebbankOrderStatusList.add(map);
+				cebbankOrderStatusMap.put(trade.getCode(), trade.getName());
+			}
 		}
 	}
 }

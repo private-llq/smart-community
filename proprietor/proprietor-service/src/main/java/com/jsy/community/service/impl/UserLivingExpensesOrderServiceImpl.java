@@ -17,8 +17,10 @@ import com.jsy.community.mapper.UserLivingExpensesOrderMapper;
 import com.jsy.community.qo.cebbank.CebBillQueryResultDataModelQO;
 import com.jsy.community.qo.cebbank.CebCreateCashierDeskQO;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.CebCallbackVO;
 import com.jsy.community.vo.CebCashierDeskVO;
 import com.zhsj.baseweb.annotation.LoginIgnore;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -39,6 +41,7 @@ import java.util.stream.Collectors;
  * @Date: 2021/12/2 18:01
  * @Version: 1.0
  **/
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_proprietor)
 public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingExpensesOrderMapper, UserLivingExpensesOrderEntity> implements UserLivingExpensesOrderService {
 	
@@ -197,13 +200,43 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		// 补充返回字段
 		UserLivingExpensesAccountEntity account = accountMapper.selectOne(new QueryWrapper<UserLivingExpensesAccountEntity>().eq("account", userLivingExpensesOrderEntity.getBillKey()));
 		// 缴费状态
-		userLivingExpensesOrderEntity.setOrderStatusName(userLivingExpensesOrderEntity.getOrderStatus() == 0 ? "订单创建成功" : userLivingExpensesOrderEntity.getOrderStatus() == 1 ? "支付成功"
-			: userLivingExpensesOrderEntity.getOrderStatus() == 2 ? "支付失败" : userLivingExpensesOrderEntity.getOrderStatus() == 3 ? "销账成功" : userLivingExpensesOrderEntity.getOrderStatus() == 4 ? "销账失败" :
-			userLivingExpensesOrderEntity.getOrderStatus() == 8 ? "实时退款" : "未知状态");
+		userLivingExpensesOrderEntity.setOrderStatusName(BusinessEnum.CebbankOrderStatusEnum.cebbankOrderStatusMap.get(userLivingExpensesOrderEntity.getOrderStatus()));
 		// 户主
 		userLivingExpensesOrderEntity.setHouseholder(account.getHouseholder());
 		// 缴费单位
 		userLivingExpensesOrderEntity.setCompany(account.getCompany());
 		return userLivingExpensesOrderEntity;
+	}
+
+	/**
+	 * @param cebCallbackVO : 云缴费返回参数
+	 * @author: Pipi
+	 * @description: 完成云缴费订单
+	 * @return: {@link Boolean}
+	 * @date: 2021/12/31 16:39
+	 **/
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public Boolean completeCebOrder(CebCallbackVO cebCallbackVO) {
+		UserLivingExpensesOrderEntity userLivingExpensesOrderEntity = userLivingExpensesOrderMapper.selectById(cebCallbackVO.getMerOrderNo());
+		if (userLivingExpensesOrderEntity == null) {
+			log.info("没有找到云缴费订单:{}", cebCallbackVO.getMerOrderNo());
+			return false;
+		}
+		if (userLivingExpensesOrderEntity.getPayAmount().compareTo(cebCallbackVO.getPayAmount()) != 0) {
+			log.info("云缴费订单支付金额不一致,订单号:{}", cebCallbackVO.getMerOrderNo());
+			return false;
+		}
+		if (userLivingExpensesOrderEntity.getOrderStatus().equals(BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_PAYMENT.getCode())) {
+			// 订单已经支付成功,不再做处理
+			return true;
+		}
+		userLivingExpensesOrderEntity.setOrderStatus(BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_PAYMENT.getCode());
+		userLivingExpensesOrderEntity.setTransacNo(cebCallbackVO.getTransacNo());
+		userLivingExpensesOrderEntity.setOrderDate(cebCallbackVO.getOrderDate());
+		userLivingExpensesOrderEntity.setRepoPayAmount(cebCallbackVO.getPayAmount());
+		userLivingExpensesOrderEntity.setPayType(cebCallbackVO.getPayType());
+		int i = userLivingExpensesOrderMapper.updateById(userLivingExpensesOrderEntity);
+		return i == 1;
 	}
 }
