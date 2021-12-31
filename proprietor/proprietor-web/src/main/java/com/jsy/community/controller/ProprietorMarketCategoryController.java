@@ -87,7 +87,7 @@ public class ProprietorMarketCategoryController {
      * @Param: [categoryEntity]
      * @Return: List
      * @Author: Tian
-     * @Date: 2021/8/21-9:44
+     * @Date: 2021/8/21-9:44  selectMarketcategoryList
      **/
     @GetMapping("/selectMarketcategoryList")
     @ApiOperation("查询社区集市商品类别")
