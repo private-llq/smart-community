@@ -994,44 +994,46 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 QueryWrapper<HouseLeaseEntity> houseLeaseEntityQueryWrapper = new QueryWrapper<>();
                 houseLeaseEntityQueryWrapper.eq("id", assetLeaseRecordEntity.getAssetId());
                 houseLeaseEntity = houseLeaseMapper.selectOne(houseLeaseEntityQueryWrapper);
-                List<String> houseImgList = houseLeaseMapper.queryHouseAllImgById(houseLeaseEntity.getHouseImageId());
-                // 朝向
-                houseLeaseEntity.setHouseDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(houseLeaseEntity.getHouseDirectionId())));
-                // 查出 房屋标签 ...
-                List<Long> advantageId = MyMathUtils.analysisTypeCode(houseLeaseEntity.getHouseAdvantageId());
-                if (!CollectionUtils.isEmpty(advantageId)) {
-                    houseLeaseEntity.setHouseAdvantageMap(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
-                }
-                for (AssetLeaseRecordEntity leaseRecordEntity : assetLeaseRecordEntities) {
-                    if (leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.INITIATE_CONTRACT.getCode()
+                if (houseLeaseEntity == null) {
+                    List<String> houseImgList = houseLeaseMapper.queryHouseAllImgById(houseLeaseEntity.getHouseImageId());
+                    // 朝向
+                    houseLeaseEntity.setHouseDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(houseLeaseEntity.getHouseDirectionId())));
+                    // 查出 房屋标签 ...
+                    List<Long> advantageId = MyMathUtils.analysisTypeCode(houseLeaseEntity.getHouseAdvantageId());
+                    if (!CollectionUtils.isEmpty(advantageId)) {
+                        houseLeaseEntity.setHouseAdvantageMap(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
+                    }
+                    for (AssetLeaseRecordEntity leaseRecordEntity : assetLeaseRecordEntities) {
+                        if (leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.INITIATE_CONTRACT.getCode()
                             || leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.CANCELLATION_REQUEST.getCode()
                             || leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.REJECTION_OF_APPLICATION.getCode()
                             || leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.REAPPLY.getCode()
                             || leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.EXPIRED.getCode()
-                    ) {
-                        UserDetail userDetail = userInfoRpcService.getUserDetail(leaseRecordEntity.getTenantUid());
-                        leaseRecordEntity.setRealName(userDetail.getNickName());
-                        leaseRecordEntity.setAvatarUrl(userDetail.getAvatarThumbnail());
-                        leaseRecordEntity.setImageUrl(CollectionUtils.isEmpty(houseImgList) ? null : houseImgList.get(0));
-                        leaseRecordEntity.setTitle(houseLeaseEntity.getHouseTitle());
-                        leaseRecordEntity.setPrice(houseLeaseEntity.getHousePrice());
-                        leaseRecordEntity.setAdvantageId(houseLeaseEntity.getHouseAdvantageId());
-                        leaseRecordEntity.setTypeCode(houseLeaseEntity.getHouseTypeCode());
-                        leaseRecordEntity.setHouseType(HouseHelper.parseHouseType(houseLeaseEntity.getHouseTypeCode()));
-                        leaseRecordEntity.setDirectionId(houseLeaseEntity.getHouseDirectionId());
-                        leaseRecordEntity.setHouseAdvantageCode(houseLeaseEntity.getHouseAdvantageMap());
-                    } else {
-                        // 查出 房屋标签 ...
-                        List<Long> advantageCode = MyMathUtils.analysisTypeCode(leaseRecordEntity.getAdvantageId());
-                        if (!CollectionUtils.isEmpty(advantageCode)) {
-                            leaseRecordEntity.setHouseAdvantageCode(houseConstService.getConstByTypeCodeForList(advantageCode, 4L));
+                        ) {
+                            UserDetail userDetail = userInfoRpcService.getUserDetail(leaseRecordEntity.getTenantUid());
+                            leaseRecordEntity.setRealName(userDetail.getNickName());
+                            leaseRecordEntity.setAvatarUrl(userDetail.getAvatarThumbnail());
+                            leaseRecordEntity.setImageUrl(CollectionUtils.isEmpty(houseImgList) ? null : houseImgList.get(0));
+                            leaseRecordEntity.setTitle(houseLeaseEntity.getHouseTitle());
+                            leaseRecordEntity.setPrice(houseLeaseEntity.getHousePrice());
+                            leaseRecordEntity.setAdvantageId(houseLeaseEntity.getHouseAdvantageId());
+                            leaseRecordEntity.setTypeCode(houseLeaseEntity.getHouseTypeCode());
+                            leaseRecordEntity.setHouseType(HouseHelper.parseHouseType(houseLeaseEntity.getHouseTypeCode()));
+                            leaseRecordEntity.setDirectionId(houseLeaseEntity.getHouseDirectionId());
+                            leaseRecordEntity.setHouseAdvantageCode(houseLeaseEntity.getHouseAdvantageMap());
+                        } else {
+                            // 查出 房屋标签 ...
+                            List<Long> advantageCode = MyMathUtils.analysisTypeCode(leaseRecordEntity.getAdvantageId());
+                            if (!CollectionUtils.isEmpty(advantageCode)) {
+                                leaseRecordEntity.setHouseAdvantageCode(houseConstService.getConstByTypeCodeForList(advantageCode, 4L));
+                            }
+                            // 房屋类型 code转换为文本 如 4室2厅1卫
+                            leaseRecordEntity.setHouseType(HouseHelper.parseHouseType(leaseRecordEntity.getTypeCode()));
+                            // 朝向
+                            leaseRecordEntity.setDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(leaseRecordEntity.getDirectionId())));
                         }
-                        // 房屋类型 code转换为文本 如 4室2厅1卫
-                        leaseRecordEntity.setHouseType(HouseHelper.parseHouseType(leaseRecordEntity.getTypeCode()));
-                        // 朝向
-                        leaseRecordEntity.setDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(leaseRecordEntity.getDirectionId())));
+                        setCountdown(leaseRecordEntity);
                     }
-                    setCountdown(leaseRecordEntity);
                 }
             }
         }
