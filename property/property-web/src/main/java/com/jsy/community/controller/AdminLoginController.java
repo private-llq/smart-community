@@ -7,6 +7,7 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.admin.AdminCommunityEntity;
 import com.jsy.community.exception.JSYError;
@@ -33,6 +34,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
@@ -71,6 +73,9 @@ public class AdminLoginController {
 	private IBaseMenuRpcService baseMenuRpcService;
 	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
 	private IBaseRoleRpcService baseRoleRpcService;
+	@DubboReference(version = Const.version, group = Const.group, check = false)
+	private ICommunityService communityService;
+
 	
 	@Resource
 	private MyCaptchaUtil captchaUtil;
@@ -260,6 +265,10 @@ public class AdminLoginController {
 		adminInfoVo.setMenuList(userMenu);
 		//设置小区ID
 		adminInfoVo.setCommunityId(communityId);
+		CommunityEntity communityNameById = communityService.getCommunityNameById(communityId);
+		if (communityNameById != null) {
+			adminInfoVo.setCommunityName(communityNameById.getName());
+		}
 //		adminInfoVo.setCommunityIdList(communityIds);
 		
 		//创建token，保存redisIShopLeaseService

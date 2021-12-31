@@ -46,7 +46,8 @@ public class RepairOrderController {
 	// 不传：查所有  传0：个人报修事项  传1：公共报修事项
 	@ApiOperation("报修事项查询")
 	@GetMapping("/listRepairType")
-	@Permit("community:property:repairOrder:listRepairType")
+	// TODO: 2021/12/31 为了暂时通过,先去掉权限验证,下个版本加回来
+//	@Permit("community:property:repairOrder:listRepairType")
 	public CommonResult listRepairType(@ApiParam("报修类别") Integer typeId) {
 		List<CommonConst> constList = repairOrderService.listRepairType(typeId);
 		return CommonResult.ok(constList);

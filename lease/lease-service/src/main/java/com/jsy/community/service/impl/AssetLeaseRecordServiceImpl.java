@@ -76,6 +76,8 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     private String SIGN_USER_PORT;
     @Value("${sign.user.api.contract_overdue}")
     private String CONTRACT_OVERDUE;
+    @Value("${sign.user.api.update-contract-pay-status}")
+    private String MODIFY_ORDER_PAY_STATUS;
 
     @Autowired
     private AssetLeaseRecordMapper assetLeaseRecordMapper;
@@ -1560,7 +1562,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(assetLeaseRecordEntity.getCommunityId());
             UserDetail userDetail = userInfoRpcService.getUserDetail(assetLeaseRecordEntity.getTenantUid());
             //支付上链
-            CochainResponseEntity cochainResponseEntity = OrderCochainUtil.orderCochain("停车费",
+            CochainResponseEntity cochainResponseEntity = OrderCochainUtil.orderCochain("房屋租金",
                     1,
                     payType,
                     total,
@@ -1601,7 +1603,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         try {
             String sysOrderNo = payCallNotice.getSysOrderNo();
             BigDecimal payAmount = payCallNotice.getPayAmount();
-            AssetLeaseRecordEntity leaseRecordEntity = queryRecordByConId(sysOrderNo);
+            AssetLeaseRecordEntity leaseRecordEntity = queryRecordByConId(payCallNotice.getBusOrderNo());
             if (leaseRecordEntity != null && leaseRecordEntity.getOperation() == 32) {
                 log.info("房东已取消发起");
                 // 签约是房东取消发起状态,则退款,并且不修改合同签约的支付状态,同时删除支付订单
@@ -1614,8 +1616,8 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 return false;
             } else {
                 // 修改签章合同支付状态
-                log.info("开始修改签章合同支付状态");
-                Map<String, Object> map = housingRentalOrderService.completeLeasingOrder(sysOrderNo, leaseRecordEntity.getConId());
+                log.info("开始修改签章合同支付状态1111111");
+                Map<String, Object> map = completeLeasingOrder(sysOrderNo, leaseRecordEntity.getConId());
                 // 修改租房签约支付状态
                 log.info("开始修改租房签约支付状态");
                 updateOperationPayStatus(leaseRecordEntity.getConId(), 2, payAmount, sysOrderNo);
@@ -1653,6 +1655,67 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             return false;
         }
         return true;
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 支付完成之后修改租赁端订单支付状态
+     * @param orderNo: 支付系统订单编号
+     * @param housingContractOderNo: 租赁系统合同编号
+     * @return: java.util.Map<java.lang.String,java.lang.Object>
+     * @date: 2021/8/16 17:05
+     **/
+    public Map<String, Object> completeLeasingOrder(String orderNo, String housingContractOderNo) {
+        log.info("进入修改1");
+        Map<String, Object> returnMap = new HashMap<>();
+        Map<String, Object> bodyMap = new HashMap<>();
+        bodyMap.put("leaseContractUuid", housingContractOderNo);
+        bodyMap.put("isPayment", true);
+        bodyMap.put("orderUuid", orderNo);
+        log.info("进入修改2");
+        log.info("进入修改3,{}",SIGN_USER_PROTOCOL);
+        log.info("进入修改4,{}",SIGN_USER_HOST);
+        log.info("进入修改5,{}",SIGN_USER_PORT);
+        log.info("进入修改6,{}",MODIFY_ORDER_PAY_STATUS);
+        //url
+        String url = SIGN_USER_PROTOCOL + SIGN_USER_HOST + ":" + SIGN_USER_PORT + MODIFY_ORDER_PAY_STATUS;
+        log.info("请求URL:{}", url);
+        // 加密参数
+        String bodyString = ZhsjUtil.postEncrypt(JSON.toJSONString(bodyMap));
+        log.info("请求参数:{}", bodyString);
+        //组装http请求
+        HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(url, bodyString);
+        //设置header
+        MyHttpUtils.setDefaultHeader(httpPost);
+        //设置默认配置
+        MyHttpUtils.setRequestConfig(httpPost);
+        //执行
+        String httpResult;
+        JSONObject result = null;
+        try {
+            //执行请求，解析结果
+            httpResult = (String)MyHttpUtils.exec(httpPost, MyHttpUtils.ANALYZE_TYPE_STR);
+            result = JSON.parseObject(httpResult);
+            if(0 == result.getIntValue("code")){
+                returnMap.put("code",0);
+                log.info("租房订单状态修改完成");
+            }else if(-1 == result.getIntValue("code")){
+                returnMap.put("code",-1);
+                returnMap.put("msg",result.getString("message"));
+                log.error("租房订单状态修改失败，订单不存在");
+            }else{
+                returnMap.put("code",JSYError.INTERNAL.getCode());
+                returnMap.put("msg","订单出错");
+                log.error("租房订单状态修改 - 远程服务出错，返回码：" + result.getIntValue("code") + " ，错误信息：" + result.getString("message"));
+            }
+            return returnMap;
+        } catch (Exception e) {
+            log.error("租房订单状态修改 - http执行或解析异常，json解析结果" + result);
+            log.error(e.getMessage());
+            returnMap.put("code", JSYError.INTERNAL.getCode());
+            returnMap.put("msg","订单出错");
+            return returnMap;
+        }
     }
 
     /**

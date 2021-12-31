@@ -5,6 +5,8 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserLivingExpensesBillEntity;
 import com.jsy.community.entity.UserLivingExpensesOrderEntity;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.vo.CebCashierDeskVO;
 import com.jsy.community.vo.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
@@ -32,9 +34,10 @@ public class UserLivingExpensesOrderController {
     @PostMapping("/v2/addOrder")
 //    @Permit("community:proprietor:livingExpensesOrder:v2:addOrder")
     public CommonResult addUserLivingExpensesOrder(@RequestBody UserLivingExpensesBillEntity billEntity) {
+        ValidatorUtils.validateEntity(UserLivingExpensesBillEntity.AddOrderValidateGroup.class);
         billEntity.setUid(UserUtils.getUserId());
-        String id = orderService.addUserLivingExpensesOrder(billEntity);
-        return id == null ? CommonResult.error("添加失败") : CommonResult.ok(id, "添加成功");
+        CebCashierDeskVO cebCashierDeskVO = orderService.addUserLivingExpensesOrder(billEntity, UserUtils.getUserInfo().getMobile());
+        return CommonResult.ok(cebCashierDeskVO, "下单成功");
     }
     
     /**

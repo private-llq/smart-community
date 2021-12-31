@@ -3,22 +3,19 @@ package com.jsy.community.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.jsy.community.api.CebBankService;
 import com.jsy.community.api.PaymentException;
-import com.jsy.community.config.CebBankExConfig;
 import com.jsy.community.config.service.CebBankEntity;
 import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.cebbank.*;
 import com.jsy.community.qo.unionpay.HttpResponseModel;
 import com.jsy.community.untils.cebbank.CebBankContributionUtil;
+import com.jsy.community.vo.CebCashierDeskVO;
 import com.jsy.community.vo.cebbank.*;
 import com.jsy.community.vo.cebbank.CebCityPagingModelVO;
 import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.amqp.AmqpException;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -408,7 +405,7 @@ public class CebBankServiceImpl implements CebBankService {
         deskQO.setRefundUrl(cebBankRefundUrl);
         HttpResponseModel responseModel = CebBankContributionUtil.createCashierDesk(deskQO);
         if (responseModel == null || !"200".equals(responseModel.getRespCode())) {
-            throw new PaymentException("创建收银台失败");
+            throw new PaymentException(501, "创建收银台失败");
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         return JSON.parseObject(respData, CebCashierDeskVO.class);
