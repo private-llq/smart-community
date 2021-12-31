@@ -28,7 +28,6 @@ public enum JSYError {
 	OPERATOR_INFORMATION_NOT_OBTAINED(ConstError.BAD_REQUEST, "未获取到操作员信息!"),
 	NO_AUTH_HOUSE(ConstError.NO_AUTH_HOUSE, "房屋待认证!"),
 	DATA_LOST(ConstError.DATA_LOST,"数据不存在！"),
-	NOT_ENOUGH(ConstError.NOT_ENOUGH,"余额不足！"),
 	FLOOR_BEYOND(ConstError.FLOOR_BEYOND,"总楼层低于房屋楼层，无法修改！"),
 
 	// 支付模块
