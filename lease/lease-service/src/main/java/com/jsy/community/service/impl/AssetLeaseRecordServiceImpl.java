@@ -655,7 +655,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     }
                 }
                 List<AssetLeaseRecordEntity> unexpired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() == 0).collect(Collectors.toList());
-                List<AssetLeaseRecordEntity> expired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() == 1).collect(Collectors.toList());
+                List<AssetLeaseRecordEntity> expired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() != 0).collect(Collectors.toList());
                 for (AssetLeaseRecordEntity record : unexpired) {
                     switch (record.getOperation()) {
                         case 1:
@@ -823,7 +823,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     }
                 }
                 List<AssetLeaseRecordEntity> unexpired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() == 0).collect(Collectors.toList());
-                List<AssetLeaseRecordEntity> expired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() == 1).collect(Collectors.toList());
+                List<AssetLeaseRecordEntity> expired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() != 0).collect(Collectors.toList());
                 for (AssetLeaseRecordEntity record : unexpired) {
                     switch (record.getOperation()) {
                         case 1:
