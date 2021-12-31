@@ -69,6 +69,8 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
 //        entity.setAcctName();
         entity.setPushTitle(qo.getPushTitle());
         entity.setPushMsg(qo.getPushMsg());
+        entity.setAcctId(qo.getAcctId());
+        entity.setAcctName(qo.getAcctName());
         entity.setPushTarget(qo.getPushTarget());
         entity.setPushState(1);
         entity.setPushTag(qo.getPushTag());
@@ -105,6 +107,8 @@ public class AdminCommunityInformServiceImpl extends ServiceImpl<AdminCommunityI
         PushInformEntity entity = PushInformEntity.getInstance();
         entity.setId(qo.getId());
         entity.setPushTitle(qo.getPushTitle());
+        entity.setAcctId(qo.getAcctId());
+        entity.setAcctName(qo.getAcctName());
         entity.setPushMsg(qo.getPushMsg());
         entity.setPushTarget(qo.getPushTarget());
         entity.setPushState(pushInformEntity.getPushState());

@@ -17,12 +17,13 @@ import com.jsy.community.mapper.UserLivingExpensesOrderMapper;
 import com.jsy.community.qo.cebbank.CebBillQueryResultDataModelQO;
 import com.jsy.community.qo.cebbank.CebCreateCashierDeskQO;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.vo.cebbank.CebCashierDeskVO;
-import com.zhsj.basecommon.enums.ErrorEnum;
+import com.jsy.community.vo.CebCashierDeskVO;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
@@ -58,7 +59,9 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 	 * @return: java.lang.String
 	 */
 	@Override
-	public String addUserLivingExpensesOrder(UserLivingExpensesBillEntity billEntity) {
+	@LoginIgnore
+	@Transactional(rollbackFor = Exception.class)
+	public CebCashierDeskVO addUserLivingExpensesOrder(UserLivingExpensesBillEntity billEntity, String mobile) {
 		UserLivingExpensesOrderEntity userLivingExpensesOrderEntity = new UserLivingExpensesOrderEntity();
 		userLivingExpensesOrderEntity.setId(SnowFlake.nextId());
 		// 添加本地订单数据
@@ -66,7 +69,9 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		userLivingExpensesOrderEntity.setItemId(billEntity.getItemId());
 		userLivingExpensesOrderEntity.setItemCode(billEntity.getItemCode());
 		userLivingExpensesOrderEntity.setBillKey(billEntity.getBillKey());
-		userLivingExpensesOrderEntity.setBillId(billEntity.getId().toString());
+		if (billEntity.getId() != null) {
+			userLivingExpensesOrderEntity.setBillId(billEntity.getId().toString());
+		}
 		userLivingExpensesOrderEntity.setBillAmount(new BigDecimal(billEntity.getBillAmount()));
 		userLivingExpensesOrderEntity.setPayAmount(billEntity.getPayAmount());
 		userLivingExpensesOrderEntity.setCustomerName(billEntity.getCustomerName());
@@ -81,7 +86,7 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		deskQO.setPaymentItemCode(billEntity.getItemCode());
 		deskQO.setPaymentItemId(billEntity.getItemId());
 		deskQO.setBillKey(billEntity.getBillKey());
-		deskQO.setSessionId("");
+		deskQO.setSessionId(cebBankService.getCebBankSessionId(mobile, billEntity.getDeviceType()));
 		if (billEntity.getBillAmount() != null) {
 			deskQO.setBillAmount(new BigDecimal(billEntity.getBillAmount()));
 		}
@@ -113,8 +118,7 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		deskQO.setType(billEntity.getType());
 		deskQO.setDeviceType(billEntity.getDeviceType());
 		// 调用支付服务下单
-		CebCashierDeskVO cashierDesk = cebBankService.createCashierDesk(deskQO);
-		return String.valueOf(userLivingExpensesOrderEntity.getId());
+		return cebBankService.createCashierDesk(deskQO);
 	}
 	
 	/**

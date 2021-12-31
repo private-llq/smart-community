@@ -1,6 +1,7 @@
 package com.jsy.community.api;
 
 import com.jsy.community.qo.cebbank.*;
+import com.jsy.community.vo.CebCashierDeskVO;
 import com.jsy.community.vo.cebbank.*;
 
 /**

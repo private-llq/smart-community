@@ -44,6 +44,9 @@ public class PushInformQO implements Serializable {
     // 推送开关,0关闭推送,1开启推送
     private Integer pushTag;
 
+    private Long acctId;
+    private String acctName;
+
     // 新增验证组
     public interface AddPushInformValidateGroup{}
     // 更新验证组

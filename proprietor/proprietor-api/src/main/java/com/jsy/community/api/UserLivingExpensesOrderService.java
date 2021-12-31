@@ -3,6 +3,7 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserLivingExpensesBillEntity;
 import com.jsy.community.entity.UserLivingExpensesOrderEntity;
+import com.jsy.community.vo.CebCashierDeskVO;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ public interface UserLivingExpensesOrderService extends IService<UserLivingExpen
 	 * @Param: [userLivingExpensesOrderEntity]
 	 * @return: java.lang.String
 	 */
-	String addUserLivingExpensesOrder(UserLivingExpensesBillEntity billEntity);
+	CebCashierDeskVO addUserLivingExpensesOrder(UserLivingExpensesBillEntity billEntity, String mobile);
 	
 	/**
 	 * @Description: 查询当前用户生活缴费记录列表
