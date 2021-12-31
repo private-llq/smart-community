@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -7,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IProprietorMarketService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.ProprietorMarketEntity;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.ProprietorMarketCategoryMapper;
 import com.jsy.community.mapper.ProprietorMarketLabelMapper;
 import com.jsy.community.mapper.ProprietorMarketMapper;
@@ -203,6 +205,11 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
     @Override
     public ProprietorMarketEntity findOne(Long id) {
         ProprietorMarketEntity marketEntity =  marketMapper.selectMarketOne(id);
+        if(ObjectUtil.isNull(marketEntity)){
+            throw new JSYException("商品为空");
+        }
+        marketEntity.setClick(marketEntity.getClick()+1);
+        marketMapper.updateById(marketEntity);
         if (marketEntity != null && StringUtil.isNotBlank(marketEntity.getUid())) {
             UserDetail userDetail = baseUserInfoRpcService.getUserDetail(marketEntity.getUid());
             if (userDetail != null) {
