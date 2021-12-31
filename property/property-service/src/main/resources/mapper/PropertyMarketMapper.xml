@@ -50,6 +50,7 @@
             where tm.deleted = 0
             and tm.state = #{query.state}
             and tm.uid = #{query.uid}
+            and tm.remove = 0
         limit #{page},#{size}
     </select>
 
@@ -59,6 +60,7 @@
         where tm.deleted = 0
           and tm.state =#{query.state}
           and tm.uid = #{query.uid}
+          and tm.remove = 0
     </select>
 
 
@@ -140,6 +142,7 @@
         where tm.deleted = 0
           and tm.state =1
           and tm.shield= 0
+          and tm.remove = 0
     </select>
 
     <select id="selectMarketLikePage" resultType="com.jsy.community.qo.proprietor.ProprietorMarketQO">

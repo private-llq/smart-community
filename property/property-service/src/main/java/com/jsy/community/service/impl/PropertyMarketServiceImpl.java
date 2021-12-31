@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -10,6 +11,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.ProprietorMarketCategoryEntity;
 import com.jsy.community.entity.proprietor.ProprietorMarketEntity;
 import com.jsy.community.entity.proprietor.ProprietorMarketLabelEntity;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.PropertyMarketCategoryMapper;
 import com.jsy.community.mapper.PropertyMarketLabelMapper;
 import com.jsy.community.mapper.PropertyMarketMapper;
@@ -221,8 +223,14 @@ public class PropertyMarketServiceImpl extends ServiceImpl<PropertyMarketMapper,
     @Override
     public ProprietorMarketVO findOne(Long id) {
         ProprietorMarketEntity marketEntity = marketMapper.selectOne(new QueryWrapper<ProprietorMarketEntity>().eq("id", id));
+        if(ObjectUtil.isNull(marketEntity)){
+            throw new JSYException("商品为空");
+        }
+
         ProprietorMarketLabelEntity labelEntity = labelMapper.selectOne(new QueryWrapper<ProprietorMarketLabelEntity>().eq("label_id", marketEntity.getLabelId()));
         ProprietorMarketCategoryEntity categoryEntity = categoryMapper.selectOne(new QueryWrapper<ProprietorMarketCategoryEntity>().eq("category_id", marketEntity.getCategoryId()));
+        marketEntity.setClick(marketEntity.getClick()+1);
+        marketMapper.updateById(marketEntity);
         ProprietorMarketVO marketVO = new ProprietorMarketVO();
         BeanUtils.copyProperties(marketEntity,marketVO);
         marketVO.setLabelName(labelEntity.getLabel());
