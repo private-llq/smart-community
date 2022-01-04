@@ -6,6 +6,7 @@ import com.jsy.community.entity.sys.SysUserRoleEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.sys.SysMenuQO;
 import com.jsy.community.qo.sys.SysRoleQO;
+import com.zhsj.base.api.domain.PermitMenu;
 import com.zhsj.base.api.vo.PageVO;
 
 import java.util.List;
@@ -52,7 +53,7 @@ public interface ISysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
-	List<SysMenuEntity> listOfMenu();
+	List<PermitMenu> listOfMenu();
 	
 	/**
 	 * @Description: 查询用户菜单权限(新接口)

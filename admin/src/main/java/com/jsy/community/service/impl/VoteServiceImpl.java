@@ -3,7 +3,6 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.proprietor.VoteEntity;
 import com.jsy.community.entity.proprietor.VoteOptionEntity;
 import com.jsy.community.entity.proprietor.VoteTopicEntity;
@@ -15,6 +14,10 @@ import com.jsy.community.service.IVoteService;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealUserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
@@ -29,6 +32,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @program: com.jsy.community
@@ -62,6 +66,9 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper,VoteEntity> implemen
     
     @Resource
     private RedisTemplate<String, String> redisTemplate;
+    
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
     
     /**
      * @Description: 分页查询
@@ -180,10 +187,11 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper,VoteEntity> implemen
         for (VoteUserEntity voteUserEntity : entityList) {
             ids.add(voteUserEntity.getUid());
         }
-        if (ids.size()!=0){
-            List<UserEntity> list = userMapper.listAuthUserInfo(ids);
-            for (UserEntity userEntity : list) {
-                map.put(userEntity.getUid(),userEntity.getRealName());
+        Set<Long> idSet = ids.stream().map(Long::parseLong).collect(Collectors.toSet());
+        if (idSet.size()!=0){
+            List<RealUserDetail> realUserDetailsByUid = baseUserInfoRpcService.getRealUserDetailsByUid(idSet);
+            for (RealUserDetail userDetail : realUserDetailsByUid) {
+                map.put(String.valueOf(userDetail.getId()),userDetail.getNickName());
             }
             for (VoteUserEntity entity : entityList) {
                 entity.setRealName(map.get(entity.getUid()));

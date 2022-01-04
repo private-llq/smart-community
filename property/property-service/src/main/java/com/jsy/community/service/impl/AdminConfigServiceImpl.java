@@ -1,5 +1,4 @@
 package com.jsy.community.service.impl;
-import com.google.common.collect.Lists;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;

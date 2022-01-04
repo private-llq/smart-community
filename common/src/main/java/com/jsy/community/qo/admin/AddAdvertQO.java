@@ -18,7 +18,6 @@ public class AddAdvertQO {
     /**
      * 广告名称
      */
-    @NotBlank
     private String name;
     /**
      * 广告位值
