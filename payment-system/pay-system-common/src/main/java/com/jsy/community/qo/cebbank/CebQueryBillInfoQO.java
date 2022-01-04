@@ -22,9 +22,10 @@ public class CebQueryBillInfoQO extends CebBaseQO {
     /**
      * 缴费项目id-必填
      */
-    @NotBlank(message = "缴费项目id不能为空")
+    @NotBlank(message = "缴费项目code不能为空")
     private String itemCode;
 
+    @NotBlank(message = "缴费项目id不能为空")
     private String itemId;
 
     /**
@@ -75,6 +76,9 @@ public class CebQueryBillInfoQO extends CebBaseQO {
     @Range(min = 0, max = 2, message = "业务流程取值范围:0：先查后缴1：直接缴费2：二次查询;")
     private Integer businessFlow;
 
+    @NotNull(message = "缴费类别不能为空")
     private String type;
+
+    @NotNull(message = "城市名称不能为空")
     private String cityName;
 }

@@ -7,6 +7,7 @@ import com.jsy.community.api.IUserSearchService;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.RegionEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.utils.CommunityType;
 import com.jsy.community.utils.UserUtils;
@@ -18,10 +19,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +47,7 @@ public class CommonController {
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ICommonService commonService;
+
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IUserSearchService userSearchService;
 
@@ -196,6 +203,28 @@ public class CommonController {
             log.error("com.jsy.community.controller.CommonController.queryRegion：{}", e.getMessage());
             //如果出现异常，说明服务并不能调通
             return CommonResult.error(JSYError.NOT_FOUND);
+        }
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 获取城市名称
+     * @param regionName: 城市名称
+     * @return: {@link CommonResult<?>}
+     * @date: 2022/1/4 14:20
+     **/
+    @LoginIgnore
+    @GetMapping("/v2/getRegionName")
+    public CommonResult<?> getRegionName(@RequestParam String regionName) {
+        if (StringUtil.isNotBlank(regionName)) {
+            RegionEntity regionEntity = commonService.queryRegionByName(regionName);
+            if (regionEntity == null) {
+                return CommonResult.ok("重庆市", null);
+            } else {
+                return CommonResult.ok(regionEntity.getName(), null);
+            }
+        } else {
+            return CommonResult.ok("重庆市", null);
         }
     }
     

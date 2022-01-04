@@ -17,7 +17,7 @@ public interface UserLivingExpensesAccountService extends IService<UserLivingExp
      * @return: {@link Integer}
      * @date: 2021/12/3 16:57
      **/
-    Integer addAccount(UserLivingExpensesAccountEntity accountEntity);
+    Long addAccount(UserLivingExpensesAccountEntity accountEntity);
 
     /**
      * @param accountEntity:
@@ -45,4 +45,14 @@ public interface UserLivingExpensesAccountService extends IService<UserLivingExp
      * @date: 2021/12/28 17:41
      **/
     Boolean modifyAccount(UserLivingExpensesAccountEntity accountEntity);
+
+    /**
+     * @author: Pipi
+     * @description: 删除户号
+     * @param accountEntity:
+     * @return: {@link Boolean}
+     * @date: 2022/1/4 18:13
+     **/
+    Boolean deleteAccount(UserLivingExpensesAccountEntity accountEntity);
+
 }

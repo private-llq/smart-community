@@ -69,5 +69,13 @@ public interface RegionMapper {
 	**/
 	@Select("select name,lng,lat from t_region where level = 2 and name like CONCAT(#{cityName},'_')")
 	List<RegionEntity> getCityNameLike(String cityName);
-	
+
+	/**
+	 * @author: Pipi
+	 * @description: 通过区域名称模糊匹配区域
+	 * @param regionName: 区域名称
+	 * @return: {@link RegionEntity}
+	 * @date: 2022/1/4 15:21
+	 **/
+	RegionEntity queryRegionByName(@Param("regionName") String regionName);
 }

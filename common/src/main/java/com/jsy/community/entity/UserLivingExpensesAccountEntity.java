@@ -71,15 +71,20 @@ public class UserLivingExpensesAccountEntity extends BaseEntity {
     @NotBlank(message = "公司名称不能为空")
     private String company;
     /**
-     * 分类ID
+     * 缴费类型ID
      */
-    @NotBlank(message = "分类ID不能为空")
-    private String categoryId;
+    @NotBlank(message = "缴费类型ID不能为空")
+    private String typeId;
     /**
      * 分类名称
      */
     @NotBlank(message = "分类名称不能为空")
-    private String category;
+    private String typeName;
+    /**
+     * 分类ID
+     */
+    @NotBlank(message = "分类ID不能为空")
+    private String categoryId;
     /**
      * 项目ID
      */

@@ -7,6 +7,7 @@ import com.jsy.community.api.CebBankService;
 import com.jsy.community.api.UserLivingExpensesOrderService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.UserLivingExpensesAccountEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.cebbank.*;
@@ -104,85 +105,74 @@ public class CebBankController {
     }
 
     /**
+     * @param billInfoQO:
+     * @author: Pipi
+     * @description: 非直缴业务直接查询账单
+     * @return: {@link CommonResult<?>}
+     * @date: 2022/1/4 10:56
+     **/
+    @PostMapping("/v2/queryBill")
+    public CommonResult<?> queryBill(@RequestBody CebQueryBillInfoQO billInfoQO) {
+        ValidatorUtils.validateEntity(billInfoQO);
+        billInfoQO.setSessionId(cebBankService.getCebBankSessionId(UserUtils.getUserInfo().getMobile(), billInfoQO.getDeviceType()));
+        billInfoQO.setFlag("1");
+        billInfoQO.setPollingTimes("1");
+        return CommonResult.ok(cebBankService.queryBillInfo(billInfoQO));
+    }
+
+    /**
      * @author: Pipi
      * @description: 光大云缴费支付回调
-     * @param request:
+     * @param httpRequestModel:
      * @return:
      * @date: 2021/11/24 9:45
      **/
     @PostMapping(value = "/v2/cebCallback")
     @LoginIgnore
-    public String cebBankPayCallback(HttpServletRequest request) {
-        // 获取回调参数
-        StringBuilder data = new StringBuilder();
-        String line = null;
-        BufferedReader reader = null;
-        try {
-            reader = request.getReader();
-            while (null != (line = reader.readLine())){
-                data.append(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        String result = new String(data);
+    public String cebBankPayCallback(HttpRequestModel httpRequestModel) {
+        log.info("光大支付回调响应respData:{}", httpRequestModel.toString());
         HashMap<String, String> map = new HashMap<>();
-        if (StringUtil.isNotBlank(result)) {
-            try {
-                log.info("光大支付回调响应:{}", result);
-                result = "{\"" + result + "\"}";
-                result = result.replaceAll("=", "\":\"").replaceAll("&", "\",\"");
-                Gson gson = new Gson();
-                HttpRequestModel httpRequestModel = gson.fromJson(result, HttpRequestModel.class);
-                if (CebBankContributionUtil.verifyhttpResonse(httpRequestModel)) {
-                    // 验签通过
-                    // 将结果转换成对象
-                    byte[] decodeBase64 = Base64.decodeBase64(httpRequestModel.getReqdata().replaceAll("%3D", ""));
-                    String respData_json = new String(decodeBase64);
-                    log.info("光大支付回调响应respData:{}", respData_json);
-                    CebCallbackVO cebCallbackVO = JSON.parseObject(respData_json, CebCallbackVO.class);
-                    log.info("cebCallbackVO:{}", cebCallbackVO);
-                    if (cebCallbackVO != null && BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_PAYMENT.getCode().equals(cebCallbackVO.getOrder_status())) {
-                        // 调用光大云缴费订单服务修改订单状态完成订单
-                        if (livingExpensesOrderService.completeCebOrder(cebCallbackVO)) {
-                            log.info("光大支付回调流程完成");
-                            map.put("orderDate", String.valueOf(LocalDate.now()));
-                            map.put("transacNo", String.valueOf(SnowFlake.nextId()));
-                            map.put("order_status", "OK");
-                        } else {
-                            log.info("光大支付回调订单状态修改不成功");
-                            map.put("orderDate", String.valueOf(LocalDate.now()));
-                            map.put("transacNo", String.valueOf(SnowFlake.nextId()));
-                            map.put("order_status", "error");
-                        }
+        try {
+            if (CebBankContributionUtil.verifyhttpResonse(httpRequestModel)) {
+                // 验签通过
+                // 将结果转换成对象
+                byte[] decodeBase64 = Base64.decodeBase64(httpRequestModel.getReqdata());
+                String respData_json = new String(decodeBase64);
+                CebCallbackVO cebCallbackVO = JSON.parseObject(respData_json, CebCallbackVO.class);
+                log.info("cebCallbackVO:{}", cebCallbackVO);
+                if (cebCallbackVO != null
+                        && (BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_PAYMENT.getCode().equals(cebCallbackVO.getOrder_status())
+                        || BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_CANCELLATION.getCode().equals(cebCallbackVO.getOrder_status())
+                        || BusinessEnum.CebbankOrderStatusEnum.CANCELLATION_FAILURE.getCode().equals(cebCallbackVO.getOrder_status())
+                    )
+                ) {
+                    // 调用光大云缴费订单服务修改订单状态完成订单
+                    if (livingExpensesOrderService.completeCebOrder(cebCallbackVO)) {
+                        log.info("光大支付回调流程完成");
+                        map.put("orderDate", String.valueOf(LocalDate.now()));
+                        map.put("transacNo", String.valueOf(SnowFlake.nextId()));
+                        map.put("order_status", "OK");
                     } else {
-                        log.info("光大支付回调支付状态不成功,支付状态值为:{}", cebCallbackVO.getOrder_status());
+                        log.info("光大支付回调订单状态修改不成功");
                         map.put("orderDate", String.valueOf(LocalDate.now()));
                         map.put("transacNo", String.valueOf(SnowFlake.nextId()));
                         map.put("order_status", "error");
                     }
                 } else {
-                    log.info("光大支付回调验签未通过");
+                    log.info("光大支付回调支付状态不成功,支付状态值为:{}", cebCallbackVO.getOrder_status());
                     map.put("orderDate", String.valueOf(LocalDate.now()));
                     map.put("transacNo", String.valueOf(SnowFlake.nextId()));
                     map.put("order_status", "error");
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } else {
+                log.info("光大支付回调验签未通过");
                 map.put("orderDate", String.valueOf(LocalDate.now()));
                 map.put("transacNo", String.valueOf(SnowFlake.nextId()));
                 map.put("order_status", "error");
-                return JSON.toJSONString(map);
             }
-        } else {
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+            log.info("光大支付回调验签发生异常");
             map.put("orderDate", String.valueOf(LocalDate.now()));
             map.put("transacNo", String.valueOf(SnowFlake.nextId()));
             map.put("order_status", "error");

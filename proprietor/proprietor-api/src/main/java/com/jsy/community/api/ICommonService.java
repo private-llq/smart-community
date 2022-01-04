@@ -186,6 +186,15 @@ public interface ICommonService {
 	 */
 	Set<Object> getFullTextSearchHotKey(Integer num);
 
+	/**
+	 * @author: Pipi
+	 * @description: 通过区域名称模糊匹配区域
+	 * @param regionName: 区域名称
+	 * @return: {@link RegionEntity}
+	 * @date: 2022/1/4 15:25
+	 **/
+	RegionEntity queryRegionByName(String regionName);
+
 
 	/**
 	 * 通过楼层文本 和 单元id或楼栋id 查下面所有房屋

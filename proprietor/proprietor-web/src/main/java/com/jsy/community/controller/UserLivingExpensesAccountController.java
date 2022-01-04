@@ -47,7 +47,8 @@ public class UserLivingExpensesAccountController {
         if (userLivingExpensesAccountEntity != null) {
             throw new JSYException(JSYError.DUPLICATE_KEY);
         }
-        return accountService.addAccount(accountEntity) == 1 ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
+        Long id = accountService.addAccount(accountEntity);
+        return id == null ? CommonResult.error("添加失败") : CommonResult.ok("添加成功");
     }
 
     /**
@@ -69,5 +70,21 @@ public class UserLivingExpensesAccountController {
         accountEntity.setUid(UserUtils.getUserId());
         accountService.modifyAccount(accountEntity);
         return CommonResult.ok();
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 删除户号
+     * @param accountEntity:
+     * @return: {@link CommonResult<?>}
+     * @date: 2022/1/4 18:12
+     **/
+    @PostMapping("/v2/deleteAccount")
+    public CommonResult<?> deleteAccount(@RequestBody UserLivingExpensesAccountEntity accountEntity) {
+        if (accountEntity.getId() == null) {
+            throw new JSYException("账号ID不能为空");
+        }
+        accountEntity.setAccount(UserUtils.getUserId());
+        return accountService.deleteAccount(accountEntity) ? CommonResult.ok("删除成功!") : CommonResult.error("删除失败!");
     }
 }

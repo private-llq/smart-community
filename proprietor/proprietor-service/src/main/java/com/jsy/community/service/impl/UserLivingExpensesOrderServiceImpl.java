@@ -140,7 +140,7 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		queryWrapper.eq("deleted", 0);
 		// 是否查分类
 		if (StringUtils.isNotBlank(userLivingExpensesOrderEntity.getCategoryId())) {
-			List<UserLivingExpensesAccountEntity> userLivingExpensesAccountEntities = accountMapper.selectList(new QueryWrapper<UserLivingExpensesAccountEntity>().eq("category_id", userLivingExpensesOrderEntity.getCategoryId()));
+			List<UserLivingExpensesAccountEntity> userLivingExpensesAccountEntities = accountMapper.selectList(new QueryWrapper<UserLivingExpensesAccountEntity>().eq("type_id", userLivingExpensesOrderEntity.getTypeId()));
 			Set<String> accounts = userLivingExpensesAccountEntities.stream().map(UserLivingExpensesAccountEntity::getAccount).collect(Collectors.toSet());
 			queryWrapper.in("bill_key", accounts);
 		}
@@ -169,7 +169,8 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 			// 补充户主
 			entity.setHouseholder(userLivingExpensesAccountEntity.getHouseholder());
 			// 补充分类名称
-			entity.setCategory(userLivingExpensesAccountEntity.getCategory());
+			entity.setTypeName(userLivingExpensesAccountEntity.getTypeName());
+			entity.setTypeId(userLivingExpensesAccountEntity.getTypeId());
 		}
 		
 		// 根据月份封装返回数据
@@ -231,7 +232,7 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 			// 订单已经支付成功,不再做处理
 			return true;
 		}
-		userLivingExpensesOrderEntity.setOrderStatus(BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_PAYMENT.getCode());
+		userLivingExpensesOrderEntity.setOrderStatus(cebCallbackVO.getOrder_status());
 		userLivingExpensesOrderEntity.setTransacNo(cebCallbackVO.getTransacNo());
 		userLivingExpensesOrderEntity.setOrderDate(cebCallbackVO.getOrderDate());
 		userLivingExpensesOrderEntity.setRepoPayAmount(cebCallbackVO.getPayAmount());

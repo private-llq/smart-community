@@ -679,6 +679,18 @@ public class CommonServiceImpl implements ICommonService {
     }
 
     /**
+     * @param regionName : 区域名称
+     * @author: Pipi
+     * @description: 通过区域名称模糊匹配区域
+     * @return: {@link RegionEntity}
+     * @date: 2022/1/4 15:25
+     **/
+    @Override
+    public RegionEntity queryRegionByName(String regionName) {
+        return regionMapper.queryRegionByName(regionName);
+    }
+
+    /**
      * 全文搜索 获取热词
      * @author YuLF
      * @since  2021/3/10 14:55

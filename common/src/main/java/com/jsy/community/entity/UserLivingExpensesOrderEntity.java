@@ -114,7 +114,13 @@ public class UserLivingExpensesOrderEntity extends BaseEntity {
      * 分类名称
      */
     @TableField(exist = false)
-    private String category;
+    private String typeId;
+
+    /**
+     * 分类名称
+     */
+    @TableField(exist = false)
+    private String typeName;
     
     /**
      * 账单状态;0:订单创建成功;1:支付成功;2:支付失败;3:销账成功;4:销账失败;5:未知状态;8:实时退款

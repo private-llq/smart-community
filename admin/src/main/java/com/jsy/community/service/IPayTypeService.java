@@ -32,4 +32,6 @@ public interface IPayTypeService extends IService<PayTypeEntity> {
 	 * @Param [id, payType]
 	 **/
 	void addPayType(Long id, PayTypeEntity payType);
+
+
 }

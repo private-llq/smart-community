@@ -53,7 +53,7 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
      **/
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Integer addAccount(UserLivingExpensesAccountEntity accountEntity) {
+    public Long addAccount(UserLivingExpensesAccountEntity accountEntity) {
         accountEntity.setId(SnowFlake.nextId());
         if (accountEntity.getBusinessFlow() == 1) {
             throw new ProprietorException("直缴业务不用绑定,请走直接缴费接口");
@@ -64,7 +64,8 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
         } else {
             throw new ProprietorException("业务流程不明确");
         }
-        return accountMapper.insert(accountEntity);
+        int insert = accountMapper.insert(accountEntity);
+        return insert == 1 ? accountEntity.getId() : null;
     }
 
     /**
@@ -134,6 +135,32 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
             recordAccountEntity.setGroupId(accountEntity.getGroupId());
             accountMapper.updateById(recordAccountEntity);
         }
+        return true;
+    }
+
+    /**
+     * @param accountEntity :
+     * @author: Pipi
+     * @description: 删除户号
+     * @return: {@link Boolean}
+     * @date: 2022/1/4 18:13
+     **/
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean deleteAccount(UserLivingExpensesAccountEntity accountEntity) {
+        QueryWrapper<UserLivingExpensesAccountEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("uid", accountEntity.getUid());
+        queryWrapper.eq("id", accountEntity.getId());
+        UserLivingExpensesAccountEntity userLivingExpensesAccountEntity = accountMapper.selectOne(queryWrapper);
+        if (userLivingExpensesAccountEntity == null) {
+            return false;
+        }
+        QueryWrapper<UserLivingExpensesBillEntity> billEntityQueryWrapper = new QueryWrapper<>();
+        billEntityQueryWrapper.eq("uid", accountEntity.getUid());
+        billEntityQueryWrapper.eq("bill_status", 0);
+        billEntityQueryWrapper.eq("bill_key", userLivingExpensesAccountEntity.getAccount());
+        billMapper.delete(billEntityQueryWrapper);
+        accountMapper.delete(queryWrapper);
         return true;
     }
 
