@@ -411,7 +411,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		Page<SysUserEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page, baseQO);
 		
-		PageVO<UserDetail> userDetailPageVO = userInfoRpcService.queryUser(query.getPhone(), "", BusinessConst.ULTIMATE_ADMIN, query.getRoleId(), baseQO.getPage().intValue(), baseQO.getSize().intValue());
+		PageVO<UserDetail> userDetailPageVO = userInfoRpcService.queryUser(query.getPhone(), query.getNickName(), BusinessConst.ULTIMATE_ADMIN, query.getRoleId(), baseQO.getPage().intValue(), baseQO.getSize().intValue());
 		
 		if (CollectionUtils.isEmpty(userDetailPageVO.getData())) {
 			return new PageVO<>();
@@ -424,7 +424,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 			sysUserEntity.setId(userDetail.getId());
 			sysUserEntity.setIdStr(String.valueOf(userDetail.getId()));
 			sysUserEntity.setNickname(userDetail.getNickName());
-			if (permitRoles != null && permitRoles.size() > 0) {
+			if (!CollectionUtils.isEmpty(permitRoles)) {
+				sysUserEntity.setRoleId(permitRoles.get(0).getId());
+				sysUserEntity.setRoleIdStr(String.valueOf(permitRoles.get(0).getId()));
 				sysUserEntity.setRoleName(permitRoles.get(0).getName());
 			}
 			sysUserEntity.setMobile(userDetail.getPhone());
@@ -556,6 +558,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	
 	@Override
 	public String getSysRealName(String userId) {
-		return sysUserMapper.querySysNameByUid(userId);
+		return userInfoRpcService.getUserDetail(Long.parseLong(userId)).getNickName();
 	}
 }

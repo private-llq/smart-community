@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.entity.CommunityEntity;
-import com.jsy.community.entity.UserEntity;
 import com.jsy.community.entity.proprietor.ProprietorMarketCategoryEntity;
 import com.jsy.community.entity.proprietor.ProprietorMarketEntity;
 import com.jsy.community.entity.proprietor.ProprietorMarketLabelEntity;
@@ -13,6 +12,10 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyMarketQO;
 import com.jsy.community.service.IMarketService;
 import com.jsy.community.vo.proprietor.ProprietorMarketVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +45,9 @@ public class MarketServiceImpl extends ServiceImpl<MarketMapper, ProprietorMarke
     
     @Resource
     private UserMapper userMapper;
+    
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
 
     /**
      * @Description: 删除发布的商品
@@ -117,8 +123,8 @@ public class MarketServiceImpl extends ServiceImpl<MarketMapper, ProprietorMarke
         CommunityEntity communityEntity = communityMapper.selectById(marketEntity.getCommunityId());
         marketVO.setCommunityName(communityEntity.getName());
         // 补充发布人名
-        UserEntity userEntity = userMapper.getUserMobileByUid(marketEntity.getUid());
-        marketVO.setRealName(userEntity.getRealName());
+        UserDetail userDetail = baseUserInfoRpcService.getUserDetail(marketEntity.getUid());
+        marketVO.setRealName(userDetail.getNickName());
         return marketVO;
     }
     
