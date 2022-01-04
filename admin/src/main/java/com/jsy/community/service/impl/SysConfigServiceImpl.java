@@ -1,7 +1,6 @@
 package com.jsy.community.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.constant.BusinessConst;
@@ -42,6 +41,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author chq459799974
@@ -99,11 +99,12 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
-	public List<SysMenuEntity> queryMenu(){
-		List<SysMenuEntity> menuList = sysMenuMapper.selectList(new QueryWrapper<SysMenuEntity>().select("*").eq("pid", 0));
-		setChildren(menuList,new LinkedList<>());
-		menuList.sort(Comparator.comparing(SysMenuEntity::getSort));
-		return menuList;
+	public List<PermitMenu> queryMenu(){
+		List<PermitMenu> ultimateMenu = baseMenuRpcService.all(BusinessConst.ULTIMATE_ADMIN);
+//		List<SysMenuEntity> menuList = sysMenuMapper.selectList(new QueryWrapper<SysMenuEntity>().select("*").eq("pid", 0));
+//		setChildren(menuList,new LinkedList<>());
+//		menuList.sort(Comparator.comparing(SysMenuEntity::getSort));
+		return ultimateMenu;
 	}
 	
 	//组装子菜单
@@ -253,20 +254,8 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Date: 2020/12/14
 	**/
 	@Override
-	public List<SysMenuEntity> listOfMenu() {
-		List<SysMenuEntity> list = null;
-		try{
-			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Sys:Menu"),List.class);
-			// list排序
-			if (CollectionUtils.isEmpty(list)) {
-				return new ArrayList<>();
-			}
-			list.sort(Comparator.comparing(SysMenuEntity::getSort));
-		}catch (Exception e){
-			log.error("redis获取菜单失败");
-			return queryMenu();//从mysql获取
-		}
-		return list;
+	public List<PermitMenu> listOfMenu() {
+		return queryMenu();//从mysql获取
 	}
 	
 	/**
@@ -484,6 +473,12 @@ public class SysConfigServiceImpl implements ISysConfigService {
 			sysRoleEntity.setName(permitRole.getName());
 			sysRoleEntity.setRemark(permitRole.getRemark());
 			sysRoleEntity.setCreateTime(LocalDateTime.parse(permitRole.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+			// 查角色对应的菜单id
+			List<RoleMenu> roleMenus = baseRoleRpcService.listAllRoleMenu(permitRole.getId());
+			List<Long> menuIdList = roleMenus.stream().map(RoleMenu::getMenuId).collect(Collectors.toList());
+			List<String> menuIdsList = menuIdList.stream().map(String::valueOf).collect(Collectors.toList());
+			sysRoleEntity.setMenuIds(menuIdList);
+			sysRoleEntity.setMenuIdsStr(menuIdsList);
 			pageVO.getData().add(sysRoleEntity);
 		}
 		pageVO.setPageNum(permitRolePageVO.getPageNum());
@@ -578,18 +573,18 @@ public class SysConfigServiceImpl implements ISysConfigService {
 		SysRoleEntity sysRoleEntity = new SysRoleEntity();
 		// 查角色详情
 		PermitRole permitRole = baseRoleRpcService.getById(roleId);
-		// 查角色关联菜单id列表
+		// 查角色对应的菜单id
 		List<RoleMenu> roleMenus = baseRoleRpcService.listAllRoleMenu(permitRole.getId());
-		List<Long> menuIds = new ArrayList<>();
-		for (RoleMenu roleMenu : roleMenus) {
-			menuIds.add(roleMenu.getMenuId());
-		}
+		List<Long> menuIdList = roleMenus.stream().map(RoleMenu::getMenuId).collect(Collectors.toList());
+		List<String> menuIdsList = menuIdList.stream().map(String::valueOf).collect(Collectors.toList());
+		
 		sysRoleEntity.setId(permitRole.getId());
 		sysRoleEntity.setIdStr(String.valueOf(permitRole.getId()));
 		sysRoleEntity.setName(permitRole.getName());
 		sysRoleEntity.setRemark(permitRole.getRemark());
 		sysRoleEntity.setCreateTime(LocalDateTime.parse(permitRole.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		sysRoleEntity.setMenuIds(menuIds);
+		sysRoleEntity.setMenuIds(menuIdList);
+		sysRoleEntity.setMenuIdsStr(menuIdsList);
 		return sysRoleEntity;
 	}
 }

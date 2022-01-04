@@ -6,6 +6,7 @@ import com.jsy.community.qo.sys.SysMenuQO;
 import com.jsy.community.service.ISysConfigService;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.base.api.domain.PermitMenu;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import org.springframework.web.bind.annotation.*;
@@ -83,7 +84,7 @@ public class SysMenuController {
 	**/
 	@GetMapping("query")
 	@Permit("community:admin:menu:query")
-	public CommonResult<List<SysMenuEntity>> listOfMenu(){
+	public CommonResult<List<PermitMenu>> listOfMenu(){
 		return CommonResult.ok(sysConfigService.listOfMenu());
 	}
 }

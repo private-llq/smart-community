@@ -1700,7 +1700,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         List<UserHouseEntity> list = userHouseService.selectUserHouse(communityId, uid);
         List<HouseMemberEntity> memberEntities = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("community_id", communityId).eq("uid", uid));
 
-        if (uid.equals("00000tourist")) {
+        if ("00000tourist".equals(uid)) {
             controlVO.setAccessLevel(5);
             controlVO.setCommunityId(communityId);
             controlVO.setHouseId(null);

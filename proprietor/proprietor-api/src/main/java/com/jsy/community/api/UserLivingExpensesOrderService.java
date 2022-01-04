@@ -3,6 +3,8 @@ package com.jsy.community.api;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jsy.community.entity.UserLivingExpensesBillEntity;
 import com.jsy.community.entity.UserLivingExpensesOrderEntity;
+import com.jsy.community.vo.CebCallbackVO;
+import com.jsy.community.vo.CebCashierDeskVO;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +24,7 @@ public interface UserLivingExpensesOrderService extends IService<UserLivingExpen
 	 * @Param: [userLivingExpensesOrderEntity]
 	 * @return: java.lang.String
 	 */
-	String addUserLivingExpensesOrder(UserLivingExpensesBillEntity billEntity);
+	CebCashierDeskVO addUserLivingExpensesOrder(UserLivingExpensesBillEntity billEntity, String mobile);
 	
 	/**
 	 * @Description: 查询当前用户生活缴费记录列表
@@ -41,4 +43,13 @@ public interface UserLivingExpensesOrderService extends IService<UserLivingExpen
 	 * @return: com.jsy.community.entity.UserLivingExpensesOrderEntity
 	 */
 	UserLivingExpensesOrderEntity getById(Long id);
+
+	/**
+	 * @author: Pipi
+	 * @description: 完成云缴费订单
+	 * @param cebCallbackVO: 云缴费返回参数
+	 * @return: {@link Boolean}
+	 * @date: 2021/12/31 16:39
+	 **/
+	Boolean completeCebOrder(CebCallbackVO cebCallbackVO);
 }

@@ -11,6 +11,7 @@ import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.admin.AdminInfoVo;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,6 +50,14 @@ public class AdminCommunityInformController {
         }
         ValidatorUtils.validateEntity(qo, PushInformQO.AddPushInformValidateGroup.class);
         qo.setUid(UserUtils.getId());
+        AdminInfoVo adminInfo = UserUtils.getAdminInfo();
+        if (adminInfo.getCommunityId() == null) {
+            qo.setAcctId(adminInfo.getCompanyId());
+            qo.setAcctName(adminInfo.getCompanyName());
+        } else {
+            qo.setAcctId(adminInfo.getCommunityId());
+            qo.setAcctName(adminInfo.getCommunityName());
+        }
         return communityInformService.addPushInform(qo) ? CommonResult.ok("添加成功!") : CommonResult.error("添加失败!");
     }
 
@@ -177,6 +186,14 @@ public class AdminCommunityInformController {
     public CommonResult updateDetail(@RequestBody PushInformQO qo) {
         ValidatorUtils.validateEntity(qo, PushInformQO.UpdateDetailValidate.class);
         qo.setUid(UserUtils.getId());
+        AdminInfoVo adminInfo = UserUtils.getAdminInfo();
+        if (adminInfo.getCommunityId() == null) {
+            qo.setAcctId(adminInfo.getCompanyId());
+            qo.setAcctName(adminInfo.getCompanyName());
+        } else {
+            qo.setAcctId(adminInfo.getCommunityId());
+            qo.setAcctName(adminInfo.getCommunityName());
+        }
         return communityInformService.updatePushInform(qo) ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败");
     }
 

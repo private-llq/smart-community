@@ -77,6 +77,11 @@ public class UserLivingExpensesOrderEntity extends BaseEntity {
      * 受理流水号
      */
     private String transacNo;
+
+    /**
+     * 云缴费客户端订单总金额
+     */
+    private BigDecimal repoPayAmount;
     
     /**
      * 分类id

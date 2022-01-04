@@ -1,25 +1,39 @@
 package com.jsy.community.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.google.gson.Gson;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.CebBankService;
+import com.jsy.community.api.UserLivingExpensesOrderService;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.cebbank.*;
 import com.jsy.community.qo.unionpay.HttpResponseModel;
 import com.jsy.community.untils.cebbank.CebBankContributionUtil;
+import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
+import com.jsy.community.vo.CebCallbackVO;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.cebbank.test.HttpRequestModel;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.concurrent.*;
 
 /**
@@ -38,6 +52,9 @@ public class CebBankController {
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
+
+    @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
+    private UserLivingExpensesOrderService livingExpensesOrderService;
 
     /**
      * @param categoryQO:
@@ -84,5 +101,92 @@ public class CebBankController {
         cebQueryCityQO.setCityRange("SOME");
         cebQueryCityQO.setDeviceType(deviceType);
         return CommonResult.ok(cebBankService.queryCity(cebQueryCityQO));
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 光大云缴费支付回调
+     * @param request:
+     * @return:
+     * @date: 2021/11/24 9:45
+     **/
+    @PostMapping(value = "/v2/cebCallback")
+    @LoginIgnore
+    public String cebBankPayCallback(HttpServletRequest request) {
+        // 获取回调参数
+        StringBuilder data = new StringBuilder();
+        String line = null;
+        BufferedReader reader = null;
+        try {
+            reader = request.getReader();
+            while (null != (line = reader.readLine())){
+                data.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        String result = new String(data);
+        HashMap<String, String> map = new HashMap<>();
+        if (StringUtil.isNotBlank(result)) {
+            try {
+                log.info("光大支付回调响应:{}", result);
+                result = "{\"" + result + "\"}";
+                result = result.replaceAll("=", "\":\"").replaceAll("&", "\",\"");
+                Gson gson = new Gson();
+                HttpRequestModel httpRequestModel = gson.fromJson(result, HttpRequestModel.class);
+                if (CebBankContributionUtil.verifyhttpResonse(httpRequestModel)) {
+                    // 验签通过
+                    // 将结果转换成对象
+                    byte[] decodeBase64 = Base64.decodeBase64(httpRequestModel.getReqdata().replaceAll("%3D", ""));
+                    String respData_json = new String(decodeBase64);
+                    log.info("光大支付回调响应respData:{}", respData_json);
+                    CebCallbackVO cebCallbackVO = JSON.parseObject(respData_json, CebCallbackVO.class);
+                    log.info("cebCallbackVO:{}", cebCallbackVO);
+                    if (cebCallbackVO != null && BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_PAYMENT.getCode().equals(cebCallbackVO.getOrder_status())) {
+                        // 调用光大云缴费订单服务修改订单状态完成订单
+                        if (livingExpensesOrderService.completeCebOrder(cebCallbackVO)) {
+                            log.info("光大支付回调流程完成");
+                            map.put("orderDate", String.valueOf(LocalDate.now()));
+                            map.put("transacNo", String.valueOf(SnowFlake.nextId()));
+                            map.put("order_status", "OK");
+                        } else {
+                            log.info("光大支付回调订单状态修改不成功");
+                            map.put("orderDate", String.valueOf(LocalDate.now()));
+                            map.put("transacNo", String.valueOf(SnowFlake.nextId()));
+                            map.put("order_status", "error");
+                        }
+                    } else {
+                        log.info("光大支付回调支付状态不成功,支付状态值为:{}", cebCallbackVO.getOrder_status());
+                        map.put("orderDate", String.valueOf(LocalDate.now()));
+                        map.put("transacNo", String.valueOf(SnowFlake.nextId()));
+                        map.put("order_status", "error");
+                    }
+                } else {
+                    log.info("光大支付回调验签未通过");
+                    map.put("orderDate", String.valueOf(LocalDate.now()));
+                    map.put("transacNo", String.valueOf(SnowFlake.nextId()));
+                    map.put("order_status", "error");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                map.put("orderDate", String.valueOf(LocalDate.now()));
+                map.put("transacNo", String.valueOf(SnowFlake.nextId()));
+                map.put("order_status", "error");
+                return JSON.toJSONString(map);
+            }
+        } else {
+            map.put("orderDate", String.valueOf(LocalDate.now()));
+            map.put("transacNo", String.valueOf(SnowFlake.nextId()));
+            map.put("order_status", "error");
+        }
+        return JSON.toJSONString(map);
     }
 }

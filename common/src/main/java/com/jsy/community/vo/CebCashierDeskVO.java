@@ -1,4 +1,4 @@
-package com.jsy.community.vo.cebbank;
+package com.jsy.community.vo;
 
 import lombok.Data;
 

@@ -43,16 +43,20 @@
     </select>
     <!-- 根据条件查列表 -->
     <select id="queryList" resultType="com.jsy.community.entity.proprietor.AssetLeaseRecordEntity">
-        select * from t_asset_lease_record
+        select talr.*
+            from t_asset_lease_record talr
+            left join t_house_lease thl on (talr.asset_type = 2 and thl.id = talr.asset_id)
+            left join t_shop_lease tsl on (talr.asset_type = 1 and tsl.id = talr.asset_id)
         <where>
+            (thl.deleted = 0 or tsl.deleted = 0)
             <if test="entity.assetType != null and entity.identityType == 1">
-                asset_type = #{entity.assetType}
+                and talr.asset_type = #{entity.assetType}
             </if>
             <if test="entity.homeOwnerUid != null">
-                and home_owner_uid = #{entity.homeOwnerUid}
+                and talr.home_owner_uid = #{entity.homeOwnerUid}
             </if>
             <if test="entity.tenantUid != null">
-                tenant_uid = #{entity.tenantUid}
+                and talr.tenant_uid = #{entity.tenantUid}
             </if>
         </where>
     </select>

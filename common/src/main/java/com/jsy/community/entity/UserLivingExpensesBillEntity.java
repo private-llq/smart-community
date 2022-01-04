@@ -20,15 +20,17 @@ public class UserLivingExpensesBillEntity extends BaseEntity {
     /**
      * 项目ID
      */
+    @NotBlank(groups = {AddOrderValidateGroup.class}, message = "项目ID不能为空")
     private String itemId;
     /**
      * 项目code
      */
+    @NotBlank(groups = {AddOrderValidateGroup.class}, message = "项目code不能为空")
     private String itemCode;
     /**
      * 户号
      */
-    @NotBlank(message = "缴费户号不能为空")
+    @NotBlank(groups = {QueryBillValidateGroup.class, AddOrderValidateGroup.class}, message = "缴费户号不能为空")
     private String billKey;
     /**
      * 用户uid
@@ -93,14 +95,14 @@ public class UserLivingExpensesBillEntity extends BaseEntity {
     /**
      * 支付金额
      */
-    @NotNull(message = "支付金额不能为空")
+    @NotNull(groups = {AddOrderValidateGroup.class}, message = "支付金额不能为空")
     @TableField(exist = false)
     private BigDecimal payAmount;
 
     /**
      * 终端类型
      */
-    @NotBlank(message = "终端类型不能为空;1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序")
+    @NotBlank(groups = {AddOrderValidateGroup.class}, message = "终端类型不能为空;1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序")
     @TableField(exist = false)
     private String deviceType;
 
@@ -108,4 +110,14 @@ public class UserLivingExpensesBillEntity extends BaseEntity {
     // 手机充值该字段必传1。手机充值时可以不用传filed,qryAcnSsn,contractNo、这些5接口没有返回的值
     @TableField(exist = false)
     private String type;
+
+    /**
+     * 查询账单验证组
+     */
+    public interface QueryBillValidateGroup{}
+
+    /**
+     * 添加订单验证组
+     */
+    public interface AddOrderValidateGroup{}
 }
