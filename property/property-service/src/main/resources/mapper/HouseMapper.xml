@@ -325,7 +325,7 @@
 	</select>
 
 	<select id="selectAllHouseByCommunityIds" resultType="java.lang.Integer">
-		select count(0) from t_house where community_id in
+		select count(0) from t_house where type = 4 and community_id in
 		<foreach collection="list" item="item" open="(" separator="," close=")">
 			#{item}
 		</foreach>

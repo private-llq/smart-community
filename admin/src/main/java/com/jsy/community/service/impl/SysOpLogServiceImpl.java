@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.entity.SysOpLogEntity;
-import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.mapper.SysOpLogMapper;
 import com.jsy.community.mapper.SysUserMapper;
 import com.jsy.community.qo.BaseQO;
@@ -13,13 +12,21 @@ import com.jsy.community.service.ISysOpLogService;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealUserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author DKS
@@ -34,6 +41,9 @@ public class SysOpLogServiceImpl extends ServiceImpl<SysOpLogMapper, SysOpLogEnt
 	
 	@Resource
 	private SysUserMapper sysUserMapper;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseUserInfoRpcService userInfoRpcService;
 	
 	/**
 	 * @author DKS
@@ -75,11 +85,14 @@ public class SysOpLogServiceImpl extends ServiceImpl<SysOpLogMapper, SysOpLogEnt
 		if (CollectionUtils.isEmpty(pageData.getRecords())) {
 			return new PageInfo<>();
 		}
+		Set<String> userIds = pageData.getRecords().stream().map(SysOpLogEntity::getUserId).collect(Collectors.toSet());
+		Set<Long> userIdList = userIds.stream().map(s -> Long.parseLong(s.trim())).collect(Collectors.toSet());
+		List<RealUserDetail> realUserDetails = userInfoRpcService.getRealUserDetailsByUid(userIdList);
+		Map<Long, RealUserDetail> realUserDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getId, Function.identity()));
 		// 补充用户名
 		for (SysOpLogEntity entity : pageData.getRecords()) {
 			if (entity.getUserId() != null) {
-				SysUserEntity sysUserEntity = sysUserMapper.queryById(entity.getUserId());
-				entity.setUserName(sysUserEntity.getRealName());
+				entity.setUserName(realUserDetailMap.get(Long.parseLong(entity.getUserId())).getNickName());
 			}
 		}
 		

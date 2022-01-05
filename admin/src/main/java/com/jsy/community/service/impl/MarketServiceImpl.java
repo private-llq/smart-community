@@ -15,15 +15,14 @@ import com.jsy.community.vo.proprietor.ProprietorMarketVO;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.PageVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MarketServiceImpl extends ServiceImpl<MarketMapper, ProprietorMarketEntity> implements IMarketService {
@@ -71,6 +70,8 @@ public class MarketServiceImpl extends ServiceImpl<MarketMapper, ProprietorMarke
      **/
     @Override
     public Map<String, Object> selectMarketAllPage(BaseQO<PropertyMarketQO> baseQO) {
+        HashMap<String, Object> map = new HashMap<>();
+        
         if (baseQO.getSize() == 0 || baseQO.getSize() == null){
             baseQO.setSize(10L);
         }
@@ -81,22 +82,33 @@ public class MarketServiceImpl extends ServiceImpl<MarketMapper, ProprietorMarke
         page1 =(baseQO.getPage()-1)*baseQO.getSize();
         PropertyMarketQO query = baseQO.getQuery();
         ArrayList<ProprietorMarketVO> arrayList = new ArrayList<>();
-
-        List<ProprietorMarketEntity> list =  marketMapper.selectMarketAllPage(query,page1,baseQO.getSize());
-        for (ProprietorMarketEntity li : list){
-            ProprietorMarketVO marketVO = new ProprietorMarketVO();
-            BeanUtils.copyProperties(li,marketVO);
-            // 补充标价
-            marketVO.setPriceName(li.getNegotiable() == 1 ? "面议" : String.valueOf(li.getPrice()));
-            // 补充状态名称
-            marketVO.setStateName(li.getState() == 1 ? "已上架" : "已下架");
-            arrayList.add(marketVO);
+    
+        PageVO<UserDetail> userDetailPageVO = baseUserInfoRpcService.queryUser("", query.getRealName(), 0, 999999999);
+        if (userDetailPageVO != null) {
+            Set<Long> userDetailIds = userDetailPageVO.getData().stream().map(UserDetail::getId).collect(Collectors.toSet());
+            List<String> collect = userDetailIds.stream().map(String::valueOf).collect(Collectors.toList());
+            query.setUserDetailIds(collect);
+            
+            Map<Long, String> nickNameMap = userDetailPageVO.getData().stream().collect(Collectors.toMap(UserDetail::getId, UserDetail::getNickName));
+        
+            List<ProprietorMarketEntity> list =  marketMapper.selectMarketAllPage(query,page1,baseQO.getSize());
+            for (ProprietorMarketEntity li : list){
+                ProprietorMarketVO marketVO = new ProprietorMarketVO();
+                BeanUtils.copyProperties(li,marketVO);
+                // 补充标价
+                marketVO.setPriceName(li.getNegotiable() == 1 ? "面议" : String.valueOf(li.getPrice()));
+                // 补充状态名称
+                marketVO.setStateName(li.getState() == 1 ? "已上架" : "已下架");
+                marketVO.setNickName(nickNameMap.get(Long.parseLong(li.getUid())));
+                arrayList.add(marketVO);
+            }
+            Long total = marketMapper.findTotals(query);
+            map.put("total",total);
+            map.put("list",arrayList);
+        } else {
+            map.put("total", 0);
+            map.put("list",arrayList);
         }
-        Long total = marketMapper.findTotals(query);
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("total",total);
-        map.put("list",arrayList);
-
         marketMapper.findCount();
         return map;
     }
