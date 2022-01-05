@@ -12,6 +12,6 @@
     </select>
 
     <select id="queryCommunityByCompanyId" resultType="com.jsy.community.entity.CommunityEntity">
-        select * from t_community where property_id = #{companyId}
+        select * from t_community where property_id = #{companyId} and deleted = 0
     </select>
 </mapper>

@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,5 +23,5 @@ public interface PropertyFinanceOrderMapper extends BaseMapper<PropertyFinanceOr
      *@Param: startTime,endTime:
      *@Date: 2021/11/09 13:47
      **/
-    BigDecimal financeTurnover(LocalDate startTime, LocalDate endTime);
+    BigDecimal financeTurnover(@Param("startTime") LocalDate startTime, @Param("endTime")LocalDate endTime);
 }

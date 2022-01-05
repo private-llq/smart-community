@@ -63,8 +63,8 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, AssetLeaseR
         Set<Long> tenantUids = tenantUid.stream().map(s -> Long.parseLong(s.trim())).collect(Collectors.toSet());
         List<RealUserDetail> realUserDetailsByUid = baseUserInfoRpcService.getRealUserDetailsByUid(homeOwnerUids);
         List<RealUserDetail> realUserDetailsByUid1 = baseUserInfoRpcService.getRealUserDetailsByUid(tenantUids);
-        Map<String, RealUserDetail> realUserDetailMap = realUserDetailsByUid.stream().collect(Collectors.toMap(RealUserDetail::getPhone, Function.identity()));
-        Map<String, RealUserDetail> realUserDetailMap1 = realUserDetailsByUid1.stream().collect(Collectors.toMap(RealUserDetail::getPhone, Function.identity()));
+        Map<Long, RealUserDetail> realUserDetailMap = realUserDetailsByUid.stream().collect(Collectors.toMap(RealUserDetail::getId, Function.identity()));
+        Map<Long, RealUserDetail> realUserDetailMap1 = realUserDetailsByUid1.stream().collect(Collectors.toMap(RealUserDetail::getId, Function.identity()));
     
         for (AssetLeaseRecordEntity entity : entities) {
             // 补充合同类型
@@ -76,11 +76,11 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, AssetLeaseR
             // 补充发起方(甲方:业主)电话和签约方(乙方:租客)电话
 //            UserEntity userEntity = userMapper.getUserMobileByUid(entity.getHomeOwnerUid());
 //            UserEntity userEntity1 = userMapper.getUserMobileByUid(entity.getTenantUid());
-	        if (realUserDetailMap.get(entity.getHomeOwnerUid()) != null) {
-		        entity.setInitiatorMobile(realUserDetailMap.get(entity.getHomeOwnerUid()).getPhone());
+	        if (realUserDetailMap.get(Long.parseLong(entity.getHomeOwnerUid())) != null) {
+		        entity.setInitiatorMobile(realUserDetailMap.get(Long.parseLong(entity.getHomeOwnerUid())).getPhone());
 	        }
-	        if (realUserDetailMap1.get(entity.getTenantUid()) != null) {
-		        entity.setSignatoryMobile(realUserDetailMap1.get(entity.getTenantUid()).getPhone());
+	        if (realUserDetailMap1.get(Long.parseLong(entity.getTenantUid())) != null) {
+		        entity.setSignatoryMobile(realUserDetailMap1.get(Long.parseLong(entity.getTenantUid())).getPhone());
 	        }
             // 补充状态
             if (entity.getOperation() == 1 || entity.getOperation() == 9) {
