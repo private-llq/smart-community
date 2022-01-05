@@ -4,6 +4,7 @@ import com.jsy.community.annotation.businessLog;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.service.IAdminUserService;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
@@ -40,6 +41,7 @@ public class AdminUserController {
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new AdminUserQO());
 		}
+		baseQO.getQuery().setUid(UserUtils.getId());
 		return CommonResult.ok(adminUserService.queryOperator(baseQO));
 	}
 	

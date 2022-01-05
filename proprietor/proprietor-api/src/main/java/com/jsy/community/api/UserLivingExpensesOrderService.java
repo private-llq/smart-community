@@ -5,6 +5,7 @@ import com.jsy.community.entity.UserLivingExpensesBillEntity;
 import com.jsy.community.entity.UserLivingExpensesOrderEntity;
 import com.jsy.community.vo.CebCallbackVO;
 import com.jsy.community.vo.CebCashierDeskVO;
+import com.jsy.community.vo.LivingExpensesOrderListVO;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ public interface UserLivingExpensesOrderService extends IService<UserLivingExpen
 	 * @Param: [userLivingExpensesOrderEntity]
 	 * @return: java.util.List<com.jsy.community.entity.UserLivingExpensesOrderEntity>
 	 */
-	Map<String, List<UserLivingExpensesOrderEntity>> getListOfUserLivingExpensesOrder(UserLivingExpensesOrderEntity userLivingExpensesOrderEntity);
+	List<LivingExpensesOrderListVO> getListOfUserLivingExpensesOrder(UserLivingExpensesOrderEntity userLivingExpensesOrderEntity);
 	
 	/**
 	 * @Description: 查询生活缴费记录详情

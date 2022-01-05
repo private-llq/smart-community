@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author DKS
@@ -80,7 +81,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 		if (CollectionUtils.isEmpty(userDetailPageVO.getData())) {
 			return new PageVO<>();
 		}
-		
+		userDetailPageVO.setData(userDetailPageVO.getData().stream().filter(userDetail -> userDetail.getId() != Long.valueOf(query.getUid())).collect(Collectors.toList()));
 		List<Long> companyIds = new ArrayList<>();
 		List<Long> uIds = new ArrayList<>();
 		// 模糊查物业公司名称

@@ -74,7 +74,7 @@ public interface CebBankService {
      * @return: {@link CebQueryMobileBillVO}
      * @date: 2021/11/23 18:06
      **/
-//    CebQueryMobileBillVO queryMobileBill(CebQueryMobileBillQO cebQueryMobileBillQO);
+    CebQueryMobileBillVO queryMobileBill(CebQueryMobileBillQO cebQueryMobileBillQO);
 
     /**
      * @author: Pipi
