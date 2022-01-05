@@ -34,6 +34,12 @@ public class MarketCategoryServiceImpl extends ServiceImpl<MarketCategoryMapper,
     public boolean addMarketCategory(ProprietorMarketCategoryEntity categoryEntity) {
         categoryEntity.setId(SnowFlake.nextId());
         categoryEntity.setCategoryId(UUID.randomUUID().toString());
+        // 查询是否存在该顺序的商品类别
+        ProprietorMarketCategoryEntity sort = categoryMapper.selectOne(new QueryWrapper<ProprietorMarketCategoryEntity>().eq("sort", categoryEntity.getSort()).eq("deleted", 0));
+        if (sort != null) {
+            // 修改大于等于该顺序的
+            categoryMapper.updateSort(categoryEntity.getSort());
+        }
         return categoryMapper.insert(categoryEntity) == 1;
     }
 
@@ -46,6 +52,12 @@ public class MarketCategoryServiceImpl extends ServiceImpl<MarketCategoryMapper,
      **/
     @Override
     public boolean updateMarketCategory(ProprietorMarketCategoryEntity categoryEntity) {
+        // 查询是否存在该顺序的商品类别
+        ProprietorMarketCategoryEntity sort = categoryMapper.selectOne(new QueryWrapper<ProprietorMarketCategoryEntity>().eq("sort", categoryEntity.getSort()).eq("deleted", 0));
+        if (sort != null) {
+            // 修改大于等于该顺序的
+            categoryMapper.updateSort(categoryEntity.getSort());
+        }
         return categoryMapper.updateById(categoryEntity) == 1;
     }
     

@@ -3,7 +3,9 @@ package com.jsy.community.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jsy.community.api.AssetLeaseRecordService;
 import com.jsy.community.constant.BusinessEnum;
+import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
@@ -18,6 +20,7 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.imutils.open.StringUtils;
 import com.jsy.community.vo.admin.LeaseReleaseInfoVO;
 import com.jsy.community.vo.admin.LeaseReleasePageVO;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +44,9 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
     private ShopLeaseMapper shopLeaseMapper;
     @Resource
     private HouseConstMapper houseConstMapper;
+    
+    @DubboReference(version = Const.version, group = Const.group_lease, check = false)
+    private AssetLeaseRecordService assetLeaseRecordService;
 
     /**
      * 商铺和房屋租赁信息发布列表
@@ -63,6 +69,12 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
         Set<Long> collect = records.stream().map(LeaseReleasePageVO::getTCommunityId).collect(Collectors.toSet());
         List<CommunityEntity> communityList = communityMapper.selectBatchIds(collect);
         Map<Long, CommunityEntity> communityMap = communityList.stream().collect(Collectors.toMap(CommunityEntity::getId, Function.identity()));
+        // 查询合同Id
+        // 资产Id列表
+        List<Long> assetId = records.stream().map(LeaseReleasePageVO::getId).collect(Collectors.toList());
+        // 根据资产id查询对应的合同编号
+        Map<Long, String> assetIdAndConIdMap = assetLeaseRecordService.queryConIdList(assetId);
+        
         // 填充额外信息
         records.stream().peek(r -> {
             // 填充小区信息
@@ -73,6 +85,7 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
                 }
             }
             r.setIdStr(String.valueOf(r.getId()));
+            r.setConId(assetIdAndConIdMap.get(r.getId()));
             // 填充租赁状态
             r.setLeaseStatus(leaseStatus(r.getTLeaseStatus()));
         }).collect(Collectors.toList());

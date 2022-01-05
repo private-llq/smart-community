@@ -11,7 +11,10 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.ConstClasses;
-import com.jsy.community.entity.*;
+import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.CompanyPayConfigEntity;
+import com.jsy.community.entity.PayConfigureEntity;
+import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
@@ -1944,5 +1947,18 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             houseLeaseContractVO.setIdCardB(userInfoVo.getIdCard());
         }
         return houseLeaseContractVO;
+    }
+    
+    /**
+     * @Description: 根据资产id查询对应的合同编号
+     * @author: DKS
+     * @since: 2022/1/5 17:09
+     * @Param: [assetId]
+     * @return: java.util.Map<java.lang.Long,java.lang.String>
+     */
+    @Override
+    public Map<Long, String> queryConIdList(Collection<?> assetId) {
+        List<AssetLeaseRecordEntity> entities = assetLeaseRecordMapper.selectList(new QueryWrapper<AssetLeaseRecordEntity>().in("asset_id", assetId));
+        return entities.stream().collect(Collectors.toMap(AssetLeaseRecordEntity::getAssetId, AssetLeaseRecordEntity::getConId));
     }
 }

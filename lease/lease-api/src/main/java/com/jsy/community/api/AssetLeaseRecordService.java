@@ -7,6 +7,7 @@ import com.zhsj.base.api.domain.PayCallNotice;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -122,4 +123,13 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
     AssetLeaseRecordEntity queryRecordByConId(String conId);
 
     HouseLeaseContractVO queryContractPreFillInfo(AssetLeaseRecordEntity assetLeaseRecordEntity);
+    
+    /**
+     * @Description: 根据资产id查询对应的合同编号
+     * @author: DKS
+     * @since: 2022/1/5 17:09
+     * @Param: [assetId]
+     * @return: java.util.Map<java.lang.Long,java.lang.String>
+     */
+    Map<Long, String> queryConIdList(Collection<?> assetId);
 }

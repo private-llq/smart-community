@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyMarketQO;
 import com.jsy.community.service.IMarketService;
