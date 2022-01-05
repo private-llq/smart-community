@@ -99,7 +99,6 @@ public class UserLivingExpensesAccountEntity extends BaseEntity {
      * 业务流程
      * 0：先查后缴1：直接缴费2：二次查询
      */
-    @TableField(exist = false)
     @NotNull(message = "业务流程不能为空")
     private Integer businessFlow;
 

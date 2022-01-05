@@ -25,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -136,7 +137,19 @@ public class CebBankServiceImpl implements CebBankService {
             throw new PaymentException(JSYError.THIRD_FAILED);
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
-        return JSON.parseObject(respData, CebQueryCityContributionCategoryVO.class);
+        CebQueryCityContributionCategoryVO cebQueryCityContributionCategoryVO = JSON.parseObject(respData, CebQueryCityContributionCategoryVO.class);
+        String costIcon = redisTemplate.opsForValue().get("costIcon");
+        Map<Integer, String> map = JSON.parseObject(costIcon, Map.class);
+        if (cebQueryCityContributionCategoryVO != null
+                && !CollectionUtils.isEmpty(cebQueryCityContributionCategoryVO.getCebPaymentCategoriesList())
+                && !CollectionUtils.isEmpty(map)
+        ) {
+            for (CebCategoryVO cebCategoryVO : cebQueryCityContributionCategoryVO.getCebPaymentCategoriesList()) {
+                String picUrl = map.get(Integer.valueOf(cebCategoryVO.getType()));
+                cebCategoryVO.setPicUrlClient(StringUtil.isNotBlank(picUrl) ? picUrl : cebCategoryVO.getPicUrlClient());
+            }
+        }
+        return cebQueryCityContributionCategoryVO;
     }
 
     /**
@@ -347,7 +360,7 @@ public class CebBankServiceImpl implements CebBankService {
      * @return: java.lang.String
      * @date: 2021/11/17 10:37
      **/
-    /*@Override
+    @Override
     public CebQueryMobileBillVO queryMobileBill(CebQueryMobileBillQO cebQueryMobileBillQO) {
         HttpResponseModel responseModel = CebBankContributionUtil.queryMobileBill(cebQueryMobileBillQO);
         if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
@@ -355,7 +368,7 @@ public class CebBankServiceImpl implements CebBankService {
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         return JSON.parseObject(respData, CebQueryMobileBillVO.class);
-    }*/
+    }
 
     /**
      * @author: Pipi

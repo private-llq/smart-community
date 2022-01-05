@@ -16,6 +16,9 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisConnectionUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -51,7 +54,7 @@ public class RegionTask {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/13
 	**/
-	//TODO 测试阶段 暂时开机启动
+	// TODO 测试阶段 暂时开机启动
 	@PostConstruct
 	public void setRegionToRedis(){
 		logger.info("服务启动任务执行：更新区域表");
@@ -255,7 +258,7 @@ public class RegionTask {
 			e.printStackTrace();
 		}
 		builder.setParameter("output","json");
-		builder.setParameter("key","NZZBZ-L6DCP-GFQDB-V66BW-KN5RH-R7BV7");
+		builder.setParameter("key","NNYBZ-VY3WD-JKV4U-PZWBW-KBG65-KOBIK");
 		HttpGet httpGet = null;
 		try {
 			httpGet = new HttpGet(builder.build());

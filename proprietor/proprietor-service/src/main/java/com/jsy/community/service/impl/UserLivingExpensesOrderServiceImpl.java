@@ -19,7 +19,9 @@ import com.jsy.community.qo.cebbank.CebCreateCashierDeskQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.CebCallbackVO;
 import com.jsy.community.vo.CebCashierDeskVO;
+import com.jsy.community.vo.LivingExpensesOrderListVO;
 import com.zhsj.baseweb.annotation.LoginIgnore;
+import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -75,7 +77,9 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		if (billEntity.getId() != null) {
 			userLivingExpensesOrderEntity.setBillId(billEntity.getId().toString());
 		}
-		userLivingExpensesOrderEntity.setBillAmount(new BigDecimal(billEntity.getBillAmount()));
+		if (StringUtil.isNotBlank(billEntity.getBillAmount())) {
+			userLivingExpensesOrderEntity.setBillAmount(new BigDecimal(billEntity.getBillAmount()));
+		}
 		userLivingExpensesOrderEntity.setPayAmount(billEntity.getPayAmount());
 		userLivingExpensesOrderEntity.setCustomerName(billEntity.getCustomerName());
 		userLivingExpensesOrderEntity.setContactNo(billEntity.getContactNo());
@@ -132,7 +136,7 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 	 * @return: java.util.List<com.jsy.community.entity.UserLivingExpensesOrderEntity>
 	 */
 	@Override
-	public Map<String, List<UserLivingExpensesOrderEntity>> getListOfUserLivingExpensesOrder(UserLivingExpensesOrderEntity userLivingExpensesOrderEntity) {
+	public List<LivingExpensesOrderListVO> getListOfUserLivingExpensesOrder(UserLivingExpensesOrderEntity userLivingExpensesOrderEntity) {
 		
 		QueryWrapper<UserLivingExpensesOrderEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.select("*,DATE_FORMAT(create_time,'%Y-%m') as monthTime");
@@ -152,7 +156,7 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		}
 		List<UserLivingExpensesOrderEntity> userLivingExpensesOrderEntities = userLivingExpensesOrderMapper.selectList(queryWrapper);
 		if (CollectionUtils.isEmpty(userLivingExpensesOrderEntities)) {
-			return new HashMap<>();
+			return new ArrayList<>();
 		}
 		
 		Set<String> accounts = userLivingExpensesOrderEntities.stream().map(UserLivingExpensesOrderEntity::getBillKey).collect(Collectors.toSet());
@@ -164,13 +168,15 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		// 补充数据
 		for (UserLivingExpensesOrderEntity entity : userLivingExpensesOrderEntities) {
 			UserLivingExpensesAccountEntity userLivingExpensesAccountEntity = userLivingExpensesAccountEntityMap.get(entity.getBillKey());
-			// 补充户号
-			entity.setAccount(userLivingExpensesAccountEntity.getAccount());
-			// 补充户主
-			entity.setHouseholder(userLivingExpensesAccountEntity.getHouseholder());
-			// 补充分类名称
-			entity.setTypeName(userLivingExpensesAccountEntity.getTypeName());
-			entity.setTypeId(userLivingExpensesAccountEntity.getTypeId());
+			if (userLivingExpensesAccountEntity != null) {
+				// 补充户号
+				entity.setAccount(userLivingExpensesAccountEntity.getAccount());
+				// 补充户主
+				entity.setHouseholder(userLivingExpensesAccountEntity.getHouseholder());
+				// 补充分类名称
+				entity.setTypeName(userLivingExpensesAccountEntity.getTypeName());
+				entity.setTypeId(userLivingExpensesAccountEntity.getTypeId());
+			}
 		}
 		
 		// 根据月份封装返回数据
@@ -179,10 +185,16 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 				Collectors.mapping(Function.identity(), Collectors.toList())));
 		
 		if (CollectionUtils.isEmpty(resultMaps)) {
-			return new HashMap<>();
+			return new ArrayList<>();
 		}
-		
-		return resultMaps;
+		ArrayList<LivingExpensesOrderListVO> livingExpensesOrderListVOS = new ArrayList<>();
+		for (String key : resultMaps.keySet()) {
+			LivingExpensesOrderListVO vo = new LivingExpensesOrderListVO();
+			vo.setDateString(key);
+			vo.setOrderEntityList(resultMaps.get(key));
+			livingExpensesOrderListVOS.add(vo);
+		}
+		return livingExpensesOrderListVOS;
 	}
 	
 	/**

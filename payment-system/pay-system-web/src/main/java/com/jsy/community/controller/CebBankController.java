@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -118,6 +119,19 @@ public class CebBankController {
         billInfoQO.setFlag("1");
         billInfoQO.setPollingTimes("1");
         return CommonResult.ok(cebBankService.queryBillInfo(billInfoQO));
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 直缴业务直接查询缴费信息
+     * @param cebQueryMobileBillQO:
+     * @return: {@link CommonResult<?>}
+     * @date: 2022/1/4 18:32
+     **/
+    @PostMapping("/v2/queryPaymentInfo")
+    public CommonResult<?> queryPaymentInfo(@RequestBody CebQueryMobileBillQO cebQueryMobileBillQO) {
+        cebQueryMobileBillQO.setSessionId(cebBankService.getCebBankSessionId(cebQueryMobileBillQO.getMobile(), cebQueryMobileBillQO.getDeviceType()));
+        return CommonResult.ok(cebBankService.queryMobileBill(cebQueryMobileBillQO));
     }
 
     /**
