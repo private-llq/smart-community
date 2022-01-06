@@ -48,7 +48,7 @@ public class UserLivingExpensesAccountController {
             throw new JSYException(JSYError.DUPLICATE_KEY);
         }
         Long id = accountService.addAccount(accountEntity);
-        return id == null ? CommonResult.error("添加失败") : CommonResult.ok("添加成功");
+        return id == null ? CommonResult.error("添加失败") : CommonResult.ok(id.toString(), "添加成功");
     }
 
     /**
@@ -84,7 +84,7 @@ public class UserLivingExpensesAccountController {
         if (accountEntity.getId() == null) {
             throw new JSYException("账号ID不能为空");
         }
-        accountEntity.setAccount(UserUtils.getUserId());
+        accountEntity.setUid(UserUtils.getUserId());
         return accountService.deleteAccount(accountEntity) ? CommonResult.ok("删除成功!") : CommonResult.error("删除失败!");
     }
 }

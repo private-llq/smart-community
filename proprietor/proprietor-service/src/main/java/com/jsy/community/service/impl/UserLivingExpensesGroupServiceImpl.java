@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ProprietorException;
@@ -16,9 +17,11 @@ import com.jsy.community.utils.SnowFlake;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import javax.validation.constraints.NotBlank;
 import java.util.*;
 import java.util.function.Function;
@@ -38,6 +41,9 @@ public class UserLivingExpensesGroupServiceImpl extends ServiceImpl<UserLivingEx
     private UserLivingExpensesAccountMapper accountMapper;
     @Autowired
     private UserLivingExpensesBillMapper billMapper;
+
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
 
     /**
      * @param groupEntity :
@@ -136,13 +142,17 @@ public class UserLivingExpensesGroupServiceImpl extends ServiceImpl<UserLivingEx
         queryWrapper.eq("uid", uid);
         List<UserLivingExpensesGroupEntity> userLivingExpensesGroupEntities = groupMapper.selectList(queryWrapper);
         Set<Long> groupIdSet = userLivingExpensesGroupEntities.stream().map(UserLivingExpensesGroupEntity::getId).collect(Collectors.toSet());
+
         if (!CollectionUtils.isEmpty(groupIdSet)) {
             QueryWrapper<UserLivingExpensesAccountEntity> accountEntityQueryWrapper = new QueryWrapper<>();
             accountEntityQueryWrapper.eq("uid", uid);
             accountEntityQueryWrapper.in("group_id", groupIdSet);
             List<UserLivingExpensesAccountEntity> accountEntities = accountMapper.selectList(accountEntityQueryWrapper);
-            Map<String, List<UserLivingExpensesAccountEntity>> accountEntityMap = accountEntities.stream()
-                    .collect(Collectors.groupingBy(UserLivingExpensesAccountEntity::getGroupId,
+            String costIcon = redisTemplate.opsForValue().get("costIcon");
+            Map<Integer, String> map = JSON.parseObject(costIcon, Map.class);
+            Map<String, List<UserLivingExpensesAccountEntity>> accountEntityMap = accountEntities.stream().peek(accountEntity -> {
+                accountEntity.setTypePicUrl(map.get(Integer.valueOf(accountEntity.getTypeId())));
+            }).collect(Collectors.groupingBy(UserLivingExpensesAccountEntity::getGroupId,
                             Collectors.mapping(Function.identity(), Collectors.toList())));
             for (UserLivingExpensesGroupEntity userLivingExpensesGroupEntity : userLivingExpensesGroupEntities) {
                 userLivingExpensesGroupEntity.setAccountEntityList(accountEntityMap.get(String.valueOf(userLivingExpensesGroupEntity.getId())));
