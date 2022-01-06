@@ -29,17 +29,14 @@ public class UserLivingExpensesAccountEntity extends BaseEntity {
     /**
      * 省份ID
      */
-    @NotBlank(message = "省份ID不能为空")
     private String provinceId;
     /**
      * 城市ID
      */
-    @NotBlank(message = "城市ID不能为空")
     private String cityId;
     /**
      * 城市code
      */
-    @NotBlank(message = "城市code不能为空")
     private String cityCode;
     /**
      * 城市名称
@@ -75,6 +72,7 @@ public class UserLivingExpensesAccountEntity extends BaseEntity {
      */
     @NotBlank(message = "缴费类型ID不能为空")
     private String typeId;
+
     /**
      * 分类名称
      */
@@ -108,6 +106,12 @@ public class UserLivingExpensesAccountEntity extends BaseEntity {
     @NotBlank(message = "终端类型不能为空;1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序")
     @TableField(exist = false)
     private String deviceType;
+
+    /**
+     * 类型图标
+     */
+    @TableField(exist = false)
+    private String typePicUrl;
 
     /**
      * 用户手机号

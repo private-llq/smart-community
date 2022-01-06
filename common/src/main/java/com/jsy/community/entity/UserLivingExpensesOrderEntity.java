@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -25,6 +26,10 @@ public class UserLivingExpensesOrderEntity extends BaseEntity {
      * 用户uid
      */
     private String uid;
+    /**
+     * 类型ID
+     */
+    private String typeId;
     /**
      * 项目ID
      */
@@ -109,12 +114,6 @@ public class UserLivingExpensesOrderEntity extends BaseEntity {
      */
     @TableField(exist = false)
     private String householder;
-    
-    /**
-     * 分类名称
-     */
-    @TableField(exist = false)
-    private String typeId;
 
     /**
      * 分类名称

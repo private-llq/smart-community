@@ -18,6 +18,11 @@ import java.math.BigDecimal;
 @TableName("t_user_living_expenses_bill")
 public class UserLivingExpensesBillEntity extends BaseEntity {
     /**
+     * 类型ID
+     */
+    @NotBlank(groups = {AddOrderValidateGroup.class}, message = "类型ID不能为空")
+    private String typeId;
+    /**
      * 项目ID
      */
     @NotBlank(groups = {AddOrderValidateGroup.class}, message = "项目ID不能为空")
@@ -110,6 +115,24 @@ public class UserLivingExpensesBillEntity extends BaseEntity {
     // 手机充值该字段必传1。手机充值时可以不用传filed,qryAcnSsn,contractNo、这些5接口没有返回的值
     @TableField(exist = false)
     private String type;
+
+    /**
+     * 缴费类型图标
+     */
+    @TableField(exist = false)
+    private String typePicUrl;
+
+    /**
+     * 缴费单位
+     */
+    @TableField(exist = false)
+    private String companyName;
+
+    /**
+     * 详细地址
+     */
+    @TableField(exist = false)
+    private String address;
 
     /**
      * 查询账单验证组

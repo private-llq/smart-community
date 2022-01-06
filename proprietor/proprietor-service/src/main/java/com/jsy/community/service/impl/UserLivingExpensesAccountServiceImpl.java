@@ -8,6 +8,8 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserLivingExpensesAccountEntity;
 import com.jsy.community.entity.UserLivingExpensesBillEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
+import com.jsy.community.exception.MsgException;
 import com.jsy.community.mapper.UserLivingExpensesAccountMapper;
 import com.jsy.community.mapper.UserLivingExpensesBillMapper;
 import com.jsy.community.qo.cebbank.CebQueryBillInfoQO;
@@ -110,7 +112,7 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
     public Boolean modifyAccount(UserLivingExpensesAccountEntity accountEntity) {
         UserLivingExpensesAccountEntity recordAccountEntity = queryAccountById(accountEntity);
         if (recordAccountEntity == null) {
-            throw new ProprietorException(JSYError.DATA_LOST);
+            throw new JSYException(JSYError.DATA_LOST);
         }
         if (!accountEntity.getAccount().equals(recordAccountEntity.getAccount()) || !accountEntity.getItemCode().equals(recordAccountEntity.getItemCode())) {
             // 如果户号或者项目有改变,需要重新查询账单信息,同时删除原有未缴费账单
@@ -203,6 +205,7 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
 
                 UserLivingExpensesBillEntity billEntity = new UserLivingExpensesBillEntity();
                 billEntity.setUid(accountEntity.getUid());
+                billEntity.setTypeId(accountEntity.getTypeId());
                 billEntity.setItemId(accountEntity.getItemId());
                 billEntity.setItemCode(accountEntity.getItemCode());
                 billEntity.setBillKey(accountEntity.getAccount());

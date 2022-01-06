@@ -369,7 +369,17 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
     public PropertyFeeRuleEntity selectByOne(Long id) {
         PropertyFeeRuleEntity ruleEntity = propertyFeeRuleMapper.selectById(id);
         if (!Objects.isNull(ruleEntity)) {
-            ruleEntity.setRelevanceIdList(propertyFeeRuleRelevanceMapper.selectFeeRuleList(id));
+            if (ruleEntity.getRelevance() == 1) {
+                // 关联部分
+                ruleEntity.setRelevanceIdList(propertyFeeRuleRelevanceMapper.selectFeeRuleList(id));
+            } else {
+                // 关联全部
+                if (ruleEntity.getRelevanceType() == 1) {
+                    // 房屋
+                } else {
+                    // 车位
+                }
+            }
             return ruleEntity;
         }
         return null;

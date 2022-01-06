@@ -163,7 +163,9 @@ public class CebBankServiceImpl implements CebBankService {
     public CebQueryContributionProjectVO queryContributionProject(CebQueryContributionProjectQO projectQO) {
         HttpResponseModel responseModel = CebBankContributionUtil.queryContributionProject(projectQO);
         if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
-            throw new PaymentException("查询缴费类别下缴费项目失败");
+            log.info("查询缴费类别下缴费项目失败");
+            return null;
+//            throw new PaymentException("查询缴费类别下缴费项目失败");
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         CebQueryContributionProjectVO projectVO = JSON.parseObject(respData, CebQueryContributionProjectVO.class);

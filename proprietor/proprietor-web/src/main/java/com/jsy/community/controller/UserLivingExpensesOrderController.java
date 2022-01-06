@@ -32,6 +32,7 @@ public class UserLivingExpensesOrderController {
      * @return: com.jsy.community.vo.CommonResult
      */
     @PostMapping("/v2/addOrder")
+    @Deprecated
 //    @Permit("community:proprietor:livingExpensesOrder:v2:addOrder")
     public CommonResult addUserLivingExpensesOrder(@RequestBody UserLivingExpensesBillEntity billEntity) {
         ValidatorUtils.validateEntity(UserLivingExpensesBillEntity.AddOrderValidateGroup.class);
