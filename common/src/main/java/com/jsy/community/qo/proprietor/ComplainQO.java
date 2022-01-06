@@ -26,4 +26,9 @@ public class ComplainQO implements Serializable {
     
     @ApiModelProperty(value = "1,投诉，2建议")
     private Integer type;
+    
+    /**
+     * 来源（1.社区 2.商家）
+     */
+    private Integer source;
 }

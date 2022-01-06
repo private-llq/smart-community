@@ -1,10 +1,10 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.entity.ComplainEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.ComplainQO;
+import com.jsy.community.service.AdminException;
 import com.jsy.community.service.IComplainService;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.CommonResult;
@@ -41,6 +41,9 @@ public class ComplainController {
     @PostMapping("/query")
     @Permit("community:admin:complain:query")
     public CommonResult<PageInfo<ComplainEntity>> queryComplain(@RequestBody BaseQO<ComplainQO> baseQO){
+        if (baseQO.getQuery().getSource() == null) {
+            throw new AdminException(JSYError.BAD_REQUEST.getCode(), "请传入来源");
+        }
         return CommonResult.ok(complainService.queryComplain(baseQO));
     }
     

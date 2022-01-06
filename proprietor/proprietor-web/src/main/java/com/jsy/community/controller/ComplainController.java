@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IComplainService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.ComplainEntity;
@@ -10,7 +9,6 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.proprietor.ComplainVO;
-import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -56,6 +54,9 @@ public class ComplainController {
         String userInfo = UserUtils.getUserId();
         complainEntity.setUid(userInfo);
         complainEntity.setCommunityId(complainEntity.getCommunityId());
+        if (complainEntity.getSource() != null) {
+            complainEntity.setSource(complainEntity.getSource());
+        }
         complainEntity.setStatus(0);
         complainEntity.setId(SnowFlake.nextId());
         complainEntity.setComplainTime(LocalDateTime.now());

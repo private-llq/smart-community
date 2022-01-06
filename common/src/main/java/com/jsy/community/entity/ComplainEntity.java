@@ -27,6 +27,8 @@ import java.time.LocalDateTime;
 public class ComplainEntity implements Serializable {
     @ApiModelProperty(value = "投诉建议id")
     private Long id;
+    @TableField(exist = false)
+    private String idStr;
     @ApiModelProperty(value = "编号")
     private String serialNumber;
     @ApiModelProperty(value = "社区id")
@@ -42,6 +44,11 @@ public class ComplainEntity implements Serializable {
     //@NotNull(message = "类型不能为空")
     @ApiModelProperty(value = "类型，1投诉，2建议")
     private Integer type;
+ 
+    /**
+     * 来源（1.社区 2.商家）
+     */
+    private Integer source;
     
     @ApiModelProperty(value = "类型名称，1投诉，2建议")
     @TableField(exist = false)
