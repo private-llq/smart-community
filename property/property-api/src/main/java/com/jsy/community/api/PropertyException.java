@@ -28,7 +28,7 @@ public class PropertyException extends JSYException {
 		super(error);
 	}
 	
-	public PropertyException(ErrorEnum errorEnum) {
+	/*public PropertyException(ErrorEnum errorEnum) {
 		super(errorEnum);
-	}
+	}*/
 }

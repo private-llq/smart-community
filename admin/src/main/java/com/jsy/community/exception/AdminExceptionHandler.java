@@ -8,6 +8,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,9 +20,9 @@ import java.util.Objects;
  * @author ling
  * @since 2020-11-19 11:01
  */
-//@RestControllerAdvice
+@RestControllerAdvice
 @Slf4j
-public class AdminExceptionHandler {
+public class AdminExceptionHandler extends JSYExceptionHandler {
 	
 	private static final Map<String,String> UNI_INDEX_MAP = new HashMap<>();
 	static {

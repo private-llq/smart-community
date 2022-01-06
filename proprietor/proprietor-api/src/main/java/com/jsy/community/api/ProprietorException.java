@@ -25,8 +25,8 @@ public class ProprietorException extends JSYException {
 	public ProprietorException(JSYError error) {
 		super(error);
 	}
-	
-	public ProprietorException(ErrorEnum errorEnum) {
+
+	/*public ProprietorException(ErrorEnum errorEnum) {
 		super(errorEnum);
-	}
+	}*/
 }

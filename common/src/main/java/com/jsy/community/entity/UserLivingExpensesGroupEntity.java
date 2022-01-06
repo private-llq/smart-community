@@ -29,6 +29,11 @@ public class UserLivingExpensesGroupEntity extends BaseEntity {
     private String groupName;
 
     /**
+     * 默认分组;0不是,1是
+     */
+    private Integer isDefault;
+
+    /**
      * 户号列表
      */
     @TableField(exist = false)
