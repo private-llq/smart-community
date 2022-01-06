@@ -9,9 +9,12 @@ import com.jsy.community.api.ProprietorException;
 import com.jsy.community.api.UserLivingExpensesOrderService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.ConstError;
 import com.jsy.community.entity.UserLivingExpensesAccountEntity;
 import com.jsy.community.entity.UserLivingExpensesBillEntity;
 import com.jsy.community.entity.UserLivingExpensesOrderEntity;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.UserLivingExpensesAccountMapper;
 import com.jsy.community.mapper.UserLivingExpensesOrderMapper;
 import com.jsy.community.qo.cebbank.CebBillQueryResultDataModelQO;
@@ -71,6 +74,7 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		userLivingExpensesOrderEntity.setId(SnowFlake.nextId());
 		// 添加本地订单数据
 		userLivingExpensesOrderEntity.setUid(billEntity.getUid());
+		userLivingExpensesOrderEntity.setTypeId(billEntity.getTypeId());
 		userLivingExpensesOrderEntity.setItemId(billEntity.getItemId());
 		userLivingExpensesOrderEntity.setItemCode(billEntity.getItemCode());
 		userLivingExpensesOrderEntity.setBillKey(billEntity.getBillKey());
@@ -208,16 +212,18 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 	public UserLivingExpensesOrderEntity getById(Long id) {
 		UserLivingExpensesOrderEntity userLivingExpensesOrderEntity = userLivingExpensesOrderMapper.selectById(id);
 		if (userLivingExpensesOrderEntity == null) {
-			throw new ProprietorException("未找到生活缴费记录");
+			throw new JSYException("未找到生活缴费记录");
 		}
 		// 补充返回字段
 		UserLivingExpensesAccountEntity account = accountMapper.selectOne(new QueryWrapper<UserLivingExpensesAccountEntity>().eq("account", userLivingExpensesOrderEntity.getBillKey()));
+		if (account != null) {
+			// 户主
+			userLivingExpensesOrderEntity.setHouseholder(account.getHouseholder());
+			// 缴费单位
+			userLivingExpensesOrderEntity.setCompany(account.getCompany());
+		}
 		// 缴费状态
 		userLivingExpensesOrderEntity.setOrderStatusName(BusinessEnum.CebbankOrderStatusEnum.cebbankOrderStatusMap.get(userLivingExpensesOrderEntity.getOrderStatus()));
-		// 户主
-		userLivingExpensesOrderEntity.setHouseholder(account.getHouseholder());
-		// 缴费单位
-		userLivingExpensesOrderEntity.setCompany(account.getCompany());
 		return userLivingExpensesOrderEntity;
 	}
 
