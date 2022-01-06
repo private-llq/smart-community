@@ -6,7 +6,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 /**
@@ -20,7 +20,8 @@ import java.io.Serializable;
 public class AddPasswordQO implements Serializable {
 	@ApiModelProperty("密码")
 	@NotBlank(groups = {passwordVGroup.class,passwordUpdateGroup.class},message = "密码不能为空")
-	@Length(groups = {passwordVGroup.class,passwordUpdateGroup.class},min = 8, max = 30, message = "密码长度8-30")
+//	@Length(groups = {passwordVGroup.class,passwordUpdateGroup.class},min = 8, max = 30, message = "密码长度8-30")
+	@Pattern(groups = {passwordVGroup.class,passwordUpdateGroup.class}, regexp = "^(?=.*[A-Z0-9])(?=.*[a-z0-9])(?=.*[a-zA-Z])(.{6,12})$", message = "请输入一个正确的6-12位密码,至少包含大写字母或小写字母或数字两种!")
 	private String password;
 	
 	@ApiModelProperty("确认密码")

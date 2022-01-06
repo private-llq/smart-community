@@ -726,17 +726,16 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 * @Date: 2021/10/13
 	 */
 	public void deleteOperator(Long id) {
-//		AdminUserEntity adminUserEntity = adminUserMapper.selectOne(new QueryWrapper<AdminUserEntity>().eq("id", id));
-//		if (adminUserEntity == null) {
-//			throw new PropertyException(JSYError.OPERATOR_INFORMATION_NOT_OBTAINED.getCode(),"未获取到操作员信息");
-//		}
-//		int i = adminUserMapper.deleteById(id);
-//		if (i != 1) {
-//			throw new PropertyException(JSYError.INTERNAL.getCode(),"删除失败");
-//		}
-		baseAuthRpcService.cancellation(id);
+		List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(id, BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
+		// 移除用户角色绑定关系
+		Set<Long> roleIds = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
+		baseRoleRpcService.roleRemoveToUser(roleIds, id);
+		// 移除登录类型范围
+		baseAuthRpcService.removeLoginTypeScope(id, BusinessConst.PROPERTY_ADMIN, false);
+		baseAuthRpcService.removeLoginTypeScope(id, BusinessConst.COMMUNITY_ADMIN, false);
+//		baseAuthRpcService.cancellation(id);
 		// 删除的同时也要删除用户和物业公司绑定关系
-		adminUserCompanyMapper.delete(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", id).eq("deleted", 0));
+		adminUserCompanyMapper.delete(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", id));
 	}
 	
 //	/**

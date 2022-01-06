@@ -5,8 +5,8 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
   servlet:
     multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
+      max-file-size: 200MB
+      max-request-size: 200MB
       enabled: true
   redis:
     port: 6379

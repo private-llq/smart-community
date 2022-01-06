@@ -51,6 +51,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 /**
@@ -501,7 +502,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	 * @Date: 2021/10/13
 	 */
 	public void deleteOperator(Long id) {
-		baseAuthRpcService.cancellation(id);
+		List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(id, BusinessConst.ULTIMATE_ADMIN);
+		// 移除用户角色绑定关系
+		Set<Long> roleIds = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
+		baseRoleRpcService.roleRemoveToUser(roleIds, id);
+		// 移除登录类型范围
+		baseAuthRpcService.removeLoginTypeScope(id, BusinessConst.ULTIMATE_ADMIN, false);
+//		baseAuthRpcService.cancellation(id);
 	}
 	
 	/**

@@ -127,9 +127,9 @@ public interface AssetLeaseRecordService extends IService<AssetLeaseRecordEntity
     /**
      * @Description: 根据资产id查询对应的合同编号
      * @author: DKS
-     * @since: 2022/1/5 17:09
+     * @since: 2022/1/6 9:31
      * @Param: [assetId]
-     * @return: java.util.Map<java.lang.Long,java.lang.String>
+     * @return: java.util.Map<java.lang.Long,java.util.List<java.lang.String>>
      */
-    Map<Long, String> queryConIdList(Collection<?> assetId);
+    Map<Long, List<String>> queryConIdList(Collection<?> assetId);
 }

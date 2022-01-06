@@ -10,7 +10,6 @@ import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
-import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
@@ -239,7 +238,7 @@ public class AdminUserController {
 	@businessLog(operation = "新增",content = "新增了【操作员】")
 	@Permit("community:property:sys:user")
 	public CommonResult addOperator(@RequestBody AdminUserQO adminUserQO){
-		ValidatorUtils.validateEntity(adminUserQO,AdminUserEntity.addOperatorValidatedGroup.class);
+		ValidatorUtils.validateEntity(adminUserQO);
 		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
 			//验证社区权限
 			UserUtils.validateCommunityIds(adminUserQO.getCommunityIdList());
@@ -261,6 +260,7 @@ public class AdminUserController {
 	@businessLog(operation = "编辑",content = "更新了【操作员】")
 	@Permit("community:property:sys:user")
 	public CommonResult updateOperator(@RequestBody AdminUserQO adminUserQO){
+		ValidatorUtils.validateEntity(adminUserQO);
 		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
 			//验证社区权限
 			UserUtils.validateCommunityIds(adminUserQO.getCommunityIdList());

@@ -13,8 +13,8 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
   servlet:
     multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
+      max-file-size: 200MB
+      max-request-size: 200MB
       enabled: true
   thymeleaf:
     prefix: classpath:/templates/
@@ -195,8 +195,8 @@ dubbo:
     threads: 50
   application:
     name: ${spring.application.name}
-#  cloud:
-#    subscribed-services: property-service
+  cloud:
+    subscribed-services: property-service,lease-service
   consumer:
     retries: 0
     timeout: 99999

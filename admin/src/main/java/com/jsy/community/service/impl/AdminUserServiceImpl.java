@@ -15,6 +15,7 @@ import com.jsy.community.service.IAdminUserService;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.SnowFlake;
 import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.PermitRole;
 import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import com.zhsj.base.api.rpc.IBaseRoleRpcService;
@@ -114,6 +115,8 @@ public class AdminUserServiceImpl implements IAdminUserService {
 				PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(entity.getCompanyId());
 				if (companyEntity != null) {
 					adminUserEntity.setCompanyName(companyEntity.getName());
+					adminUserEntity.setCommunityId(companyEntity.getId());
+					adminUserEntity.setCompanyIdStr(String.valueOf(companyEntity.getId()));
 				}
 			}
 			adminUserEntity.setId(userDetail.getId());
@@ -199,8 +202,15 @@ public class AdminUserServiceImpl implements IAdminUserService {
 	 */
 	@Override
 	public void deleteOperator(Long id) {
-		baseAuthRpcService.cancellation(id);
+		List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(id, BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
+		// 移除用户角色绑定关系
+		Set<Long> roleIds = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
+		baseRoleRpcService.roleRemoveToUser(roleIds, id);
+		// 移除登录类型范围
+		baseAuthRpcService.removeLoginTypeScope(id, BusinessConst.PROPERTY_ADMIN, false);
+		baseAuthRpcService.removeLoginTypeScope(id, BusinessConst.COMMUNITY_ADMIN, false);
+//		baseAuthRpcService.cancellation(id);
 		// 删除的同时也要删除用户和物业公司绑定关系
-		adminUserCompanyMapper.delete(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", id).eq("deleted", 0));
+		adminUserCompanyMapper.delete(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", id));
 	}
 }

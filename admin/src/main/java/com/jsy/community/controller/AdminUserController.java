@@ -5,6 +5,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.service.IAdminUserService;
 import com.jsy.community.utils.UserUtils;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
@@ -56,6 +57,7 @@ public class AdminUserController {
 	@businessLog(operation = "新增",content = "新增了【账号管理】")
 	@Permit("community:admin:account:insert")
 	public CommonResult addOperator(@RequestBody AdminUserQO adminUserQO){
+		ValidatorUtils.validateEntity(adminUserQO);
 		Integer integer = adminUserService.addOperator(adminUserQO);
 		return CommonResult.ok(integer == 1 ? "添加成功" : "请使用原账号的密码登录");
 	}
@@ -71,6 +73,7 @@ public class AdminUserController {
 	@businessLog(operation = "编辑",content = "更新了【账号管理】")
 	@Permit("community:admin:account:update")
 	public CommonResult updateOperator(@RequestBody AdminUserQO adminUserQO){
+		ValidatorUtils.validateEntity(adminUserQO);
 		adminUserService.updateOperator(adminUserQO);
 		return CommonResult.ok("操作成功");
 	}

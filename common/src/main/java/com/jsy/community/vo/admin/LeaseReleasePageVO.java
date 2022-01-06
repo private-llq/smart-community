@@ -10,6 +10,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class LeaseReleasePageVO implements Serializable {
@@ -52,5 +53,5 @@ public class LeaseReleasePageVO implements Serializable {
     /**
      * 合同Id
      */
-    private String conId;
+    private List<String> conId;
 }

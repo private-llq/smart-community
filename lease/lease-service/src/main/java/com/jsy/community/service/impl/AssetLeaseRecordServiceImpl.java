@@ -1952,13 +1952,18 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     /**
      * @Description: 根据资产id查询对应的合同编号
      * @author: DKS
-     * @since: 2022/1/5 17:09
+     * @since: 2022/1/6 9:31
      * @Param: [assetId]
-     * @return: java.util.Map<java.lang.Long,java.lang.String>
+     * @return: java.util.Map<java.lang.Long,java.util.List<java.lang.String>>
      */
     @Override
-    public Map<Long, String> queryConIdList(Collection<?> assetId) {
+    public Map<Long, List<String>> queryConIdList(Collection<?> assetId) {
         List<AssetLeaseRecordEntity> entities = assetLeaseRecordMapper.selectList(new QueryWrapper<AssetLeaseRecordEntity>().in("asset_id", assetId));
-        return entities.stream().collect(Collectors.toMap(AssetLeaseRecordEntity::getAssetId, AssetLeaseRecordEntity::getConId));
+        if (entities == null) {
+            return new HashMap<>();
+        }
+        return entities.stream().filter(assetLeaseRecordEntity -> StringUtils.isNotBlank(assetLeaseRecordEntity.getConId()))
+            .collect(Collectors.groupingBy(AssetLeaseRecordEntity::getAssetId,
+            Collectors.mapping(AssetLeaseRecordEntity::getConId, Collectors.toList())));
     }
 }

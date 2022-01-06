@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
@@ -8,7 +7,6 @@ import com.jsy.community.service.HouseExcelHandler;
 import com.jsy.community.service.IHouseService;
 import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
@@ -74,7 +72,7 @@ public class HouseController {
 	@PostMapping("/downloadHouseList")
 	@Permit("community:admin:house:downloadHouseList")
 	public ResponseEntity<byte[]> downloadOrderList(@RequestBody HouseQO houseQO) {
-		houseQO.setCommunityId(UserUtils.getAdminCommunityId());
+//		houseQO.setCommunityId(UserUtils.getAdminCommunityId());
 		List<HouseEntity> houseEntities = houseService.queryExportHouseExcel(houseQO);
 		//设置excel 响应头信息
 		MultiValueMap<String, String> multiValueMap = new HttpHeaders();

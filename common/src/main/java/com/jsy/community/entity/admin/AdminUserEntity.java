@@ -240,6 +240,12 @@ public class AdminUserEntity extends BaseEntity {
 	private String communityRoleId;
 	
 	/**
+	 * 公司idStr
+	 */
+	@TableField(exist = false)
+	private String companyIdStr;
+	
+	/**
 	 * 注册邀请传参验证
 	 */
 	public interface inviteUserValidatedGroup{}

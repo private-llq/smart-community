@@ -23,6 +23,7 @@ import com.jsy.community.vo.admin.LeaseReleasePageVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -73,8 +74,7 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
         // 资产Id列表
         List<Long> assetId = records.stream().map(LeaseReleasePageVO::getId).collect(Collectors.toList());
         // 根据资产id查询对应的合同编号
-        Map<Long, String> assetIdAndConIdMap = assetLeaseRecordService.queryConIdList(assetId);
-        
+        Map<Long, List<String>> assetIdAndConIdMap = assetLeaseRecordService.queryConIdList(assetId);
         // 填充额外信息
         records.stream().peek(r -> {
             // 填充小区信息
@@ -85,7 +85,9 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
                 }
             }
             r.setIdStr(String.valueOf(r.getId()));
-            r.setConId(assetIdAndConIdMap.get(r.getId()));
+            if (!CollectionUtils.isEmpty(assetIdAndConIdMap)) {
+                r.setConId(assetIdAndConIdMap.get(r.getId()));
+            }
             // 填充租赁状态
             r.setLeaseStatus(leaseStatus(r.getTLeaseStatus()));
         }).collect(Collectors.toList());
