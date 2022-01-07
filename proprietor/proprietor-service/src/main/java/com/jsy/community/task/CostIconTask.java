@@ -42,7 +42,7 @@ public class CostIconTask {
         QueryWrapper<LivingExpensesTypeEntity> queryWrapper = new QueryWrapper<>();
         List<LivingExpensesTypeEntity> livingExpensesTypeEntities = typeMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(livingExpensesTypeEntities)) {
-            Map<Long, String> map = livingExpensesTypeEntities.stream().collect(Collectors.toMap(LivingExpensesTypeEntity::getId, LivingExpensesTypeEntity::getTypeName));
+            Map<Long, String> map = livingExpensesTypeEntities.stream().collect(Collectors.toMap(LivingExpensesTypeEntity::getId, LivingExpensesTypeEntity::getPicUrl));
             redisTemplate.opsForValue().set("costIcon", JSON.toJSONString(map));
         }
     }

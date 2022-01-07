@@ -32,7 +32,7 @@ public enum JSYError {
 
 	// 支付模块
 	THIRD_FAILED(46001, "第三方服务调用失败!"),
-	THIRD_QUERY_FAILED(46002, "查询失败!"),
+	THIRD_QUERY_FAILED(46002, "第三方查询失败!"),
 	DESK_CREATE_ERROR(46003, "收银台失败!"),
 
 	// 租赁模块

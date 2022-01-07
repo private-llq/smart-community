@@ -3,9 +3,12 @@ package com.jsy.community.untils.cebbank;
 import com.google.gson.Gson;
 import com.jsy.community.config.service.CebBankEntity;
 import com.jsy.community.constant.CebBankConst;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.cebbank.*;
 import com.jsy.community.qo.unionpay.HttpResponseModel;
 import com.jsy.community.vo.cebbank.test.HttpRequestModel;
+import com.zhsj.basecommon.exception.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -199,7 +202,7 @@ public class CebBankContributionUtil {
                     return httpResponseModel;
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         log.info("发生异常,返回null");
@@ -213,20 +216,27 @@ public class CebBankContributionUtil {
      * @return: java.lang.Boolean
      * @date: 2021/11/11 15:08
      **/
-    public static Boolean verifyhttpResonse(HttpResponseModel httpResponseModel) throws IOException {
+    public static Boolean verifyhttpResonse(HttpResponseModel httpResponseModel){
         String respData = httpResponseModel.getRespData();
         String respCode = httpResponseModel.getRespCode();
         String respMsg = httpResponseModel.getRespMsg();
         String signature = httpResponseModel.getSignature();
-
+        if ("100".equals(respCode) || "2000".equals(respCode)) {
+            throw new JSYException(46001, respMsg);
+        }
         byte[] decodeBase64 = Base64.decodeBase64(respData);
-        String respData_json = new String(decodeBase64);
+        String respData_json = null;
+        String content = new String();
+        if (decodeBase64 != null) {
+            respData_json = new String(decodeBase64);
+            content = respCode + respMsg + respData_json;
+        } else {
+            content = respCode+respMsg;
+        }
         log.info("返回应答，respCode={}", respCode);
         log.info("返回应答，respMsg={}", respMsg);
         log.info("返回应答，signature={}", signature);
         log.info("返回应答，respData={}", respData_json);
-
-        String content = respCode+respMsg+respData_json;
         //验签
         return VerifyUtil.verify(CebBankEntity.cebBankPublicKey, signature, content, "utf-8");
     }
