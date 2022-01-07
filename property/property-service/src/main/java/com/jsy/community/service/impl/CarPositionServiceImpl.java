@@ -25,6 +25,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.management.JMException;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -301,11 +302,21 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
     }
 
     @Override
+    @Transactional
     public Boolean updateCarPosition(UpdateCarPositionQO qo) {
+        CarPositionEntity carPositionEntity1 = carPositionMapper.selectById(qo.getId());
 
+        QueryWrapper<CarPositionEntity> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("community_id",carPositionEntity1.getCommunityId());
+            queryWrapper.eq("car_position",qo.getCarPosition());
+        List<CarPositionEntity> list = carPositionMapper.selectList(queryWrapper);
+        if (list.size()>0) {
+            throw  new PropertyException(500,"车位号已存在");
+        }
 
         CarPositionEntity carPositionEntity = new CarPositionEntity();
         BeanUtils.copyProperties(qo, carPositionEntity);
+
         int i = carPositionMapper.updateById(carPositionEntity);
         if (i > 0) {
             return true;
