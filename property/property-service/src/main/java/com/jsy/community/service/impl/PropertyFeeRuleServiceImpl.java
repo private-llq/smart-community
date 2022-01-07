@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @program: com.jsy.community
@@ -375,9 +376,15 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
             } else {
                 // 关联全部
                 if (ruleEntity.getRelevanceType() == 1) {
-                    // 房屋
+                    // 查询小区所有房屋
+                    List<HouseEntity> allHouse = houseMapper.getAllHouse(ruleEntity.getCommunityId());
+                    List<String> houseId = allHouse.stream().map(houseEntity -> houseEntity.getId() + "").collect(Collectors.toList());
+                    ruleEntity.setRelevanceIdList(houseId);
                 } else {
-                    // 车位
+                    // 查询小区所有车位
+                    List<CarPositionEntity> allCarPositionByCommunity = carPositionMapper.getAllCarPositionByCommunity(ruleEntity.getCommunityId());
+                    List<String> positionId = allCarPositionByCommunity.stream().map(carPositionEntity -> carPositionEntity.getId() + "").collect(Collectors.toList());
+                    ruleEntity.setRelevanceIdList(positionId);
                 }
             }
             return ruleEntity;

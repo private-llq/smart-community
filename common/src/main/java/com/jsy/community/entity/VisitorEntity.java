@@ -71,7 +71,7 @@ public class VisitorEntity extends BaseEntity {
     private LocalDateTime endTime;
 
     @ApiModelProperty(value = "来访人联系方式")
-    @Pattern(regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
+    @Pattern(groups = {addVisitorValidate.class}, regexp = "^1[3|4|5|6|7|8|9][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
     @NotBlank(groups = {addVisitorValidate.class}, message = "缺少来访人联系方式")
     private String contact;
 

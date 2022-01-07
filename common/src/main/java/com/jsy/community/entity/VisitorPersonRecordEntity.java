@@ -32,7 +32,7 @@ public class VisitorPersonRecordEntity extends BaseEntity implements Serializabl
     private String name;
     
     @ApiModelProperty(value = "随行人员手机号")
-    @Pattern(regexp = "^1[3|4|5|7|8][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
+    @Pattern(regexp = "^1[3|4|5|6|7|8|9][0-9]{9}$", message = "请输入一个正确的手机号码 电信丨联通丨移动!")
     private String mobile;
     
 }

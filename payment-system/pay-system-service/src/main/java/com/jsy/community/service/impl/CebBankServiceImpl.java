@@ -6,6 +6,7 @@ import com.jsy.community.api.PaymentException;
 import com.jsy.community.config.service.CebBankEntity;
 import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.cebbank.*;
 import com.jsy.community.qo.unionpay.HttpResponseModel;
 import com.jsy.community.untils.cebbank.CebBankContributionUtil;
@@ -350,7 +351,7 @@ public class CebBankServiceImpl implements CebBankService {
             }
         }
         if (responseModel == null || (!CebBankEntity.successCode.equals(responseModel.getRespCode()) && !"1002".equals(responseModel.getRespCode()))) {
-            throw new PaymentException(JSYError.THIRD_QUERY_FAILED);
+            throw new JSYException(JSYError.THIRD_QUERY_FAILED);
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         return JSON.parseObject(respData, CebQueryBillInfoVO.class);
