@@ -824,6 +824,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         List<PropertyFinanceFormEntity> propertyFinanceFormEntityList = new LinkedList<>();
         // 押金查询
         QueryWrapper<PropertyDepositEntity> DepositWrapper = new QueryWrapper<>();
+        DepositWrapper.ne("status", 1);
         if (qo.getStartTime() != null) {
             DepositWrapper.ge("create_time", qo.getStartTime());
         }

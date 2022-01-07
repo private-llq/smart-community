@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @program: com.jsy.community
@@ -72,6 +73,8 @@ public class ComplainEntity implements Serializable {
     private LocalDateTime updateTime;
     @ApiModelProperty(value = "图片地址")
     private String images;
+    @TableField(exist = false)
+    private List<String> imageList;
     @ApiModelProperty(value = "投诉人")
     private String uid;
     @ApiModelProperty(value = "投诉时间")

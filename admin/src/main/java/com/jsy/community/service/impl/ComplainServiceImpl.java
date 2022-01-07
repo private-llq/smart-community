@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @program: com.jsy.community
@@ -55,6 +57,9 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
             // 补充类型名称
             complainEntity.setTypeName(complainEntity.getType() == 1 ? "投诉" : "建议");
             complainEntity.setIdStr(String.valueOf(complainEntity.getId()));
+            List<String> imageList = new ArrayList<>();
+            imageList.add(complainEntity.getImages());
+            complainEntity.setImageList(imageList);
         }
         PageInfo<ComplainEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(pageData, pageInfo);
