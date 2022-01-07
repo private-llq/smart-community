@@ -460,8 +460,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 			// 手机号是否已经注册
 			if (e.getErrorEnum().getCode() == 103) {
 				userDetail = new UserDetail();
-				Set<Long> uid = userInfoRpcService.queryRealUserDetailByUid(sysUserQO.getPhone(), "");
-				userDetail.setId(uid.iterator().next());
+				userDetail.setId(userInfoRpcService.getUserDetailByPhone(sysUserQO.getPhone()).getId());
 				result = 2;
 			}
 		}

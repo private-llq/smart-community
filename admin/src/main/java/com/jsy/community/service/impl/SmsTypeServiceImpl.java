@@ -2,13 +2,16 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.entity.SmsTemplateEntity;
 import com.jsy.community.entity.SmsTypeEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.SmsTemplateMapper;
 import com.jsy.community.mapper.SmsTypeMapper;
 import com.jsy.community.service.AdminException;
 import com.jsy.community.service.ISmsTypeService;
 import com.jsy.community.utils.SnowFlake;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -60,19 +63,17 @@ public class SmsTypeServiceImpl extends ServiceImpl<SmsTypeMapper, SmsTypeEntity
      * @return: boolean
      */
     @Override
-    public boolean deleteSmsType(Long id) {
-        SmsTypeEntity smsTypeEntity = smsTypeMapper.selectById(id);
-        // 根据短信分类id查询是否存在短信模板
-        if (smsTypeEntity != null) {
-            Integer integer = smsTemplateMapper.selectSmsTemplateBySmsTypeId(smsTypeEntity.getId());
-            if (integer > 0) {
-                throw new AdminException("存在短信模板的分类无法被删除");
-            } else {
-                return smsTypeMapper.deleteById(id) == 1;
-            }
-        } else {
-            throw new AdminException("不存在该短信分类");
+    public boolean deleteSmsType(List<Long> id) {
+        List<SmsTypeEntity> smsTypeEntities = smsTypeMapper.selectList(new QueryWrapper<SmsTypeEntity>().in("id", id));
+        if (CollectionUtils.isEmpty(smsTypeEntities)) {
+            throw new AdminException(JSYError.SMS_TYPE_LOST);
         }
+        List<SmsTemplateEntity> smsTemplateEntities = smsTemplateMapper.selectList(new QueryWrapper<SmsTemplateEntity>().in("sms_type_id", id));
+        // 根据短信分类id查询是否存在短信模板
+        if (!CollectionUtils.isEmpty(smsTemplateEntities)) {
+            throw new AdminException(JSYError.SMS_TYPE_DUPLICATE);
+        }
+        return smsTypeMapper.deleteBatchIds(id) >= 1;
     }
     
     /**

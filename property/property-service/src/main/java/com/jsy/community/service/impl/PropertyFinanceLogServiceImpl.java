@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyFinanceLogService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.FinanceLogEntity;
-import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.mapper.PropertyFinanceLogMapper;
 import com.jsy.community.qo.BaseQO;
@@ -15,7 +14,11 @@ import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealUserDetail;
+import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.PageVO;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -23,7 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author DKS
@@ -66,16 +71,14 @@ public class PropertyFinanceLogServiceImpl extends ServiceImpl<PropertyFinanceLo
 		MyPageUtils.setPageAndSize(page, baseQO);
 		QueryWrapper<FinanceLogEntity> queryWrapper = new QueryWrapper<>();
 		// 查小区
-		if (query.getCommunityId() != null) {
-			queryWrapper.eq("community_id", query.getCommunityId());
-		}
+		queryWrapper.eq("community_id", query.getCommunityId());
 		
 		// 模糊查询用户名
-		if (query.getUserName() != null) {
-			// TODO: 2021/12/23 等待刘金荣解决
-			Set<String> strings = baseUserInfoRpcService.queryRealUserDetail(null, query.getUserName());
-			if (strings.size() > 0) {
-				queryWrapper.in("user_id", strings);
+		if (StringUtils.isNotBlank(query.getUserName())) {
+			PageVO<UserDetail> pageVO = baseUserInfoRpcService.queryUser("", query.getUserName(), 0, 9999);
+			Set<Long> uid = pageVO.getData().stream().map(UserDetail::getId).collect(Collectors.toSet());
+			if (uid.size() > 0) {
+				queryWrapper.in("user_id", uid);
 			} else {
 				queryWrapper.eq("user_id", 0);
 			}
@@ -92,10 +95,14 @@ public class PropertyFinanceLogServiceImpl extends ServiceImpl<PropertyFinanceLo
 		if (CollectionUtils.isEmpty(pageData.getRecords())) {
 			return new PageInfo<>();
 		}
+		Set<String> userIds = pageData.getRecords().stream().map(FinanceLogEntity::getUserId).collect(Collectors.toSet());
+		Set<Long> userId = userIds.stream().map(Long::parseLong).collect(Collectors.toSet());
+		List<RealUserDetail> realUserDetailsByUid = baseUserInfoRpcService.getRealUserDetailsByUid(userId);
+		Map<Long, String> uIdMaps = realUserDetailsByUid.stream().collect(Collectors.toMap(RealUserDetail::getId, RealUserDetail::getNickName));
+		
 		// 补充用户名
 		for (FinanceLogEntity entity : pageData.getRecords()) {
-			AdminUserEntity adminUserEntity = adminUserMapper.queryByUid(entity.getUserId());
-			entity.setUserName(adminUserEntity.getRealName());
+			entity.setUserName(uIdMaps.get(Long.parseLong(entity.getUserId())));
 		}
 		
 		PageInfo<FinanceLogEntity> pageInfo = new PageInfo<>();

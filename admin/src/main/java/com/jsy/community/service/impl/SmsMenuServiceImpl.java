@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.entity.SmsMenuEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.SmsMenuMapper;
 import com.jsy.community.service.AdminException;
 import com.jsy.community.service.ISmsMenuService;
@@ -95,13 +96,12 @@ public class SmsMenuServiceImpl extends ServiceImpl<SmsMenuMapper, SmsMenuEntity
      * @return: boolean
      */
     @Override
-    public boolean deleteSmsMenu(Long id) {
-        SmsMenuEntity smsMenuEntity = smsMenuMapper.selectById(id);
-        if (smsMenuEntity != null) {
-            return smsMenuMapper.deleteById(id) == 1;
-        } else {
-            throw new AdminException("不存在该短信套餐");
+    public boolean deleteSmsMenu(List<Long> id) {
+        List<SmsMenuEntity> smsMenuEntities = smsMenuMapper.selectList(new QueryWrapper<SmsMenuEntity>().in("id", id));
+        if (CollectionUtils.isEmpty(smsMenuEntities)) {
+            throw new AdminException(JSYError.SMS_MENU_LOST);
         }
+        return smsMenuMapper.deleteBatchIds(id) >= 1;
     }
     
     /**

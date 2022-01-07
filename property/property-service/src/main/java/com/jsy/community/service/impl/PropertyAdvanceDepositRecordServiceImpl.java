@@ -3,6 +3,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.jsy.community.api.IPropertyAdvanceDepositRecordService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseEntity;
@@ -61,6 +62,7 @@ public class PropertyAdvanceDepositRecordServiceImpl extends ServiceImpl<Propert
 	 * @Date: 2021/08/12
 	 **/
     @Override
+    @LcnTransaction
     public boolean addPropertyAdvanceDepositRecord(PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity){
 	    int row;
 //	    //根据预存款id查询是否新增

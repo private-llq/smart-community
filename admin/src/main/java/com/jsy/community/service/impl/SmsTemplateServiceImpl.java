@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.entity.SmsTemplateEntity;
+import com.jsy.community.entity.SmsTypeEntity;
 import com.jsy.community.mapper.SmsTemplateMapper;
 import com.jsy.community.mapper.SmsTypeMapper;
 import com.jsy.community.qo.BaseQO;
@@ -20,6 +21,9 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @Description: 短信模板
@@ -86,7 +90,20 @@ public class SmsTemplateServiceImpl extends ServiceImpl<SmsTemplateMapper, SmsTe
      */
     @Override
     public List<SmsTemplateEntity> selectSmsTemplate() {
-        return smsTemplateMapper.selectList(new QueryWrapper<SmsTemplateEntity>().eq("deleted", 0));
+        List<SmsTemplateEntity> smsTemplateEntities = smsTemplateMapper.selectList(new QueryWrapper<SmsTemplateEntity>().eq("deleted", 0));
+        // 查询短信分类信息
+        Set<Long> smsTypeIds = smsTemplateEntities.stream().map(SmsTemplateEntity::getSmsTypeId).collect(Collectors.toSet());
+        List<SmsTypeEntity> smsTypeEntities = smsTypeMapper.selectList(new QueryWrapper<SmsTypeEntity>().in("id", smsTypeIds));
+        Map<Long, String> smsTypeMap = smsTypeEntities.stream().collect(Collectors.toMap(SmsTypeEntity::getId, SmsTypeEntity::getName));
+    
+        smsTemplateEntities.stream().peek(s -> {
+            // 填充idStr
+            s.setSmsTypeIdStr(String.valueOf(s.getId()));
+            // 填充分类名称
+            s.setSmsTypeIdName(smsTypeMap.get(s.getSmsTypeId()));
+        }).collect(Collectors.toList());
+        
+        return smsTemplateEntities;
     }
     
     /**

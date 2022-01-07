@@ -1,13 +1,12 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.LeaseReleasePageQO;
 import com.jsy.community.service.LeaseReleaseService;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.LeaseReleaseInfoVO;
-import com.jsy.community.vo.admin.LeaseReleasePageVO;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +28,7 @@ public class LeaseReleaseController {
     @ApiOperation("商铺和房屋租赁信息发布列表")
     @PostMapping("/release/page")
     @Permit("community:admin:application:lease:release:page")
-    public CommonResult<PageInfo<LeaseReleasePageVO>> queryLeaseReleasePage(@RequestBody BaseQO<LeaseReleasePageQO> baseQO) {
+    public CommonResult<PageInfo<AssetLeaseRecordEntity>> queryLeaseReleasePage(@RequestBody BaseQO<LeaseReleasePageQO> baseQO) {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new LeaseReleasePageQO());
         }

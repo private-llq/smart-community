@@ -172,7 +172,7 @@ public class SmsController {
      */
     @DeleteMapping("/type/delete")
     @Permit("community:admin:sms:type:delete")
-    public CommonResult deleteSmsType(@RequestParam("id") Long id){
+    public CommonResult deleteSmsType(@RequestParam("id") List<Long> id){
         return CommonResult.ok(smsTypeService.deleteSmsType(id) ? "删除成功" : "删除失败");
     }
     
@@ -291,7 +291,7 @@ public class SmsController {
      */
     @DeleteMapping("/menu/delete")
     @Permit("community:admin:sms:menu:delete")
-    public CommonResult deleteSmsMenu(@RequestParam("id") Long id){
+    public CommonResult deleteSmsMenu(@RequestParam("id") List<Long> id){
         return CommonResult.ok(smsMenuService.deleteSmsMenu(id) ? "删除成功" : "删除失败");
     }
     

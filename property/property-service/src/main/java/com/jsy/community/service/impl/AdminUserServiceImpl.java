@@ -598,8 +598,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			// 手机号是否已经注册
 			if (e.getErrorEnum().getCode() == 103) {
 				userDetail = new UserDetail();
-				Set<Long> uid = userInfoRpcService.queryRealUserDetailByUid(adminUserQO.getMobile(), "");
-				userDetail.setId(uid.iterator().next());
+				userDetail.setId(userInfoRpcService.getUserDetailByPhone(adminUserQO.getMobile()).getId());
 				result = 2;
 			}
 		}

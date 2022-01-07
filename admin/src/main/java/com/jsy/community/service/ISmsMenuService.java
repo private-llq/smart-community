@@ -36,7 +36,7 @@ public interface ISmsMenuService extends IService<SmsMenuEntity>{
      * @Param: [id]
      * @return: boolean
      */
-    boolean deleteSmsMenu(Long id);
+    boolean deleteSmsMenu(List<Long> id);
     
     /**
      * @Description: 查询短信套餐列表

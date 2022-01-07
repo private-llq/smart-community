@@ -36,7 +36,7 @@ public interface ISmsTypeService extends IService<SmsTypeEntity>{
      * @Param: [id]
      * @return: boolean
      */
-    boolean deleteSmsType(Long id);
+    boolean deleteSmsType(List<Long> id);
     
     /**
      * @Description: 查询短信分类列表

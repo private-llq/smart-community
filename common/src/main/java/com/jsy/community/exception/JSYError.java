@@ -42,7 +42,9 @@ public enum JSYError {
 	// 物业模块
 
 	// 大后台模块
-
+	SMS_TYPE_DUPLICATE(50001, "有存在短信模板的分类无法被删除!"),
+	SMS_TYPE_LOST(50002, "有不存在的短信分类"),
+	SMS_MENU_LOST(50003, "有不存在的短信套餐"),
 
 
 	NOT_ENOUGH(ConstError.NOT_ENOUGH,"余额不足！");

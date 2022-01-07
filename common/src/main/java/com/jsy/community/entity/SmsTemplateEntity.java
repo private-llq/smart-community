@@ -16,6 +16,10 @@ public class SmsTemplateEntity extends BaseEntity {
     // 短信分类id
     private Long smsTypeId;
     
+    // 短信分类idStr
+    @TableField(exist = false)
+    private String smsTypeIdStr;
+    
     // 短信模板名称
     private String name;
     
