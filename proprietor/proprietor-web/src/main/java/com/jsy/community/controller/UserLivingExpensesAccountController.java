@@ -10,6 +10,7 @@ import com.jsy.community.exception.JSYException;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,6 +62,9 @@ public class UserLivingExpensesAccountController {
     @PostMapping("/v2/modifyAccount")
     public CommonResult<?> modifyAccount(@RequestBody UserLivingExpensesAccountEntity accountEntity) {
         ValidatorUtils.validateEntity(accountEntity);
+        if (StringUtils.isBlank(accountEntity.getGroupId())) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "分组ID不能为空");
+        }
         if (accountEntity.getBusinessFlow() == 1) {
             throw new JSYException(ConstError.BAD_REQUEST, "直缴业务不用绑定,请走直接缴费接口");
         }

@@ -24,7 +24,6 @@ public class UserLivingExpensesAccountEntity extends BaseEntity {
     /**
      * 分组ID
      */
-    @NotBlank(message = "分组ID不能为空")
     private String groupId;
     /**
      * 省份ID

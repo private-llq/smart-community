@@ -28,7 +28,7 @@ public class AdminException extends JSYException {
 		super(error);
 	}
 	
-	public AdminException(ErrorEnum errorEnum) {
+	/*public AdminException(ErrorEnum errorEnum) {
 		super(errorEnum);
-	}
+	}*/
 }

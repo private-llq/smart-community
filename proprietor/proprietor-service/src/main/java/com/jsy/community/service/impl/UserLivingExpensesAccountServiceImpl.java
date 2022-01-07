@@ -1,4 +1,6 @@
 package com.jsy.community.service.impl;
+import com.google.common.collect.Lists;
+import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.CebBankService;
@@ -7,16 +9,18 @@ import com.jsy.community.api.UserLivingExpensesAccountService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserLivingExpensesAccountEntity;
 import com.jsy.community.entity.UserLivingExpensesBillEntity;
+import com.jsy.community.entity.UserLivingExpensesGroupEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
-import com.jsy.community.exception.MsgException;
 import com.jsy.community.mapper.UserLivingExpensesAccountMapper;
 import com.jsy.community.mapper.UserLivingExpensesBillMapper;
+import com.jsy.community.mapper.UserLivingExpensesGroupMapper;
 import com.jsy.community.qo.cebbank.CebQueryBillInfoQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.cebbank.CebQueryBillInfoVO;
 import com.jsy.community.vo.cebbank.test.CebBillQueryResultDataModelVO;
 import com.jsy.community.vo.cebbank.test.CebCreatePaymentBillParamsModelVO;
+import com.zhsj.basecommon.exception.BaseException;
 import jodd.util.StringUtil;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -40,6 +44,9 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
 
     @Autowired
     private UserLivingExpensesBillMapper billMapper;
+
+    @Autowired
+    private UserLivingExpensesGroupMapper groupMapper;
 
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private CebBankService cebBankService;
@@ -65,6 +72,26 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
             addBill(accountEntity, cebQueryBillInfoVO);
         } else {
             throw new ProprietorException("业务流程不明确");
+        }
+        // 如果没有选择分组,则分配到默认分组
+        if (StringUtil.isBlank(accountEntity.getGroupId())) {
+            // 查询是否存在分组
+            QueryWrapper<UserLivingExpensesGroupEntity> groupEntityQueryWrapper = new QueryWrapper<>();
+            groupEntityQueryWrapper.eq("uid", accountEntity.getUid());
+            groupEntityQueryWrapper.last("limit 1");
+            UserLivingExpensesGroupEntity userLivingExpensesGroupEntity = groupMapper.selectOne(groupEntityQueryWrapper);
+            if (userLivingExpensesGroupEntity != null) {
+                accountEntity.setGroupId(userLivingExpensesGroupEntity.getId().toString());
+            } else {
+                // 新增默认分组
+                UserLivingExpensesGroupEntity userLivingExpensesGroupEntity1 = new UserLivingExpensesGroupEntity();
+                userLivingExpensesGroupEntity1.setUid(accountEntity.getUid());
+                userLivingExpensesGroupEntity1.setGroupName("默认分组");
+                userLivingExpensesGroupEntity1.setIsDefault(1);
+                userLivingExpensesGroupEntity1.setId(SnowFlake.nextId());
+                groupMapper.insert(userLivingExpensesGroupEntity1);
+                accountEntity.setGroupId(userLivingExpensesGroupEntity1.getId().toString());
+            }
         }
         int insert = accountMapper.insert(accountEntity);
         return insert == 1 ? accountEntity.getId() : null;
@@ -112,7 +139,7 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
     public Boolean modifyAccount(UserLivingExpensesAccountEntity accountEntity) {
         UserLivingExpensesAccountEntity recordAccountEntity = queryAccountById(accountEntity);
         if (recordAccountEntity == null) {
-            throw new JSYException(JSYError.DATA_LOST);
+            throw new ProprietorException(JSYError.DATA_LOST);
         }
         if (!accountEntity.getAccount().equals(recordAccountEntity.getAccount()) || !accountEntity.getItemCode().equals(recordAccountEntity.getItemCode())) {
             // 如果户号或者项目有改变,需要重新查询账单信息,同时删除原有未缴费账单
