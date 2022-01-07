@@ -74,7 +74,8 @@ public class CebBankServiceImpl implements CebBankService {
         log.info("光大云缴费注册");
         HttpResponseModel responseModel = CebBankContributionUtil.login(cebLoginQO);
         if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
-            throw new PaymentException("光大云缴费注册失败,请稍候重试");
+            log.info("光大云缴费注册失败,请稍候重试");
+            return null;
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         CebLoginVO cebLoginVO = JSON.parseObject(respData, CebLoginVO.class);
@@ -349,7 +350,7 @@ public class CebBankServiceImpl implements CebBankService {
             }
         }
         if (responseModel == null || (!CebBankEntity.successCode.equals(responseModel.getRespCode()) && !"1002".equals(responseModel.getRespCode()))) {
-            throw new PaymentException("查询缴费账单信息失败");
+            throw new PaymentException(JSYError.THIRD_QUERY_FAILED);
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         return JSON.parseObject(respData, CebQueryBillInfoVO.class);
@@ -366,7 +367,7 @@ public class CebBankServiceImpl implements CebBankService {
     public CebQueryMobileBillVO queryMobileBill(CebQueryMobileBillQO cebQueryMobileBillQO) {
         HttpResponseModel responseModel = CebBankContributionUtil.queryMobileBill(cebQueryMobileBillQO);
         if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
-            throw new PaymentException("查询手机充值缴费账单失败");
+            throw new PaymentException(JSYError.THIRD_QUERY_FAILED);
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         return JSON.parseObject(respData, CebQueryMobileBillVO.class);
@@ -420,7 +421,7 @@ public class CebBankServiceImpl implements CebBankService {
         deskQO.setRefundUrl(cebBankRefundUrl);
         HttpResponseModel responseModel = CebBankContributionUtil.createCashierDesk(deskQO);
         if (responseModel == null || !"200".equals(responseModel.getRespCode())) {
-            throw new PaymentException(501, "创建收银台失败");
+            throw new PaymentException(JSYError.DESK_CREATE_ERROR);
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         return JSON.parseObject(respData, CebCashierDeskVO.class);
