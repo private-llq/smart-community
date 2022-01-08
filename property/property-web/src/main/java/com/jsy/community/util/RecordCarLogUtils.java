@@ -10,11 +10,6 @@ import java.util.Map;
 public class RecordCarLogUtils {
 
 
-
-
-
-
-
     public static void recordLog(Class currentClass,String  methodName,String operation,String userRole ,Class... parametersClass){
 
         System.out.println("工具赋值开始");
