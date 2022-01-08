@@ -10,9 +10,12 @@ import com.jsy.community.entity.property.CarOperationLog;
 import com.jsy.community.mapper.AdminRoleMapper;
 import com.jsy.community.mapper.CarOperationMapper;
 import com.jsy.community.qo.property.CarOperationLogQO;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.property.CarOperationLogVO;
 import com.jsy.community.vo.property.PageVO;
+import com.zhsj.baseweb.support.ContextHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.ObjectUtils;
@@ -24,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @DubboService(version = Const.version, group = Const.group_property)
+@Slf4j
 public class CarOperationServiceImpl extends ServiceImpl<CarOperationMapper, CarOperationLog> implements CarOperationService {
 
 
@@ -35,6 +39,8 @@ public class CarOperationServiceImpl extends ServiceImpl<CarOperationMapper, Car
     @Override
     public PageVO selectCarOperationLogPag(CarOperationLogQO qo) {
 
+        Long adminCommunityId =UserUtils.getAdminCommunityId();
+        log.info("社区id"+adminCommunityId);
         PageVO<CarOperationLogVO> pageVO=new PageVO();
 
 
@@ -43,9 +49,9 @@ public class CarOperationServiceImpl extends ServiceImpl<CarOperationMapper, Car
         QueryWrapper<CarOperationLog> queryWrapper = new QueryWrapper<>();
 
 
-        if (!ObjectUtils.isEmpty(qo.getUserRole())) {
-            queryWrapper.eq("user_role",qo.getUserRole());
-        }
+//        if (!ObjectUtils.isEmpty(qo.getUserRole())) {
+//            queryWrapper.eq("user_role",qo.getUserRole());
+//        }
         if (!ObjectUtils.isEmpty(qo.getCarNumber())) {
             queryWrapper.like("operation",qo.getCarNumber());
         }
@@ -54,6 +60,8 @@ public class CarOperationServiceImpl extends ServiceImpl<CarOperationMapper, Car
             LocalDateTime localDateTime1 = localDateTime.minusDays(-1);//第二天
             queryWrapper.le("operation_time",localDateTime1);
             queryWrapper.ge("operation_time", localDateTime);
+            queryWrapper.eq("community_id",adminCommunityId);
+
         }
 
         Page<CarOperationLog> carOperationLogPage = caroperationMapper.selectPage(page, queryWrapper);
@@ -61,9 +69,9 @@ public class CarOperationServiceImpl extends ServiceImpl<CarOperationMapper, Car
         List<CarOperationLogVO> voList=new ArrayList<>();
         for (CarOperationLog record : records) {
             CarOperationLogVO carOperationLogVO = new CarOperationLogVO();
-            AdminRoleEntity adminRoleEntity = adminRoleMapper.selectById(record.getUserRole());
+           // AdminRoleEntity adminRoleEntity = adminRoleMapper.selectById(record.getUserRole());
             BeanUtils.copyProperties(record,carOperationLogVO);
-            carOperationLogVO.setUserRole(adminRoleEntity.getName());
+           // carOperationLogVO.setUserRole(adminRoleEntity.getName());
             voList.add(carOperationLogVO);
 
         }

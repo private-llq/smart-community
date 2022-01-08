@@ -7,6 +7,9 @@ import com.jsy.community.api.CarOperationService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarOperationLog;
 import com.jsy.community.utils.UserUtils;
+import com.zhsj.baseweb.support.ContextHolder;
+import com.zhsj.baseweb.support.LoginUser;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -27,6 +30,7 @@ import java.time.LocalDateTime;
  */
 @Aspect
 @Component
+@Slf4j
 public class OperLogAspect {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -53,31 +57,36 @@ public class OperLogAspect {
     @AfterReturning(value = "operLogPoinCut()", returning = "keys")
     @Login
     public void saveOperLog(JoinPoint joinPoint, Object keys) {
-        System.out.println("进入aop");
+        log.info("进入aop");
         CarOperationLog carOperationLog = new CarOperationLog();
-
         // 从切面织入点处通过反射机制获取织入点处的方法
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         // 获取切入点所在的方法
         Method method = signature.getMethod();
         //根据uid查询用户角色id
-        String userId = UserUtils.getId();//用户id
-        Long roleId = adminUserRoleService.selectRoleIdByUserId(userId, UserUtils.getAdminCompanyId());
+        LoginUser loginUser = ContextHolder.getContext().getLoginUser();
+        String nickName = loginUser.getNickName();//昵称
 
-
+        String userId = UserUtils.getId();
+        Long adminCommunityId = UserUtils.getAdminCommunityId();
+       log.info("用户id"+userId+"社区id"+adminCommunityId);
+//
+//        String userId = UserUtils.getId();//用户id
+//        Long roleId = adminUserRoleService.selectRoleIdByUserId(userId, UserUtils.getAdminCompanyId());
         // 获取操作
         try {
             CarOperation annotation = method.getAnnotation(CarOperation.class);
             if (annotation != null) {
                 System.out.println("对象开始赋值");
                 String operation = annotation.operation();
-                System.out.println("aop获取的userRole" + roleId);
+//                System.out.println("aop获取的userRole" + roleId);
                 System.out.println("aop获取的operation" + operation);
-
-                carOperationLog.setUserRole(roleId); // 操作角色id
+                carOperationLog.setUserRole(1L); // 操作角色id
+                carOperationLog.setUserName(nickName);//用户名
+                carOperationLog.setCommunityId(adminCommunityId);//社区id
+                carOperationLog.setUserId(userId);//用户id
                 carOperationLog.setOperation(operation);//操作
-                carOperationLog.setStatus(0); // 状态
-
+                carOperationLog.setStatus(1); // 状态
                 carOperationLog.setOperationTime(LocalDateTime.now());
                 carOperationLog.setDeleted(0L);
                 System.out.println("对象结束赋值");
@@ -87,11 +96,8 @@ public class OperLogAspect {
             e.printStackTrace();
         }
 
-
-        System.out.println("开始保存");
+        log.info("开始保存车辆操作日志");
         boolean save = carOperationService.save(carOperationLog);
-        if (save) {
-            carOperationLog.setStatus(1); // 状态
-        }
+
     }
 }

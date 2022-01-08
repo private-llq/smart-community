@@ -18,6 +18,10 @@ public class CarOperationLogVO implements Serializable {
 
     private String operation;//操作
 
+    private String userId;//用户id
+
+    private String userName;//用户名
+
     private Integer status;//转态0操作失败，1操作成功
 
     private LocalDateTime operationTime;//操作时间
