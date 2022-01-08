@@ -42,4 +42,22 @@ public interface IPropertyCompanyService {
      * @date: 2021/9/1 11:50
      **/
     PropertyCompanyEntity selectCompany(Long companyId);
+    
+    /**
+     * @Description: 修改物业公司
+     * @author: DKS
+     * @since: 2021/12/13 17:05
+     * @Param: [propertyCompanyEntity]
+     * @return: void
+     */
+    void updatePropertyCompany(PropertyCompanyEntity propertyCompanyEntity);
+    
+    /**
+     * @Description: 根据uid查询物业公司id
+     * @author: DKS
+     * @since: 2021/12/21 15:21
+     * @Param: [uid]
+     * @return: java.lang.Long
+     */
+    Long getPropertyCompanyIdByUid(String uid);
 }

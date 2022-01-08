@@ -1,9 +1,7 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.Desensitization;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IHouseInfoService;
 import com.jsy.community.api.IPropertyRelationService;
@@ -23,6 +21,8 @@ import com.jsy.community.vo.property.HouseImportErrorVO;
 import com.jsy.community.vo.property.HouseMemberVO;
 import com.jsy.community.vo.property.RelationImportErrVO;
 import com.jsy.community.vo.property.RelationImportQO;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -54,7 +54,7 @@ import java.util.Map;
 @Api(tags = "物业家属查询")
 @RestController
 @RequestMapping("/members")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyRelationController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -68,14 +68,14 @@ public class PropertyRelationController {
 
     @ApiOperation("分页查询")
     @PostMapping("/pageList")
-    @Login
+    @Permit("community:property:members:pageList")
     public CommonResult pageList(@RequestBody BaseQO<HouseMemberQO> baseQO){
     return CommonResult.ok(propertyRelationService.pageList(baseQO));
     }
 
-    @Login
     @ApiOperation("下载成员信息导入模板")
     @PostMapping("/downloadRelationExcelTemplate")
+    @Permit("community:property:members:downloadRelationExcelTemplate")
     public ResponseEntity<byte[]> downloadHouseExcelTemplate() {
         //设置excel 响应头信息
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();
@@ -92,9 +92,10 @@ public class PropertyRelationController {
             return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
         }
     }
+    
     @ApiOperation("导出")
     @PostMapping("/export")
-    @Login
+    @Permit("community:property:members:export")
     public ResponseEntity<byte[]> export(@RequestBody HouseMemberQO houseMemberQO){
         houseMemberQO.setCommunityId(UserUtils.getAdminCommunityId());
         List<HouseMemberVO> houseMemberVOS = propertyRelationService.queryExportRelationExcel(houseMemberQO);
@@ -114,9 +115,10 @@ public class PropertyRelationController {
             return new ResponseEntity<>(null, multiValueMap, HttpStatus.ACCEPTED);
         }
     }
+    
     @ApiOperation("导入")
     @PostMapping("/import")
-    @Login
+    @Permit("community:property:members:import")
     public CommonResult importRelation(@RequestBody MultipartFile excel){
         String originalFilename = excel.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -126,7 +128,7 @@ public class PropertyRelationController {
         List<RelationImportErrVO> errorVos = new LinkedList<>();
         List<RelationImportQO> list = membersHandler.importRelation(excel,errorVos);
         //导入数据库返回其中错误信息
-        List<RelationImportErrVO> errVOList = propertyRelationService.importRelation(list,UserUtils.getAdminCommunityId(),UserUtils.getUserId());
+        List<RelationImportErrVO> errVOList = propertyRelationService.importRelation(list,UserUtils.getAdminCommunityId(),UserUtils.getId());
         for (RelationImportErrVO errVO : errVOList) {
             errorVos.add(errVO);
         }
@@ -162,7 +164,7 @@ public class PropertyRelationController {
 
     @ApiOperation("迁入")
     @GetMapping("/immigration")
-    @Login
+    @Permit("community:property:members:immigration")
     public CommonResult immigration(@RequestParam Long id){
         propertyRelationService.immigration(id);
         return CommonResult.ok();
@@ -170,21 +172,22 @@ public class PropertyRelationController {
 
     @ApiOperation("迁出")
     @GetMapping("/emigration")
-    @Login
+    @Permit("community:property:members:emigration")
     public CommonResult emigration(@RequestParam Long id){
         propertyRelationService.emigration(id);
         return CommonResult.ok();
     }
+    
+    @LoginIgnore
     @ApiOperation("查询推送消息类容")
     @GetMapping("/getByPushInfo")
-//    @Login
     public CommonResult getByPushInfo(@RequestParam Long id){
         return CommonResult.ok(houseInfoService.getByPushInfo(id));
     }
 
+    @LoginIgnore
     @ApiOperation("用户确定入驻房间")
     @PostMapping("/relationSave")
-//    @Login
     public CommonResult relationSave(@RequestBody HouseInfoEntity houseInfoEntity){
         houseInfoService.relationSave(houseInfoEntity);
         return CommonResult.ok();
@@ -192,7 +195,7 @@ public class PropertyRelationController {
 
     @ApiOperation("批量迁出")
     @GetMapping("/emigrations")
-    @Login
+    @Permit("community:property:members:emigrations")
     public CommonResult emigrations(@RequestParam String ids){
         String[] split = ids.split(",");
         Long[] longAry= new Long[split.length];
@@ -205,26 +208,28 @@ public class PropertyRelationController {
 
     @ApiOperation("新增")
     @PostMapping("/save")
-    @Login
     @businessLog(operation = "新增",content = "新增了【物业家属】")
+    @Permit("community:property:members:save")
     public CommonResult save(@RequestBody HouseMemberEntity houseMemberEntity){
         ValidatorUtils.validateEntity(houseMemberEntity,HouseMemberEntity.SaveVerification.class);
         propertyRelationService.save(houseMemberEntity,UserUtils.getAdminUserInfo().getUid());
         return CommonResult.ok();
     }
+    
     @ApiOperation("修改")
     @PutMapping("/update")
-    @Login
     @businessLog(operation = "编辑",content = "更新了【物业家属】")
+    @Permit("community:property:members:update")
     public CommonResult update(@RequestBody HouseMemberEntity houseMemberEntity){
         ValidatorUtils.validateEntity(houseMemberEntity,HouseMemberEntity.SaveVerification.class);
         propertyRelationService.update(houseMemberEntity);
         return CommonResult.ok();
     }
+    
     @ApiOperation("批量删除")
     @DeleteMapping("/deletes")
-    @Login
     @businessLog(operation = "删除",content = "删除了【批量物业家属】")
+    @Permit("community:property:members:deletes")
     public CommonResult deletes(@RequestParam String ids){
         String[] split = ids.split(",");
         Long[] longAry= new Long[split.length];
@@ -234,10 +239,11 @@ public class PropertyRelationController {
         propertyRelationService.deletes(longAry);
         return CommonResult.ok();
     }
+    
     @ApiOperation("删除")
     @DeleteMapping("/delete")
-    @Login
     @businessLog(operation = "删除",content = "删除了【物业家属】")
+    @Permit("community:property:members:delete")
     public CommonResult delete(@RequestParam Long id){
         propertyRelationService.delete(id);
         return CommonResult.ok();
@@ -245,7 +251,7 @@ public class PropertyRelationController {
 
     @ApiOperation("查询一条")
     @GetMapping("/findOne")
-    @Login
+    @Permit("community:property:members:findOne")
     public CommonResult findOne(@RequestParam Long id){
         HouseMemberEntity entity = propertyRelationService.findOne(id);
         return CommonResult.ok(entity);
@@ -253,7 +259,7 @@ public class PropertyRelationController {
 
     @ApiOperation("新增入住图")
     @PostMapping("/enterPicture")
-    @Login
+    @Permit("community:property:members:enterPicture")
     public CommonResult enterPicture(@RequestParam("file") MultipartFile file) {
         if(PicUtil.checkSizeAndType(file,2048)){
             String upload = MinioUtils.upload(file, "enterimge");
@@ -261,9 +267,10 @@ public class PropertyRelationController {
         }
         return  CommonResult.ok("上传失败！");
     }
+    
     @ApiOperation("新增身份证图")
     @PostMapping("/idCardImage")
-    @Login
+    @Permit("community:property:members:idCardImage")
     public CommonResult idCardImage(@RequestParam("file") MultipartFile file) {
         if(PicUtil.checkSizeAndType(file,2048)){
             String upload = MinioUtils.upload(file, "idcardimage");
@@ -271,34 +278,38 @@ public class PropertyRelationController {
         }
         return  CommonResult.ok("上传失败！");
     }
+    
     @ApiOperation("查询成员列表")
     @PostMapping("/list")
-    @Login
     @Desensitization(type = {DesensitizationType.PHONE,DesensitizationType.ID_CARD,DesensitizationType.PHONE,DesensitizationType.ID_CARD}, field = {"mobile","idCard","ownerMobile","ownerIdCard"})
+    @Permit("community:property:members:list")
     public CommonResult list(@RequestBody BaseQO<PropertyRelationQO> baseQO){
         System.out.println(baseQO);
         Map map=propertyRelationService.list(baseQO,UserUtils.getAdminUserInfo().getCommunityId());
         return CommonResult.ok(map);
     }
+    
     @ApiOperation("房屋下拉框")
     @PostMapping("/getHouseId")
-    @Login
+    @Permit("community:property:members:getHouseId")
     public CommonResult getHouseId(@RequestBody BaseQO<RelationListQO> baseQO){
         AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
         List list =propertyRelationService.getHouseId(baseQO,adminInfoVo);
         return CommonResult.ok(list);
     }
+    
     @ApiOperation("楼栋下拉框")
     @PostMapping("/getBuildingId")
-    @Login
+    @Permit("community:property:members:getBuildingId")
     public CommonResult getBuildingId(@RequestBody BaseQO<RelationListQO> baseQO){
         AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
         List list =propertyRelationService.getBuildingId(baseQO,adminInfoVo);
         return CommonResult.ok(list);
     }
+    
     @ApiOperation("单元下拉框")
     @PostMapping("/getUnitId")
-    @Login
+    @Permit("community:property:members:getUnitId")
     public CommonResult getUnitId(@RequestBody BaseQO<RelationListQO> baseQO){
         AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
         List list =propertyRelationService.getUnitId(baseQO,adminInfoVo);

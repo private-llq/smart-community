@@ -14,13 +14,21 @@ import com.jsy.community.qo.property.OpLogQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealUserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author DKS
@@ -35,6 +43,9 @@ public class OpLogServiceImpl extends ServiceImpl<OpLogMapper, OpLogEntity> impl
 	
 	@Autowired
 	private AdminUserMapper adminUserMapper;
+
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+	private IBaseUserInfoRpcService baseUserInfoRpcService;
 	
 	/**
 	 * @author DKS
@@ -80,10 +91,15 @@ public class OpLogServiceImpl extends ServiceImpl<OpLogMapper, OpLogEntity> impl
 			return new PageInfo<>();
 		}
 		// 补充用户名
+		Set<String> uidSet = pageData.getRecords().stream().map(OpLogEntity::getUserId).collect(Collectors.toSet());
+		List<RealUserDetail> realUserDetails = baseUserInfoRpcService.getRealUserDetails(uidSet);
+		Map<String, RealUserDetail> userDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
 		for (OpLogEntity entity : pageData.getRecords()) {
 			if (entity.getUserId() != null) {
-				AdminUserEntity adminUserEntity = adminUserMapper.queryByUid(entity.getUserId());
-				entity.setUserName(adminUserEntity.getRealName());
+				RealUserDetail realUserDetail = userDetailMap.get(entity.getUserId());
+				if (realUserDetail != null) {
+					entity.setUserName(realUserDetail.getRealName());
+				}
 			}
 		}
 		

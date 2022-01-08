@@ -33,10 +33,14 @@ public class AdminUserQO implements Serializable {
 	private String number;
 	
 	@ApiModelProperty(value = "姓名")
-	private String realName;
+	private String nickName;
 	
 	@ApiModelProperty(value = "电话号码")
 	private String mobile;
+	
+	// 密码
+//	@Pattern(regexp = "^(?=.*[A-Z0-9])(?=.*[a-z0-9])(?=.*[a-zA-Z])(.{6,12})$", message = "请输入一个正确的6-12位密码,至少包含大写字母或小写字母或数字两种!")
+	private String password;
 	
 	@ApiModelProperty(value = "身份证号")
 	private String idCard;
@@ -47,7 +51,13 @@ public class AdminUserQO implements Serializable {
 	// 公司ID
 	private Long companyId;
 
-	// 角色ID
+	// 物业角色ID
 	private Long roleId;
+	
+	// 小区角色ID
+	private Long communityRoleId;
+	
+	@ApiModelProperty(value = "物业公司名称")
+	private String companyName;
 
 }

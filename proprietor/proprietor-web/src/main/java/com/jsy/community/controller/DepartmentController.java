@@ -2,13 +2,13 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IDepartmentService;
 import com.jsy.community.api.IDepartmentStaffService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.DepartmentEntity;
 import com.jsy.community.entity.DepartmentStaffEntity;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,8 +34,7 @@ import java.util.Map;
 @Api(tags = "社区通讯录控制器")
 @RestController
 @RequestMapping("/department")
-@ApiJSYController
-@Login(allowAnonymous = true)
+// @ApiJSYController
 public class DepartmentController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
@@ -46,6 +45,7 @@ public class DepartmentController {
 	
 	@ApiOperation("通讯录")
 	@GetMapping("/listDepartment")
+	// @Permit("community:proprietor:department:listDepartment")
 	public CommonResult<List<Map>> listDepartment(@ApiParam(value = "社区id") @RequestParam Long id) {
 		List<DepartmentEntity> departmentList = departmentService.listDepartment(id);
 		List<Map> strings = new ArrayList<>();

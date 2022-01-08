@@ -1,10 +1,6 @@
 package com.jsy.community.controller;
 
-import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSONObject;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Auth;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.sys.SysUserEntity;
 import com.jsy.community.entity.sys.SysUserRoleEntity;
@@ -17,20 +13,21 @@ import com.jsy.community.service.ISysUserService;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseAuthRpcService;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,14 +42,17 @@ import java.util.Map;
 @Api(tags = "系统用户控制器")
 @Slf4j
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class SysUserController {
 	
-	@Autowired
+	@Resource
 	private ISysUserService sysUserService;
 	
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+	private IBaseAuthRpcService baseAuthRpcService;
 
 	/**
 	* @Description: 设置用户角色
@@ -61,6 +61,7 @@ public class SysUserController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
+	@LoginIgnore
 	@Transactional(rollbackFor = Exception.class)
 	@PostMapping("roles")
 	public CommonResult setUserRoles(@RequestBody SysUserRoleEntity sysUserRoleEntity){
@@ -77,6 +78,7 @@ public class SysUserController {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/30
 	**/
+	@LoginIgnore
 	@PostMapping("invitation")
 	public CommonResult invitation(@RequestBody SysUserEntity sysUserEntity) {
 		ValidatorUtils.validateEntity(sysUserEntity,SysUserEntity.inviteUserValidatedGroup.class);
@@ -91,6 +93,7 @@ public class SysUserController {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/30
 	**/
+	@LoginIgnore
 	@GetMapping("activation")
 	public ModelAndView activation(SysUserEntity sysUserEntity){
 		ModelAndView mv = new ModelAndView();
@@ -113,6 +116,7 @@ public class SysUserController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/1
 	**/
+	@LoginIgnore
 	@PutMapping("disable")
 	public CommonResult disableUser(@RequestParam Long uid){
 		SysUserEntity sysUserEntity = new SysUserEntity();
@@ -126,6 +130,7 @@ public class SysUserController {
 	
 	
 	//邮箱注册后添加用户名
+	@LoginIgnore
 	@PutMapping("username")
 	public CommonResult setUserName(@RequestParam String userName){
 		//TODO TOKEN获取uid
@@ -135,6 +140,7 @@ public class SysUserController {
 	}
 	
 	//添加手机号(短信验证)
+	@LoginIgnore
 	@PutMapping("mobile")
 	public CommonResult changeMobile(){
 		Long uid = 1L;
@@ -148,8 +154,8 @@ public class SysUserController {
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
-	@Login
 	@PostMapping("query")
+	@Permit("community:admin:sys:user:query")
 	public CommonResult queryOperator(@RequestBody BaseQO<SysUserQO> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new SysUserQO());
@@ -164,29 +170,31 @@ public class SysUserController {
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
-	@Login
 	@PostMapping("add")
 	@Transactional(rollbackFor = Exception.class)
 	@businessLog(operation = "新增",content = "新增了【操作员】")
-	public CommonResult addOperator(@RequestBody SysUserEntity sysUserEntity){
-		ValidatorUtils.validateEntity(sysUserEntity);
-		sysUserService.addOperator(sysUserEntity);
-		return CommonResult.ok("添加成功");
+	@Permit("community:admin:sys:user:add")
+	public CommonResult addOperator(@RequestBody SysUserQO sysUserQO){
+		ValidatorUtils.validateEntity(sysUserQO);
+		sysUserQO.setId(Long.valueOf(UserUtils.getId()));
+		Integer integer = sysUserService.addOperator(sysUserQO);
+		return CommonResult.ok(integer == 1 ? "添加成功" : "请使用原账号的密码登录");
 	}
 	
 	/**
 	 * @Description: 编辑操作员
-	 * @Param: [sysUserEntity]
+	 * @Param: [sysUserQO]
 	 * @Return: com.jsy.community.vo.CommonResult
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
-	@Login
 	@PutMapping("update")
 	@Transactional(rollbackFor = Exception.class)
 	@businessLog(operation = "编辑",content = "更新了【操作员】")
-	public CommonResult updateOperator(@RequestBody SysUserEntity sysUserEntity){
-		sysUserService.updateOperator(sysUserEntity);
+	@Permit("community:admin:sys:user:update")
+	public CommonResult updateOperator(@RequestBody SysUserQO sysUserQO){
+		ValidatorUtils.validateEntity(sysUserQO);
+		sysUserService.updateOperator(sysUserQO);
 		return CommonResult.ok("操作成功");
 	}
 	
@@ -197,10 +205,10 @@ public class SysUserController {
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
-	@Login
 	@DeleteMapping("delete")
 	@Transactional(rollbackFor = Exception.class)
 	@businessLog(operation = "删除",content = "删除了【操作员】")
+	@Permit("community:admin:sys:user:delete")
 	public CommonResult deleteOperator(Long id){
 		sysUserService.deleteOperator(id);
 		return CommonResult.ok("操作成功");
@@ -220,29 +228,36 @@ public class SysUserController {
 	@ApiOperation("修改/忘记密码")
 	@PutMapping("password")
 	@Auth
-	@Login(allowAnonymous = true)
-	public CommonResult<Boolean> updatePassword(@RequestAttribute(value = "body") String body) {
-		ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
-		String uid = UserUtils.getUserId();
-		if(uid == null){  //忘记密码
-			ValidatorUtils.validateEntity(qo,ResetPasswordQO.forgetPassVGroup.class);
-		}else{  //在线修改密码
-			ValidatorUtils.validateEntity(qo,ResetPasswordQO.updatePassVGroup.class);
-		}
+	@Permit("community:admin:sys:user:password")
+	public CommonResult<Boolean> updatePassword(@RequestBody ResetPasswordQO qo) {
+//		ResetPasswordQO qo = JSONObject.parseObject(body, ResetPasswordQO.class);
+//		String uid = UserUtils.getUserId();
+//		if(uid == null){  //忘记密码
+//			ValidatorUtils.validateEntity(qo,ResetPasswordQO.forgetPassVGroup.class);
+//		}else{  //在线修改密码
+//			ValidatorUtils.validateEntity(qo,ResetPasswordQO.updatePassVGroup.class);
+//		}
+//		if (!qo.getPassword().equals(qo.getConfirmPassword())) {
+//			throw new JSYException("两次密码不一致");
+//		}
+//		boolean b = sysUserService.updatePassword(qo,UserUtils.getUserId());
+//		if(b){
+//			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+//			String authToken = request.getHeader("authToken");
+//			if (StrUtil.isBlank(authToken)) {
+//				authToken = request.getParameter("authToken");
+//			}
+//			//销毁Auth token
+//			UserUtils.destroyToken("Auth",authToken);
+//		}
+//		return b ? CommonResult.ok() : CommonResult.error("操作失败");
+		
+		ValidatorUtils.validateEntity(qo, ResetPasswordQO.forgetPassVGroup.class);
 		if (!qo.getPassword().equals(qo.getConfirmPassword())) {
 			throw new JSYException("两次密码不一致");
 		}
-		boolean b = sysUserService.updatePassword(qo,UserUtils.getUserId());
-		if(b){
-			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-			String authToken = request.getHeader("authToken");
-			if (StrUtil.isBlank(authToken)) {
-				authToken = request.getParameter("authToken");
-			}
-			//销毁Auth token
-			UserUtils.destroyToken("Auth",authToken);
-		}
-		return b ? CommonResult.ok() : CommonResult.error("操作失败");
+		baseAuthRpcService.resetPhoneLoginPassword(qo.getAccount(), qo.getCode(), qo.getPassword());
+		return CommonResult.ok();
 	}
 	
 //	@ApiOperation("更换手机号")

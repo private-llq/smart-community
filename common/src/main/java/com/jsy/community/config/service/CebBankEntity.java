@@ -15,6 +15,10 @@ public class CebBankEntity {
     public static String privateKey;
     // 商户自己的公钥
     public static String publicKey;
+    /**
+     * 光大银行云缴费平台公钥
+     */
+    public static String cebBankPublicKey;
     // 接口地址
     public static String requestUrl;
     // 云缴费客户端分配给对方的接入渠道标识
@@ -24,6 +28,11 @@ public class CebBankEntity {
     // reqdata编码字符集
     public static String charset;
 
+    /**
+     * 成功code
+     */
+    public static String successCode;
+
     @Value("${cebbank.private_key}")
     public void setPrivateKey(String privateKey) {
         CebBankEntity.privateKey = privateKey;
@@ -31,6 +40,10 @@ public class CebBankEntity {
     @Value("${cebbank.public_key}")
     public void setPublicKey(String publicKey) {
         CebBankEntity.publicKey = publicKey;
+    }
+    @Value("${cebbank.ceb_bank_public_key}")
+    public void setCebBankPublicKey(String cebBankPublicKey) {
+        CebBankEntity.cebBankPublicKey = cebBankPublicKey;
     }
     @Value("${cebbank.request_url}")
     public void setRequestUrl(String requestUrl) {
@@ -47,5 +60,9 @@ public class CebBankEntity {
     @Value("${cebbank.charset}")
     public void setCharset(String charset) {
         CebBankEntity.charset = charset;
+    }
+    @Value("${cebbank.success_code}")
+    public void setSuccessCode(String successCode) {
+        CebBankEntity.successCode = successCode;
     }
 }

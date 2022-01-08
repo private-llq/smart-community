@@ -20,38 +20,38 @@ import javax.annotation.Resource;
 @ConditionalOnProperty(value = "jsy.web.enable", havingValue = "true")
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private String name="payment";
+    /*private String name="payment";*/
 
-    private String prefix = "/api/v1/";
-    private String prefix2 = "";
+    /*private String prefix = "/api/v1/";
+    private String prefix2 = "";*/
 
-    @PostConstruct
+    /*@PostConstruct
     public void init() {
         prefix += name.split("-")[0];
         prefix2 += prefix + "/out";
-    }
+    }*/
 
-    @Resource
-    private AuthorizationInterceptor authorizationInterceptor;
+    /*@Resource
+    private AuthorizationInterceptor authorizationInterceptor;*/
 
-    @Override
+    /*@Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
         configurer
-                .addPathPrefix(prefix, c -> c.isAnnotationPresent(ApiJSYController.class))
+                // .addPathPrefix(prefix, c -> c.isAnnotationPresent(ApiJSYController.class))ApiJSYController
                 .addPathPrefix(prefix2, c -> c.isAnnotationPresent(ApiOutController.class));
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authorizationInterceptor).addPathPatterns("/**");
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("*")
                 .allowCredentials(true)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .maxAge(3600);
-    }
+    }*/
 }

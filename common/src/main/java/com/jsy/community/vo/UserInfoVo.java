@@ -17,6 +17,9 @@ import java.util.List;
 @Data
 @ApiModel("业主个人信息")
 public class UserInfoVo implements Serializable {
+	// 主键id
+	private Long id;
+	
 	@ApiModelProperty("ID")
 	private Long thirdPlatformId;
 
@@ -29,8 +32,14 @@ public class UserInfoVo implements Serializable {
 	@ApiModelProperty("是否绑定支付宝1已绑定，0未绑定")
 	private Integer isBindAlipay;
 
-	@ApiModelProperty("是否设置登录密码1已绑定，0未绑定")
+	@ApiModelProperty("是否绑定IOS1已绑定，0未绑定")
+	private Integer isBindIos;
+
+	@ApiModelProperty("是否设置支付密码1已绑定，0未绑定")
 	private Integer isBindPayPassword;
+
+	@ApiModelProperty("是否设置登录密码1已绑定，0未绑定")
+	private Integer isBindPassword;
 
 	@ApiModelProperty("手机号")
 	private String mobile;
@@ -64,6 +73,11 @@ public class UserInfoVo implements Serializable {
 	
 	@ApiModelProperty("真实姓名")
 	private String realName;
+
+	/**
+	 * 生日
+	 */
+	private String birthday;
 	
 	@ApiModelProperty("身份证")
 	private String idCard;

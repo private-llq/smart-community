@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jsy.community.mapper.SmsTemplateMapper">
+
+    <select id="selectSmsTemplateBySmsTypeId" resultType="java.lang.Integer">
+        select count(0) from t_sms_template where sms_type_id = #{smsTypeId} and deleted = 0
+    </select>
+</mapper>

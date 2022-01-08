@@ -15,6 +15,10 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseAuthRpcService;
+import com.zhsj.base.api.vo.LoginVo;
+import com.zhsj.baseweb.support.LoginUser;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -26,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -59,12 +65,75 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ProprietorUserService userService;
 
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseAuthRpcService baseAuthRpcService;
+
     @Resource
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     private UserThirdPlatformMapper userThirdPlatformMapper;
 
+
+
+    /**
+     * @Description: 微信三方登录v2
+     * @author: Hu
+     * @since: 2021/12/8 16:35
+     * @Param: [code]
+     * @return: com.jsy.community.vo.UserAuthVo
+     */
+    @Override
+    public UserAuthVo loginV2(String code) {
+        UserAuthVo userAuthVo = new UserAuthVo();
+        LoginVo loginVo = baseAuthRpcService.weChatLoginEHome(code);
+        userAuthVo.setToken(loginVo.getToken().getToken());
+        LocalDateTime localDateTime = LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime()/1000, 0, ZoneOffset.ofHours(8));
+        userAuthVo.setExpiredTime(localDateTime);
+        userAuthVo.setUserInfo(userService.getUserInfoVo(loginVo));
+        return userAuthVo;
+    }
+
+
+    /**
+     * @Description: 微信三方绑定手机
+     * @author: Hu
+     * @since: 2021/12/8 16:42
+     * @Param: [bindingMobileQO, loginUser]
+     * @return: com.jsy.community.vo.UserAuthVo
+     */
+    @Override
+    public UserAuthVo bindingMobileV2(BindingMobileQO bindingMobileQO,LoginUser loginUser) {
+        UserAuthVo authVo = new UserAuthVo();
+        LoginVo loginVo = baseAuthRpcService.weChatBindPhone(loginUser.getToken(), bindingMobileQO.getMobile(), bindingMobileQO.getCode());
+        authVo.setToken(loginVo.getToken().getToken());
+        LocalDateTime localDateTime = LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime()/1000, 0, ZoneOffset.ofHours(8));
+        authVo.setExpiredTime(localDateTime);
+        authVo.setUserInfo(userService.getUserInfoVo(loginVo));
+        return authVo;
+    }
+
+    @Override
+    public UserAuthVo loginNotMobileV2(String identityToken) {
+        UserAuthVo userAuthVo = new UserAuthVo();
+        LoginVo loginVo = baseAuthRpcService.iosLoginEHome(identityToken);
+        userAuthVo.setToken(loginVo.getToken().getToken());
+        LocalDateTime localDateTime = LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime()/1000, 0, ZoneOffset.ofHours(8));
+        userAuthVo.setExpiredTime(localDateTime);
+        userAuthVo.setUserInfo(userService.getUserInfoVo(loginVo));
+        return userAuthVo;
+    }
+
+    @Override
+    public UserAuthVo iosBindingMobileV2(BindingMobileQO bindingMobileQO, LoginUser loginUser) {
+        UserAuthVo authVo = new UserAuthVo();
+        LoginVo loginVo = baseAuthRpcService.iosBindPhone(loginUser.getToken(), bindingMobileQO.getMobile(), bindingMobileQO.getCode());
+        authVo.setToken(loginVo.getToken().getToken());
+        LocalDateTime localDateTime = LocalDateTime.ofEpochSecond(loginVo.getToken().getExpiredTime()/1000, 0, ZoneOffset.ofHours(8));
+        authVo.setExpiredTime(localDateTime);
+        authVo.setUserInfo(userService.getUserInfoVo(loginVo));
+        return authVo;
+    }
 
     /**
      * @Description: 登录
@@ -95,6 +164,7 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         userThirdPlatformMapper.insert(platformEntity);
         return createBindMobile(platformEntity.getId());
     }
+
 
 
 
@@ -306,4 +376,17 @@ public class WeChatLoginServiceImpl implements IWeChatLoginService {
         return userInfoVo;
     }
 
+
+
+    /**
+     * @Description: 苹果三方登录解绑
+     * @author: Hu
+     * @since: 2021/12/21 14:38
+     * @Param: [identityToken, loginUser]
+     * @return: void
+     */
+    @Override
+    public void unbind(String code, LoginUser loginUser) {
+        baseAuthRpcService.unboundIos(loginUser.getToken(),code);
+    }
 }

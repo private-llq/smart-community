@@ -190,10 +190,6 @@
         values
         ( #{id},#{operationPerson},#{operationTime},#{pid},#{operationType})
     </insert>
-    <!-- 查出管理员姓名 -->
-    <select id="queryAdminNameByUid" resultType="java.lang.String">
-        select real_name from t_admin_user where uid = #{adminUid} and deleted = 0
-    </select>
     <!-- 通过houseId 查询 t_house表是否存在 -->
     <select id="existHouse" resultType="java.lang.Integer">
         select count(*) from t_house where id = #{houseId} and community_id = #{communityId} and deleted = 0

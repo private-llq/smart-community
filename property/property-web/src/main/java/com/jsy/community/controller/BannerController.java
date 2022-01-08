@@ -1,8 +1,6 @@
 package com.jsy.community.controller;
 
 
-import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IBannerService;
 import com.jsy.community.constant.Const;
@@ -14,6 +12,7 @@ import com.jsy.community.qo.proprietor.BannerQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -33,8 +32,7 @@ import java.util.List;
 @Api(tags = "轮播图控制器")
 @RestController
 @RequestMapping("banner")
-@ApiJSYController
-@Login
+// @ApiJSYController
 public class BannerController {
 
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -55,6 +53,7 @@ public class BannerController {
 	 **/
 	@ApiOperation("【轮播图】分页查询")
 	@PostMapping("page")
+	@Permit("community:property:banner:page")
 	public CommonResult<PageInfo<BannerEntity>> page(@RequestBody BaseQO<BannerEntity> baseQO){
 		BannerEntity query = baseQO.getQuery();
 		if(query == null || (query.getId() == null && query.getPublishType() == null)){
@@ -73,6 +72,7 @@ public class BannerController {
 	**/
 	@ApiOperation("【轮播图】发布中轮播图按排序查询列表")
 	@GetMapping("listOnShow")
+	@Permit("community:property:banner:listOnShow")
 	public CommonResult<List<BannerEntity>> listOnShow(){
 		return CommonResult.ok(bannerService.queryBannerListOnShowByCommunityId(UserUtils.getAdminCommunityId()));
 	}
@@ -88,6 +88,7 @@ public class BannerController {
 	@ApiOperation("【轮播图基本信息】新增")
 	@PostMapping("")
 	@businessLog(operation = "新增",content = "新增了【轮播图】")
+	@Permit("community:property:banner")
 	public CommonResult upload(@RequestBody BannerEntity bannerEntity){
 		ValidatorUtils.validateEntity(bannerEntity, BannerEntity.addBannerValidatedGroup.class);
 		AdminInfoVo adminUserInfo = UserUtils.getAdminUserInfo();
@@ -111,6 +112,7 @@ public class BannerController {
 	 **/
 	@ApiOperation("【轮播图图片】上传")
 	@PostMapping("uploadImg")
+	@Permit("community:property:banner:uploadImg")
 	public CommonResult uploadImg(MultipartFile file){
 		if(!PicUtil.checkSizeAndType(file,5*1024)){
 			throw new JSYException(JSYError.BAD_REQUEST.getCode(),"文件格式错误");
@@ -147,6 +149,7 @@ public class BannerController {
 	@ApiOperation("【轮播图】删除")
 	@DeleteMapping("")
 	@businessLog(operation = "删除",content = "删除了【轮播图】")
+	@Permit("community:property:banner")
 	public CommonResult delBanner(@RequestParam Long id){
 		return bannerService.delBanner(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("删除成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"删除失败");
 	}
@@ -161,9 +164,10 @@ public class BannerController {
 	@ApiOperation("【轮播图】修改")
 	@PutMapping("")
 	@businessLog(operation = "编辑",content = "更新了【轮播图】")
+	@Permit("community:property:banner")
 	public CommonResult updateBanner(@RequestBody BannerQO bannerQO){
 		ValidatorUtils.validateEntity(bannerQO,BannerQO.updateBannerValidatedGroup.class);
-		bannerQO.setOperator(UserUtils.getUserId());
+		bannerQO.setOperator(UserUtils.getId());
 		bannerQO.setCommunityId(UserUtils.getAdminCommunityId());
 		return bannerService.updateBanner(bannerQO) ? CommonResult.ok("操作成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
 	}
@@ -178,6 +182,7 @@ public class BannerController {
 	@ApiOperation("【轮播图】修改排序")
 	@PutMapping("sort")
 	@businessLog(operation = "编辑",content = "更新了【轮播图排序】")
+	@Permit("community:property:banner:sort")
 	public CommonResult changeSorts(@RequestBody List<Long> idList){
 		boolean result = bannerService.changeSorts(idList,UserUtils.getAdminCommunityId());
 		return result ? CommonResult.ok("更新成功") : CommonResult.error("更新失败");

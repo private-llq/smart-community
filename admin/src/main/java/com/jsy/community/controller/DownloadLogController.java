@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.exception.JSYException;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.http.HttpHeaders;
@@ -32,7 +33,7 @@ import java.util.zip.ZipOutputStream;
  */
 @Controller
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 public class DownloadLogController {
 
     //日志的绝对路径 本地
@@ -41,6 +42,7 @@ public class DownloadLogController {
     //linux 日志logs目录的绝对路径
     private final String LogPath = File.separator+"mnt"+File.separator+"db"+File.separator+"smart-community"+File.separator+"logs" + File.separator;
 
+    @LoginIgnore
     @GetMapping("/downloadLog")
     public ResponseEntity<byte[]> downloadLog(@RequestParam(value = "isDirectory", required = false, defaultValue = "true") Boolean isDirectory,
                                               @RequestParam(value = "date", required = false) String date,

@@ -1,4 +1,7 @@
 package com.jsy.community.service.impl;
+import com.jsy.community.entity.*;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import java.time.LocalDateTime;
 
 import com.alibaba.fastjson.JSON;
@@ -11,24 +14,30 @@ import com.jsy.community.config.PropertyTopicNameEntity;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
-import com.jsy.community.entity.CommunityHardWareEntity;
-import com.jsy.community.entity.HouseMemberEntity;
-import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.UserFaceSyncRecordEntity;
 import com.jsy.community.mapper.CommunityHardWareMapper;
+import com.jsy.community.mapper.UserFaceMapper;
 import com.jsy.community.mapper.UserFaceSyncRecordMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
+import com.zhsj.base.api.entity.RealUserDetail;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import jodd.util.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +45,7 @@ import java.util.stream.Collectors;
  * @author YuLF
  * @since 2020-11-25
  */
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_property)
 public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements PropertyUserService {
 
@@ -49,13 +59,38 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 	private CommunityHardWareMapper hardWareMapper;
 
 	@Autowired
+	private UserFaceMapper userFaceMapper;
+
+	@Autowired
 	private RabbitTemplate rabbitTemplate;
+
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseUserInfoRpcService baseUserInfoRpcService;
 	
 	@Override
 	public UserEntity selectOne(String uid) {
-		QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
+		UserDetail userDetail = baseUserInfoRpcService.getUserDetail(uid);
+		RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(uid);
+		UserEntity userEntity = new UserEntity();
+		userEntity.setUid(uid);
+		userEntity.setIsRealAuth(0);
+		if (userDetail != null) {
+			userEntity.setNickname(userDetail.getNickName());
+			userEntity.setAvatarUrl(userDetail.getAvatarThumbnail());
+			userEntity.setMobile(userDetail.getPhone());
+			userEntity.setSex(userDetail.getSex());
+		}
+		if (idCardRealInfo != null) {
+			log.info("用户详情实名");
+			userEntity.setRealName(idCardRealInfo.getIdCardName());
+			userEntity.setIdCard(idCardRealInfo.getIdCardNumber());
+			userEntity.setIsRealAuth(2);
+		}
+		log.info("用户详情:{}", userEntity);
+
+		/*QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("uid",uid);
-		UserEntity userEntity = baseMapper.selectOne(wrapper);
+		UserEntity userEntity = baseMapper.selectOne(wrapper);*/
 		return userEntity;
 	}
 
@@ -66,16 +101,14 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 
 	@Override
 	public String selectUserUID(String phone, String username) {
-		QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
-		wrapper.eq("mobile",phone);
-		wrapper.eq("real_name",username);
-		UserEntity userEntity = baseMapper.selectOne(wrapper);
-		String UUID="";
-		if (userEntity!=null) {
-			UUID=userEntity.getUid();
+		Set<String> strings = baseUserInfoRpcService.queryRealUserDetail(phone, username);
+		if (!CollectionUtils.isEmpty(strings) && strings.size() != 1) {
+			throw new PropertyException("查找到的相关用户不唯一");
 		}
-
-
+		String UUID="";
+		if (!CollectionUtils.isEmpty(strings)) {
+			UUID = strings.iterator().next();
+		}
 		return UUID;
 	}
 
@@ -101,7 +134,7 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 	@Override
 	public List<UserEntity> queryUnsyncFaceUrlList(Long communityId, String facilityId) {
 		// 查询所有需要同步的数据
-		QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
+		QueryWrapper<UserFaceEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.isNotNull("face_url");
 		// 查询所有该设备已同步的人脸信息
 		QueryWrapper<UserFaceSyncRecordEntity> recordEntityQueryWrapper = new QueryWrapper<>();
@@ -129,7 +162,22 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 			// 社区没有人,返回空
 			return new ArrayList<UserEntity>();
 		}
-		return baseMapper.selectList(queryWrapper);
+		List<UserFaceEntity> userFaceEntities = userFaceMapper.selectList(queryWrapper);
+		if (!CollectionUtils.isEmpty(userFaceEntities)) {
+			List<String> uidList = userFaceEntities.stream().map(UserFaceEntity::getUid).collect(Collectors.toList());
+			Map<String, RealUserDetail> uidMap = getRealUserDetailsMapByUid(uidList);
+			for (UserFaceEntity userFaceEntity : userFaceEntities) {
+				UserEntity userEntity = new UserEntity();
+				BeanUtils.copyProperties(userFaceEntity, userEntity);
+				RealUserDetail realUserDetail = uidMap.get(userFaceEntity.getUid());
+				if (realUserDetail != null) {
+					userEntity.setRealName(realUserDetail.getRealName());
+					userEntity.setMobile(realUserDetail.getPhone());
+				}
+				userEntities.add(userEntity);
+			}
+		}
+		return userEntities;
 	}
 
 	/**
@@ -143,11 +191,24 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 	public PageInfo<UserEntity> facePageList(BaseQO<UserEntity> baseQO) {
 		PageInfo<UserEntity> pageInfo = new PageInfo<>();
 		Long startNum = (baseQO.getPage() - 1) * baseQO.getSize();
-		List<UserEntity> userEntityList = baseMapper.queryFacePageList(baseQO.getQuery(), startNum, baseQO.getSize());
-		if (!CollectionUtils.isEmpty(userEntityList)) {
-			Set<String> uidSet = new HashSet<>();
-			for (UserEntity userEntity : userEntityList) {
-				uidSet.add(userEntity.getUid());
+		Set<String> uidList = new HashSet<>();
+		if (StringUtil.isNotBlank(baseQO.getQuery().getKeyword())) {
+			uidList = baseUserInfoRpcService.queryRealUserDetail(baseQO.getQuery().getKeyword(), baseQO.getQuery().getKeyword());
+		}
+		List<UserFaceEntity> userFaceEntities = userFaceMapper.queryFacePageList(baseQO.getQuery(), uidList, startNum, baseQO.getSize());
+		List<UserEntity> userEntities = new ArrayList<>();
+		if (!CollectionUtils.isEmpty(userFaceEntities)) {
+			Set<String> uidSet = userFaceEntities.stream().map(UserFaceEntity::getUid).collect(Collectors.toSet());
+			Map<String, RealUserDetail> uidMap = getRealUserDetailsMapByUid(uidSet);
+			for (UserFaceEntity userEntity : userFaceEntities) {
+				UserEntity userEntity1 = new UserEntity();
+				BeanUtils.copyProperties(userEntity, userEntity1);
+				RealUserDetail realUserDetail = uidMap.get(userEntity.getUid());
+				if (realUserDetail != null) {
+					userEntity1.setMobile(realUserDetail.getPhone());
+					userEntity1.setRealName(realUserDetail.getRealName());
+				}
+				userEntities.add(userEntity1);
 			}
 			List<HouseMemberEntity> houseMemberEntities = houseMemberService.queryByCommunityIdAndUids(baseQO.getQuery().getCommunityId(), uidSet);
 			Map<String, Set<String>> relationMap = new HashMap<>();
@@ -161,7 +222,7 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 					relationMap.put(houseMemberEntity.getUid(), relationString);
 				}
 			}
-			for (UserEntity userEntity : userEntityList) {
+			for (UserEntity userEntity : userEntities) {
 				if (String.valueOf(userEntity.getId()).equals(userEntity.getUid())) {
 					HashSet<String> hashSet = new HashSet<>();
 					hashSet.add("物业");
@@ -171,12 +232,12 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 				}
 			}
 		}
-		Integer count = baseMapper.queryFacePageListCount(baseQO.getQuery());
+		Integer count = userFaceMapper.queryFacePageListCount(baseQO.getQuery(), uidList);
 		count = count == null ? 0 : count;
 		pageInfo.setSize(baseQO.getSize());
 		pageInfo.setTotal(count);
 		pageInfo.setCurrent(baseQO.getPage());
-		pageInfo.setRecords(userEntityList);
+		pageInfo.setRecords(userEntities);
 		return pageInfo;
 	}
 
@@ -191,10 +252,10 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 	@Transactional(rollbackFor = Exception.class)
 	public Integer faceOpration(UserEntity userEntity, Long communityId) {
 		// 查询用户信息
-		QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
+		QueryWrapper<UserFaceEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("uid", userEntity.getUid());
 		queryWrapper.eq("face_deleted", 0);
-		UserEntity userEntityResult = baseMapper.selectOne(queryWrapper);
+		UserFaceEntity userEntityResult = userFaceMapper.selectOne(queryWrapper);
 		if (userEntityResult == null) {
 			throw new PropertyException("未找到该用户");
 		}
@@ -215,7 +276,7 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 		// 设置人脸启用状态
 		userEntityResult.setFaceEnableStatus(userEntity.getFaceEnableStatus());
 		// 更新人脸启用状态
-		int updateResult = baseMapper.updateById(userEntityResult);
+		int updateResult = userFaceMapper.updateById(userEntityResult);
 
 		// 发送消息到消息队列
 		if (updateResult == 1) {
@@ -223,7 +284,10 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 			if (userEntity.getFaceEnableStatus() == 1) {
 				// 启用操作
 				xuFaceEditPersonDTO.setOperator("editPerson");
-				xuFaceEditPersonDTO.setName(userEntityResult.getRealName());
+				RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(userEntity.getUid());
+				if (idCardRealInfo != null) {
+					xuFaceEditPersonDTO.setName(idCardRealInfo.getIdCardName());
+				}
 				xuFaceEditPersonDTO.setPersonType(0);
 				xuFaceEditPersonDTO.setTempCardType(0);
 				xuFaceEditPersonDTO.setPicURI(userEntityResult.getFaceUrl());
@@ -245,7 +309,10 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 				// 禁用操作
 				xuFaceEditPersonDTO.setOperator("DelPerson");
 			}
-			xuFaceEditPersonDTO.setCustomId(userEntityResult.getMobile());
+			UserDetail userDetail = baseUserInfoRpcService.getUserDetail(userEntity.getUid());
+			if (userDetail != null) {
+				xuFaceEditPersonDTO.setCustomId(userDetail.getPhone());
+			}
 			xuFaceEditPersonDTO.setHardwareIds(hardwareIds);
 			xuFaceEditPersonDTO.setCommunityId(String.valueOf(communityId));
 			rabbitTemplate.convertAndSend(PropertyTopicNameEntity.exFaceXu, PropertyTopicNameEntity.topicFaceXuServer, JSON.toJSONString(xuFaceEditPersonDTO));
@@ -265,35 +332,49 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 	@Transactional(rollbackFor = Exception.class)
 	public Integer deleteFace(UserEntity userEntity, Long communityId) {
 		// 查询用户信息
-		QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
+		QueryWrapper<UserFaceEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("uid", userEntity.getUid());
-		queryWrapper.eq("face_deleted", 0);
-		UserEntity userEntityResult = baseMapper.selectOne(queryWrapper);
+		UserFaceEntity userEntityResult = userFaceMapper.selectOne(queryWrapper);
 		if (userEntityResult == null) {
-			throw new PropertyException("未找到该用户");
+			log.info("未找到该用户");
+			return 0;
 		}
 		// 删除原有的同步记录
 		QueryWrapper<UserFaceSyncRecordEntity> recordEntityQueryWrapper = new QueryWrapper<>();;
 		recordEntityQueryWrapper.eq("uid", userEntity.getUid());
 		recordEntityQueryWrapper.eq("community_id", communityId);
 		userFaceSyncRecordMapper.delete(recordEntityQueryWrapper);
-		// 设置人脸删除状态
-		userEntityResult.setFaceDeleted(1);
-		// 更新人脸删除状态
-		int updateResult = baseMapper.updateById(userEntityResult);
+		// 删除人脸
+		int updateResult = baseMapper.deleteById(userEntityResult);
 		// 查询设备
 		List<CommunityHardWareEntity> communityHardWareEntities = hardWareMapper.selectAllByCommunityId(communityId);
 		if (!CollectionUtils.isEmpty(communityHardWareEntities) && updateResult == 1) {
 			Set<String> hardwareIds = communityHardWareEntities.stream().map(CommunityHardWareEntity::getHardwareId).collect(Collectors.toSet());
 			// 删除小区设备的人脸照片
-			XUFaceEditPersonDTO xuFaceEditPersonDTO = new XUFaceEditPersonDTO();
-			xuFaceEditPersonDTO.setOperator("DelPerson");
-			xuFaceEditPersonDTO.setCustomId(userEntityResult.getMobile());
-			xuFaceEditPersonDTO.setHardwareIds(hardwareIds);
-			xuFaceEditPersonDTO.setCommunityId(String.valueOf(communityId));
-			rabbitTemplate.convertAndSend(PropertyTopicNameEntity.exFaceXu, PropertyTopicNameEntity.topicFaceXuServer, JSON.toJSONString(xuFaceEditPersonDTO));
+			UserDetail userDetail = baseUserInfoRpcService.getUserDetail(userEntity.getUid());
+			if (userDetail != null) {
+				deleteFaceMechine(userDetail.getPhone(), String.valueOf(communityId), hardwareIds);
+			}
 		}
 		return updateResult;
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 删除人脸设备的人脸
+	 * @param mobile: 用户电话
+	     * @param communityId: 小区ID
+	     * @param hardwareIds: 设备序列号列表
+	 * @return:
+	 * @date: 2021/12/22 18:58
+	 **/
+	public void deleteFaceMechine(String mobile, String communityId, Set<String> hardwareIds) {
+		XUFaceEditPersonDTO xuFaceEditPersonDTO = new XUFaceEditPersonDTO();
+		xuFaceEditPersonDTO.setOperator("DelPerson");
+		xuFaceEditPersonDTO.setCustomId(mobile);
+		xuFaceEditPersonDTO.setHardwareIds(hardwareIds);
+		xuFaceEditPersonDTO.setCommunityId(String.valueOf(communityId));
+		rabbitTemplate.convertAndSend(PropertyTopicNameEntity.exFaceXu, PropertyTopicNameEntity.topicFaceXuServer, JSON.toJSONString(xuFaceEditPersonDTO));
 	}
 
 	/**
@@ -308,55 +389,38 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 	@Transactional(rollbackFor = Exception.class)
 	public Integer addFace(UserEntity userEntity, Long communityId) {
 		// 查询用户信息
-		QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("real_name", userEntity.getRealName());
-		queryWrapper.eq("mobile", userEntity.getMobile());
-		UserEntity userEntityResult = baseMapper.selectOne(queryWrapper);
-		if (userEntityResult == null) {
+		Set<String> uidSet = baseUserInfoRpcService.queryRealUserDetail(userEntity.getMobile(), userEntity.getRealName());
+		if (CollectionUtils.isEmpty(uidSet)) {
 			throw new PropertyException("未找到该用户");
 		}
-		// 设置用户人脸
-		userEntityResult.setFaceDeleted(0);
-		userEntityResult.setFaceUrl(userEntity.getFaceUrl());
-		userEntityResult.setFaceEnableStatus(userEntity.getFaceEnableStatus());
-		// 更新用户人脸
-		int updateResult = baseMapper.updateById(userEntityResult);
-		if (userEntity.getFaceEnableStatus() == 1) {
-			// 删除原有的同步记录
-			QueryWrapper<UserFaceSyncRecordEntity> recordEntityQueryWrapper = new QueryWrapper<>();;
-			recordEntityQueryWrapper.eq("uid", userEntity.getUid());
-			recordEntityQueryWrapper.eq("community_id", communityId);
-			userFaceSyncRecordMapper.delete(recordEntityQueryWrapper);
-			// 查询设备
-			List<CommunityHardWareEntity> communityHardWareEntities = hardWareMapper.selectAllByCommunityId(communityId);
-			if (!CollectionUtils.isEmpty(communityHardWareEntities) && updateResult == 1) {
-				Set<String> hardwareIds = communityHardWareEntities.stream().map(CommunityHardWareEntity::getHardwareId).collect(Collectors.toSet());
-				// 新增同步记录
-				ArrayList<UserFaceSyncRecordEntity> recordEntities = new ArrayList<>();
-				for (String hardwareId : hardwareIds) {
-					UserFaceSyncRecordEntity userFaceSyncRecordEntity = new UserFaceSyncRecordEntity();
-					userFaceSyncRecordEntity.setUid(userEntityResult.getUid());
-					userFaceSyncRecordEntity.setCommunityId(communityId);
-					userFaceSyncRecordEntity.setFaceUrl(userEntityResult.getFaceUrl());
-					userFaceSyncRecordEntity.setFacilityId(hardwareId);
-					userFaceSyncRecordEntity.setId(SnowFlake.nextId());
-					userFaceSyncRecordEntity.setDeleted(0L);
-					userFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
-					recordEntities.add(userFaceSyncRecordEntity);
-				}
-				userFaceSyncRecordMapper.insertBatchRecord(recordEntities);
-				// 启用人脸
-				XUFaceEditPersonDTO xuFaceEditPersonDTO = new XUFaceEditPersonDTO();
-				xuFaceEditPersonDTO.setOperator("editPerson");
-				xuFaceEditPersonDTO.setName(userEntityResult.getRealName());
-				xuFaceEditPersonDTO.setPersonType(0);
-				xuFaceEditPersonDTO.setTempCardType(0);
-				xuFaceEditPersonDTO.setPicURI(userEntityResult.getFaceUrl());
-				xuFaceEditPersonDTO.setCustomId(userEntityResult.getMobile());
-				xuFaceEditPersonDTO.setHardwareIds(hardwareIds);
-				xuFaceEditPersonDTO.setCommunityId(String.valueOf(communityId));
-				rabbitTemplate.convertAndSend(PropertyTopicNameEntity.exFaceXu, PropertyTopicNameEntity.topicFaceXuServer, JSON.toJSONString(xuFaceEditPersonDTO));
+		if (uidSet.size() != 1) {
+			throw new PropertyException("找到的用户不唯一");
+		}
+		String uid = uidSet.iterator().next();
+		QueryWrapper<UserFaceEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("uid", uid);
+		UserFaceEntity userEntityResult = userFaceMapper.selectOne(queryWrapper);
+		List<CommunityHardWareEntity> communityHardWareEntities = hardWareMapper.selectAllByCommunityId(communityId);
+		Set<String> hardwareIds = new HashSet<>();
+		if (!CollectionUtils.isEmpty(communityHardWareEntities)) {
+			hardwareIds = communityHardWareEntities.stream().map(CommunityHardWareEntity::getHardwareId).collect(Collectors.toSet());
+		}
+		if (userEntityResult != null) {
+			userFaceMapper.deleteById(userEntityResult.getId());
+			if (!CollectionUtils.isEmpty(hardwareIds)) {
+				deleteFaceMechine(userEntity.getMobile(), String.valueOf(communityId), hardwareIds);
 			}
+		}
+		// 设置用户人脸
+		UserFaceEntity userFaceEntity = new UserFaceEntity();
+		userFaceEntity.setFaceUrl(userEntity.getFaceUrl());
+		userFaceEntity.setUid(uid);
+		userFaceEntity.setFaceEnableStatus(userEntity.getFaceEnableStatus());
+		userFaceEntity.setId(SnowFlake.nextId());
+		// 新增用户人脸
+		int updateResult = userFaceMapper.insert(userEntityResult);
+		if (userEntity.getFaceEnableStatus() == 1) {
+			syncFace(userEntity, new ArrayList<>(Arrays.asList(communityId)));
 		}
 		return updateResult;
 	}
@@ -365,12 +429,13 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 	 * @param userEntity   :
 	 * @param communityIds :
 	 * @author: Pipi
-	 * @description: app用户修改人脸照片
+	 * @description: 下发用户人脸数据操作
 	 * @return: void
 	 * @date: 2021/10/8 17:58
 	 **/
 	@Override
-	public void saveFace(UserEntity userEntity, List<Long> communityIds) {
+	@Transactional(rollbackFor = Exception.class)
+	public void syncFace(UserEntity userEntity, List<Long> communityIds) {
 		// 删除原有的同步记录
 		QueryWrapper<UserFaceSyncRecordEntity> recordEntityQueryWrapper = new QueryWrapper<>();;
 		recordEntityQueryWrapper.eq("uid", userEntity.getUid());
@@ -403,7 +468,7 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 					userFaceSyncRecordEntity.setCreateTime(LocalDateTime.now());
 					recordEntities.add(userFaceSyncRecordEntity);
 				}
-				// 启用人脸
+				// 下发人脸到设备
 				XUFaceEditPersonDTO xuFaceEditPersonDTO = new XUFaceEditPersonDTO();
 				xuFaceEditPersonDTO.setOperator("editPerson");
 				xuFaceEditPersonDTO.setName(userEntity.getRealName());
@@ -417,5 +482,17 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 			}
 			userFaceSyncRecordMapper.insertBatchRecord(recordEntities);
 		}
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 通过用户uid列表获取用户电话号码和实名信息
+	 * @param uidList: 用户uid列表
+	 * @return: {@link Map< String, RealUserDetail>}
+	 * @date: 2021/12/23 14:06
+	 **/
+	public Map<String, RealUserDetail> getRealUserDetailsMapByUid(Collection<String> uidList) {
+		List<RealUserDetail> realUserDetails = baseUserInfoRpcService.getRealUserDetails(uidList);
+		return realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
 	}
 }

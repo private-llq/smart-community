@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IComplainsService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.BaseQO;
@@ -10,6 +9,7 @@ import com.jsy.community.qo.property.PropertyComplaintsQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -29,14 +29,14 @@ import java.util.Map;
 @Api(tags = "投诉建议控制器")
 @RestController
 @RequestMapping("/complains")
-@ApiJSYController
+// @ApiJSYController
 public class ComplainsController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IComplainsService complainsService;
 
     @ApiOperation("查询所有投诉建议")
     @PostMapping("/list")
-    @Login
+    @Permit("community:property:complains:list")
     public CommonResult list(@RequestBody BaseQO<PropertyComplaintsQO> baseQO) {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         Map<String, Object> map = complainsService.listAll(baseQO,userInfo);
@@ -45,7 +45,7 @@ public class ComplainsController {
     }
     @ApiOperation("反馈内容")
     @PostMapping("/feedback")
-    @Login
+    @Permit("community:property:complains:feedback")
     public CommonResult feedback(@RequestBody ComplainFeedbackQO complainFeedbackQO) {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         complainsService.feedback(complainFeedbackQO,userInfo);

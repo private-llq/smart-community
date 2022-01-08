@@ -1,12 +1,12 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyAccountService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyAccountBankEntity;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -26,8 +26,7 @@ import java.util.Map;
 @Api(tags = "社区账户信息")
 @RestController
 @RequestMapping("/account")
-@ApiJSYController
-@Login
+// @ApiJSYController
 public class PropertyAccountController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -42,6 +41,7 @@ public class PropertyAccountController {
 	**/
 	@ApiOperation("本社区社区信息查询")
 	@GetMapping("")
+	@Permit("community:property:account")
 	public CommonResult queryByCommunityId(){
 		Map<String, Object> returnMap = new HashMap<>();
 		//对公账户
@@ -73,6 +73,7 @@ public class PropertyAccountController {
 	**/
 	@ApiOperation("结算账户查询")
 	@GetMapping("statementAccount")
+	@Permit("community:property:account:statementAccount")
 	public CommonResult queryByBankAccountById(@RequestParam Long id){
 		//这里默认结算账户是物业银行卡账户
 		return CommonResult.ok(propertyAccountService.queryBankAccountById(id));

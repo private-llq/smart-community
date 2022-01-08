@@ -1,5 +1,6 @@
 package com.jsy.community.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -12,6 +13,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 /**
@@ -77,6 +79,11 @@ public class PushInformEntity extends BaseEntity {
     
     @ApiModelProperty(value = "推送对象：1.物业 2.小区 4.商家")
     private Integer pushObject;
+    
+    // 推送对象
+    @ApiModelProperty(value = "推送对象：1.物业 2.小区 4.商家")
+    @TableField(exist = false)
+    private List<String> pushObjectName;
 
     // 推送开关,0关闭推送,1开启推送
     private Integer pushTag;

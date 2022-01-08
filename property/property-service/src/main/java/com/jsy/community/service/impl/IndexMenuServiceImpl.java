@@ -46,7 +46,6 @@
 //	@Autowired
 //	private AppMenuMapper appMenuMapper;
 //
-//	// TODO 首页展示菜单数量 暂定5个
 //	private static final Integer INDEXMENUCOUNT = 3;
 //
 //	@Override

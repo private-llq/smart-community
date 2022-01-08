@@ -8,7 +8,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.qo.sys.NameAndCreatorQO;
 import com.jsy.community.qo.sys.SysUserQO;
-import com.jsy.community.utils.PageInfo;
+import com.zhsj.base.api.vo.PageVO;
 
 import java.util.List;
 import java.util.Map;
@@ -127,31 +127,40 @@ public interface ISysUserService extends IService<SysUserEntity> {
 	SysUserEntity queryUserByMobile(String mobile, Long communityId);
 	
 	/**
+	 * @Description: 根据uid查询用户信息
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.entity.sys.SysUserEntity
+	 * @Author: DKS
+	 * @Date: 2021/11/30
+	 **/
+	SysUserEntity queryByUid(String id);
+	
+	/**
 	 * @Description: 操作员条件查询
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.utils.PageInfo
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
-	PageInfo queryOperator(BaseQO<SysUserQO> baseQO);
+	PageVO<SysUserEntity> queryOperator(BaseQO<SysUserQO> baseQO);
 	
 	/**
 	 * @Description: 添加操作员
-	 * @Param: [sysUserEntity]
+	 * @Param: [sysUserQO]
 	 * @Return: boolean
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
-	void addOperator(SysUserEntity sysUserEntity);
+	Integer addOperator(SysUserQO sysUserQO);
 	
 	/**
 	 * @Description: 编辑操作员
-	 * @Param: [sysUserEntity]
+	 * @Param: [sysUserQO]
 	 * @Return: boolean
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
-	void updateOperator(SysUserEntity sysUserEntity);
+	void updateOperator(SysUserQO sysUserQO);
 	
 	/**
 	 * @Description: 删除操作员
@@ -161,24 +170,6 @@ public interface ISysUserService extends IService<SysUserEntity> {
 	 * @Date: 2021/10/13
 	 */
 	void deleteOperator(Long id);
-	
-	/**
-	 * @Description: 根据手机号检查小区用户是否存在(t_sys_user)
-	 * @Param: [mobile]
-	 * @Return: boolean
-	 * @Author: DKS
-	 * @Date: 2021/10/13
-	 **/
-	boolean checkUserExists(String mobile);
-	
-	/**
-	 * @Description: 根据uid查询手机号
-	 * @Param: [uid]
-	 * @Return: java.lang.String
-	 * @Author: DKS
-	 * @Date: 2021/10/13
-	 **/
-	String queryMobileByUid(String uid);
 	
 	/**
 	 * @Description: 修改手机号

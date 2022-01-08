@@ -2,11 +2,12 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IAppMenuService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.AppMenuEntity;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -31,8 +32,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/menu")
-@Login(allowAnonymous = true)
-@ApiJSYController
+// @ApiJSYController
 public class AppMenuController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
@@ -40,6 +40,8 @@ public class AppMenuController {
 	
 	@ApiOperation("查询首页展示的菜单选项")
 	@GetMapping("/listIndexMenu")
+	// @Permit("community:proprietor:menu:listIndexMenu")
+	@Deprecated
 	public CommonResult listIndexMenu(@ApiParam(value = "社区id") @RequestParam Long communityId) {
 		List<AppMenuEntity> list = appMenuService.listIndexMenu(communityId);
 		return CommonResult.ok(list);
@@ -48,6 +50,8 @@ public class AppMenuController {
 	
 	@ApiOperation("更多菜单")
 	@GetMapping("/moreListMenu")
+	// @Permit("community:proprietor:menu:moreListMenu")
+	@Deprecated
 	public CommonResult moreListMenu(@ApiParam(value = "社区id") @RequestParam Long communityId) {
 		List<AppMenuEntity> list = appMenuService.moreIndexMenu(communityId);
 		return CommonResult.ok(list);
@@ -55,13 +59,20 @@ public class AppMenuController {
 
 	@ApiOperation("查询首页展示的菜单选项")
 	@GetMapping("/listIndexMenu/v2")
-	public CommonResult listIndexMenu2(@ApiParam(value = "社区id") @RequestParam Long communityId) {
-		List<AppMenuEntity> list = appMenuService.listAppMenu(communityId);
+	// @Permit("community:proprietor:menu:listIndexMenu:v2")
+	@LoginIgnore
+	public CommonResult listIndexMenu2(@ApiParam(value = "社区id") @RequestParam("communityId") Long communityId,
+									   @ApiParam(value = "系统类型") @RequestParam("sysType") Integer sysType,
+									   @ApiParam(value = "版本号") @RequestParam("version") String version
+									   ) {
+		List<AppMenuEntity> list = appMenuService.listAppMenu(communityId, sysType, version);
 		return CommonResult.ok(list);
 
 	}
 	@ApiOperation("更多菜单")
 	@GetMapping("/moreListMenu/v2")
+	@LoginIgnore
+	// @Permit("community:proprietor:menu:moreListMenu:v2")
 	public CommonResult moreListMenuV2(@ApiParam(value = "社区id") @RequestParam Long communityId) {
 		List<AppMenuEntity> list = appMenuService.listAppMenuAll(communityId);
 		return CommonResult.ok(list);

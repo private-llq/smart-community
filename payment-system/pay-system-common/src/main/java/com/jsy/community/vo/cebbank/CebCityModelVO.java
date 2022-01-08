@@ -12,9 +12,13 @@ import java.io.Serializable;
  **/
 @Data
 public class CebCityModelVO implements Serializable {
-    // 城市首字母
-    private String cityFlag;
-
-    // 城市
+    private String cityId;
+    private String provinceId;
+    private String provinceName;
+    private String cityCode;
     private String cityName;
+    private String description;
+    private String categoryId;
+    private String categoryType;
+    private String cityFlag;
 }

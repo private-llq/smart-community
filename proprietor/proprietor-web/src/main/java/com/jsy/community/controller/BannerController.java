@@ -4,11 +4,10 @@ package com.jsy.community.controller;
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IBannerService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.proprietor.BannerQO;
 import com.jsy.community.vo.BannerVO;
-import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -24,7 +23,7 @@ import java.util.List;
 @Api(tags = "轮播图控制器")
 @RestController
 @RequestMapping("banner")
-@ApiJSYController
+// @ApiJSYController
 public class BannerController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
@@ -37,8 +36,10 @@ public class BannerController {
 	 * @Author: chq459799974
 	 * @Date: 2020/11/16
 	 **/
+	@LoginIgnore
 	@ApiOperation("【轮播图】列表查询")
 	@PostMapping("list")
+	// @Permit("community:proprietor:banner:list")
 	public CommonResult<List<BannerVO>> list(@RequestBody BannerQO bannerQO){
 //		ValidatorUtils.validateEntity(bannerQO, BannerQO.queryBannerValidatedGroup.class);
 		List<BannerVO> returnList = bannerService.queryBannerList(bannerQO);
@@ -52,8 +53,10 @@ public class BannerController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/30
 	**/
+	@LoginIgnore
 	@ApiOperation("【轮播图】点击量+1")
 	@PutMapping("clickUp")
+	// @Permit("community:proprietor:banner:clickUp")
 	public CommonResult clickUp(@RequestParam Long id){
 		bannerService.clickUp(id);
 		return CommonResult.ok();

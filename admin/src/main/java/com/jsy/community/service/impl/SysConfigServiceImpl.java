@@ -1,9 +1,9 @@
 package com.jsy.community.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.sys.SysMenuEntity;
 import com.jsy.community.entity.sys.SysRoleEntity;
 import com.jsy.community.entity.sys.SysUserRoleEntity;
@@ -16,22 +16,31 @@ import com.jsy.community.qo.sys.SysMenuQO;
 import com.jsy.community.qo.sys.SysRoleQO;
 import com.jsy.community.service.ISysConfigService;
 import com.jsy.community.utils.MyPageUtils;
-import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.MenuPermission;
+import com.zhsj.base.api.domain.PermitMenu;
+import com.zhsj.base.api.domain.PermitRole;
+import com.zhsj.base.api.domain.RoleMenu;
+import com.zhsj.base.api.entity.AddMenuDto;
+import com.zhsj.base.api.entity.UpdateMenuDto;
+import com.zhsj.base.api.entity.UpdateRoleDto;
+import com.zhsj.base.api.rpc.IBaseMenuPermissionRpcService;
+import com.zhsj.base.api.rpc.IBaseMenuRpcService;
+import com.zhsj.base.api.rpc.IBasePermissionRpcService;
+import com.zhsj.base.api.rpc.IBaseRoleRpcService;
+import com.zhsj.base.api.vo.PageVO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -58,6 +67,18 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	@Resource
 	private SysRoleMenuMapper sysRoleMenuMapper;
 	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseRoleRpcService baseRoleRpcService;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseMenuRpcService baseMenuRpcService;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseMenuPermissionRpcService baseMenuPermissionRpcService;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+	private IBasePermissionRpcService permissionRpcService;
+	
 	//==================================================== Menu菜单 ===============================================================
 	/**
 	* @Description: 缓存菜单
@@ -78,11 +99,12 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/15
 	**/
-	public List<SysMenuEntity> queryMenu(){
-		List<SysMenuEntity> menuList = sysMenuMapper.selectList(new QueryWrapper<SysMenuEntity>().select("*").eq("pid", 0));
-		setChildren(menuList,new LinkedList<>());
-		menuList.sort(Comparator.comparing(SysMenuEntity::getSort));
-		return menuList;
+	public List<PermitMenu> queryMenu(){
+		List<PermitMenu> ultimateMenu = baseMenuRpcService.all(BusinessConst.ULTIMATE_ADMIN);
+//		List<SysMenuEntity> menuList = sysMenuMapper.selectList(new QueryWrapper<SysMenuEntity>().select("*").eq("pid", 0));
+//		setChildren(menuList,new LinkedList<>());
+//		menuList.sort(Comparator.comparing(SysMenuEntity::getSort));
+		return ultimateMenu;
 	}
 	
 	//组装子菜单
@@ -104,32 +126,47 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Date: 2020/12/14
 	**/
 	@Override
-	public boolean addMenu(SysMenuEntity sysMenuEntity){
-		if(sysMenuEntity.getPid() != null && sysMenuEntity.getPid() != 0){ //①非顶级节点，查找父节点，确保数据严密性
-			SysMenuEntity parent = sysMenuMapper.findParent(sysMenuEntity.getPid());
-			if(parent == null){
-				return false;
-			}
-			if(0 == parent.getBelongTo()){//父级是顶级节点
-				sysMenuEntity.setBelongTo(parent.getId());
-			}else{ //父级也是子级
-				sysMenuEntity.setBelongTo(parent.getBelongTo());//同步父节点的顶级节点
-			}
-		}else { //②顶级节点
-			sysMenuEntity.setPid(0L);
-			sysMenuEntity.setBelongTo(0L);
-		}
-		int result = 0;
-		if(sysMenuEntity.getSort() == null){
-			result = sysMenuMapper.addMenu(sysMenuEntity);
-		}else{
-			result = sysMenuMapper.insert(sysMenuEntity);
-		}
-		if(result == 1){
-			cacheMenuToRedis(); //刷新redis
-			return true;
-		}
-		return false;
+	public void addMenu(SysMenuEntity sysMenuEntity){
+//		if(sysMenuEntity.getPid() != null && sysMenuEntity.getPid() != 0){ //①非顶级节点，查找父节点，确保数据严密性
+//			SysMenuEntity parent = sysMenuMapper.findParent(sysMenuEntity.getPid());
+//			if(parent == null){
+//				return false;
+//			}
+//			if(0 == parent.getBelongTo()){//父级是顶级节点
+//				sysMenuEntity.setBelongTo(parent.getId());
+//			}else{ //父级也是子级
+//				sysMenuEntity.setBelongTo(parent.getBelongTo());//同步父节点的顶级节点
+//			}
+//		}else { //②顶级节点
+//			sysMenuEntity.setPid(0L);
+//			sysMenuEntity.setBelongTo(0L);
+//		}
+//		int result = 0;
+//		if(sysMenuEntity.getSort() == null){
+//			result = sysMenuMapper.addMenu(sysMenuEntity);
+//		}else{
+//			result = sysMenuMapper.insert(sysMenuEntity);
+//		}
+//		if(result == 1){
+//			cacheMenuToRedis(); //刷新redis
+//			return true;
+//		}
+//		return false;
+		AddMenuDto addMenuDto = new AddMenuDto();
+		addMenuDto.setLoginType(sysMenuEntity.getLoginType() == 1 ? BusinessConst.ULTIMATE_ADMIN : sysMenuEntity.getLoginType() == 2 ? BusinessConst.PROPERTY_ADMIN : BusinessConst.COMMUNITY_ADMIN);
+		addMenuDto.setName(sysMenuEntity.getName());
+		addMenuDto.setIcon(sysMenuEntity.getIcon());
+		addMenuDto.setPath(sysMenuEntity.getPath());
+		addMenuDto.setSort(sysMenuEntity.getSort());
+		addMenuDto.setPid(sysMenuEntity.getPid());
+		addMenuDto.setType(sysMenuEntity.getType());
+		addMenuDto.setUid(sysMenuEntity.getId());
+		// 新增菜单
+		PermitMenu permitMenu = baseMenuRpcService.addMenu(addMenuDto);
+		// 绑定菜单到默认角色
+		List<Long> menuIds = new ArrayList<>();
+		menuIds.add(permitMenu.getId());
+		baseMenuRpcService.menuJoinRole(menuIds, sysMenuEntity.getLoginType() == 1 ? 1463327674104250369L : sysMenuEntity.getLoginType() == 2 ? 1463327674070695937L : 1467739062281084931L , 1460884237115367425L);
 	}
 	
 	//寻找顶级菜单ID
@@ -152,19 +189,22 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Date: 2020/12/14
 	**/
 	@Override
-	public boolean delMenu(Long id){
-		List<Long> idList = new LinkedList<>(); // 级联出的要删除的id
-		idList.add(id);
-//		List<Long> subIdList = sysMenuMapper.getSubIdList(Arrays.asList(id));
-//		setDeleteIds(idList, subIdList);
-//		int result = sysMenuMapper.deleteBatchIds(idList);
-		int result = sysMenuMapper.deleteById(id);
-		sysMenuMapper.delete(new QueryWrapper<SysMenuEntity>().eq("belong_to",id));
-		if(result == 1){
-			cacheMenuToRedis(); //刷新redis
-			return true;
-		}
-		return false;
+	public void delMenu(Long id){
+//		List<Long> idList = new LinkedList<>(); // 级联出的要删除的id
+//		idList.add(id);
+////		List<Long> subIdList = sysMenuMapper.getSubIdList(Arrays.asList(id));
+////		setDeleteIds(idList, subIdList);
+////		int result = sysMenuMapper.deleteBatchIds(idList);
+//		int result = sysMenuMapper.deleteById(id);
+//		sysMenuMapper.delete(new QueryWrapper<SysMenuEntity>().eq("belong_to",id));
+//		if(result == 1){
+//			cacheMenuToRedis(); //刷新redis
+//			return true;
+//		}
+//		return false;
+		List<Long> menuIds = new ArrayList<>();
+		menuIds.add(id);
+		baseMenuRpcService.deleteMenu(menuIds);
 	}
 	
 	//组装全部需要删除的id
@@ -184,15 +224,26 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Date: 2020/12/14
 	**/
 	@Override
-	public boolean updateMenu(SysMenuQO sysMenuQO){
-		SysMenuEntity entity = new SysMenuEntity();
-		BeanUtils.copyProperties(sysMenuQO,entity);
-		int result = sysMenuMapper.updateById(entity);
-		if(result == 1){
-			cacheMenuToRedis(); //刷新redis
-			return true;
-		}
-		return false;
+	public void updateMenu(SysMenuQO sysMenuQO){
+//		SysMenuEntity entity = new SysMenuEntity();
+//		BeanUtils.copyProperties(sysMenuQO,entity);
+//		int result = sysMenuMapper.updateById(entity);
+//		if(result == 1){
+//			cacheMenuToRedis(); //刷新redis
+//			return true;
+//		}
+//		return false;
+		UpdateMenuDto updateMenuDto = new UpdateMenuDto();
+		updateMenuDto.setId(sysMenuQO.getId());
+		updateMenuDto.setLoginType(sysMenuQO.getLoginType() == 1 ? BusinessConst.ULTIMATE_ADMIN : sysMenuQO.getLoginType() == 2 ? BusinessConst.PROPERTY_ADMIN : BusinessConst.COMMUNITY_ADMIN);
+		updateMenuDto.setName(sysMenuQO.getName());
+		updateMenuDto.setIcon(sysMenuQO.getIcon());
+		updateMenuDto.setPath(sysMenuQO.getPath());
+		updateMenuDto.setSort(sysMenuQO.getSort());
+		updateMenuDto.setPid(sysMenuQO.getPid());
+		updateMenuDto.setUid(sysMenuQO.getUpdateId());
+		
+		baseMenuRpcService.updateMenu(updateMenuDto);
 	}
 	
 	/**
@@ -203,20 +254,8 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Date: 2020/12/14
 	**/
 	@Override
-	public List<SysMenuEntity> listOfMenu() {
-		List<SysMenuEntity> list = null;
-		try{
-			list = JSONArray.parseObject(stringRedisTemplate.opsForValue().get("Sys:Menu"),List.class);
-			// list排序
-			if (CollectionUtils.isEmpty(list)) {
-				return new ArrayList<>();
-			}
-			list.sort(Comparator.comparing(SysMenuEntity::getSort));
-		}catch (Exception e){
-			log.error("redis获取菜单失败");
-			return queryMenu();//从mysql获取
-		}
-		return list;
+	public List<PermitMenu> listOfMenu() {
+		return queryMenu();//从mysql获取
 	}
 	
 	/**
@@ -283,15 +322,26 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Date: 2020/12/14
 	 **/
 	@Override
-	public boolean addRole(SysRoleEntity sysRoleEntity){
-		sysRoleEntity.setId(SnowFlake.nextId());
-		//设置角色菜单
-		if(!CollectionUtils.isEmpty(sysRoleEntity.getMenuIds())){
-			setRoleMenus(sysRoleEntity.getMenuIds(),sysRoleEntity.getId());
+	public void addRole(SysRoleEntity sysRoleEntity){
+//		sysRoleEntity.setId(SnowFlake.nextId());
+//		//设置角色菜单
+//		if(!CollectionUtils.isEmpty(sysRoleEntity.getMenuIds())){
+//			setRoleMenus(sysRoleEntity.getMenuIds(),sysRoleEntity.getId());
+//		}
+//		int result = sysRoleMapper.insert(sysRoleEntity);
+//        return result == 1;
+		PermitRole permitRole = baseRoleRpcService.createRole(sysRoleEntity.getName(), sysRoleEntity.getRemark(), BusinessConst.ULTIMATE_ADMIN, sysRoleEntity.getId());
+		// 菜单分配给角色
+		baseMenuRpcService.menuJoinRole(sysRoleEntity.getMenuIds(), permitRole.getId(), sysRoleEntity.getId());
+		// 查询菜单和权限绑定关系
+		List<MenuPermission> menuPermissions = baseMenuPermissionRpcService.listByIds(sysRoleEntity.getMenuIds());
+		Set<Long> permisIds = new HashSet<>();
+		for (MenuPermission menuPermission : menuPermissions) {
+			permisIds.add(menuPermission.getPermisId());
 		}
-		int result = sysRoleMapper.insert(sysRoleEntity);
-        return result == 1;
-    }
+		// 将权限添加到角色
+		permissionRpcService.permitJoinRole(permisIds, permitRole.getId(), sysRoleEntity.getId());
+	}
 	
 	/**
 	 * @Description: 删除角色
@@ -301,9 +351,12 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Date: 2020/12/14
 	 **/
 	@Override
-	public boolean delRole(Long id){
-		int result = sysRoleMapper.deleteById(id);
-        return result == 1;
+	public void delRole(Long id){
+//		int result = sysRoleMapper.deleteById(id);
+//        return result == 1;
+		List<Long> roleIds = new ArrayList<>();;
+		roleIds.add(id);
+		baseRoleRpcService.deleteRole(roleIds);
     }
 	
 	/**
@@ -314,15 +367,38 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Date: 2020/12/14
 	 **/
 	@Override
-	public boolean updateRole(SysRoleQO sysRoleOQ){
-		SysRoleEntity entity = new SysRoleEntity();
-		BeanUtils.copyProperties(sysRoleOQ,entity);
-		//更新角色菜单
-		if(!CollectionUtils.isEmpty(entity.getMenuIds())){
-			setRoleMenus(entity.getMenuIds(),entity.getId());
+	public void updateRole(SysRoleQO sysRoleOQ, Long id){
+//		SysRoleEntity entity = new SysRoleEntity();
+//		BeanUtils.copyProperties(sysRoleOQ,entity);
+//		//更新角色菜单
+//		if(!CollectionUtils.isEmpty(entity.getMenuIds())){
+//			setRoleMenus(entity.getMenuIds(),entity.getId());
+//		}
+//		int result = sysRoleMapper.updateById(entity);
+//        return result == 1;
+		UpdateRoleDto updateRoleDto = new UpdateRoleDto();
+		updateRoleDto.setId(sysRoleOQ.getId());
+		updateRoleDto.setName(sysRoleOQ.getName());
+		if (org.apache.commons.lang3.StringUtils.isNotBlank(sysRoleOQ.getRemark())) {
+			updateRoleDto.setRemark(sysRoleOQ.getRemark());
 		}
-		int result = sysRoleMapper.updateById(entity);
-        return result == 1;
+		updateRoleDto.setUpdateUid(id);
+		// 修改角色
+		baseRoleRpcService.updateRole(updateRoleDto);
+		// 需要更改角色的菜单
+		if (sysRoleOQ.getMenuIds() != null && sysRoleOQ.getMenuIds().size() > 0) {
+			// 先移除绑定角色的菜单，再把新的菜单分配给角色(全删全增)
+			// 查询该角色关联的菜单id列表
+			List<RoleMenu> roleMenus = baseRoleRpcService.listAllRoleMenu(sysRoleOQ.getId());
+			List<Long> menuIdsList = new ArrayList<>();
+			for (RoleMenu roleMenu : roleMenus) {
+				menuIdsList.add(roleMenu.getMenuId());
+			}
+			// 移除角色下的菜单id列表
+			baseMenuRpcService.roleRemoveMenu(sysRoleOQ.getId(), menuIdsList);
+			// 新菜单分配给角色
+			baseMenuRpcService.menuJoinRole(sysRoleOQ.getMenuIds(), sysRoleOQ.getId(), id);
+		}
     }
 	
 	/**
@@ -334,7 +410,19 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 **/
 	@Override
 	public List<SysRoleEntity> listOfRole(){
-		return sysRoleMapper.selectList(new QueryWrapper<SysRoleEntity>().select("*"));
+//		return sysRoleMapper.selectList(new QueryWrapper<SysRoleEntity>().select("*
+		List<SysRoleEntity> sysRoleEntities = new ArrayList<>();
+		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage("", BusinessConst.ULTIMATE_ADMIN, 0, 999999999);
+		for (PermitRole permitRole : permitRolePageVO.getData()) {
+			SysRoleEntity sysRoleEntity = new SysRoleEntity();
+			sysRoleEntity.setId(permitRole.getId());
+			sysRoleEntity.setIdStr(String.valueOf(permitRole.getId()));
+			sysRoleEntity.setName(permitRole.getName());
+			sysRoleEntity.setRemark(permitRole.getRemark());
+			sysRoleEntity.setCreateTime(LocalDateTime.parse(permitRole.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+			sysRoleEntities.add(sysRoleEntity);
+		}
+		return sysRoleEntities;
 	}
 	
 	/**
@@ -345,28 +433,59 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 * @Date: 2021/10/13
 	 **/
 	@Override
-	public PageInfo<SysRoleEntity> queryPage(BaseQO<SysRoleEntity> baseQO){
-		Page<SysRoleEntity> page = new Page<>();
-		MyPageUtils.setPageAndSize(page,baseQO);
+	public PageVO<SysRoleEntity> queryPage(BaseQO<SysRoleEntity> baseQO){
+//		Page<SysRoleEntity> page = new Page<>();
+//		MyPageUtils.setPageAndSize(page,baseQO);
+//		SysRoleEntity query = baseQO.getQuery();
+//		QueryWrapper<SysRoleEntity> queryWrapper = new QueryWrapper<>();
+//		queryWrapper.select("id,name,remark,create_time");
+//		if(!StringUtils.isEmpty(query.getName())){
+//			queryWrapper.like("name",query.getName());
+//		}
+//		if(query.getId() != null){
+//			//查详情
+//			queryWrapper.eq("id",query.getId());
+//		}
+//		Page<SysRoleEntity> pageData = sysRoleMapper.selectPage(page,queryWrapper);
+//		if(query.getId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
+//			//查菜单权限
+//			SysRoleEntity entity = pageData.getRecords().get(0);
+//			entity.setMenuIds(sysRoleMapper.getRoleMenu(entity.getId()));
+//		}
+//		PageInfo<SysRoleEntity> pageInfo = new PageInfo<>();
+//		BeanUtils.copyProperties(pageData,pageInfo);
+//		return pageInfo;
 		SysRoleEntity query = baseQO.getQuery();
-		QueryWrapper<SysRoleEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.select("id,name,remark,create_time");
-		if(!StringUtils.isEmpty(query.getName())){
-			queryWrapper.like("name",query.getName());
+		Page<SysRoleEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page, baseQO);
+		
+		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(query.getName(), BusinessConst.ULTIMATE_ADMIN, baseQO.getPage().intValue(), baseQO.getSize().intValue());
+		if (CollectionUtils.isEmpty(permitRolePageVO.getData())) {
+			return new PageVO<>();
 		}
-		if(query.getId() != null){
-			//查详情
-			queryWrapper.eq("id",query.getId());
+		
+		PageVO<SysRoleEntity> pageVO = new PageVO<>();
+		// 补充数据
+		for (PermitRole permitRole : permitRolePageVO.getData()) {
+			SysRoleEntity sysRoleEntity = new SysRoleEntity();
+			sysRoleEntity.setId(permitRole.getId());
+			sysRoleEntity.setIdStr(String.valueOf(permitRole.getId()));
+			sysRoleEntity.setName(permitRole.getName());
+			sysRoleEntity.setRemark(permitRole.getRemark());
+			sysRoleEntity.setCreateTime(LocalDateTime.parse(permitRole.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+			// 查角色对应的菜单id
+			List<RoleMenu> roleMenus = baseRoleRpcService.listAllRoleMenu(permitRole.getId());
+			List<Long> menuIdList = roleMenus.stream().map(RoleMenu::getMenuId).collect(Collectors.toList());
+			List<String> menuIdsList = menuIdList.stream().map(String::valueOf).collect(Collectors.toList());
+			sysRoleEntity.setMenuIds(menuIdList);
+			sysRoleEntity.setMenuIdsStr(menuIdsList);
+			pageVO.getData().add(sysRoleEntity);
 		}
-		Page<SysRoleEntity> pageData = sysRoleMapper.selectPage(page,queryWrapper);
-		if(query.getId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
-			//查菜单权限
-			SysRoleEntity entity = pageData.getRecords().get(0);
-			entity.setMenuIds(sysRoleMapper.getRoleMenu(entity.getId()));
-		}
-		PageInfo<SysRoleEntity> pageInfo = new PageInfo<>();
-		BeanUtils.copyProperties(pageData,pageInfo);
-		return pageInfo;
+		pageVO.setPageNum(permitRolePageVO.getPageNum());
+		pageVO.setPageSize(permitRolePageVO.getPageSize());
+		pageVO.setPages(permitRolePageVO.getPages());
+		pageVO.setTotal(permitRolePageVO.getTotal());
+		return pageVO;
 	}
 	
 	/**
@@ -438,18 +557,34 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	 **/
 	@Override
 	public SysRoleEntity queryRoleDetail(Long roleId) {
-		// 查询角色信息
-		QueryWrapper<SysRoleEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("id", roleId);
-		SysRoleEntity sysRoleEntity = sysRoleMapper.selectOne(queryWrapper);
-		if (sysRoleEntity == null) {
-			return new SysRoleEntity();
-		}
-		// 查询分配的菜单列表
-		List<Long> roleMenuIds = sysRoleMapper.queryRoleMuneIdsByRoleId(roleId);
-		// 去重
-		List<Long> collect = roleMenuIds.stream().distinct().collect(Collectors.toList());
-		sysRoleEntity.setMenuIds(collect);
+//		// 查询角色信息
+//		QueryWrapper<SysRoleEntity> queryWrapper = new QueryWrapper<>();
+//		queryWrapper.eq("id", roleId);
+//		SysRoleEntity sysRoleEntity = sysRoleMapper.selectOne(queryWrapper);
+//		if (sysRoleEntity == null) {
+//			return new SysRoleEntity();
+//		}
+//		// 查询分配的菜单列表
+//		List<Long> roleMenuIds = sysRoleMapper.queryRoleMuneIdsByRoleId(roleId);
+//		// 去重
+//		List<Long> collect = roleMenuIds.stream().distinct().collect(Collectors.toList());
+//		sysRoleEntity.setMenuIds(collect);
+//		return sysRoleEntity;
+		SysRoleEntity sysRoleEntity = new SysRoleEntity();
+		// 查角色详情
+		PermitRole permitRole = baseRoleRpcService.getById(roleId);
+		// 查角色对应的菜单id
+		List<RoleMenu> roleMenus = baseRoleRpcService.listAllRoleMenu(permitRole.getId());
+		List<Long> menuIdList = roleMenus.stream().map(RoleMenu::getMenuId).collect(Collectors.toList());
+		List<String> menuIdsList = menuIdList.stream().map(String::valueOf).collect(Collectors.toList());
+		
+		sysRoleEntity.setId(permitRole.getId());
+		sysRoleEntity.setIdStr(String.valueOf(permitRole.getId()));
+		sysRoleEntity.setName(permitRole.getName());
+		sysRoleEntity.setRemark(permitRole.getRemark());
+		sysRoleEntity.setCreateTime(LocalDateTime.parse(permitRole.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+		sysRoleEntity.setMenuIds(menuIdList);
+		sysRoleEntity.setMenuIdsStr(menuIdsList);
 		return sysRoleEntity;
 	}
 }

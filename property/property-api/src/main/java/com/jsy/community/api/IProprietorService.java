@@ -79,14 +79,6 @@ public interface IProprietorService extends IService<ProprietorEntity> {
      */
     void addUser(ProprietorQO qo, String adminUid);
 
-
-    /**
-     * 通过管理员uid 获取管理员真实名称
-     * @param adminUid      管理员uid
-     * @return               真实名称
-     */
-    String getAdminRealName(String adminUid);
-
     /**
      * @author: Pipi
      * @description: 查询未绑定房屋列表 

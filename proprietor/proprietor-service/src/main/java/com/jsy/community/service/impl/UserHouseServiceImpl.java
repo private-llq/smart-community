@@ -1,4 +1,5 @@
 package com.jsy.community.service.impl;
+
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -12,9 +13,17 @@ import com.jsy.community.qo.UserHouseQO;
 import com.jsy.community.qo.proprietor.UserHouseQo;
 import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.vo.HouseMembersQO;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.MembersVO;
 import com.jsy.community.vo.UserHouseVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealUserDetail;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
+import com.zhsj.base.api.entity.RealInfoDto;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +35,8 @@ import org.springframework.util.CollectionUtils;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author chq459799974
@@ -67,7 +78,13 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IHouseInfoService houseInfoService;
-	
+
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+	private IBaseUserInfoRpcService userInfoRpcService;
+
+	@DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check=false)
+	private IImChatPublicPushRpcService iImChatPublicPushRpcService;
+
 	/**
 	 * @return java.lang.Boolean
 	 * @Author lihao
@@ -133,17 +150,18 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	@Override
 	@Transactional
 	public void updateMobileUser(String uid) {
-		UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", uid));
+		// UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", uid));
+		UserDetail userDetail = userInfoRpcService.getUserDetail(uid);
 		Set<Long> ids = new HashSet<>();
-		if (userEntity != null) {
-			List<HouseMemberEntity> entityList = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("mobile", userEntity.getMobile()));
+		if (userDetail != null) {
+			List<HouseMemberEntity> entityList = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("mobile", userDetail.getPhone()));
 			if (entityList.size()!=0){
 				for (HouseMemberEntity houseMemberEntity : entityList) {
 					ids.add(houseMemberEntity.getHouseId());
 				}
 
 				//给成员表添加uid
-				houseMemberMapper.updateByUid(uid,userEntity.getMobile());
+				houseMemberMapper.updateByUid(uid,userDetail.getPhone());
 				//给房屋认证表添加用户uid
 				userHouseMapper.updateByUid(ids,uid);
 			}
@@ -278,22 +296,23 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		List<String> list = Arrays.asList(ids.split(","));
 		for (String s : list) {
 			HouseMemberEntity entity = houseMemberMapper.selectById(s);
-			UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", entity.getUid()));
+			UserImVo userIm = userInfoRpcService.getEHomeUserIm(entity.getUid());
 			CommunityEntity communityEntity = communityMapper.selectById(entity.getCommunityId());
 			HouseEntity houseEntity = houseMapper.selectById(entity.getHouseId());
 			//移除人
-			UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
+			UserDetail userDetail = userInfoRpcService.getUserDetail(userId);
 
 			Map<String, Object> map = new HashMap<>();
 			map.put("type",8);
 			//推送消息
 			PushInfoUtil.PushPublicTextMsg(
-					userIMEntity.getImId(),
+					iImChatPublicPushRpcService,
+					userIm.getImId(),
 					"房屋管理",
 					"您有房屋最新消息了！",
 					null,
 					"尊敬的用户您好，\n" +
-							"用户"+userEntity.getRealName()+"已房东的身份移除你在"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(entity.getRelation())+"身份，如已知晓，请忽略。",
+							"用户"+userDetail.getNickName()+"已房东的身份移除你在"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+BusinessEnum.RelationshipEnum.getCodeName(entity.getRelation())+"身份，如已知晓，请忽略。",
 					map,
 					BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
 
@@ -329,18 +348,19 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 		//房间
 		HouseEntity houseEntity = houseMapper.selectById(membersQO.getHouseId());
 		//被添加的用户
-		UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("mobile", membersQO.getMobile()));
+		UserDetail userEntity = userInfoRpcService.getUserDetailByPhone(membersQO.getMobile());
 		//业主
-		UserEntity user = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
+		UserDetail user = userInfoRpcService.getUserDetail(userId);
+
 		if (userEntity != null) {
 
-			UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", userEntity.getUid()));
+			UserImVo userIm = userInfoRpcService.getEHomeUserIm(userEntity.getAccount());
 
 			String relation = membersQO.getRelation()==6?"亲属":membersQO.getRelation()==7?"租客":"";
 			String str = membersQO.getRelation()==6?"点击此处确定关系。":"点击此处确定入驻。";
 			String title="房屋绑定"+relation+"!";
 			String desc="房屋绑定"+relation  +"\n"+
-					"我是"+user.getRealName()+"，邀请您("+membersQO.getName()+")加入"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+",成为我的"+relation+"成员，"+ str;
+					"我是"+user.getNickName()+"，邀请您("+membersQO.getName()+")加入"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+",成为我的"+relation+"成员，"+ str;
 
 			HouseInfoEntity houseInfoEntity = new HouseInfoEntity();
 			houseInfoEntity.setId(String.valueOf(SnowFlake.nextId()));
@@ -350,7 +370,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			houseInfoEntity.setCreateTime(LocalDateTime.now());
 			houseInfoEntity.setOverdueTime(LocalDateTime.now().plusHours(1));
 			houseInfoEntity.setYzUid(userId);
-			houseInfoEntity.setYhUid(userEntity.getUid());
+			houseInfoEntity.setYhUid(userEntity.getAccount());
 			houseInfoEntity.setHouseId(String.valueOf(membersQO.getHouseId()));
 			houseInfoService.saveOne(houseInfoEntity);
 
@@ -358,7 +378,8 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			map.put("type",9);
 			//推送消息
 			PushInfoUtil.PushPublicMsg(
-					userIMEntity.getImId(),
+					iImChatPublicPushRpcService,
+					userIm.getImId(),
 					"房屋管理",
 					title,
 					H5Url+"?id="+houseInfoEntity.getId()+"&mobile="+membersQO.getMobile(),
@@ -379,7 +400,7 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 			String str = membersQO.getRelation()==6?"点击此处确定关系。":"点击此处确定入驻。";
 			String title="房屋绑定"+relation+"!";
 			String desc="房屋绑定"+relation  +"\n"+
-					"我是"+user.getRealName()+"，邀请您("+membersQO.getName()+")加入"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+",成为我的"+relation+"成员，"+ str;
+					"我是"+user.getNickName()+"，邀请您("+membersQO.getName()+")加入"+communityEntity.getName()+houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor()+",成为我的"+relation+"成员，"+ str;
 
 			HouseInfoEntity houseInfoEntity = new HouseInfoEntity();
 			houseInfoEntity.setId(String.valueOf(SnowFlake.nextId()));
@@ -531,7 +552,9 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 				userHouseMapper.insert(houseEntity);
 
 				//房间成员表里添加数据
-				UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
+				// UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", userId));
+				UserDetail userDetail = userInfoRpcService.getUserDetail(userId);
+				RealInfoDto idCardRealInfo = userInfoRpcService.getIdCardRealInfo(userId);
 				HouseMemberEntity houseMemberEntity = houseMemberMapper.selectOne(new QueryWrapper<HouseMemberEntity>().eq("community_id", userHouseQO.getCommunityId()).eq("house_id", userHouseQO.getHouseId()).eq("mobile", userHouseQO.getMobile()).eq("name", userHouseQO.getName()));
 				if (houseMemberEntity!=null){
 					houseMemberEntity.setUid(userId);
@@ -541,11 +564,15 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 					memberEntity.setUid(userId);
 					memberEntity.setCommunityId(userHouseQO.getCommunityId());
 					memberEntity.setHouseId(userHouseQO.getHouseId());
-					memberEntity.setName(userEntity.getRealName());
-					memberEntity.setSex(userEntity.getSex());
-					memberEntity.setMobile(userEntity.getMobile());
+					if (userDetail != null) {
+						memberEntity.setMobile(userDetail.getPhone());
+						memberEntity.setSex(userDetail.getSex());
+					}
+					if (idCardRealInfo != null) {
+						memberEntity.setIdCard(idCardRealInfo.getIdCardNumber());
+						memberEntity.setName(idCardRealInfo.getIdCardName());
+					}
 					memberEntity.setRelation(1);
-					memberEntity.setIdCard(userEntity.getIdCard());
 					memberEntity.setId(SnowFlake.nextId());
 					houseMemberMapper.insert(memberEntity);
 				}
@@ -573,13 +600,29 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 
 			//当前登录人员为业主
 			UserHouseVO userHouseVO = houseMemberMapper.selectLoginUser(userId, userHouseQO.getCommunityId(), userHouseQO.getHouseId(), 1);
+			UserDetail userDetail = userInfoRpcService.getUserDetail(userId);
+			if (userDetail != null) {
+				userHouseVO.setAvatarUrl(userDetail.getAvatarThumbnail());
+			}
 			userHouseVO.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(userHouseVO.getRelation()));
 			userHouseVO.setHouseSite(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
 			userHouseVO.setCommunityText(communityEntity.getName());
 
 			//查询房屋下所有成员
 			List<MembersVO> voList = houseMemberMapper.selectRelation(userHouseQO.getCommunityId(), userHouseQO.getHouseId(), 0);
+			Set<String> uidSet = voList.stream().map(MembersVO::getUid).collect(Collectors.toSet());
+			Map<String, RealUserDetail> map = new HashMap<>();
+			if (!CollectionUtils.isEmpty(uidSet)) {
+				List<RealUserDetail> realUserDetails = userInfoRpcService.getRealUserDetails(uidSet);
+				if (!CollectionUtils.isEmpty(realUserDetails)) {
+					map = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
+				}
+			}
 			for (MembersVO membersVO : voList) {
+				RealUserDetail realUserDetails = map.get(membersVO.getUid());
+				if (realUserDetails != null) {
+					membersVO.setAvatarUrl(realUserDetails.getAvatarThumbnail());
+				}
 				if (!membersVO.getRelation().equals(1)){
 					membersVO.setRelationText(BusinessEnum.RelationshipEnum.getCodeName(membersVO.getRelation()));
 					list.add(membersVO);
@@ -698,6 +741,20 @@ public class UserHouseServiceImpl extends ServiceImpl<UserHouseMapper, UserHouse
 	@Override
 	public List<UserHouseEntity> selectUserHouse(Long communityId, String uid) {
 		List<UserHouseEntity> list = userHouseMapper.selectList(new QueryWrapper<UserHouseEntity>().eq("community_id", communityId).eq("uid", uid));
+		return list;
+	}
+
+
+	/**
+	 * @Description: 养老导入家人列表接口
+	 * @author: Hu
+	 * @since: 2021/12/2 15:33
+	 * @Param: [userId]
+	 * @return: java.util.List<com.jsy.community.vo.HouseMembersQO>
+	 */
+	@Override
+	public List<HouseMembersQO> selectMembers(String userId) {
+		List<HouseMembersQO> list = houseMemberMapper.selectMembers(userId);
 		return list;
 	}
 }

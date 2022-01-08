@@ -1,7 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseQO;
@@ -9,8 +7,8 @@ import com.jsy.community.service.HouseExcelHandler;
 import com.jsy.community.service.IHouseService;
 import com.jsy.community.utils.ExcelUtil;
 import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -40,7 +38,7 @@ import java.util.List;
 @Api(tags = "房屋信息控制器")
 @RestController
 @RequestMapping("house")
-@ApiJSYController
+// @ApiJSYController
 public class HouseController {
 
 	@Resource
@@ -56,9 +54,9 @@ public class HouseController {
 	 * @Author: chq459799974
 	 * @Date: 2021/4/1
 	**/
-	@Login
 	@ApiOperation("【楼宇房屋】条件查询")
 	@PostMapping("query")
+	@Permit("community:admin:house:query")
 	public CommonResult<PageInfo<HouseEntity>> queryHouse(@RequestBody BaseQO<HouseQO> baseQO){
 		return CommonResult.ok(houseService.queryHouse(baseQO));
 	}
@@ -70,11 +68,11 @@ public class HouseController {
 	 *@Return: com.jsy.community.vo.CommonResult
 	 *@Date: 2021/10/22 14:26
 	 **/
-	@Login
 	@ApiOperation("导出房屋信息")
 	@PostMapping("/downloadHouseList")
+	@Permit("community:admin:house:downloadHouseList")
 	public ResponseEntity<byte[]> downloadOrderList(@RequestBody HouseQO houseQO) {
-		houseQO.setCommunityId(UserUtils.getAdminCommunityId());
+//		houseQO.setCommunityId(UserUtils.getAdminCommunityId());
 		List<HouseEntity> houseEntities = houseService.queryExportHouseExcel(houseQO);
 		//设置excel 响应头信息
 		MultiValueMap<String, String> multiValueMap = new HttpHeaders();

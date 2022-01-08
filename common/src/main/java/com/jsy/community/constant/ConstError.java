@@ -34,4 +34,13 @@ public interface ConstError {
 	 * 余额不足
 	 */
 	int NOT_ENOUGH = 40003;
+	/**
+	 * 数据丢失
+	 */
+	int DATA_LOST = 4041;
+	
+	/**
+	 * 楼层超出
+	 */
+	int FLOOR_BEYOND = 40004;
 }

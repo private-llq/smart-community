@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @author lihao
  * @ClassName AppMenuVO
  * @Date 2021/3/23  15:15
- * @Description TODO
+ * @Description
  * @Version 1.0
  **/
 @Data

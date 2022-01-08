@@ -88,7 +88,6 @@ public class TopicListener {
 					break;
 				case "XUFace":
 					//炫优人脸识别一体机
-					//TODO
 					break;
 				default:
 					log.error("监听到云端到无效指令：" + jsonObject.getString("act"));

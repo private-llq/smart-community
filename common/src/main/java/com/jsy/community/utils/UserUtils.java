@@ -1,5 +1,4 @@
 package com.jsy.community.utils;
-
 import com.alibaba.fastjson.JSONObject;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
@@ -7,15 +6,14 @@ import com.jsy.community.vo.ControlVO;
 import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.sys.SysInfoVo;
+import com.zhsj.baseweb.support.ContextHolder;
+import com.zhsj.baseweb.support.LoginUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -78,39 +76,31 @@ public class UserUtils {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/21
 	**/
-	public static AdminInfoVo getAdminInfo(String loginToken) {
-		if(StringUtils.isEmpty(loginToken)){
-			return null;
-		}
+	public static AdminInfoVo getAdminInfo() {
 		String str;
 		try {
-			str = stringRedisTemplate.opsForValue().get("Admin:Login:" + loginToken);
+			str = stringRedisTemplate.opsForValue().get("Admin:Login:" + getUserToken());
 		} catch (Exception e) {
 			throw new JSYException(JSYError.INTERNAL.getCode(),"redis超时");
 		}
-		AdminInfoVo adminUser = JSONObject.parseObject(str, AdminInfoVo.class);
-		return adminUser;
+		return JSONObject.parseObject(str, AdminInfoVo.class);
 	}
 	
 	/**
-	 * @Description: 通过token获取用户信息(物业端)
+	 * @Description: 通过token获取用户信息(大后台)
 	 * @Param: [loginToken]
 	 * @Return: com.jsy.community.vo.sys.SysInfoVo
 	 * @Author: DKS
 	 * @Date: 2021/10/14
 	 **/
-	public static SysInfoVo getSysInfo(String loginToken) {
-		if(StringUtils.isEmpty(loginToken)){
-			return null;
-		}
+	public static SysInfoVo getSysInfo() {
 		String str;
 		try {
-			str = stringRedisTemplate.opsForValue().get("Sys:Login:" + loginToken);
+			str = stringRedisTemplate.opsForValue().get("Sys:Login:" + getUserToken());
 		} catch (Exception e) {
 			throw new JSYException(JSYError.INTERNAL.getCode(),"redis超时");
 		}
-		SysInfoVo sysUser = JSONObject.parseObject(str, SysInfoVo.class);
-		return sysUser;
+		return JSONObject.parseObject(str, SysInfoVo.class);
 	}
 	
 	/**
@@ -121,9 +111,17 @@ public class UserUtils {
 	 * @Date: 2020/12/3
 	**/
 	public static UserInfoVo getUserInfo() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (UserInfoVo)request.getAttribute(USER_INFO);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+		LoginUser loginUser = ContextHolder.getContext().getLoginUser();
+		UserInfoVo userInfoVo = new UserInfoVo();
+		
+		userInfoVo.setId(loginUser.getId());
+		userInfoVo.setMobile(loginUser.getPhone());
+		userInfoVo.setUid(loginUser.getAccount());
+		userInfoVo.setImId(loginUser.getImId());
+		userInfoVo.setNickname(loginUser.getNickName());
+		return userInfoVo;
 	}
 
 
@@ -136,9 +134,10 @@ public class UserUtils {
 	 * @Date: 2020/12/3
 	 **/
 	public static AdminInfoVo getAdminUserInfo() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (AdminInfoVo)request.getAttribute(USER_INFO);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+//		return (AdminInfoVo)request.getAttribute(USER_INFO);
+		return getAdminInfo();
 	}
 	
 	/**
@@ -149,9 +148,20 @@ public class UserUtils {
 	 * @Date: 2020/12/3
 	**/
 	public static String getUserId() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (String) request.getAttribute(USER_KEY);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+		return ContextHolder.getContext().getLoginUser().getAccount();
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 获取e到家用户id
+	 * @param :
+	 * @return: {@link Long}
+	 * @date: 2021/12/8 16:54
+	 **/
+	public static Long getEHomeUserId() {
+		return ContextHolder.getContext().getLoginUser().getId();
 	}
 	
 	/**
@@ -162,9 +172,10 @@ public class UserUtils {
 	 * @Date: 2021/10/14
 	 **/
 	public static String getId() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (String) request.getAttribute(USER_ID);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+//		return (String) request.getAttribute(USER_ID);
+		return String.valueOf(ContextHolder.getContext().getLoginUser().getId());
 	}
 	
 	/**
@@ -175,10 +186,13 @@ public class UserUtils {
 	 * @Date: 2021/4/8
 	**/
 	public static String getUserToken() {
+		return ContextHolder.getContext().getLoginUser().getToken();
+	}
+	/*public static String getUserToken() {
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
 			.getRequest();
 		return (String) request.getAttribute(USER_TOKEN);
-	}
+	}*/
 	
 	/**
 	* @Description: 获取物业端登录用户社区ID
@@ -188,9 +202,11 @@ public class UserUtils {
 	 * @Date: 2021/4/1
 	**/
 	public static Long getAdminCommunityId() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (Long) request.getAttribute(USER_COMMUNITY);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+//		return (Long) request.getAttribute(USER_COMMUNITY);
+		AdminInfoVo adminInfo = getAdminInfo();
+		return adminInfo.getCommunityId();
 	}
 
 	/**
@@ -201,9 +217,11 @@ public class UserUtils {
 	 * @date: 2021/7/29 11:20
 	 **/
 	public static Long getAdminCompanyId() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-				.getRequest();
-		return (Long) request.getAttribute(USER_COMPANY_ID);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//				.getRequest();
+//		return (Long) request.getAttribute(USER_COMPANY_ID);
+		AdminInfoVo adminInfo = getAdminInfo();
+		return adminInfo.getCompanyId();
 	}
 
 	/**
@@ -214,9 +232,11 @@ public class UserUtils {
 	 * @date: 2021/8/6 14:28
 	 **/
 	public static Long getAdminRoleId() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-				.getRequest();
-		return (Long) request.getAttribute(USER_ROLE_ID);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//				.getRequest();
+//		return (Long) request.getAttribute(USER_ROLE_ID);
+		AdminInfoVo adminInfo = getAdminInfo();
+		return adminInfo.getRoleId();
 	}
 	
 	/**
@@ -227,9 +247,11 @@ public class UserUtils {
 	 * @Date: 2021/7/20
 	 **/
 	public static List<String> getAdminCommunityIdList() {
-		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-			.getRequest();
-		return (List<String>) request.getAttribute(USER_COMMUNITY_ID_LIST);
+//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+//			.getRequest();
+//		return (List<String>) request.getAttribute(USER_COMMUNITY_ID_LIST);
+		AdminInfoVo adminInfo = getAdminInfo();
+		return adminInfo.getCommunityIdList();
 	}
 	
 	/**

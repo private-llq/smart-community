@@ -57,9 +57,9 @@ public class PropertyFinanceLogAop extends BaseAop {
 		Method method = signature.getMethod();
 		
 		//获取用户id和社区id
-		financeLog.setUserId(UserUtils.getUserId());
+		financeLog.setUserId(UserUtils.getId());
 		financeLog.setCommunityId(UserUtils.getAdminCommunityId());
-		financeLog.setCreateBy(UserUtils.getUserId());
+		financeLog.setCreateBy(UserUtils.getId());
 		
 		//获取请求的类名
 		String className = joinPoint.getTarget().getClass().getName();

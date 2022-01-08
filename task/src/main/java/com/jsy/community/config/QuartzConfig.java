@@ -11,7 +11,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
  * @author lihao
  * @ClassName QuartzConfig
  * @Date 2020/12/3  11:11
- * @Description TODO
+ * @Description
  * @Version 1.0
  **/
 @Configuration
@@ -33,7 +33,7 @@ public class QuartzConfig {
 //		factory.setCronExpression("0 0/4 * * * ? *");
 //		factory.setCronExpression("0/2 * * * * ?");
 //		factory.setCronExpression("0 0 0 * * ? *");
-		factory.setCronExpression("0 0 3 * * ? *");// TODO 暂定每天  am3:00
+		factory.setCronExpression("0 0 3 * * ? *");
 		
 		return factory;
 	}

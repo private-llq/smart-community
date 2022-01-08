@@ -16,6 +16,10 @@ import com.jsy.community.qo.RepairOrderQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.vo.repair.RepairPlanVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -59,7 +63,13 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	
 	@Autowired
 	private OrganizationMapper organizationMapper;
-	
+
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseUserInfoRpcService userInfoRpcService;
+
+	@DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check=false)
+	private IImChatPublicPushRpcService iImChatPublicPushRpcService;
+
 	// 房屋报修事项(个人)
 	private static final int TYPE_PERSON = 1;
 	
@@ -146,7 +156,7 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 
 		UserIMEntity imEntity = userImService.selectUid(repairEntity.getUserId());
 		if (imEntity!=null){
-			PushInfoUtil.PushPublicTextMsg(imEntity.getImId(),
+			PushInfoUtil.PushPublicTextMsg(iImChatPublicPushRpcService,imEntity.getImId(),
 					"报修通知",
 					"您提交的报修事项处理中",
 					null,"您提交的报修事项处理中\n请耐心等待处理结果。",null, BusinessEnum.PushInfromEnum.REPAIRNOTICE.getName());
@@ -179,9 +189,9 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 		repairEntity.setStatus(2); // 将状态设置为 已完成
 		repairMapper.updateById(repairEntity); // 更新报修表
 
-		UserIMEntity imEntity = userImService.selectUid(repairEntity.getUserId());
-		if (imEntity!=null){
-			PushInfoUtil.PushPublicTextMsg(imEntity.getImId(),
+		UserImVo userIm = userInfoRpcService.getEHomeUserIm(repairEntity.getUserId());
+		if (userIm!=null){
+			PushInfoUtil.PushPublicTextMsg(iImChatPublicPushRpcService,userIm.getImId(),
 					"报修通知",
 					"报修事项处理完成",
 					null,"报修事项处理完成\n您提交的报修事项工作人员已近处理完成了。",null, BusinessEnum.PushInfromEnum.REPAIRNOTICE.getName());

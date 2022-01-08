@@ -1,7 +1,11 @@
 package com.jsy.community.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.constant.BusinessConst;
+import com.jsy.community.constant.ConstClasses;
+import com.jsy.community.entity.SmsEntity;
 import com.jsy.community.entity.UserAuthEntity;
+import com.jsy.community.mapper.SmsMapper;
 import com.jsy.community.service.AdminException;
 import com.jsy.community.service.ICaptchaService;
 import com.jsy.community.service.ISysUserService;
@@ -29,6 +33,9 @@ public class CaptchaServiceImpl implements ICaptchaService {
 	@Resource
 	private ISysUserService sysUserService;
 	
+	@Resource
+	private SmsMapper smsMapper;
+	
 	@Override
 	public boolean sendMobile(String mobile, Integer type) {
 		if (type == UserAuthEntity.CODE_TYPE_REGISTER || type == UserAuthEntity.CODE_TYPE_CHANGE_MOBILE) {
@@ -47,7 +54,9 @@ public class CaptchaServiceImpl implements ICaptchaService {
 		}
 		
 		//发短信
-		String code = SmsUtil.sendVcode(mobile, BusinessConst.SMS_VCODE_LENGTH_DEFAULT);
+		SmsEntity smsEntity = smsMapper.selectOne(new QueryWrapper<SmsEntity>().eq("deleted", 0));
+		ConstClasses.AliYunDataEntity.setConfig(smsEntity);
+		String code = SmsUtil.sendVcode(mobile, BusinessConst.SMS_VCODE_LENGTH_DEFAULT, smsEntity.getSmsSign());
 		//5分钟有效期
 		redisTemplate.opsForValue().set("vCodeSys:" + mobile, code, 5, TimeUnit.MINUTES);
 		

@@ -5,7 +5,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IAppMenuService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.AppMenuEntity;
+import com.jsy.community.entity.AppVersionEntity;
 import com.jsy.community.mapper.AppMenuMapper;
+import com.jsy.community.mapper.AppVersionMapper;
+import jodd.util.StringUtil;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -25,6 +28,9 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	
 	@Autowired
 	private AppMenuMapper appMenuMapper;
+
+	@Autowired
+	private AppVersionMapper appVersionMapper;
 	
 	/**
 	 * 首页展示的菜单数   本来原先需求是说每个社区首页展示的菜单数可有物业控制(可以有1个2个3个...)   最新产品暂定的需求：每个社区首页最多有3个菜单  其中有个菜单是固定的(我的房屋) pS:应该在社区入驻的同事为其添加一条菜单(我的房屋)   应该是写在大后台的
@@ -73,8 +79,28 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	 * @Param: [communityId]
 	 * @return: java.util.List<com.jsy.community.entity.AppMenuEntity>
 	 */
-	public List<AppMenuEntity> listAppMenu(Long communityId) {
-		return appMenuMapper.listAppMenu(communityId,7);
+	public List<AppMenuEntity> listAppMenu(Long communityId, Integer sysType, String version) {
+		Integer paySupport = 0;
+		if (sysType != null && sysType == 2 && StringUtil.isNotBlank(version)) {
+			QueryWrapper<AppVersionEntity> versionEntityQueryWrapper = new QueryWrapper<>();
+			versionEntityQueryWrapper.eq("sys_version", version);
+			versionEntityQueryWrapper.eq("sys_type", sysType);
+			AppVersionEntity appVersionEntity = appVersionMapper.selectOne(versionEntityQueryWrapper);
+			if (appVersionEntity != null) {
+				paySupport = appVersionEntity.getPaySupport();
+			}
+		}
+		QueryWrapper<AppMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("version", "v2");
+		if (sysType != null && sysType == 2 && paySupport == 0) {
+			queryWrapper.ne("id", 14L);
+			queryWrapper.ne("id", 15L);
+		}
+		queryWrapper.orderByAsc("id");
+		queryWrapper.last("limit 9");
+		// List<AppMenuEntity> appMenuEntities = appMenuMapper.listAppMenu(communityId,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 9);
+
+		return appMenuMapper.selectList(queryWrapper);
 	}
 
 
@@ -87,6 +113,11 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 	 */
 	@Override
 	public List<AppMenuEntity> listAppMenuAll(Long communityId) {
-		return appMenuMapper.selectList(new QueryWrapper<AppMenuEntity>().eq("path","/community/hotline"));
+		QueryWrapper<AppMenuEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("version", "v2");
+		queryWrapper.orderByAsc("id");
+		queryWrapper.last("limit 9, 999");
+//		return appMenuMapper.selectList(new QueryWrapper<AppMenuEntity>().eq("path","/community/hotline"));
+		return appMenuMapper.selectList(queryWrapper);
 	}
 }

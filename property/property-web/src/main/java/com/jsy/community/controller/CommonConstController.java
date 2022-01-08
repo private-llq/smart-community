@@ -6,6 +6,7 @@ import com.jsy.community.api.ICommonConstService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ import java.util.Map;
  * @since 2020-12-25
  */
 @Api(tags = "公共常量控制器")
-@ApiJSYController
+// @ApiJSYController
 @Slf4j
 @RestController
 @RequestMapping("/const")
@@ -38,6 +39,7 @@ public class CommonConstController {
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private ICommonConstService commonConstService;
 
+	@LoginIgnore
 	@ApiOperation("字典资源查询")
 	@GetMapping("typeSources")
 	public CommonResult typeSources(@RequestParam String typeKey){

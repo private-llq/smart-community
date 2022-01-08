@@ -1,10 +1,6 @@
 package com.jsy.community.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.Log;
-import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.constant.Const;
@@ -19,6 +15,8 @@ import com.jsy.community.utils.POIUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +33,7 @@ import java.util.Objects;
 @Api(tags = "包月车辆")
 @RestController
 @RequestMapping("CarMonthlyVehicle")
-@ApiJSYController
+// @ApiJSYController
 public class CarMonthlyVehicleController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -50,10 +48,9 @@ public class CarMonthlyVehicleController {
      * @param carMonthlyVehicle
      * @return
      */
-
-    @Login
     @PostMapping("SaveMonthlyVehicle")
     @CarOperation(operation = "新增了【月租停车】")
+    @Permit("community:property:CarMonthlyVehicle:SaveMonthlyVehicle")
     public CommonResult SaveMonthlyVehicle(@RequestBody CarMonthlyVehicle carMonthlyVehicle) {
        vehicleService.SaveMonthlyVehicle(carMonthlyVehicle, UserUtils.getAdminCommunityId());
        return CommonResult.ok();
@@ -66,7 +63,7 @@ public class CarMonthlyVehicleController {
      */
     @PutMapping("UpdateMonthlyVehicle")
     @CarOperation(operation = "更新了【月租停车】")
-    @Login
+    @Permit("community:property:CarMonthlyVehicle:UpdateMonthlyVehicle")
     public CommonResult UpdateMonthlyVehicle(@RequestBody CarMonthlyVehicle carMonthlyVehicle) {
         Long adminCommunityId = UserUtils.getAdminCommunityId();
         carMonthlyVehicle.setCommunityId(adminCommunityId);
@@ -79,7 +76,7 @@ public class CarMonthlyVehicleController {
      * @param uid
      * @return
      */
-
+    @LoginIgnore
     @DeleteMapping("DelMonthlyVehicle")
     @CarOperation(operation = "删除了【月租停车】")
     public CommonResult DelMonthlyVehicle(@RequestParam("uid") String uid) {
@@ -93,9 +90,8 @@ public class CarMonthlyVehicleController {
      * @param carMonthlyVehicleQO
      * @return
      */
-
-    @Login
     @PostMapping("FindByMultiConditionPage")
+    @Permit("community:property:CarMonthlyVehicle:FindByMultiConditionPage")
     public CommonResult<PageInfo> FindByMultiConditionPage(@RequestBody CarMonthlyVehicleQO carMonthlyVehicleQO) {
         PageInfo pageInfo = vehicleService.FindByMultiConditionPage(carMonthlyVehicleQO,UserUtils.getAdminCommunityId());
         return CommonResult.ok(pageInfo);
@@ -106,8 +102,8 @@ public class CarMonthlyVehicleController {
      * @param carMonthlyDelayQO
      */
     @PostMapping("delay")
-    @Login
     @CarOperation(operation = "包月延期了【月租停车】")
+    @Permit("community:property:CarMonthlyVehicle:delay")
     public CommonResult delay(@RequestBody CarMonthlyDelayQO carMonthlyDelayQO){
         Long adminCommunityId = UserUtils.getAdminCommunityId();
         carMonthlyDelayQO.setCommunityId(adminCommunityId);
@@ -120,8 +116,8 @@ public class CarMonthlyVehicleController {
      * 同步按钮 (下发业务)
      */
     @GetMapping("issue")
-    @Login
     @CarOperation(operation = "同步下发了【月租停车】")
+    @Permit("community:property:CarMonthlyVehicle:issue")
     public CommonResult issue(@RequestParam("uid") String uid){
         Long adminCommunityId = UserUtils.getAdminCommunityId();
         vehicleService.issue(uid,adminCommunityId);
@@ -133,6 +129,7 @@ public class CarMonthlyVehicleController {
     /**
      * 上传模板
      */
+    @LoginIgnore
     @PostMapping("uploadTemplate")
     public  String uploadTemplate(MultipartFile file){
         String path = MinioUtils.upload(file, "template");
@@ -144,6 +141,7 @@ public class CarMonthlyVehicleController {
     /**
      * 下载模板
      */
+    @LoginIgnore
     @CarOperation(operation = "下载了【包月车辆导入模板】")
     @PostMapping("dataExportTemplate")
     public String dataExportTemplate(){
@@ -154,9 +152,9 @@ public class CarMonthlyVehicleController {
     /**
      * 数据录入2.0
      */
-    @Login
     @PostMapping("dataImport2")
     @CarOperation(operation = "导入了【包月车辆数据】")
+    @Permit("community:property:CarMonthlyVehicle:dataImport2")
     public CommonResult dataImport2(MultipartFile file){
         try {
             List<String[]> strings = POIUtils.readExcel(file);
@@ -174,8 +172,8 @@ public class CarMonthlyVehicleController {
      * 车辆数据导出
      */
     @PostMapping("dataExport")
-    @Login
     @CarOperation(operation = "导出了【包月车辆数据】")
+    @Permit("community:property:CarMonthlyVehicle:dataExport")
     public CommonResult dataExport(@RequestBody CarMonthlyVehicleQO carMonthlyVehicleQO, HttpServletResponse response){
         carMonthlyVehicleQO.setCommunityId(UserUtils.getAdminCommunityId());
         List<CarMonthlyVehicle> vehicleList = vehicleService.selectListCar(carMonthlyVehicleQO);
@@ -224,8 +222,8 @@ public class CarMonthlyVehicleController {
     /**
      * 多条件+分页查询包月车位
      */
-    @Login
     @PostMapping("findByMultiConditionPage2Position")
+    @Permit("community:property:CarMonthlyVehicle:findByMultiConditionPage2Position")
     public CommonResult<PageInfo> findByMultiConditionPage2Position(@RequestBody CarMonthlyVehicleQO carMonthlyVehicleQO) {
         PageInfo pageInfo = vehicleService.findByMultiConditionPage2Position(carMonthlyVehicleQO,UserUtils.getAdminCommunityId());
         return CommonResult.ok(pageInfo);
@@ -234,9 +232,9 @@ public class CarMonthlyVehicleController {
     /**
      * 包月车位新增
      */
-    @Login
     @PostMapping("SaveMonthlyVehicle2Position")
     @CarOperation(operation = "新增了【包月车位数据】")
+    @Permit("community:property:CarMonthlyVehicle:SaveMonthlyVehicle2Position")
     public CommonResult SaveMonthlyVehicle2Position(@RequestBody CarMonthlyVehicle carMonthlyVehicle) {
         vehicleService.SaveMonthlyVehicle2Position(carMonthlyVehicle, UserUtils.getAdminCommunityId());
         return CommonResult.ok();
@@ -245,9 +243,9 @@ public class CarMonthlyVehicleController {
     /**
      * 包月车位导入
      */
-    @Login
     @PostMapping("dataImport2Position")
     @CarOperation(operation = "导入了【包月车位数据】")
+    @Permit("community:property:CarMonthlyVehicle:dataImport2Position")
     public CommonResult dataImport2Position(MultipartFile file){
         try {
             List<String[]> strings = POIUtils.readExcel(file);
@@ -263,9 +261,9 @@ public class CarMonthlyVehicleController {
     /**
      * 包月车位导出
      */
-    @Login
     @PostMapping("dataExport2Position")
     @CarOperation(operation = "导出了【包月车位数据】")
+    @Permit("community:property:CarMonthlyVehicle:dataExport2Position")
     public CommonResult dataExport2Position(@RequestBody CarMonthlyVehicleQO carMonthlyVehicleQO, HttpServletResponse response){
         carMonthlyVehicleQO.setCommunityId(UserUtils.getAdminCommunityId());
         List<CarMonthlyVehicle> vehicleList = vehicleService.selectListPostion(carMonthlyVehicleQO);
@@ -322,6 +320,7 @@ public class CarMonthlyVehicleController {
     /**
      * 包月车位导入模板下载
      */
+    @LoginIgnore
     @PostMapping("dataExportTemplate2Position")
     @CarOperation(operation = "下载了【包月车位导入模板】")
     public String dataExportTemplate2Position(){

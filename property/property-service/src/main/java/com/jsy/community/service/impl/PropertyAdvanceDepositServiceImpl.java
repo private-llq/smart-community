@@ -109,6 +109,7 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
      * @Date: 2021/08/11
      **/
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateRechargePropertyAdvanceDeposit(PropertyAdvanceDepositEntity propertyAdvanceDepositEntity){
         if (propertyAdvanceDepositEntity.getId() == null) {
             throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"请传入id！");

@@ -1,8 +1,6 @@
 package com.jsy.community.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICommunityService;
 import com.jsy.community.api.IPropertyCompanyService;
@@ -19,6 +17,7 @@ import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.PropertyCommunityListVO;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -40,12 +39,10 @@ import java.util.Map;
  */
 @Api(tags = "社区控制器")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/community")
-@Login
 public class CommunityController {
 
-    // TODO: 2021/4/16 这里的group没有改成  property是因为目前  group这种写法不知道其他人调ICommunityService时  人家是不是没有改成  property  所以我这里也先不动
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private ICommunityService communityService;
 
@@ -67,6 +64,7 @@ public class CommunityController {
      **/
     @ApiOperation("添加社区")
     @GetMapping("/addCommunityEntity")
+    @Permit("community:property:community:addCommunityEntity")
     public CommonResult addCommunityEntity() {
         communityService.addCommunityEntity();
         return CommonResult.ok();
@@ -74,6 +72,7 @@ public class CommunityController {
 
     @ApiOperation("获取社区电子地图")
     @GetMapping
+    @Permit("community:property:community")
     public CommonResult getElectronicMap() {
         Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
         Map<String, Object> map = communityService.getElectronicMap(communityId);
@@ -89,6 +88,7 @@ public class CommunityController {
      **/
     @ApiOperation("id单查详情")
     @GetMapping("/details")
+    @Permit("community:property:community:details")
     public CommonResult queryDetails(@RequestParam Long communityId) {
         return CommonResult.ok(communityService.queryDetails(communityId));
     }
@@ -100,16 +100,16 @@ public class CommunityController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/7/22 9:37
      **/
-    @Login
     @PostMapping("/addCommunity")
     @businessLog(operation = "新增", content = "新增了【物业社区】")
+    @Permit("community:property:community:addCommunity")
     public CommonResult addCommunity(@RequestBody CommunityEntity communityEntity) {
         ValidatorUtils.validateEntity(communityEntity, CommunityEntity.ProperyuAddValidatedGroup.class);
         communityEntity.setPropertyId(UserUtils.getAdminCompanyId());
         // 设置默认的社区房屋层级模式
         communityEntity.setHouseLevelMode(1);
         // 新增数据
-        Long communityId = communityService.addCommunity(communityEntity, UserUtils.getUserId());
+        Long communityId = communityService.addCommunity(communityEntity, UserUtils.getId());
         // 获取登录用户数据
         AdminInfoVo adminUserInfo = UserUtils.getAdminUserInfo();
         adminUserInfo.getCommunityIdList().add(String.valueOf(communityId));
@@ -126,8 +126,8 @@ public class CommunityController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/7/22 11:41
      **/
-    @Login
     @PostMapping("/queryCommunityList")
+    @Permit("community:property:community:queryCommunityList")
     public CommonResult communityList(@RequestBody BaseQO<CommunityEntity> baseQO) {
         PageInfo<PropertyCommunityListVO> communityListVOPageInfo = communityService.queryPropertyCommunityList(baseQO, UserUtils.getAdminUserInfo().getCommunityIdList());
         return CommonResult.ok(communityListVOPageInfo);
@@ -140,9 +140,9 @@ public class CommunityController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/7/22 18:03
      **/
-    @Login
     @PutMapping("/updateCommunity")
     @businessLog(operation = "编辑", content = "更新了【物业社区】")
+    @Permit("community:property:community:updateCommunity")
     public CommonResult updateCommunity(@RequestBody CommunityEntity communityEntity) {
         if (communityEntity.getId() == null) {
             throw new JSYException(400, "社区ID不能为空!");
@@ -165,8 +165,8 @@ public class CommunityController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/8/24 11:52
      **/
-    @Login
     @GetMapping("/getCommunitySurvey")
+    @Permit("community:property:community:getCommunitySurvey")
     public CommonResult getCommunitySurvey(Integer month) {
         if (month == null) {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "缺少查询类型");
@@ -181,8 +181,8 @@ public class CommunityController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/8/25 13:45
      **/
-    @Login
     @GetMapping("/getPropertySurvey")
+    @Permit("community:property:community:getPropertySurvey")
     public CommonResult getPropertySurvey() {
         Long companyId = UserUtils.getAdminCompanyId();
         List<String> communityIdList = UserUtils.getAdminCommunityIdList();
@@ -196,8 +196,8 @@ public class CommunityController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/8/31 17:09
      **/
-    @Login
     @GetMapping("/getPropertySurvey/order/from")
+    @Permit("community:property:community:getPropertySurvey:order:from")
     public CommonResult getPropertySurvey(Integer year, Long communityId) {
         if (communityId == null || year == null) {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "缺少查询类型");
@@ -213,7 +213,7 @@ public class CommunityController {
      **/
     @ApiOperation("获取物业通用顶部")
     @GetMapping("/property/top/details")
-    @Login
+    @Permit("community:property:community:property:top:details")
     public CommonResult getCompanyNameByCompanyId() {
         return CommonResult.ok(propertyCompanyService.getCompanyNameByCompanyId(UserUtils.getAdminCompanyId()));
     }
@@ -224,8 +224,8 @@ public class CommunityController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/8/30 17:22
      **/
-    @Login
     @GetMapping("/group/send/sms")
+    @Permit("community:property:community:group:send:sms")
     public CommonResult groupSendSMS(@RequestParam(value = "content")String content, @RequestParam(value = "isDistinct")boolean isDistinct,
                                      @RequestParam(value = "taskTime")String taskTime, @RequestParam(value = "number")int number, @RequestParam(value = "communityIdList")List<String> communityIdList) {
         Long adminCompanyId = UserUtils.getAdminCompanyId();
@@ -241,8 +241,8 @@ public class CommunityController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/1 11:50
      **/
-    @Login
     @PostMapping("/update/sms/config")
+    @Permit("community:property:community:update:sms:config")
     public CommonResult updateSMSConfig(@RequestBody PropertyCompanyEntity propertyCompanyEntity) {
         Long companyId = UserUtils.getAdminCompanyId();
         ValidatorUtils.validateEntity(propertyCompanyEntity);
@@ -256,8 +256,8 @@ public class CommunityController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/2 09:51
      **/
-    @Login
     @GetMapping("/select/company")
+    @Permit("community:property:community:select:company")
     public CommonResult selectCompany() {
         Long companyId = UserUtils.getAdminCompanyId();
         return CommonResult.ok(propertyCompanyService.selectCompany(companyId), "查询成功");

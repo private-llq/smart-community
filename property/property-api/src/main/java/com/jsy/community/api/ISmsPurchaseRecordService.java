@@ -29,4 +29,22 @@ public interface ISmsPurchaseRecordService extends IService<SmsPurchaseRecordEnt
 	 * @Date: 2021/09/14
 	 **/
 	List<SmsPurchaseRecordEntity> querySmsPurchaseRecord(Long companyId);
+	
+	/**
+	 * @Description: 根据订单编号查询短信购买记录详情
+	 * @author: DKS
+	 * @since: 2021/12/13 14:35
+	 * @Param: [orderNum]
+	 * @return: com.jsy.community.entity.SmsPurchaseRecordEntity
+	 */
+	SmsPurchaseRecordEntity querySmsPurchaseByOrderNum(String orderNum);
+	
+	/**
+	 * @Description: 修改短信购买记录
+	 * @author: DKS
+	 * @since: 2021/12/13 16:52
+	 * @Param: [smsPurchaseRecordEntity]
+	 * @return: void
+	 */
+	void updateSmsPurchase(SmsPurchaseRecordEntity smsPurchaseRecordEntity);
 }

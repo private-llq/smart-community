@@ -4,14 +4,15 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.jsy.community.entity.BaseEntity;
 import com.jsy.community.utils.RegexUtils;
+import com.zhsj.base.api.domain.PermitMenu;
+import com.zhsj.base.api.domain.PermitRole;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.*;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 物业端用户
@@ -100,7 +101,7 @@ public class AdminUserEntity extends BaseEntity {
 	/**
 	 * 昵称
 	 */
-	private String nickname;
+	private String nickName;
 	
 	/**
 	 * 真实姓名
@@ -173,7 +174,7 @@ public class AdminUserEntity extends BaseEntity {
 	 * 用户菜单列表
 	 */
 	@TableField(exist = false)
-	private List<AdminMenuEntity> menuList;
+	private List<PermitMenu> menuList;
 	
 	/**
 	 * 创建者UID (老功能暂时使用，新接口统一用createBy)
@@ -212,7 +213,7 @@ public class AdminUserEntity extends BaseEntity {
 	// 角色Id
 	@TableField(exist = false)
 	@NotNull(groups = {addOperatorValidatedGroup.class}, message = "角色Id不能为空")
-	private Long roleId;
+	private List<PermitRole> permitRoles;
 
 	// 角色Id
 	@TableField(exist = false)
@@ -221,6 +222,28 @@ public class AdminUserEntity extends BaseEntity {
 	// 角色名称
 	@TableField(exist = false)
 	private String roleName;
+	
+	@ApiModelProperty(value = "物业公司名称")
+	@TableField(exist = false)
+	private String companyName;
+	
+	@ApiModelProperty(value = "应用菜单名称")
+	@TableField(exist = false)
+	private String menuName;
+
+	// 物业角色ID
+	@TableField(exist = false)
+	private String roleId;
+
+	// 小区角色ID
+	@TableField(exist = false)
+	private String communityRoleId;
+	
+	/**
+	 * 公司idStr
+	 */
+	@TableField(exist = false)
+	private String companyIdStr;
 	
 	/**
 	 * 注册邀请传参验证

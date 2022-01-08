@@ -31,7 +31,7 @@ import java.util.List;
 @Api(tags = "设备分类控制器")
 @RestController
 @RequestMapping("/facilityType")
-@ApiJSYController
+// @ApiJSYController
 @Login
 public class FacilityTypeController {
 	

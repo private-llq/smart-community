@@ -9,7 +9,7 @@ import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
  **/
 public interface AiliAppPayRecordService {
 	boolean createAliAppPayRecord(AiliAppPayRecordEntity ailiAppPayRecordEntity);//订单创建
-	void completeAliAppPayRecord(String outTradeNo);//订单完成
+	void completeAliAppPayRecord(String outTradeNo, String tradeNo);//订单完成
 	AiliAppPayRecordEntity getAliAppPayByOutTradeNo(String outTradeNo);//订单查询
 	AiliAppPayRecordEntity queryPropertyFeeByOutTradeNo(String outTradeNo);//订单查询(查物业费缴费记录)
 

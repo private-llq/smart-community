@@ -8,6 +8,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
 import com.jsy.community.mapper.WeChatMapper;
 import com.jsy.community.qo.payment.WechatRefundQO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.util.Map;
  * @author: Hu
  * @create: 2021-01-26 14:26
  **/
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_payment)
 public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEntity> implements IWeChatService {
     @Autowired
@@ -35,7 +37,9 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
 
     @Override
     public WeChatOrderEntity getOrderOne(String msg) {
-        return weChatMapper.selectById(msg);
+        QueryWrapper<WeChatOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("order_no", msg);
+        return weChatMapper.selectOne(queryWrapper);
     }
 
     @Override
@@ -69,12 +73,16 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
      */
     @Override
     public void orderStatus(Map<String,String> map) {
-        WeChatOrderEntity entity = weChatMapper.selectById(map.get("out_trade_no"));
+        QueryWrapper<WeChatOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("order_no", map.get("out_trade_no"));
+        WeChatOrderEntity entity = weChatMapper.selectOne(queryWrapper);
+        log.info("更新订单状态");
         if (entity!=null){
             entity.setOrderStatus(2);
             entity.setArriveStatus(2);
             entity.setTransactionId(map.get("transaction_id"));
             weChatMapper.updateById(entity);
+            log.info("更新订单状态完成");
         }
     }
     /**
@@ -86,7 +94,9 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
      */
     @Override
     public void orderRefundStatus(Map<String,String> map) {
-        WeChatOrderEntity entity = weChatMapper.selectById(map.get("out_trade_no"));
+        QueryWrapper<WeChatOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("order_no", map.get("out_trade_no"));
+        WeChatOrderEntity entity = weChatMapper.selectOne(queryWrapper);
         if (entity!=null){
             entity.setOrderStatus(3);
             entity.setArriveStatus(3);
@@ -120,7 +130,21 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
      */
     @Override
     public WeChatOrderEntity getOrderByQuery(WechatRefundQO wechatRefundQO) {
-        return weChatMapper.selectOne(new QueryWrapper<WeChatOrderEntity>().eq("pay_type",wechatRefundQO.getTradeFrom()).eq("service_order_no",wechatRefundQO.getServiceOrderNo()));
+        return weChatMapper.selectById(wechatRefundQO.getOrderNum());
+    }
+
+    /**
+     * @param orderNo : 订单编号
+     * @author: Pipi
+     * @description: 根据订单编号查询订单
+     * @return: {@link WeChatOrderEntity}
+     * @date: 2021/12/22 10:18
+     **/
+    @Override
+    public WeChatOrderEntity getOrderByOrderNo(String orderNo) {
+        QueryWrapper<WeChatOrderEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("order_no", orderNo);
+        return weChatMapper.selectOne(queryWrapper);
     }
 
     /**
@@ -133,9 +157,10 @@ public class WeChatServiceImpl extends ServiceImpl<WeChatMapper, WeChatOrderEnti
      **/
     @Override
     public Boolean checkPayStatus(String id, String serviceOrderNo) {
+        log.info("微信进来...............................");
         QueryWrapper<WeChatOrderEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("service_order_no", serviceOrderNo);
-        queryWrapper.eq("id", id);
+        queryWrapper.eq("order_no", id);
         WeChatOrderEntity weChatOrderEntity = weChatMapper.selectOne(queryWrapper);
         if (weChatOrderEntity != null && weChatOrderEntity.getOrderStatus() == 2) {
             return true;

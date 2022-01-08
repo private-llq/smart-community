@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.jsy.community.mapper.AdminCommunityMapper">
+
+	<!-- 批量添加用户社区权限 -->
+	<insert id="addAdminCommunityBatch">
+		insert into t_admin_community(uid,community_id)
+		values
+		<foreach collection="ids" item="item" separator=",">
+			(#{uid},#{item})
+		</foreach>
+	</insert>
+
+
+</mapper>

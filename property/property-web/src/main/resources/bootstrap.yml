@@ -30,16 +30,6 @@ spring:
     allow-bean-definition-overriding: true
   application:
     name: property-web
-  cloud:
-    config:
-      #uri: http://127.0.0.1:2020 #zuul要从配置中心拉取文件
-      discovery:
-        enabled: true #开启springcloudconfig服务端的服务发现
-        service-id: base-config-server #config-server服务的名称
-      #你要拉取具体的哪个配置文件
-      name: property-web,common,common-service,common-web  #配置文件名字   dev是环境
-      profile: ${spring.profiles.active} #环境  组成完整的文件名：gateway-service-dev.yml
-      label: master #主分支
 #服务发现
 #eureka:
 #  client:
@@ -64,6 +54,7 @@ dubbo:
   cloud:
     subscribed-services: property-service
   consumer:
+    check: false
     retries: 0
     timeout: 99999
   provider:
@@ -80,7 +71,18 @@ jsy:
 ---
 spring:
   profiles: dev
-
+  cloud:
+    config:
+      #uri: http://127.0.0.1:2020 #zuul要从配置中心拉取文件
+      discovery:
+        enabled: true #开启springcloudconfig服务端的服务发现
+        service-id: base-config-server #config-server服务的名称
+      #你要拉取具体的哪个配置文件
+      name: property-web,common,common-service,common-web  #配置文件名字   dev是环境
+      profile: dev #环境  组成完整的文件名：gateway-service-dev.yml
+      label: master #主分支
+      username: ecf50273a250499a9ec28953c2c494ab
+      password: ecf50273a250499a9ec28953c2c494ab
 eureka:
   client:
     service-url:
@@ -93,6 +95,18 @@ eureka:
 ---
 spring:
   profiles: test
+  cloud:
+    config:
+      #uri: http://127.0.0.1:2020 #zuul要从配置中心拉取文件
+      discovery:
+        enabled: true #开启springcloudconfig服务端的服务发现
+        service-id: base-config-server #config-server服务的名称
+      #你要拉取具体的哪个配置文件
+      name: property-web,common,common-service,common-web  #配置文件名字   dev是环境
+      profile: test #环境  组成完整的文件名：gateway-service-dev.yml
+      label: master #主分支
+      username: f14550980f8c4070a43864e365a0e8fa
+      password: 8a33d8f0f7b3452ab52b9644c1188139
 eureka:
   client:
     service-url:
@@ -105,10 +119,22 @@ eureka:
 ---
 spring:
   profiles: prod
+  cloud:
+    config:
+      #uri: http://127.0.0.1:2020 #zuul要从配置中心拉取文件
+      discovery:
+        enabled: true #开启springcloudconfig服务端的服务发现
+        service-id: base-config-server #config-server服务的名称
+      #你要拉取具体的哪个配置文件
+      name: property-web,common,common-service,common-web  #配置文件名字   dev是环境
+      profile: prod #环境  组成完整的文件名：gateway-service-dev.yml
+      label: master #主分支
+      username: cfd39a0d977742bba485998b7752a452
+      password: 6c6e06fc325b40379fa0687c0f197e1d
 eureka:
   client:
     service-url:
-      defaultZone: ${server.eureka-service-address}
+      defaultZone: http://222.178.213.183:36366/eureka, http://222.178.213.186:36366/eureka
   instance:
     hostname: ${spring.cloud.client.ip-address}
     prefer-ip-address: true

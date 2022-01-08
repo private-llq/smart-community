@@ -1,6 +1,7 @@
 package com.jsy.community.exception;
 
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.basecommon.exception.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
@@ -22,7 +23,12 @@ public class JSYExceptionHandler {
 	public CommonResult<Boolean> handlerJSYException(JSYException e) {
 		return CommonResult.error(e.getCode(), e.getMessage());
 	}
-	
+
+	@ExceptionHandler(BaseException.class)
+	public CommonResult<Boolean> handlerBaseException(BaseException e) {
+		return CommonResult.error(e.getErrorEnum().getCode(), e.getErrorEnum().getMsg());
+	}
+
 	@ExceptionHandler(MissingServletRequestParameterException.class)
 	public CommonResult<Boolean> handlerMissingServletRequestParameterException(MissingServletRequestParameterException e) {
 		return CommonResult.error(JSYError.REQUEST_PARAM);

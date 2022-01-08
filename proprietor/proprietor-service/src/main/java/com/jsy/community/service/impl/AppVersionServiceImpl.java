@@ -56,14 +56,51 @@ public class AppVersionServiceImpl extends ServiceImpl<AppVersionMapper,AppVersi
 	**/
 	@Override
 	public void addAppVersion(AppVersionEntity appVersionEntity){
-		try {
+		QueryWrapper<AppVersionEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("sys_version", appVersionEntity.getSysVersion());
+		queryWrapper.eq("sys_type", appVersionEntity.getSysType());
+		AppVersionEntity entity = aPPVersionMapper.selectOne(queryWrapper);
+		if (entity == null) {
+			appVersionEntity.setId(SnowFlake.nextId());
+			aPPVersionMapper.insert(appVersionEntity);
+		} else {
+			entity.setPaySupport(appVersionEntity.getPaySupport());
+			int i = aPPVersionMapper.updateById(entity);
+		}
+		/*try {
 			appVersionEntity.setId(SnowFlake.nextId());
 			aPPVersionMapper.insert(appVersionEntity);
 		}catch (DuplicateKeyException e){
 			throw new ProprietorException("app版本已存在");
-		}
+		}*/
 	}
-	
+
+	/**
+	 * @param appVersionEntity :
+	 * @author: Pipi
+	 * @description: 更新版本信息
+	 * @return:
+	 * @date: 2021/12/27 15:15
+	 **/
+	@Override
+	public Boolean updateAppVersion(AppVersionEntity appVersionEntity) {
+		QueryWrapper<AppVersionEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("sys_version", appVersionEntity.getSysVersion());
+		queryWrapper.eq("sys_type", appVersionEntity.getSysType());
+		AppVersionEntity entity = aPPVersionMapper.selectOne(queryWrapper);
+		if (entity == null) {
+			return false;
+		}
+		if (appVersionEntity.getPaySupport() != null) {
+			entity.setPaySupport(appVersionEntity.getPaySupport());
+			int i = aPPVersionMapper.updateById(entity);
+			if (i == 1) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * @Description: 查询APP版本详情 1.安卓 2.IOS
 	 * @Param: [sysType]

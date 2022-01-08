@@ -2,9 +2,10 @@ package com.jsy.community.service.impl;
 
 import com.jsy.community.api.ILeaseUserService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.mapper.UserIMMapper;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author chq459799974
@@ -14,8 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @DubboService(version = Const.version, group = Const.group_lease)
 public class ILeaseUserServiceImpl implements ILeaseUserService {
 
-    @Autowired
-    private UserIMMapper userIMMapper;
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseUserInfoRpcService userInfoRpcService;
 
     /**
      * @Description: 用户uid查imID
@@ -26,6 +27,9 @@ public class ILeaseUserServiceImpl implements ILeaseUserService {
      **/
     @Override
     public String queryIMIdByUid(String uid) {
-        return userIMMapper.queryIMIdByUid(uid);
+        if (userInfoRpcService.getEHomeUserIm(uid) != null) {
+            return userInfoRpcService.getEHomeUserIm(uid).getImId();
+        }
+        return null;
     }
 }

@@ -2,7 +2,6 @@ package com.jsy.community.controller;
 
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICommonConstService;
 import com.jsy.community.api.IFacilityService;
@@ -17,6 +16,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,8 +34,7 @@ import java.util.Map;
 @Api(tags = "设备控制器")
 @RestController
 @RequestMapping("/facility")
-@ApiJSYController
-@Login
+// @ApiJSYController
 public class FacilityController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -49,6 +48,7 @@ public class FacilityController {
 	 **/
 	@ApiOperation("获取设备作用")
 	@GetMapping("/getFacilityTypeEffect")
+	@Permit("community:property:facility:getFacilityTypeEffect")
 	public CommonResult getFacilityTypeEffect() {
 		List<CommonConst> constList = commonConstService.getFacilityTypeEffect();
 		return CommonResult.ok(constList);
@@ -56,6 +56,7 @@ public class FacilityController {
 	
 	@ApiOperation("分页查询设备")
 	@PostMapping("/listFacility")
+	@Permit("community:property:facility:listFacility")
 	public CommonResult listFacility(@RequestBody BaseQO<FacilityQO> baseQO) {
 		if (baseQO.getQuery() == null) {
 			baseQO.setQuery(new FacilityQO());
@@ -67,6 +68,7 @@ public class FacilityController {
 	
 	@ApiOperation("获取设备在线离线数")
 	@GetMapping("/getCount")
+	@Permit("community:property:facility:getCount")
 	// TODO: 2021/5/15 这个功能好像前端没有在强制刷新后调用这个接口  应该让他调的 后面让前端做下
 	public CommonResult getCount(@ApiParam("设备分类Id") @RequestParam("typeId") Long typeId) {
 		Map<String, Integer> map = facilityService.getCount(typeId,UserUtils.getAdminCommunityId());
@@ -76,6 +78,7 @@ public class FacilityController {
 	@ApiOperation("添加设备")
 	@PostMapping("/addFacility")
 	@businessLog(operation = "新增",content = "新增了【设备】")
+	@Permit("community:property:facility:addFacility")
 	public CommonResult addFacility(@RequestBody FacilityEntity facilityEntity) {
 		AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
 		facilityEntity.setCommunityId(adminInfoVo.getCommunityId());
@@ -89,6 +92,7 @@ public class FacilityController {
 	@ApiOperation("编辑设备")
 	@PostMapping("/updateFacility")
 	@businessLog(operation = "编辑",content = "更新了【设备】")
+	@Permit("community:property:facility:updateFacility")
 	public CommonResult updateFacility(@RequestBody FacilityEntity facilityEntity) {
 		// By:LH: 编辑的时候不能更改该摄像头的作用哈  因为摄像头的作用需要更改摄像头后台  开启相应的功能 比如你要开启人脸比对，摄像机应该去后台选择人脸比对模式
 		// By:LH: 一个摄像机不能同时做车牌抓拍与人脸比对功能2个事
@@ -101,6 +105,7 @@ public class FacilityController {
 	@ApiOperation("删除设备")
 	@GetMapping("/deleteFacility")
 	@businessLog(operation = "删除",content = "删除了【设备】")
+	@Permit("community:property:facility:deleteFacility")
 	public CommonResult deleteFacility(@RequestParam("id") Long id) {
 		facilityService.deleteFacility(id,UserUtils.getAdminCommunityId());
 		return CommonResult.ok("操作成功");
@@ -111,6 +116,7 @@ public class FacilityController {
 	 **/
 	@ApiOperation("刷新设备")
 	@GetMapping("/flushFacility")
+	@Permit("community:property:facility:flushFacility")
 	public CommonResult flushFacility(@RequestParam("page") Integer page, @RequestParam("size") Integer size, @RequestParam("facilityTypeId") String facilityTypeId) {
 		if(page == null || page == 0){
 			page = 1;
@@ -130,6 +136,7 @@ public class FacilityController {
 	 **/
 	@ApiOperation("根据设备id同步数据")
 	@GetMapping("/connectData")
+	@Permit("community:property:facility:connectData")
 	public CommonResult connectData(@RequestParam("id") Long id) {
 		facilityService.syncFaceData(id, UserUtils.getAdminCommunityId());
 		return CommonResult.ok();
@@ -137,6 +144,7 @@ public class FacilityController {
 	
 	@ApiOperation("分页查询设备数据同步记录")
 	@PostMapping("/connectData/record")
+	@Permit("community:property:facility:connectData:record")
 	public CommonResult queryDataRecord(@RequestBody BaseQO<FacilitySyncRecordEntity> baseQO) {
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new FacilitySyncRecordEntity());
@@ -147,6 +155,7 @@ public class FacilityController {
 	
 	@ApiOperation("根据数据同步状态统计设备数")
 	@GetMapping("/count")
+	@Permit("community:property:facility:count")
 	public CommonResult queryDataRecord(@RequestParam Integer isConnectData) {
 		return CommonResult.ok(facilityService.countBySyncStatus(UserUtils.getAdminCommunityId(),isConnectData),"查询成功");
 	}

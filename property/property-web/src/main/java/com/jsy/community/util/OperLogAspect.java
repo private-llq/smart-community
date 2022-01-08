@@ -1,32 +1,22 @@
 package com.jsy.community.util;
 
 
-import java.lang.reflect.Method;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.api.AdminRoleService;
 import com.jsy.community.api.AdminUserRoleService;
 import com.jsy.community.api.CarOperationService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.admin.AdminUserRoleEntity;
 import com.jsy.community.entity.property.CarOperationLog;
 import com.jsy.community.utils.UserUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
-
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
+
+import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 
 
 /**
@@ -71,9 +61,8 @@ public class OperLogAspect {
         // 获取切入点所在的方法
         Method method = signature.getMethod();
         //根据uid查询用户角色id
-        String userId = UserUtils.getUserId();//用户id
-
-        Long roleId = adminUserRoleService.selectRoleIdByUserId(userId);
+        String userId = UserUtils.getId();//用户id
+        Long roleId = adminUserRoleService.selectRoleIdByUserId(userId, UserUtils.getAdminCompanyId());
 
 
         // 获取操作

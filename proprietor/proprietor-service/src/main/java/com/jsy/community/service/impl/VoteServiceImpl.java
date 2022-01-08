@@ -16,6 +16,11 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.VoteQO;
 import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +51,12 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, VoteEntity> impleme
 
     @Autowired
     private UserIMMapper userIMMapper;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseUserInfoRpcService userInfoRpcService;
+
+    @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check=false)
+    private IImChatPublicPushRpcService iImChatPublicPushRpcService;
 
 
 
@@ -80,14 +91,15 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, VoteEntity> impleme
         Set<String> total = voteUserMapper.getUserTotal(voteQO.getId());
         if (total.size()==voteEntity.getTotal()){
             Map  map = null;
-            List<String> imId = userIMMapper.selectByUid(total);
-            for (String im : imId) {
+            List<UserImVo> userImVos = userInfoRpcService.batchGetEHomeUserIm(total);
+            for (UserImVo im : userImVos) {
                 map = new HashMap<>();
                 map.put("type",5);
                 map.put("dataId",voteEntity.getId());
                 //推送消息
                 PushInfoUtil.PushPublicTextMsg(
-                        im,
+                        iImChatPublicPushRpcService,
+                        im.getImId(),
                         "活动投票",
                         voteEntity.getTheme(),
                         null,

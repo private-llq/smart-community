@@ -3,10 +3,13 @@ package com.jsy.community.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jsy.community.api.AssetLeaseRecordService;
 import com.jsy.community.constant.BusinessEnum;
+import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseLeaseConstEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
+import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.entity.shop.ShopLeaseEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
@@ -15,11 +18,17 @@ import com.jsy.community.service.AdminException;
 import com.jsy.community.service.LeaseReleaseService;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
-import com.jsy.community.utils.imutils.open.StringUtils;
 import com.jsy.community.vo.admin.LeaseReleaseInfoVO;
-import com.jsy.community.vo.admin.LeaseReleasePageVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealUserDetail;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.PageVO;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -34,6 +43,8 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
     @Resource
     private LeaseOperationRecordMapper leaseOperationRecordMapper;
     @Resource
+    private AssetLeaseRecordMapper assetLeaseRecordMapper;
+    @Resource
     private CommunityMapper communityMapper;
     @Resource
     private HouseLeaseMapper houseLeaseMapper;
@@ -41,6 +52,12 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
     private ShopLeaseMapper shopLeaseMapper;
     @Resource
     private HouseConstMapper houseConstMapper;
+    
+    @DubboReference(version = Const.version, group = Const.group_lease, check = false)
+    private AssetLeaseRecordService assetLeaseRecordService;
+    
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseUserInfoRpcService userInfoRpcService;
 
     /**
      * 商铺和房屋租赁信息发布列表
@@ -49,39 +66,122 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
      * @return
      */
     @Override
-    public PageInfo<LeaseReleasePageVO> queryLeaseReleasePage(BaseQO<LeaseReleasePageQO> baseQO) {
+    public PageInfo<AssetLeaseRecordEntity> queryLeaseReleasePage(BaseQO<LeaseReleasePageQO> baseQO) {
         LeaseReleasePageQO query = baseQO.getQuery();
-        Page<LeaseReleasePageVO> page = new Page<>();
+        Page<AssetLeaseRecordEntity> page = new Page<>();
         MyPageUtils.setPageAndSize(page, baseQO);
-        // 分页查询
-        Page<LeaseReleasePageVO> pageData = leaseOperationRecordMapper.queryLeaseReleasePage(query, page);
-        if (pageData.getRecords().size() == 0) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        // 查小区
+        if (query.getCommunityId() != null) {
+            queryWrapper.eq("community_id", query.getCommunityId());
+        }
+        // 查房屋类型
+        if (query.getType() != null) {
+            queryWrapper.eq("asset_type", query.getType());
+        }
+        // 查状态
+        if (query.getLeaseStatus() != null) {
+            List<HouseLeaseEntity> houseLeaseEntities = houseLeaseMapper.selectList(new QueryWrapper<HouseLeaseEntity>().eq("lease_status", query.getLeaseStatus()));
+            List<Long> houseLeaseIds = houseLeaseEntities.stream().map(HouseLeaseEntity::getId).collect(Collectors.toList());
+            List<ShopLeaseEntity> shopLeaseEntities = shopLeaseMapper.selectList(new QueryWrapper<ShopLeaseEntity>().eq("lease_status", query.getLeaseStatus()));
+            List<Long> shopLeaseIds = shopLeaseEntities.stream().map(ShopLeaseEntity::getId).collect(Collectors.toList());
+            houseLeaseIds.addAll(shopLeaseIds);
+            if (!CollectionUtils.isEmpty(houseLeaseIds)) {
+                queryWrapper.in("asset_id", houseLeaseIds);
+            } else {
+                queryWrapper.eq("asset_id", 0);
+            }
+        }
+        // 查姓名、电话
+        if (StringUtils.isNotBlank(query.getPhone()) || StringUtils.isNotBlank(query.getNickName())) {
+            PageVO<UserDetail> pageVO = userInfoRpcService.queryUser(query.getPhone(), query.getNickName(), 0, 9999);
+            Set<Long> uid = pageVO.getData().stream().map(UserDetail::getId).collect(Collectors.toSet());
+            if (!CollectionUtils.isEmpty(uid)) {
+                queryWrapper.in("tenant_uid", uid);
+            } else {
+                queryWrapper.eq("tenant_uid", 0);
+            }
+        }
+        Page<AssetLeaseRecordEntity> pageData = assetLeaseRecordMapper.selectPage(page, queryWrapper);
+        List<AssetLeaseRecordEntity> records = pageData.getRecords();
+        if (CollectionUtils.isEmpty(records)) {
             return new PageInfo<>();
         }
         // 查询小区信息
-        List<LeaseReleasePageVO> records = pageData.getRecords();
-        Set<Long> collect = records.stream().map(LeaseReleasePageVO::getTCommunityId).collect(Collectors.toSet());
+        Set<Long> collect = records.stream().map(AssetLeaseRecordEntity::getCommunityId).collect(Collectors.toSet());
         List<CommunityEntity> communityList = communityMapper.selectBatchIds(collect);
         Map<Long, CommunityEntity> communityMap = communityList.stream().collect(Collectors.toMap(CommunityEntity::getId, Function.identity()));
+        // 查询租赁状态map
+        Set<Long> assetIds = records.stream().map(AssetLeaseRecordEntity::getAssetId).collect(Collectors.toSet());
+        List<HouseLeaseEntity> houseLeaseEntityList = houseLeaseMapper.selectList(new QueryWrapper<HouseLeaseEntity>().in("id", assetIds));
+        List<ShopLeaseEntity> shopLeaseEntityList = shopLeaseMapper.selectList(new QueryWrapper<ShopLeaseEntity>().in("id", assetIds));
+        Map<Long, Integer> houseLeaseStatusMap = houseLeaseEntityList.stream().collect(Collectors.toMap(HouseLeaseEntity::getId, HouseLeaseEntity::getLeaseStatus));
+        Map<Long, Integer> shopLeaseStatusMap = shopLeaseEntityList.stream().collect(Collectors.toMap(ShopLeaseEntity::getId, ShopLeaseEntity::getLeaseStatus));
+        houseLeaseStatusMap.putAll(shopLeaseStatusMap);
+        // 查询租户姓名和电话
+        Set<String> uids = records.stream().map(AssetLeaseRecordEntity::getTenantUid).collect(Collectors.toSet());
+        Set<Long> uidList = uids.stream().map(Long::parseLong).collect(Collectors.toSet());
+        List<RealUserDetail> realUserDetailList = userInfoRpcService.getRealUserDetailsByUid(uidList);
+        Map<Long, RealUserDetail> realUserDetailMap = realUserDetailList.stream().collect(Collectors.toMap(RealUserDetail::getId, Function.identity()));
+    
         // 填充额外信息
         records.stream().peek(r -> {
+            // 填充房源类型
+            r.setTypeName(r.getAssetType() == 1 ? "商铺" : "普通住宅");
             // 填充小区信息
-            if (r.getTCommunityId() != null) {
-                CommunityEntity communityEntity = communityMap.get(r.getTCommunityId());
+            if (r.getCommunityId() != null) {
+                CommunityEntity communityEntity = communityMap.get(r.getCommunityId());
                 if (communityEntity != null) {
-                    r.setCommunity(communityEntity.getName());
+                    r.setCommunityName(communityEntity.getName());
                 }
             }
             r.setIdStr(String.valueOf(r.getId()));
             // 填充租赁状态
-            r.setLeaseStatus(leaseStatus(r.getTLeaseStatus()));
+            if (!CollectionUtils.isEmpty(houseLeaseStatusMap)) {
+                r.setLeaseStatusName(leaseStatus(houseLeaseStatusMap.get(r.getAssetId())));
+            }
+            // 填充租户姓名和电话
+            r.setRealName(realUserDetailMap.get(Long.parseLong(r.getTenantUid())).getNickName());
+            r.setTenantPhone(realUserDetailMap.get(Long.parseLong(r.getTenantUid())).getPhone());
         }).collect(Collectors.toList());
-        PageInfo<LeaseReleasePageVO> pageInfo = new PageInfo<>();
+        
+//        // 分页查询
+//        Page<LeaseReleasePageVO> pageData = leaseOperationRecordMapper.queryLeaseReleasePage(query, page);
+//        if (pageData.getRecords().size() == 0) {
+//            return new PageInfo<>();
+//        }
+//        // 查询小区信息
+//        List<LeaseReleasePageVO> records = pageData.getRecords();
+//        Set<Long> collect = records.stream().map(LeaseReleasePageVO::getTCommunityId).collect(Collectors.toSet());
+//        List<CommunityEntity> communityList = communityMapper.selectBatchIds(collect);
+//        Map<Long, CommunityEntity> communityMap = communityList.stream().collect(Collectors.toMap(CommunityEntity::getId, Function.identity()));
+//        // 查询合同Id
+//        // 资产Id列表
+//        List<Long> assetId = records.stream().map(LeaseReleasePageVO::getId).collect(Collectors.toList());
+//        // 根据资产id查询对应的合同编号
+//        Map<Long, List<String>> assetIdAndConIdMap = assetLeaseRecordService.queryConIdList(assetId);
+//        // 填充额外信息
+//        records.stream().peek(r -> {
+//            // 填充小区信息
+//            if (r.getTCommunityId() != null) {
+//                CommunityEntity communityEntity = communityMap.get(r.getTCommunityId());
+//                if (communityEntity != null) {
+//                    r.setCommunity(communityEntity.getName());
+//                }
+//            }
+//            r.setIdStr(String.valueOf(r.getId()));
+//            if (!CollectionUtils.isEmpty(assetIdAndConIdMap)) {
+//                r.setConId(assetIdAndConIdMap.get(r.getId()));
+//            }
+//            // 填充租赁状态
+//            r.setLeaseStatus(leaseStatus(r.getTLeaseStatus()));
+//        }).collect(Collectors.toList());
+        PageInfo<AssetLeaseRecordEntity> pageInfo = new PageInfo<>();
         BeanUtils.copyProperties(pageData, pageInfo);
         return pageInfo;
     }
 
-    public static String leaseStatus(Integer leaseTypeI) {
+    private static String leaseStatus(Integer leaseTypeI) {
         if (leaseTypeI == null) {
             return "";
         }
@@ -95,16 +195,17 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
         if (StringUtils.isEmpty(typeStr)) {
             throw new AdminException("type类型不符合");
         }
+        AssetLeaseRecordEntity assetLeaseRecordEntity = assetLeaseRecordMapper.selectById(id);
         LeaseReleaseInfoVO result;
         if ("住宅".equals(typeStr)) {
-            HouseLeaseEntity house = houseLeaseMapper.selectById(id);
+            HouseLeaseEntity house = houseLeaseMapper.selectById(assetLeaseRecordEntity.getAssetId());
             if (house == null) {
                 result = null;
             } else {
                 result = JSONObject.parseObject(JSONObject.toJSONString(house), LeaseReleaseInfoVO.class);
             }
         } else {
-            ShopLeaseEntity shop = shopLeaseMapper.selectById(id);
+            ShopLeaseEntity shop = shopLeaseMapper.selectById(assetLeaseRecordEntity.getAssetId());
             if (shop == null) {
                 result = null;
             } else {

@@ -12,6 +12,7 @@ import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.AiliAppPayRecordDao;
 import com.jsy.community.utils.SnowFlake;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 
@@ -22,6 +23,7 @@ import javax.annotation.Resource;
  * @Author: chq459799974
  * @Date: 2021/1/6
 **/
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_payment)
 public class AiliAppPayRecordServiceImpl implements AiliAppPayRecordService {
 	
@@ -40,9 +42,10 @@ public class AiliAppPayRecordServiceImpl implements AiliAppPayRecordService {
 	
 	//支付完成修改流水状态(支付完成)
 	@Override
-	public void completeAliAppPayRecord(String outTradeNo){
+	public void completeAliAppPayRecord(String outTradeNo, String tradeNo){
 		AiliAppPayRecordEntity ailiAppPayRecordEntity = new AiliAppPayRecordEntity();
 		ailiAppPayRecordEntity.setTradeStatus(PaymentEnum.TradeStatusEnum.ORDER_COMPLETED.getIndex());
+		ailiAppPayRecordEntity.setTradeNo(tradeNo);
 		int result = ailiAppPayRecordDao.update(ailiAppPayRecordEntity, new UpdateWrapper<AiliAppPayRecordEntity>().eq("order_no", outTradeNo));
 		if(result != 1){
 			throw new PaymentException(JSYError.INTERNAL.getCode(),"订单状态修改异常，请联系管理员");
@@ -84,6 +87,7 @@ public class AiliAppPayRecordServiceImpl implements AiliAppPayRecordService {
 	 **/
 	@Override
 	public Boolean checkPayTradeStatus(String orderNo, String serviceOrderNo) {
+		log.info("支付进来...............................");
 		QueryWrapper<AiliAppPayRecordEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.select("trade_status");
 		queryWrapper.eq("order_no", orderNo);

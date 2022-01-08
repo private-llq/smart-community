@@ -1501,4 +1501,348 @@ public interface BusinessEnum {
 		}
 	}
 
+	/**
+	 * @author: Pipi
+	 * @description: 订单source枚举
+	 * @date: 2021/12/20 13:49
+	 **/
+	enum BaseOrderSourceEnum {
+		SHOP(2, "商城购物", "com.zhsj.shop", "-i=9bX:mA}wcB^t1V6i#ES59A#&2)[a2"),
+		LEASE(9, "房屋租金", "com.zhsj.house", "44=0~_[!,,kc9CJEaI$dlU[lPcEOVfdU"),
+		PROPERTY_FEE(4, "物业管理", "com.zhsj.property", "EKaSmjtJ[gb%=Q%p9gtyHZ|$|.|#c(,)"),
+		PARKING_FEE(8, "停车缴费", "com.zhsj.parkingFee", ";X3WN#y-wvc4]:-^q~%*O_0-[c*2*i)C");
+
+		private final Integer code;
+		private final String name;
+		private final String source;
+		private final String secret;
+
+		BaseOrderSourceEnum(Integer code, String name, String source, String secret) {
+			this.code = code;
+			this.name = name;
+			this.source = source;
+			this.secret = secret;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String getSource() {
+			return source;
+		}
+
+		public String getSecret() {
+			return secret;
+		}
+
+		@Override
+		public String toString() {
+			return "OrderSourceEnum{" +
+					"code=" + code +
+					", name='" + name + '\'' +
+					", source='" + source + '\'' +
+					", secret='" + secret + '\'' +
+					'}';
+		}
+
+		public static String getSourceByCode(Integer code) {
+			for (BaseOrderSourceEnum value : BaseOrderSourceEnum.values()) {
+				if (value.getCode() == code) {
+					return value.getSource();
+				}
+			}
+			return null;
+		}
+
+		public static String getSecretByCode(Integer code) {
+			for (BaseOrderSourceEnum value : BaseOrderSourceEnum.values()) {
+				if (value.getCode() == code) {
+					return value.getSecret();
+				}
+			}
+			return null;
+		}
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 订单支出类型枚举
+	 * @date: 2021/12/20 15:07
+	 **/
+	enum BaseOrderExpensesTypeEnum {
+		SHOP(2, 34, "商城购物 - 支出"),
+		LIVING_EXPENSES(3, 66, "水电缴费 - 支出"),
+		PROPERTY_FEE(4, 130, "物业管理 - 支出"),
+		LEASE(9, 258, "房屋租赁 - 支出"),
+		PARKING_FEE(8, 514, "停车缴费 - 支出"),
+		TEMP_PARKING_FEE(10, 1026, "零时停车缴费 - 支出");
+		private Integer code;
+		private Integer expensesType;
+		private String name;
+
+		BaseOrderExpensesTypeEnum(Integer code, Integer expensesType, String name) {
+			this.code = code;
+			this.expensesType = expensesType;
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		public Integer getExpensesType() {
+			return expensesType;
+		}
+
+		public void setExpensesType(Integer expensesType) {
+			this.expensesType = expensesType;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public String toString() {
+			return "BaseOrderExpensesTypeEnum{" +
+					"code=" + code +
+					", expensesType=" + expensesType +
+					", name='" + name + '\'' +
+					'}';
+		}
+
+		public static Integer getExpenses(Integer code) {
+			for (BaseOrderExpensesTypeEnum value : BaseOrderExpensesTypeEnum.values()) {
+				if (value.getCode() == code) {
+					return value.getExpensesType();
+				}
+			}
+			return null;
+		}
+	}
+	/**
+	 * @author: Pipi
+	 * @description: 订单支出类型枚举
+	 * @date: 2021/12/20 15:07
+	 **/
+	enum BaseOrderRevenueTypeEnum {
+		SHOP(2, 33, "商城购物 - 收入"),
+		LIVING_EXPENSES(3, 65, "水电缴费 - 收入"),
+		PROPERTY_FEE(4, 129, "物业管理 - 收入"),
+		LEASE(9, 257, "房屋租赁 - 收入"),
+		PARKING_FEE(8, 513, "停车缴费 - 收入"),
+		TEMP_PARKING_FEE(10, 1025, "零时停车缴费 - 收入");
+		private Integer code;
+		private Integer expensesType;
+		private String name;
+
+		BaseOrderRevenueTypeEnum(Integer code, Integer expensesType, String name) {
+			this.code = code;
+			this.expensesType = expensesType;
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		public Integer getExpensesType() {
+			return expensesType;
+		}
+
+		public void setExpensesType(Integer expensesType) {
+			this.expensesType = expensesType;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public String toString() {
+			return "BaseOrderRevenueTypeEnum{" +
+					"code=" + code +
+					", expensesType=" + expensesType +
+					", name='" + name + '\'' +
+					'}';
+		}
+
+		public static Integer getExpenses(Integer code) {
+			for (BaseOrderRevenueTypeEnum value : BaseOrderRevenueTypeEnum.values()) {
+				if (value.getCode() == code) {
+					return value.getExpensesType();
+				}
+			}
+			return null;
+		}
+	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 订单类型枚举
+	 * @date: 2021/12/20 15:07
+	 **/
+	enum TradeFromEnum{
+		CHARGE_AND_WITHDRAW(1, "充值提现"),
+		SHOPPING_MALL(2, "商城购物"),
+		LIVING_EXPENSES(3, "水电缴费"),
+		PROPERTY_MANAGEMENT(4, "物业管理"),
+		HOUSE_RENT(5, "房屋租金"),
+		RED_PACKET(6, "红包"),
+		RED_PACKET_RETURN(7, "红包退回"),
+		PARKING_PAYMENT(8, "停车缴费"),
+		HOUSING_RENTAL(9, "房屋租赁"),
+		TEMP_PARKING_PAYMENT(10, "临时车辆缴费");
+
+		private Integer code;
+		private String name;
+
+		TradeFromEnum(Integer code, String name) {
+			this.code = code;
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public String toString() {
+			return "TradeFromEnum{" +
+					"code=" + code +
+					", name='" + name + '\'' +
+					'}';
+		}
+
+		public static final List<Map<String, Object>> tradeList = new ArrayList<>();
+		public static final Map<Integer, String> tradeMap = new HashMap<>();
+
+		static {
+			for (TradeFromEnum trade : TradeFromEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", trade.getCode());
+				map.put("name", trade.getName());
+				tradeList.add(map);
+				tradeMap.put(trade.getCode(), trade.getName());
+			}
+		}
+	}
+
+	/**
+	 * 通用缴费枚举
+	 */
+	enum PaymentStatusEnum{
+		UNPAID(0, "未缴费"),
+		PAID(1, "已缴费");
+		private Integer code;
+		private String name;
+
+		PaymentStatusEnum(Integer code, String name) {
+			this.code = code;
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public static final List<Map<String, Object>> payList = new ArrayList<>();
+		public static final Map<Integer, String> payMap = new HashMap<>();
+
+		static {
+			for (PaymentStatusEnum trade : PaymentStatusEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", trade.getCode());
+				map.put("name", trade.getName());
+				payList.add(map);
+				payMap.put(trade.getCode(), trade.getName());
+			}
+		}
+	}
+
+	/**
+	 * 光大云缴费订单状态枚举
+	 */
+	enum CebbankOrderStatusEnum {
+		INIT(0, "订单创建成功"),
+		SUCCESSFUL_PAYMENT(1, "支付成功"),
+		PAYMENT_FAILURE(2, "支付失败"),
+		SUCCESSFUL_CANCELLATION(3, "销账成功"),
+		CANCELLATION_FAILURE(4, "销账失败"),
+		UNKNOWN_STATUS(5, "未知状态"),
+		REAL_TIME_REFUNDS(8, "实时退款");
+		private final Integer code;
+		private final String name;
+
+		CebbankOrderStatusEnum(Integer code, String name) {
+			this.code = code;
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public static final List<Map<String, Object>> cebbankOrderStatusList = new ArrayList<>();
+		public static final Map<Integer, String> cebbankOrderStatusMap = new HashMap<>();
+
+		static {
+			for (PaymentStatusEnum trade : PaymentStatusEnum.values()) {
+				HashMap<String, Object> map = new HashMap<>();
+				map.put("code", trade.getCode());
+				map.put("name", trade.getName());
+				cebbankOrderStatusList.add(map);
+				cebbankOrderStatusMap.put(trade.getCode(), trade.getName());
+			}
+		}
+	}
 }

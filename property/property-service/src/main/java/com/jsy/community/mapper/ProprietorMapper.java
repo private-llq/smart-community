@@ -164,15 +164,6 @@ public interface ProprietorMapper extends BaseMapper<ProprietorEntity> {
      */
     void insertOperationLog( Long id,  String operationPerson, String operationTime, Long pid , Integer operationType);
 
-
-    /**
-     * 通过管理员uid查出 管理员姓名
-     * @param adminUid  管理员uid
-     * @return          返回管理员姓名
-     */
-    String queryAdminNameByUid(String adminUid);
-
-
     /**
      * 通过房屋id 判断是否存在 房屋
      * @param houseId       房屋id

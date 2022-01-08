@@ -10,6 +10,8 @@ import com.jsy.community.qo.proprietor.RegisterQO;
 import com.jsy.community.vo.ControlVO;
 import com.jsy.community.vo.UserAuthVo;
 import com.jsy.community.vo.UserInfoVo;
+import com.zhsj.base.api.vo.LoginVo;
+import com.zhsj.baseweb.support.LoginUser;
 
 import java.util.Collection;
 import java.util.List;
@@ -40,6 +42,24 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @date: 2021/10/28 11:26
 	 **/
 	UserInfoVo queryUserInfo(String uid);
+
+	/**
+	 * @author: Pipi
+	 * @description: 查询用户信息
+	 * @param qo:
+	 * @return: {@link UserAuthVo}
+	 * @date: 2021/11/27 9:43
+	 **/
+	UserAuthVo queryUserInfoV2(LoginQO qo);
+
+	/***
+	 * @author: Pipi
+	 * @description: 查询极光推送标签
+	 * @param uid: 用户uid
+	 * @return: {@link String}
+	 * @date: 2021/11/22 17:01
+	 **/
+	String getUroraTags(String uid);
 	
 	/**
 	* @Description: 更新用户极光ID
@@ -66,7 +86,6 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 */
 	String register(RegisterQO qo);
 
-
 	/**
 	 * @Description: 第二版注册
 	 * @author: Hu
@@ -75,6 +94,15 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @return:
 	 */
 	String registerV2(RegisterQO qo);
+
+	/***
+	 * @author: Pipi
+	 * @description: 第三版注册,在用户基础模块注册后,添加需要添加用户信息
+	 * @param qo:
+	 * @return: {@link String}
+	 * @date: 2021/11/23 10:55
+	 **/
+	UserAuthVo registerV3(RegisterQO qo);
 
 	/**
 	* @Description: 三方登录
@@ -260,35 +288,6 @@ public interface ProprietorUserService extends IService<UserEntity> {
 	 * @return:
 	 */
 	Integer userIsRealAuth(String userId);
-
-	/**
-	 * @Description: 查询人脸
-	 * @author: Hu
-	 * @since: 2021/8/23 13:46
-	 * @Param:
-	 * @return:
-	 */
-    String getFace(String userId);
-
-    /**
-     * @Description: 修改用户人脸
-     * @author: Hu
-     * @since: 2021/8/23 13:51
-     * @Param:
-     * @return:
-     */
-	void saveFace(String userId,String faceUrl);
-
-
-	/**
-	 * @Description: 删除业主人脸
-	 * @author: Hu
-	 * @since: 2021/8/24 16:58
-	 * @Param:
-	 * @return:
-	 */
-	void deleteFaceAvatar(String userId);
-
 	/**
 	 * @Description: 查询家属拥有的小区
 	 * @author: Hu
@@ -342,4 +341,31 @@ public interface ProprietorUserService extends IService<UserEntity> {
      * @return:
      */
 	void relieveBindingWechat(RegisterQO registerQO, String userId);
+
+	/**
+	 * @Description: 支付宝登录v2
+	 * @author: Hu
+	 * @since: 2021/12/7 15:32
+	 * @Param:
+	 * @return:
+	 */
+	UserAuthVo thirdPlatformLoginV2(UserThirdPlatformQO userThirdPlatformQO);
+
+	/**
+	 * @Description: 查询用户信息
+	 * @author: Hu
+	 * @since: 2021/12/7 15:49
+	 * @Param:
+	 * @return:
+	 */
+	UserInfoVo getUserInfoVo(LoginVo loginVo);
+
+	/**
+	 * @Description: 三方绑定手机V2
+	 * @author: Hu
+	 * @since: 2021/12/7 15:51
+	 * @Param:
+	 * @return:
+	 */
+	UserAuthVo bindThirdPlatformV2(UserThirdPlatformQO userThirdPlatformQO, LoginUser loginUser);
 }

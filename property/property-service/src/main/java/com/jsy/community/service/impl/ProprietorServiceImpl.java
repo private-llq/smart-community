@@ -20,9 +20,13 @@ import com.jsy.community.qo.property.RelationListQO;
 import com.jsy.community.utils.CardUtil;
 import com.jsy.community.utils.DateUtils;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.HouseVo;
 import com.jsy.community.vo.property.ProprietorVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -57,10 +61,8 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
         return proprietorMapper.unbindHouse( id ) > 0;
     }
 
-    @Override
-    public String getAdminRealName( String adminUid ) {
-        return proprietorMapper.queryAdminNameByUid( adminUid );
-    }
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
 
     /**
      * 通过传入的参数更新业主信息
@@ -71,7 +73,11 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
     @Override
     public Boolean update(ProprietorQO qo, String adminUid) {
         //管理员姓名
-        String adminUserName = proprietorMapper.queryAdminNameByUid(adminUid);
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(UserUtils.getId());
+        String adminUserName = "";
+        if (idCardRealInfo != null) {
+            adminUserName = idCardRealInfo.getIdCardName();
+        }
         proprietorMapper.insertOperationLog(SnowFlake.nextId(),  adminUserName, DateUtils.now(), qo.getId(), 2);
         ProprietorEntity entity = new ProprietorEntity();
         BeanUtils.copyProperties( qo, entity );
@@ -97,7 +103,11 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
             throw new JSYException("房屋业主已经存在,请不要重复添加!");
         }
         //管理员姓名
-        String adminUserName = proprietorMapper.queryAdminNameByUid(adminUid);
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(UserUtils.getId());
+        String adminUserName = "";
+        if (idCardRealInfo != null) {
+            adminUserName = idCardRealInfo.getIdCardName();
+        }
         ProprietorEntity entity = new ProprietorEntity();
         BeanUtils.copyProperties( qo, entity );
         entity.setId( SnowFlake.nextId() );

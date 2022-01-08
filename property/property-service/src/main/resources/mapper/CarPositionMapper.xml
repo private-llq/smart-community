@@ -95,7 +95,7 @@
     </select>
 
     <select id="selectAllOccupyCarPositionByCommunityIds" resultType="java.lang.Integer">
-        select count(0) from t_car_cut_off where stop_time is null and community_id in
+        select count(0) from t_car_position where car_pos_status &lt;&gt; 0 and community_id in
         <foreach collection="list" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>

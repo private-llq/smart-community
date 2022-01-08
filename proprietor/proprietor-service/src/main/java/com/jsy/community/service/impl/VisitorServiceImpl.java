@@ -317,7 +317,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
 //    **/
 //    private VisitorEntryVO getVisitorEntry(VisitorEntity visitorEntity){
 //        VisitorEntryVO visitorEntryVO = new VisitorEntryVO();
-//        visitorEntryVO.setPassword(MyMathUtils.randomCode(7)); //TODO 密码保存与验证方案待定
+//        visitorEntryVO.setPassword(MyMathUtils.randomCode(7));
 //        visitorEntryVO.setIsCommunityAccess(visitorEntity.getIsCommunityAccess());
 //        visitorEntryVO.setIsBuildingAccess(visitorEntity.getIsBuildingAccess());
 //        visitorEntryVO.setUid(visitorEntity.getUid());

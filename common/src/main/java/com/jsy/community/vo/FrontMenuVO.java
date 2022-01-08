@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @Author lihao
  * @ClassName FrontMenuVO
  * @Date 2020/11/15  15:10
- * @Description TODO
+ * @Description
  * @Version 1.0
  **/
 @Data

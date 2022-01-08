@@ -21,7 +21,7 @@ public interface PropertyAdvanceDepositRecordMapper extends BaseMapper<PropertyA
 	 * @Date: 2021/8/12
 	 **/
 	@Select("select * from t_property_advance_deposit_record where advance_deposit_id = #{id} and community_id = #{communityId} and deleted = 0")
-	List<PropertyAdvanceDepositRecordEntity> queryAdvanceDepositRecordList(Long id, Long communityId);
+	List<PropertyAdvanceDepositRecordEntity> queryAdvanceDepositRecordList(@Param("id")Long id, @Param("communityId")Long communityId);
 	
 	/**
 	 * @Description: 查询最新时间的一条记录
@@ -30,7 +30,7 @@ public interface PropertyAdvanceDepositRecordMapper extends BaseMapper<PropertyA
 	 * @Author: DKS
 	 * @Date: 2021/8/12
 	 **/
-	PropertyAdvanceDepositRecordEntity queryMaxCreateTimeRecord(Long advanceDepositId, Long communityId);
+	PropertyAdvanceDepositRecordEntity queryMaxCreateTimeRecord(@Param("advanceDepositId") Long advanceDepositId, @Param("communityId")Long communityId);
 	
 	/**
 	 *@Author: DKS

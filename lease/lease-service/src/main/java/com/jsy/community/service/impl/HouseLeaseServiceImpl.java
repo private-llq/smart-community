@@ -254,7 +254,6 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         //1.查出单条数据
         HouseLeaseVO vo = houseLeaseMapper.queryHouseLeaseOne(houseId);
 
-
         if (vo == null) {
             return null;
         }
@@ -368,6 +367,7 @@ public class HouseLeaseServiceImpl extends ServiceImpl<HouseLeaseMapper, HouseLe
         String imId = leaseUserService.queryIMIdByUid(vo.getUid());
         one.setImId(imId);
         vo.setUser(one);
+        vo.setHouseAddress(vo.getCommunityAddress());
         return vo;
     }
 

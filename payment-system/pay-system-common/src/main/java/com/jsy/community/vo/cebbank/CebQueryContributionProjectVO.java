@@ -14,14 +14,12 @@ import java.util.List;
 @Data
 public class CebQueryContributionProjectVO implements Serializable {
     // 数据模型
-    private String paymentItemPagingModel;
+    private CebQueryContributionProjectVO paymentItemPagingModel;
 
     // 缴费项目集合
     private List<CebPaymentItemModelVO> paymentItemModelList;
-
-    // 缴费项目配置
-    private List<CebQueryPaymentBillParamModelVO> queryPaymentBillParamModelList;
-
-    // 缴费项目配置
-    private List<CebCreatePaymentBillParamsModelVO> createPaymentBillParamsModelList;
+    private List<CebPaymentItemModelVO> listPageModelList;
+    private String userPaymentItemRecordsModel;
+    private CebCityModelVO cityModel;
+    private CebPageInfoVO pageInfo;
 }

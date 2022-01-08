@@ -6,6 +6,7 @@ import com.jsy.community.entity.BaseEntity;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -27,11 +28,18 @@ public class AdminRoleEntity extends BaseEntity {
 	
 	private Long createBy;//创建人
 	private Long updateBy;//修改人
+	private Integer scope;// 范围
 	
 	@TableField(exist = false)
 	private List<Long> menuIds;//菜单ID列表
 
 	@TableField(exist = false)
+	private List<String> menuIdsStr;//菜单ID列表str
+
+	@TableField(exist = false)
 	private List<AdminMenuEntity> menuList;//菜单ID列表
 
+	@TableField(exist = false)
+	@NotNull(message = "角色类型不能为空")
+	private Integer roleType;// 角色类型(8.物业 16.小区)
 }

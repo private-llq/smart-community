@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.api.IPatrolService;
@@ -15,6 +14,7 @@ import com.jsy.community.utils.NumberFormatUtil;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -35,9 +35,8 @@ import java.util.List;
  * @description 巡检接口
  * @since 2021-07-23 09:15
  **/
-@ApiJSYController
+// @ApiJSYController
 @RestController
-@Login
 @RequestMapping("/patrol")
 public class PatrolController {
 	
@@ -57,12 +56,13 @@ public class PatrolController {
 	**/
 	@PostMapping("/equip")
 	@businessLog(operation = "新增",content = "新增了【巡检设备】")
+	@Permit("community:property:patrol:equip")
 	public CommonResult addEquip(@RequestBody PatrolEquipEntity patrolEquipEntity){
 		ValidatorUtils.validateEntity(patrolEquipEntity);
 		patrolEquipEntity.setCommunityId(UserUtils.getAdminCommunityId());
 		return patrolService.addEquip(patrolEquipEntity) ? CommonResult.ok("添加成功") : CommonResult.error("添加失败");
 	}
-	
+
 	/**
 	* @Description: 巡检设备 分页查询
 	 * @Param: [baseQO]
@@ -71,6 +71,7 @@ public class PatrolController {
 	 * @Date: 2021-07-23
 	**/
 	@PostMapping("/equip/page")
+	@Permit("community:property:patrol:equip:page")
 	public CommonResult queryEquipPage(@RequestBody BaseQO<PatrolEquipEntity> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new PatrolEquipEntity());
@@ -88,6 +89,7 @@ public class PatrolController {
 	**/
 	@PutMapping("/equip")
 	@businessLog(operation = "编辑",content = "更新了【巡检设备】")
+	@Permit("community:property:patrol:equip")
 	public CommonResult updateEquip(@RequestBody PatrolEquipEntity patrolEquipEntity){
 		if(patrolEquipEntity.getId() == null){
 			return CommonResult.error("缺少id");
@@ -105,6 +107,7 @@ public class PatrolController {
 	**/
 	@DeleteMapping("/equip")
 	@businessLog(operation = "删除",content = "删除了【巡检设备】")
+	@Permit("community:property:patrol:equip")
 	public CommonResult deleteEquip(@RequestParam Long id){
 		return patrolService.deleteEquip(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
@@ -120,6 +123,7 @@ public class PatrolController {
 	**/
 	@PostMapping("/point")
 	@businessLog(operation = "新增",content = "新增了【巡检点位】")
+	@Permit("community:property:patrol:point")
 	public CommonResult addEquip(@RequestBody PatrolPointEntity patrolPointEntity){
 		ValidatorUtils.validateEntity(patrolPointEntity);
 		if(patrolPointEntity.getBuildingId() == null && patrolPointEntity.getUnitId() == null){
@@ -140,6 +144,7 @@ public class PatrolController {
 	 * @Date: 2021-07-24
 	**/
 	@PostMapping("/point/page")
+	@Permit("community:property:patrol:point:page")
 	public CommonResult queryPointPage(@RequestBody BaseQO<PatrolPointEntity> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new PatrolPointEntity());
@@ -157,6 +162,7 @@ public class PatrolController {
 	**/
 	@PutMapping("/point")
 	@businessLog(operation = "编辑",content = "更新了【巡检点位】")
+	@Permit("community:property:patrol:point")
 	public CommonResult updateEquip(@RequestBody PatrolPointEntity patrolPointEntity){
 		if(patrolPointEntity.getId() == null){
 			return CommonResult.error("缺少id");
@@ -177,6 +183,7 @@ public class PatrolController {
 	**/
 	@DeleteMapping("/point")
 	@businessLog(operation = "删除",content = "删除了【巡检点位】")
+	@Permit("community:property:patrol:point")
 	public CommonResult deletePoint(@RequestParam Long id){
 		return patrolService.deletePoint(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
@@ -192,6 +199,7 @@ public class PatrolController {
 	**/
 	@PostMapping("/line")
 	@businessLog(operation = "新增",content = "新增了【巡检线路】")
+	@Permit("community:property:patrol:line")
 	public CommonResult addLine(@RequestBody PatrolLineEntity patrolLineEntity){
 		ValidatorUtils.validateEntity(patrolLineEntity);
 		patrolLineEntity.setCommunityId(UserUtils.getAdminCommunityId());
@@ -206,6 +214,7 @@ public class PatrolController {
 	 * @Date: 2021-07-26
 	**/
 	@PostMapping("/line/page")
+	@Permit("community:property:patrol:line:page")
 	public CommonResult queryLinePage(@RequestBody BaseQO<PatrolLineEntity> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new PatrolLineEntity());
@@ -223,6 +232,7 @@ public class PatrolController {
 	**/
 	@PutMapping("/line")
 	@businessLog(operation = "编辑",content = "更新了【巡检线路】")
+	@Permit("community:property:patrol:line")
 	public CommonResult updateLine(@RequestBody PatrolLineEntity patrolLineEntity){
 		if(patrolLineEntity.getId() == null){
 			return CommonResult.error("缺少id");
@@ -240,6 +250,7 @@ public class PatrolController {
 	**/
 	@DeleteMapping("/line")
 	@businessLog(operation = "删除",content = "删除了【巡检线路】")
+	@Permit("community:property:patrol:line")
 	public CommonResult deleteLine(@RequestParam Long id){
 		return patrolService.deleteLine(id,UserUtils.getAdminCommunityId()) ? CommonResult.ok("操作成功") : CommonResult.error("操作失败");
 	}
@@ -254,8 +265,8 @@ public class PatrolController {
 	 * @Author: chq459799974
 	 * @Date: 2021-07-27
 	**/
-	@Login(allowAnonymous = true)
 	@RequestMapping("/record")
+	@Permit("community:property:patrol:record")
 	public String addRecord(HttpServletRequest req) throws IOException {
 		//读参数
 		InputStream in = req.getInputStream();
@@ -314,6 +325,7 @@ public class PatrolController {
 	 * @Date: 2021-07-27
 	**/
 	@PostMapping("/record/page")
+	@Permit("community:property:patrol:record:page")
 	public CommonResult queryRecordPage(@RequestBody BaseQO<PatrolRecordEntity> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new PatrolRecordEntity());
@@ -330,6 +342,7 @@ public class PatrolController {
 	 * @Date: 2021-08-02
 	**/
 	@RequestMapping("/record/export")
+	@Permit("community:property:patrol:record:export")
 	public void exportRecord(HttpServletResponse response, @RequestBody BaseQO<PatrolRecordEntity> baseQO) throws UnsupportedEncodingException{
 		
 		/*导出(写)*/

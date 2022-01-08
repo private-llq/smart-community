@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.CommunityHardWareService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityHardWareEntity;
@@ -10,6 +9,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * @Version: 1.0
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/hardWare")
 public class CommunityHardWareController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -40,8 +40,8 @@ public class CommunityHardWareController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/8/18 10:25
      **/
-    @Login
     @PostMapping("/v2/addHardWare")
+    @Permit("community:property:hardWare:v2:addHardWare")
     public CommonResult addHardWare(@RequestBody CommunityHardWareEntity communityHardWareEntity) {
         ValidatorUtils.validateEntity(communityHardWareEntity, CommunityHardWareEntity.addHardWareValidate.class);
         communityHardWareEntity.setHardwareType(1);
@@ -59,8 +59,8 @@ public class CommunityHardWareController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/8/19 10:43
      **/
-    @Login
     @PutMapping("/v2/updateHardWare")
+    @Permit("community:property:hardWare:v2:updateHardWare")
     public CommonResult updateHardWare(@RequestBody CommunityHardWareEntity communityHardWareEntity) {
         if (communityHardWareEntity.getId() == null) {
             throw new JSYException("需要更新的ID为空");
@@ -77,8 +77,8 @@ public class CommunityHardWareController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/8/19 14:33
      **/
-    @Login
     @PostMapping("/v2/syncFaceUrl")
+    @Permit("community:property:hardWare:v2:syncFaceUrl")
     public CommonResult syncFaceUrl(@RequestParam("id") Long id) {
         if (id == null) {
             throw new JSYException("ID不能为空");
@@ -99,8 +99,8 @@ public class CommunityHardWareController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/3 16:41
      **/
-    @Login
     @PostMapping("/v2/deleteHardWare")
+    @Permit("community:property:hardWare:v2:deleteHardWare")
     public CommonResult deleteHardWare(@RequestParam("id") Long id) {
         if (id == null) {
             throw new JSYException("ID不能为空");
@@ -115,8 +115,8 @@ public class CommunityHardWareController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/9/3 14:59
      **/
-    @Login
     @PostMapping("/v2/hardWarePageList")
+    @Permit("community:property:hardWare:v2:hardWarePageList")
     public CommonResult hardWarePageList(@RequestBody BaseQO<CommunityHardWareEntity> baseQO) {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new CommunityHardWareEntity());

@@ -3,7 +3,6 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.CommunityEntity;
 import org.apache.ibatis.annotations.MapKey;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -44,7 +43,7 @@ public interface CommunityMapper extends BaseMapper<CommunityEntity> {
      * @Date: 2020/12/16
     **/
     @MapKey("id")
-    Map<String,Map<String,Object>> queryCommunityNameByIdBatch(Collection<Long> list);
+    Map<String,Map<String,Object>> queryCommunityNameByIdBatch(@Param("list")Collection<Long> list);
     
     /**
      * @Description: 查询所有小区ID

@@ -20,10 +20,14 @@ public class SysUserQO implements Serializable {
 	private String name;
 	
 	@ApiModelProperty(value = "姓名")
-	private String realName;
+	private String nickName;
 	
 	@ApiModelProperty(value = "电话号码")
-	private String mobile;
+	private String phone;
+	
+	@ApiModelProperty(value = "密码")
+//	@Pattern(regexp = "^(?=.*[A-Z0-9])(?=.*[a-z0-9])(?=.*[a-zA-Z])(.{6,12})$", message = "请输入一个正确的6-12位密码,至少包含大写字母或小写字母或数字两种!")
+	private String password;
 	
 	@ApiModelProperty(value = "身份证号")
 	private String idCard;

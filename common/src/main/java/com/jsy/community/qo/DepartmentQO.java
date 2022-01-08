@@ -18,7 +18,7 @@ import java.util.List;
  * @author lihao
  * @ClassName DepartmentQO
  * @Date 2021/3/8  17:22
- * @Description TODO
+ * @Description
  * @Version 1.0
  **/
 @Data

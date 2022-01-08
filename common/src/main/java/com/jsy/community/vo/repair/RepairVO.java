@@ -11,7 +11,7 @@ import java.util.Date;
  * @author lihao
  * @ClassName RepairVO
  * @Date 2020/12/8  15:05
- * @Description TODO
+ * @Description
  * @Version 1.0
  **/
 @Data

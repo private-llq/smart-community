@@ -1,7 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.sys.SysRoleEntity;
 import com.jsy.community.entity.sys.SysRoleMenuEntity;
@@ -9,12 +7,14 @@ import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.sys.SysRoleQO;
 import com.jsy.community.service.ISysConfigService;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.zhsj.baseweb.annotation.Permit;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -24,10 +24,10 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("role")
-@ApiJSYController
+// @ApiJSYController
 public class SysRoleController {
 	
-	@Autowired
+	@Resource
 	private ISysConfigService sysConfigService;
 	
 	/**
@@ -40,10 +40,12 @@ public class SysRoleController {
 	@PostMapping("add")
 	@Transactional(rollbackFor = Exception.class)
 	@businessLog(operation = "新增",content = "新增了【系统角色】")
+	@Permit("community:admin:role:add")
 	public CommonResult addRole(@RequestBody SysRoleEntity sysRoleEntity){
 		ValidatorUtils.validateEntity(sysRoleEntity);
-		boolean b = sysConfigService.addRole(sysRoleEntity);
-		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"添加失败");
+		sysRoleEntity.setId(Long.valueOf(UserUtils.getId()));
+		sysConfigService.addRole(sysRoleEntity);
+		return CommonResult.ok("添加成功");
 	}
 	
 	/**
@@ -55,9 +57,10 @@ public class SysRoleController {
 	**/
 	@DeleteMapping("delete")
 	@businessLog(operation = "删除",content = "删除了【系统角色】")
+	@Permit("community:admin:role:delete")
 	public CommonResult delMenu(@RequestParam("id") Long id){
-		boolean b = sysConfigService.delRole(id);
-		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"删除失败");
+		sysConfigService.delRole(id);
+		return CommonResult.ok("删除成功");
 	}
 	
 	/**
@@ -70,9 +73,11 @@ public class SysRoleController {
 	@PutMapping("update")
 	@Transactional(rollbackFor = Exception.class)
 	@businessLog(operation = "编辑",content = "更新了【系统角色】")
+	@Permit("community:admin:role:update")
 	public CommonResult updateMenu(@RequestBody SysRoleQO sysRoleQO){
-		boolean b = sysConfigService.updateRole(sysRoleQO);
-		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改失败");
+		String id = UserUtils.getId();
+		sysConfigService.updateRole(sysRoleQO, Long.valueOf(id));
+		return CommonResult.ok("修改成功");
 	}
 	
 	/**
@@ -83,6 +88,7 @@ public class SysRoleController {
 	 * @Date: 2020/12/14
 	**/
 	@GetMapping("list")
+	@Permit("community:admin:role:list")
 	public CommonResult<List<SysRoleEntity>> listOfMenu(){
 		return CommonResult.ok(sysConfigService.listOfRole());
 	}
@@ -94,8 +100,8 @@ public class SysRoleController {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	 **/
-	@Login
 	@PostMapping("/page")
+	@Permit("community:admin:role:page")
 	public CommonResult queryPage(@RequestBody BaseQO<SysRoleEntity> baseQO){
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new SysRoleEntity());
@@ -112,6 +118,7 @@ public class SysRoleController {
 	**/
 	@Transactional(rollbackFor = Exception.class)
 	@PostMapping("menus")
+	@Permit("community:admin:role:menus")
 	public CommonResult setUserRoles(@RequestBody SysRoleMenuEntity sysRoleMenuEntity){
 		boolean b = sysConfigService.setRoleMenus(sysRoleMenuEntity.getMenuIds(), sysRoleMenuEntity.getRoleId());
 		return b ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"设置角色菜单失败");
@@ -124,8 +131,8 @@ public class SysRoleController {
 	 * @return: com.jsy.community.vo.CommonResult
 	 * @date: 2021/10/18 16:10
 	 **/
-	@Login
 	@GetMapping("/roleDetail")
+	@Permit("community:admin:role:roleDetail")
 	public CommonResult roleDetail(@RequestParam("roleId") Long roleId) {
 		return CommonResult.ok(sysConfigService.queryRoleDetail(roleId));
 	}

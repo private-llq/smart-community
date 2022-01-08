@@ -6,6 +6,10 @@ import com.jsy.community.api.IUserImService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserIMEntity;
 import com.jsy.community.mapper.UserIMMapper;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.UserImVo;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,6 +28,9 @@ public class UserImServiceImpl extends ServiceImpl<UserIMMapper, UserIMEntity> i
     @Autowired
     private UserIMMapper userIMMapper;
 
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseUserInfoRpcService userInfoRpcService;
+
     @Override
     public List<UserIMEntity> selectUidAll(Set<String> uidAll) {
         return userIMMapper.selectList(new QueryWrapper<UserIMEntity>().in("uid",uidAll));
@@ -31,6 +38,12 @@ public class UserImServiceImpl extends ServiceImpl<UserIMMapper, UserIMEntity> i
 
     @Override
     public UserIMEntity selectUid(String uid) {
-        return userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid",uid));
+        UserIMEntity userIMEntity = new UserIMEntity();
+        UserImVo eHomeUserIm = userInfoRpcService.getEHomeUserIm(uid);
+        if (eHomeUserIm != null) {
+            userIMEntity.setImId(eHomeUserIm.getImId());
+        }
+//        return userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid",uid));
+        return userIMEntity;
     }
 }

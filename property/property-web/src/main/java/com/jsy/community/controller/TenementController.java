@@ -2,7 +2,6 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.Desensitization;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ITenementService;
 import com.jsy.community.aspectj.DesensitizationType;
 import com.jsy.community.constant.Const;
@@ -10,6 +9,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyRelationQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -29,8 +29,7 @@ import java.util.Map;
 @Api(tags = "物业租户查询")
 @RestController
 @RequestMapping("/tenement")
-@ApiJSYController
-@Login
+// @ApiJSYController
 public class TenementController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ITenementService tenementService;
@@ -38,6 +37,7 @@ public class TenementController {
     @ApiOperation("查询租户列表")
     @PostMapping("/list")
     @Desensitization(type = {DesensitizationType.PHONE,DesensitizationType.ID_CARD,DesensitizationType.PHONE,DesensitizationType.ID_CARD}, field = {"mobile","idCard","ownerMobile","ownerIdCard"})
+    @Permit("community:property:tenement:list")
     public CommonResult list(@RequestBody BaseQO<PropertyRelationQO> baseQO){
         System.out.println(baseQO);
         Long communityId = UserUtils.getAdminCommunityId();

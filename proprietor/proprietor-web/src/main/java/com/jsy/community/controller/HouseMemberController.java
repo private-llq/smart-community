@@ -1,26 +1,23 @@
 package com.jsy.community.controller;
 
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IHouseMemberService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.HouseMemberEntity;
-import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.HouseMemberQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Set;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
@@ -33,8 +30,7 @@ import java.util.Set;
 @Api(tags = "房间成员控制器")
 @RestController
 @RequestMapping("houseMember")
-@ApiJSYController
-@Login
+// @ApiJSYController
 public class HouseMemberController {
 	
 	@DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
@@ -84,7 +80,8 @@ public class HouseMemberController {
 	
 	@ApiOperation("【房间成员】查询")
 	@PostMapping("page")
-		public CommonResult<PageInfo<HouseMemberEntity>> queryHouseMemberPage(@RequestBody BaseQO<HouseMemberQO> baseQO){
+	// @Permit("community:proprietor:houseMember:page")
+	public CommonResult<PageInfo<HouseMemberEntity>> queryHouseMemberPage(@RequestBody BaseQO<HouseMemberQO> baseQO){
 		if( baseQO.getQuery() == null ){
 			baseQO.setQuery(new HouseMemberQO());
 		}

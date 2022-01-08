@@ -5,12 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.sys.SysRoleEntity;
+import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.sys.SysUserAuthEntity;
 import com.jsy.community.entity.sys.SysUserEntity;
-import com.jsy.community.entity.sys.SysUserRoleEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.SysRoleMapper;
 import com.jsy.community.mapper.SysUserAuthMapper;
@@ -23,27 +22,40 @@ import com.jsy.community.qo.sys.SysUserQO;
 import com.jsy.community.service.AdminException;
 import com.jsy.community.service.ISysUserService;
 import com.jsy.community.utils.*;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.PermitRole;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseAuthRpcService;
+import com.zhsj.base.api.rpc.IBaseRoleRpcService;
+import com.zhsj.base.api.rpc.IBaseUpdateUserRpcService;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.PageVO;
+import com.zhsj.basecommon.exception.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.shiro.crypto.hash.Sha256Hash;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 /**
  * 系统用户
  */
 @Slf4j
+@Transactional(rollbackFor = Exception.class)
 @Service("sysUserService")
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity> implements ISysUserService {
 	
@@ -67,6 +79,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	
 	@Resource
 	private SysRoleMapper sysRoleMapper;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseAuthRpcService baseAuthRpcService;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseRoleRpcService baseRoleRpcService;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseUpdateUserRpcService baseUpdateUserRpcService;
+	
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseUserInfoRpcService userInfoRpcService;
 	
 	/**
 	* @Description: 设置用户角色
@@ -361,6 +385,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	}
 	
 	/**
+	 * @Description: 根据uid查询用户信息
+	 * @Param: [uid]
+	 * @Return: com.jsy.community.entity.sys.SysUserEntity
+	 * @Author: DKS
+	 * @Date: 2021/11/30
+	 **/
+	@Override
+	public SysUserEntity queryByUid(String id){
+		return sysUserMapper.queryById(id);
+	}
+	
+	/**
 	 * @Description: 操作员条件查询
 	 * @Param: [baseQO]
 	 * @Return: com.jsy.community.utils.PageInfo
@@ -368,150 +404,104 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	 * @Date: 2021/10/13
 	 **/
 	@Override
-	public PageInfo queryOperator(BaseQO<SysUserQO> baseQO){
+	public PageVO<SysUserEntity> queryOperator(BaseQO<SysUserQO> baseQO){
 		SysUserQO query = baseQO.getQuery();
-		/*AdminUserQO query = baseQO.getQuery();
-		Page<AdminUserEntity> page = new Page();
-		MyPageUtils.setPageAndSize(page,baseQO);
-		QueryWrapper<AdminUserEntity> queryWrapper = new QueryWrapper<AdminUserEntity>().select("id,uid,real_name,mobile,create_time");
-		//是否查详情
-		Integer menuCount = null;
-		if(query.getId() != null){
-			queryWrapper.eq("id",query.getId());
-			//TODO 换成查角色 回显到详情
-//			String uid = sysUserMapper.queryUidById(query.getId());
-//			menuCount = adminConfigService.countUserMenu(uid);
-		}
+		Page<SysUserEntity> page = new Page<>();
+		MyPageUtils.setPageAndSize(page, baseQO);
 		
-		if(!StringUtils.isEmpty(query.getName())){
-			queryWrapper.and(wrapper -> wrapper
-				.like("real_name",query.getName())
-				.or().like("mobile",query.getName())
-			);
+		PageVO<UserDetail> userDetailPageVO = userInfoRpcService.queryUser(query.getPhone(), query.getNickName(), BusinessConst.ULTIMATE_ADMIN, query.getRoleId(), baseQO.getPage().intValue(), baseQO.getSize().intValue());
+		
+		if (CollectionUtils.isEmpty(userDetailPageVO.getData())) {
+			return new PageVO<>();
 		}
-		queryWrapper.orderByDesc("create_time");
-		Page<AdminUserEntity> pageData = sysUserMapper.selectPage(page,queryWrapper);
-
-		if(CollectionUtils.isEmpty(pageData.getRecords())){
-			return new PageInfo<>();
-		}
-		Set<String> uidSet = pageData.getRecords().stream().map(adminUserEntity -> adminUserEntity.getUid()).collect(Collectors.toSet());
-		List<AdminUserRoleEntity> userRoleEntities = adminUserRoleMapper.queryByUids(uidSet, query.getCompanyId());
-		if (!CollectionUtils.isEmpty(userRoleEntities)) {
-			for (AdminUserEntity record : pageData.getRecords()) {
-				for (AdminUserRoleEntity userRoleEntity : userRoleEntities) {
-					if (record.getUid().equals(userRoleEntity.getUid())) {
-						record.setRoleId(userRoleEntity.getRoleId());
-						record.setRoleName(userRoleEntity.getRoleName());
-						break;
-					}
-				}
+		PageVO<SysUserEntity> pageVO = new PageVO<>();
+		// 补充数据
+		for (UserDetail userDetail : userDetailPageVO.getData()) {
+			SysUserEntity sysUserEntity = new SysUserEntity();
+			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(userDetail.getId(), BusinessConst.ULTIMATE_ADMIN);
+			sysUserEntity.setId(userDetail.getId());
+			sysUserEntity.setIdStr(String.valueOf(userDetail.getId()));
+			sysUserEntity.setNickname(userDetail.getNickName());
+			if (!CollectionUtils.isEmpty(permitRoles)) {
+				sysUserEntity.setRoleId(permitRoles.get(0).getId());
+				sysUserEntity.setRoleIdStr(String.valueOf(permitRoles.get(0).getId()));
+				sysUserEntity.setRoleName(permitRoles.get(0).getName());
 			}
-		}*/
-		List<SysUserEntity> sysUserEntities = sysUserMapper.queryPageUserEntity(query, (baseQO.getPage() - 1) * baseQO.getSize(), baseQO.getSize());
-		Integer integer = sysUserMapper.countPageUserEntity(query);
-		if (integer == null) {
-			integer = 0;
+			sysUserEntity.setMobile(userDetail.getPhone());
+			sysUserEntity.setCreateTime(LocalDateTime.parse(userDetail.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+			pageVO.getData().add(sysUserEntity);
 		}
-		// 补充角色名称和角色idStr
-		for (SysUserEntity sysUserEntity : sysUserEntities) {
-			SysRoleEntity sysRoleEntity = sysRoleMapper.selectById(sysUserEntity.getRoleId());
-			sysUserEntity.setRoleIdStr(String.valueOf(sysUserEntity.getRoleId()));
-			sysUserEntity.setRoleName(sysRoleEntity.getName());
-		}
-		PageInfo<SysUserEntity> pageInfo = new PageInfo<>();
-		pageInfo.setRecords(sysUserEntities);
-		pageInfo.setTotal(integer);
-		pageInfo.setSize(baseQO.getSize());
-		pageInfo.setCurrent(baseQO.getPage());
-
-//		BeanUtils.copyProperties(pageData,pageInfo);
-		return pageInfo;
+		pageVO.setPageNum(userDetailPageVO.getPageNum());
+		pageVO.setPageSize(userDetailPageVO.getPageSize());
+		pageVO.setPages(userDetailPageVO.getPages());
+		pageVO.setTotal(userDetailPageVO.getTotal());
+		return pageVO;
 	}
 	
 	/**
 	 * @Description: 添加操作员
-	 * @Param: [sysUserEntity]
+	 * @Param: [sysUserQO]
 	 * @Return: boolean
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
 	@Override
-	public void addOperator(SysUserEntity sysUserEntity){
-		//生成盐值并对密码加密
-		String salt = RandomStringUtils.randomAlphanumeric(20);
-		//生成UUID 和 ID
-		sysUserEntity.setId(SnowFlake.nextId());
-		//t_sys_user用户资料表插入数据
-		sysUserEntity.setPassword(new Sha256Hash(RSAUtil.privateDecrypt(sysUserEntity.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), salt).toHex());
-//		sysUserEntity.setPassword(new Sha256Hash(sysUserEntity.getPassword(), salt).toHex());
-		sysUserEntity.setSalt(salt);
-		sysUserMapper.addOperator(sysUserEntity);
-		// TODO 变为添加角色
-		SysUserRoleEntity sysUserRoleEntity = new SysUserRoleEntity();
-		sysUserRoleEntity.setUserId(sysUserEntity.getId());
-		sysUserRoleEntity.setRoleId(sysUserEntity.getRoleId());
-		sysUserRoleEntity.setCreateTime(LocalDateTime.now());
-		sysUserRoleMapper.insert(sysUserRoleEntity);
-//		//t_sys_user_menu添加菜单权限
-//		sysConfigService.setUserMenus(sysUserEntity.getMenuIdList(), uid);
-		//t_sys_user_auth用户登录表插入数据
-		SysUserAuthEntity sysUserAuthEntity = new SysUserAuthEntity();
-		BeanUtils.copyProperties(sysUserEntity,sysUserAuthEntity);
-		sysUserAuthMapper.createLoginUser(sysUserAuthEntity);
-//		//发短信通知，并发送初始密码
-//		SmsUtil.sendSmsPassword(sysUserEntity.getMobile(), randomPass);
+	public Integer addOperator(SysUserQO sysUserQO){
+		// 判断是新增(1)的还是原有(2)的
+		int result = 1;
+		// 增加用户
+		UserDetail userDetail = null;
+		// 密码正则匹配
+		String password = RSAUtil.privateDecrypt(sysUserQO.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY));
+		String pattern = "^(?=.*[A-Z0-9])(?=.*[a-z0-9])(?=.*[a-zA-Z])(.{6,12})$";
+		if (!password.matches(pattern)) {
+			throw new AdminException(JSYError.REQUEST_PARAM.getCode(), "请输入一个正确的6-12位密码,至少包含大写字母或小写字母或数字两种!");
+		}
+		
+		try {
+			userDetail = baseAuthRpcService.userPhoneRegister(sysUserQO.getNickName(), sysUserQO.getPhone(), RSAUtil.privateDecrypt(sysUserQO.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)));
+		} catch (BaseException e) {
+			// 手机号是否已经注册
+			if (e.getErrorEnum().getCode() == 103) {
+				userDetail = new UserDetail();
+				userDetail.setId(userInfoRpcService.getUserDetailByPhone(sysUserQO.getPhone()).getId());
+				result = 2;
+			}
+		}
+		if (userDetail == null) {
+			throw new AdminException("用户添加失败");
+		}
+		// 增加登录类型范围为物业大后台
+		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.ULTIMATE_ADMIN, false);
+		// 先移除大后台默认角色，再给用户添加角色
+//		List<Long> roleId = new ArrayList<>();
+//		roleId.add(1463327674104250369L);
+//		baseRoleRpcService.roleRemoveToUser(roleId, userDetail.getId());
+		List<Long> roleIds = new ArrayList<>();
+		roleIds.add(sysUserQO.getRoleId());
+		baseRoleRpcService.userJoinRole(roleIds, userDetail.getId(), sysUserQO.getId());
+		return result;
 	}
 	
 	/**
 	 * @Description: 编辑操作员
-	 * @Param: [sysUserEntity]
+	 * @Param: [sysUserQO]
 	 * @Return: boolean
 	 * @Author: DKS
 	 * @Date: 2021/10/13
 	 **/
 	@Override
-	public void updateOperator(SysUserEntity sysUserEntity){
-		//查询uid
-		UserEntity user = sysUserMapper.queryUidById(sysUserEntity.getId());
-		if(user == null){
-			throw new AdminException("用户不存在！");
+	public void updateOperator(SysUserQO sysUserQO){
+		// 密码正则匹配
+		String password = RSAUtil.privateDecrypt(sysUserQO.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY));
+		String pattern = "^(?=.*[A-Z0-9])(?=.*[a-z0-9])(?=.*[a-zA-Z])(.{6,12})$";
+		if (!password.matches(pattern)) {
+			throw new AdminException(JSYError.REQUEST_PARAM.getCode(), "请输入一个正确的6-12位密码,至少包含大写字母或小写字母或数字两种!");
 		}
-		//更新密码
-		if(!StringUtils.isEmpty(sysUserEntity.getPassword())){
-			//生成盐值并对密码加密
-			String salt = RandomStringUtils.randomAlphanumeric(20);
-			String password = new Sha256Hash(RSAUtil.privateDecrypt(sysUserEntity.getPassword(),RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), salt).toHex();
-//			String password = new Sha256Hash(sysUserEntity.getPassword(), salt).toHex();
-			//更新
-			SysUserAuthEntity sysUserAuthEntity = new SysUserAuthEntity();
-			sysUserAuthEntity.setPassword(password);
-			sysUserAuthEntity.setSalt(salt);
-			sysUserAuthMapper.update(sysUserAuthEntity, new UpdateWrapper<SysUserAuthEntity>().eq("mobile",user.getMobile()));
-		}
-		//修改手机号
-		if(!StringUtils.isEmpty(sysUserEntity.getMobile()) && !sysUserEntity.getMobile().equals(user.getMobile())){
-			//用户是否已注册
-			boolean exists = checkUserExists(sysUserEntity.getMobile());
-			if(exists){
-				throw new AdminException(JSYError.DUPLICATE_KEY.getCode(),"该手机号已被注册");
-			}
-			//更换手机号操作
-			boolean b = changeMobile(sysUserEntity.getMobile(), user.getMobile());
-			if(b){
-				//旧手机账号退出登录
-				UserUtils.destroyToken("Sys:Login",String.valueOf(redisTemplate.opsForValue().get("Sys:LoginAccount:" + user.getMobile())));
-				UserUtils.destroyToken("Sys:LoginAccount",user.getMobile());
-			}
-		}
-		//更新菜单权限
-//		adminConfigService.setUserMenus(sysUserEntity.getMenuIdList(), uid);
-		// 更新操作员角色
-		if (sysUserEntity.getRoleId() != null) {
-			sysUserRoleMapper.updateOperatorRole(sysUserEntity.getId(), sysUserEntity.getRoleId());
-		}
+		
 		//更新资料
-		sysUserMapper.updateOperator(sysUserEntity);
+		baseUpdateUserRpcService.updateUserInfo(sysUserQO.getId(), sysUserQO.getNickName(),
+			sysUserQO.getPhone(), sysUserQO.getPassword(), BusinessConst.ULTIMATE_ADMIN);
 	}
 	
 	/**
@@ -522,40 +512,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	 * @Date: 2021/10/13
 	 */
 	public void deleteOperator(Long id) {
-		SysUserEntity sysUserEntity = sysUserMapper.selectOne(new QueryWrapper<SysUserEntity>().eq("id", id));
-		if (sysUserEntity == null) {
-			throw new AdminException(JSYError.OPERATOR_INFORMATION_NOT_OBTAINED.getCode(),"未获取到操作员信息");
-		}
-		int i = sysUserMapper.deleteById(id);
-		if (i != 1) {
-			throw new AdminException(JSYError.INTERNAL.getCode(),"删除失败");
-		}
-		SysUserAuthEntity sysUserAuthEntity = sysUserAuthMapper.selectOne(new QueryWrapper<SysUserAuthEntity>().eq("mobile", sysUserEntity.getMobile()));
-		sysUserAuthMapper.deleteById(sysUserAuthEntity.getId());
-	}
-	
-	/**
-	 * @Description: 根据手机号检查小区用户是否已存在(t_sys_user)
-	 * @Param: [mobile]
-	 * @Return: boolean
-	 * @Author: DKS
-	 * @Date: 2021/10/13
-	 **/
-	@Override
-	public boolean checkUserExists(String mobile){
-		return sysUserMapper.countUser(mobile) != null;
-	}
-	
-	/**
-	 * @Description: 根据uid查询手机号
-	 * @Param: [uid]
-	 * @Return: java.lang.String
-	 * @Author: DKS
-	 * 	 * @Date: 2021/10/13
-	 **/
-	@Override
-	public String queryMobileByUid(String uid){
-		return sysUserMapper.queryMobileByUid(uid);
+		List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(id, BusinessConst.ULTIMATE_ADMIN);
+		// 移除用户角色绑定关系
+		Set<Long> roleIds = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
+		baseRoleRpcService.roleRemoveToUser(roleIds, id);
+		// 移除登录类型范围
+		baseAuthRpcService.removeLoginTypeScope(id, BusinessConst.ULTIMATE_ADMIN, false);
+//		baseAuthRpcService.cancellation(id);
 	}
 	
 	/**
@@ -612,6 +575,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	
 	@Override
 	public String getSysRealName(String userId) {
-		return sysUserMapper.querySysNameByUid(userId);
+		return userInfoRpcService.getUserDetail(Long.parseLong(userId)).getNickName();
 	}
 }

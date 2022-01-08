@@ -89,6 +89,9 @@ public class ComplainServiceImpl extends ServiceImpl<ComplainMapper, ComplainEnt
     public boolean appendComplain(ComplainQO complainQO) {
         ComplainEntity complainEntity = new ComplainEntity();
         complainEntity.setCommunityId(complainEntity.getCommunityId());
+        if (complainQO.getSource() != null) {
+            complainEntity.setSource(complainQO.getSource());
+        }
         complainEntity.setStatus(0);
         complainEntity.setId(SnowFlake.nextId());
         complainEntity.setComplainTime(LocalDateTime.now());

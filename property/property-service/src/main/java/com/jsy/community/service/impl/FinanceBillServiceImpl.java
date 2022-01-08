@@ -7,13 +7,16 @@ import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.HouseEntity;
-import com.jsy.community.entity.UserIMEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
 import lombok.SneakyThrows;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -60,6 +63,12 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
 
     @Autowired
     private CarPositionMapper carPositionMapper;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseUserInfoRpcService userInfoRpcService;
+
+    @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check=false)
+    private IImChatPublicPushRpcService iImChatPublicPushRpcService;
 
 
 
@@ -240,9 +249,9 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
         }
         //消息推送
         if (uid.size()!=0){
-            List<UserIMEntity> list = userImService.selectUidAll(uid);
-            for (UserIMEntity userIMEntity : list) {
-                PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
+            List<UserImVo> userImVos = userInfoRpcService.batchGetEHomeUserIm(uid);
+            for (UserImVo userIMEntity : userImVos) {
+                PushInfoUtil.PushPublicTextMsg(iImChatPublicPushRpcService,userIMEntity.getImId(),
                         "账单通知",
                         "上月账单出来了，及时缴费哦！",
                         null,
@@ -282,9 +291,9 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
         }
         //消息推送
         if (uid.size()!=0){
-            List<UserIMEntity> list = userImService.selectUidAll(uid);
-            for (UserIMEntity userIMEntity : list) {
-                PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
+            List<UserImVo> userImVos = userInfoRpcService.batchGetEHomeUserIm(uid);
+            for (UserImVo userIMEntity : userImVos) {
+                PushInfoUtil.PushPublicTextMsg(iImChatPublicPushRpcService,userIMEntity.getImId(),
                         "账单通知",
                         "上月账单出来了，及时缴费哦！",
                         null,
@@ -384,9 +393,9 @@ public class FinanceBillServiceImpl implements IFinanceBillService {
         }
         //消息推送
         if (uidAll.size()!=0){
-            List<UserIMEntity> list = userImService.selectUidAll(uidAll);
-            for (UserIMEntity userIMEntity : list) {
-                PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
+            List<UserImVo> userImVos = userInfoRpcService.batchGetEHomeUserIm(uidAll);
+            for (UserImVo userIMEntity : userImVos) {
+                PushInfoUtil.PushPublicTextMsg(iImChatPublicPushRpcService,userIMEntity.getImId(),
                         "账单通知",
                         "上月账单出来了，及时缴费哦！",
                         null,

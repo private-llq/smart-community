@@ -33,13 +33,32 @@
     </update>
 
     <!--所有发布商品的条数-->
+<!--    <select id="findTotals" resultType="java.lang.Long">-->
+<!--        select count(*) from t_proprietor_market tm-->
+<!--        left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id-->
+<!--        left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id-->
+<!--        left join t_user tu on tm.uid = tu.uid-->
+<!--        left join t_community tc on tc.id = tm.community_id-->
+<!--        where  tm.shield= 0-->
+<!--        and tm.remove = 0-->
+<!--        <if test="query.categoryId!=null and query.categoryId!=''">-->
+<!--            and tm.category_id=#{query.categoryId}-->
+<!--        </if>-->
+<!--        <if test="query.communityId!=null and query.communityId!=''">-->
+<!--            and tm.community_id=#{query.communityId}-->
+<!--        </if>-->
+<!--        <if test="query.realName !=null and query.realName!=''">-->
+<!--            AND (tu.real_name LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%')-->
+<!--            OR  tm.phone LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%'))-->
+<!--        </if>-->
+<!--        <if test="query.state !=null and query.state !='' or query.state==0">-->
+<!--            AND state= #{query.state,jdbcType=INTEGER}-->
+<!--        </if>-->
+<!--    </select>-->
+
     <select id="findTotals" resultType="java.lang.Long">
         select count(*) from t_proprietor_market tm
-        left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
-        left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
-        left join t_user tu on tm.uid = tu.uid
-        left join t_community tc on tc.id = tm.community_id
-        where  tm.shield= 0
+        where tm.shield = 0
         and tm.remove = 0
         <if test="query.categoryId!=null and query.categoryId!=''">
             and tm.category_id=#{query.categoryId}
@@ -47,28 +66,57 @@
         <if test="query.communityId!=null and query.communityId!=''">
             and tm.community_id=#{query.communityId}
         </if>
-        <if test="query.realName !=null and query.realName!=''">
-            AND (tu.real_name LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%')
-            OR  tm.phone LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%'))
-        </if>
         <if test="query.state !=null and query.state !='' or query.state==0">
-            AND state= #{query.state,jdbcType=INTEGER}
+            and state= #{query.state,jdbcType=INTEGER}
+        </if>
+        <if test="query.userDetailIds != null">
+            and tm.uid in (
+            <foreach collection="query.userDetailIds" item="id" separator=",">
+                #{id}
+            </foreach>)
         </if>
     </select>
 
     <!--所有发布商品-->
-    <select id="selectMarketAllPage" resultMap="ProprietorMarketEntityMap">
-        select tm.id,tm.community_id as communityId,tc.name as communityName, tm.uid as uid, tm.goods_name as goodsName, tm.price, tm.goods_explain as goodsExplain,
-               tm.negotiable,  tm.state, tm.category_id as categoryId,tm.label_id as labelId, tm.remove,
-               tm.click as click, tm.phone as phone,tm.images as images,tm.shield as shield,
-               tm.deleted as deleted, tm.create_time as createTime,tm.update_time as updateTime,
-               tpml.label as labelName,tpmc.category  as categoryName,tu.real_name as realName
+<!--    <select id="selectMarketAllPage" resultMap="ProprietorMarketEntityMap">-->
+<!--        select tm.id,tm.community_id as communityId,tc.name as communityName, tm.uid as uid, tm.goods_name as goodsName, tm.price, tm.goods_explain as goodsExplain,-->
+<!--               tm.negotiable,  tm.state, tm.category_id as categoryId,tm.label_id as labelId, tm.remove,-->
+<!--               tm.click as click, tm.phone as phone,tm.images as images,tm.shield as shield,-->
+<!--               tm.deleted as deleted, tm.create_time as createTime,tm.update_time as updateTime,-->
+<!--               tpml.label as labelName,tpmc.category  as categoryName,tu.real_name as realName-->
+<!--        from t_proprietor_market tm-->
+<!--                 left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id-->
+<!--                 left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id-->
+<!--                 left join t_user tu on tm.uid = tu.uid-->
+<!--                 left join t_community tc on tc.id = tm.community_id-->
+<!--        where  tm.shield= 0-->
+<!--        and tm.remove = 0-->
+<!--        <if test="query.categoryId!=null and query.categoryId!=''">-->
+<!--            and tm.category_id=#{query.categoryId}-->
+<!--        </if>-->
+<!--        <if test="query.communityId!=null and query.communityId!=''">-->
+<!--            and tm.community_id=#{query.communityId}-->
+<!--        </if>-->
+<!--        <if test="query.realName !=null and query.realName!=''">-->
+<!--            AND (tu.real_name LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%')-->
+<!--            OR  tm.phone LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%'))-->
+<!--        </if>-->
+<!--        <if test="query.state !=null and query.state !='' or query.state==0">-->
+<!--            AND state= #{query.state,jdbcType=INTEGER}-->
+<!--        </if>-->
+<!--        limit #{page},#{size}-->
+<!--    </select>-->
+    <select id="selectMarketAllPage" resultType="com.jsy.community.entity.proprietor.ProprietorMarketEntity">
+        select tm.id, tm.community_id, tc.name as communityName, tm.uid, tm.goods_name as goodsName, tm.price, tm.goods_explain as goodsExplain,
+        tm.negotiable,  tm.state, tm.category_id as categoryId,tm.label_id as labelId,
+        tm.click as click, tm.phone as phone,tm.images as images,tm.shield as shield,
+        tm.deleted as deleted, tm.create_time as createTime,tm.update_time as updateTime,
+        tpml.label as labelName,tpmc.category  as categoryName
         from t_proprietor_market tm
-                 left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
-                 left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
-                 left join t_user tu on tm.uid = tu.uid
-                 left join t_community tc on tc.id = tm.community_id
-        where  tm.shield= 0
+        left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
+        left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
+        left join t_community tc on tc.id = tm.community_id
+        where tm.shield = 0
         and tm.remove = 0
         <if test="query.categoryId!=null and query.categoryId!=''">
             and tm.category_id=#{query.categoryId}
@@ -76,13 +124,16 @@
         <if test="query.communityId!=null and query.communityId!=''">
             and tm.community_id=#{query.communityId}
         </if>
-        <if test="query.realName !=null and query.realName!=''">
-            AND (tu.real_name LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%')
-            OR  tm.phone LIKE CONCAT('%',#{query.realName,jdbcType=VARCHAR},'%'))
-        </if>
         <if test="query.state !=null and query.state !='' or query.state==0">
-            AND state= #{query.state,jdbcType=INTEGER}
+            and state= #{query.state,jdbcType=INTEGER}
         </if>
+        <if test="query.userDetailIds != null">
+            and tm.uid in (
+            <foreach collection="query.userDetailIds" item="id" separator=",">
+                #{id}
+            </foreach>)
+        </if>
+        order by tm.create_time desc
         limit #{page},#{size}
     </select>
 
@@ -90,7 +141,6 @@
         select count(*) from t_proprietor_market tm
                          left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
                          left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
-                         left join t_user tu on tm.uid = tu.uid
                          left join t_community tc on tc.id = tm.community_id
         where tm.remove = 0 and  tm.shield = 1
     </select>
@@ -100,11 +150,10 @@
         tm.negotiable,  tm.state, tm.category_id as categoryId,tm.label_id as labelId, tm.remove,
         tm.click as click, tm.phone as phone,tm.images as images,tm.shield as shield,
         tm.deleted as deleted, tm.create_time as createTime,tm.update_time as updateTime,
-        tpml.label as labelName,tpmc.category  as categoryName,tu.real_name as realName,tc.name as communityName
+        tpml.label as labelName,tpmc.category  as categoryName,tc.name as communityName
         from t_proprietor_market tm
         left join t_proprietor_market_category tpmc on tm.category_id = tpmc.category_id
         left join t_proprietor_market_label tpml on tm.label_id = tpml.label_id
-        left join t_user tu on tm.uid = tu.uid
         left join t_community tc on tc.id = tm.community_id
         where tm.remove = 0 and tm.shield = 1
         limit #{page},#{size}

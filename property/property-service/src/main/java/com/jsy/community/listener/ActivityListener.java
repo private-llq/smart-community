@@ -3,7 +3,6 @@ package com.jsy.community.listener;
 import com.jsy.community.api.IUserImService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.UserIMEntity;
 import com.jsy.community.entity.proprietor.ActivityEntity;
 import com.jsy.community.entity.proprietor.VoteEntity;
 import com.jsy.community.mapper.PropertyActivityMapper;
@@ -11,6 +10,10 @@ import com.jsy.community.mapper.PropertyActivityUserMapper;
 import com.jsy.community.mapper.PropertyVoteMapper;
 import com.jsy.community.utils.PushInfoUtil;
 import com.rabbitmq.client.Channel;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -45,6 +48,12 @@ public class ActivityListener {
     @DubboReference(version = Const.version, group = Const.group, check = false)
     private IUserImService userImService;
 
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseUserInfoRpcService userInfoRpcService;
+
+    @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check = false)
+    private IImChatPublicPushRpcService iImChatPublicPushRpcService;
+
 
     @RabbitListener(queues = {"queue_activity_delay"})
     public void QUEUE_CAR_INSERT(Map<String,Object> map, Message message, Channel channel)throws IOException {
@@ -71,9 +80,9 @@ public class ActivityListener {
                 map1.put("type",4);
                 map1.put("dataId",activityEntity.getId());
                 if (set.size()!=0){
-                    List<UserIMEntity> list = userImService.selectUidAll(set);
-                    for (UserIMEntity entity : list) {
-                        PushInfoUtil.PushPublicTextMsg(entity.getImId(),
+                    List<UserImVo> userImVos = userInfoRpcService.batchGetEHomeUserIm(set);
+                    for (UserImVo entity : userImVos) {
+                        PushInfoUtil.PushPublicTextMsg(iImChatPublicPushRpcService,entity.getImId(),
                                 "活动投票",
                                 "您报名的活动即将开始",
                                 null,

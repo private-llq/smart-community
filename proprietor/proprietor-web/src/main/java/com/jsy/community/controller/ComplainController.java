@@ -1,7 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IComplainService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.ComplainEntity;
@@ -31,8 +29,7 @@ import java.util.List;
 @Api(tags = "投诉建议前端控制器")
 @RestController
 @RequestMapping("/complain")
-@ApiJSYController
-@Login(allowAnonymous = true)
+// @ApiJSYController
 public class ComplainController {
 
     private final String[] img ={"jpg","png","jpeg"};
@@ -50,13 +47,16 @@ public class ComplainController {
      * @Param:
      * @return:
      */
-    @Login
     @ApiOperation("用户投诉建议接口")
     @PostMapping("/addComplain")
+    // @Permit("community:proprietor:complain:addComplain")
     public CommonResult addComplain(@RequestBody ComplainEntity complainEntity){
         String userInfo = UserUtils.getUserId();
         complainEntity.setUid(userInfo);
         complainEntity.setCommunityId(complainEntity.getCommunityId());
+        if (complainEntity.getSource() != null) {
+            complainEntity.setSource(complainEntity.getSource());
+        }
         complainEntity.setStatus(0);
         complainEntity.setId(SnowFlake.nextId());
         complainEntity.setComplainTime(LocalDateTime.now());
@@ -71,9 +71,9 @@ public class ComplainController {
      * @Param:
      * @return:
      */
-    @Login
     @ApiOperation("用户查询所有投诉建议")
     @GetMapping("/selectUserIdComplain")
+    // @Permit("community:proprietor:complain:selectUserIdComplain")
     public CommonResult selectUserIdComplain(){
         String userId = UserUtils.getUserId();
 
@@ -88,9 +88,9 @@ public class ComplainController {
      * @Param:
      * @return:
      */
-    @Login
     @ApiOperation("投诉建议图片批量上传")
     @PostMapping(value = "/uploadComplainImages")
+    // @Permit("community:proprietor:complain:uploadComplainImages")
     public CommonResult uploadComplainImages(@RequestParam("complainImages")MultipartFile[] complainImages, HttpServletRequest request)  {
         for (MultipartFile complainImage : complainImages) {
             String originalFilename = complainImage.getOriginalFilename();
@@ -119,9 +119,9 @@ public class ComplainController {
      * @Author: Tian
      * @Date: 2021/8/20-11:06
      **/
-    @Login
     @ApiOperation("新用户投诉建议接口")
     @PostMapping("/appendComplain")
+    // @Permit("community:proprietor:complain:appendComplain")
     public CommonResult appendComplain(@RequestBody ComplainQO complainQO){
         String userInfo = UserUtils.getUserId();
         complainQO.setUid(userInfo);
@@ -136,9 +136,9 @@ public class ComplainController {
      * @Param:
      * @return:
      */
-    @Login
     @ApiOperation("用户查询所有投诉建议")
     @GetMapping("/selectComplain")
+    // @Permit("community:proprietor:complain:selectComplain")
     public CommonResult selectComplain(){
         String userId = UserUtils.getUserId();
         List<ComplainVO> complainEntities=complainService.selectComplain(userId);

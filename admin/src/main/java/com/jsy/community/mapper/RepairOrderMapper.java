@@ -3,6 +3,7 @@ package com.jsy.community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.RepairOrderEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,5 +24,5 @@ public interface RepairOrderMapper extends BaseMapper<RepairOrderEntity> {
 	 *@Param: startTime,endTime:
 	 *@Date: 2021/11/09 13:49
 	 **/
-	BigDecimal repairTurnover(LocalDate startTime, LocalDate endTime);
+	BigDecimal repairTurnover(@Param("startTime") LocalDate startTime, @Param("endTime")LocalDate endTime);
 }

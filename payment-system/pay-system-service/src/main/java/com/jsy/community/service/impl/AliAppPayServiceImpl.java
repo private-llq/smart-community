@@ -6,6 +6,7 @@ import com.alipay.api.request.AlipayFundTransUniTransferRequest;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.constant.ConstClasses;
@@ -58,7 +59,6 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 		}
 		AlipayClient alipayClient = alipayUtils.getDefaultCertClient();
 		AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
-//		request.setNotifyUrl("http://tb2korpp.dongtaiyuming.net/api/v1/payment/callBack/pay");
 		request.setNotifyUrl(notifyUrl);
 		request.setBizContent("{" +
 //		"\"timeout_express\":\"90m\"," +
@@ -94,7 +94,7 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 		}
 		return null;
 	}
-	
+
 	/*转账*/
 	@Override
 	public void transferByCert() {
@@ -168,5 +168,5 @@ public class AliAppPayServiceImpl implements AliAppPayService {
 //		}
 //		return null;
 //	}
-	
+
 }

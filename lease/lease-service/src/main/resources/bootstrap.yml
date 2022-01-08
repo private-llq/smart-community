@@ -1,26 +1,3 @@
-#spring:
-#  main:
-#    allow-bean-definition-overriding: true
-#  application:
-#    name: lease-service
-#  profiles:
-#    active: dev
-#  cloud:
-#    nacos:
-#      discovery:
-#        server-addr: 127.0.0.1:8848
-#      config:
-#        server-addr: 127.0.0.1:8848
-#        file-extension: yaml
-#        # 全部服务提供模块固定不变的配置，比如mybatis plus配置，三方登录配置，
-#        extension-configs[0]:
-#          data-id: common-service-fixed.yaml
-#          refresh: true
-#        extension-configs[1]:
-#          data-id: common.yaml
-#          refresh: true
-
-#配置中心的地址
 spring:
   profiles:
     active: dev
@@ -28,16 +5,6 @@ spring:
     allow-bean-definition-overriding: true
   application:
     name: lease-service
-  cloud:
-    config:
-      #uri: http://127.0.0.1:2020 #zuul要从配置中心拉取文件
-      discovery:
-        enabled: true #开启springcloudconfig服务端的服务发现
-        service-id: base-config-server #config-server服务的名称
-      #你要拉取具体的哪个配置文件
-      name: lease-service,common,common-service,common-web  #配置文件名字   dev是环境
-      profile: ${spring.profiles.active} #环境  组成完整的文件名：gateway-service-dev.yml
-      label: master #主分支
 
 #服务调用
 dubbo:
@@ -53,10 +20,11 @@ dubbo:
   application:
     name: ${spring.application.name}
   cloud:
-    subscribed-services: proprietor-service,property-service,payment-service,lease-service
+    subscribed-services: proprietor-service,property-service,payment-service,lease-service,im-chat-user
   consumer:
     retries: 0
     timeout: 99999
+    check: false
   provider:
     retries: 0
     timeout: 99999
@@ -70,18 +38,21 @@ alipay:
   #appid(测试)
   appid: 2021000116687297
 
-#服务发现
-#eureka:
-#  client:
-#    serviceUrl:
-#      defaultZone: http://192.168.12.49:36366/eureka/ #注册中心地址
-#  instance:
-#    prefer-ip-address: true #使用ip地址注册
-#    instance-id: lease-service:8002  #指定服务的id
 ---
 spring:
   profiles: dev
-
+  cloud:
+    config:
+      #uri: http://127.0.0.1:2020 #zuul要从配置中心拉取文件
+      discovery:
+        enabled: true #开启springcloudconfig服务端的服务发现
+        service-id: base-config-server #config-server服务的名称
+      #你要拉取具体的哪个配置文件
+      name: lease-service,common,common-service,common-web  #配置文件名字   dev是环境
+      profile: dev #环境  组成完整的文件名：gateway-service-dev.yml
+      label: master #主分支
+      username: ecf50273a250499a9ec28953c2c494ab
+      password: ecf50273a250499a9ec28953c2c494ab
 eureka:
   client:
     service-url:
@@ -94,6 +65,18 @@ eureka:
 ---
 spring:
   profiles: test
+  cloud:
+    config:
+      #uri: http://127.0.0.1:2020 #zuul要从配置中心拉取文件
+      discovery:
+        enabled: true #开启springcloudconfig服务端的服务发现
+        service-id: base-config-server #config-server服务的名称
+      #你要拉取具体的哪个配置文件
+      name: lease-service,common,common-service,common-web  #配置文件名字   dev是环境
+      profile: test #环境  组成完整的文件名：gateway-service-dev.yml
+      label: master #主分支
+      username: f14550980f8c4070a43864e365a0e8fa
+      password: 8a33d8f0f7b3452ab52b9644c1188139
 eureka:
   client:
     service-url:
@@ -106,10 +89,22 @@ eureka:
 ---
 spring:
   profiles: prod
+  cloud:
+    config:
+      #uri: http://127.0.0.1:2020 #zuul要从配置中心拉取文件
+      discovery:
+        enabled: true #开启springcloudconfig服务端的服务发现
+        service-id: base-config-server #config-server服务的名称
+      #你要拉取具体的哪个配置文件
+      name: lease-service,common,common-service,common-web  #配置文件名字   dev是环境
+      profile: prod #环境  组成完整的文件名：gateway-service-dev.yml
+      label: master #主分支
+      username: cfd39a0d977742bba485998b7752a452
+      password: 6c6e06fc325b40379fa0687c0f197e1d
 eureka:
   client:
     service-url:
-      defaultZone: ${server.eureka-service-address}
+      defaultZone: http://222.178.213.183:36366/eureka, http://222.178.213.186:36366/eureka
   instance:
     hostname: ${spring.cloud.client.ip-address}
     prefer-ip-address: true

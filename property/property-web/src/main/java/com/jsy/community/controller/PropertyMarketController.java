@@ -1,23 +1,15 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyMarketCategoryService;
 import com.jsy.community.api.IPropertyMarketService;
-import com.jsy.community.api.IProprietorMarketCategoryService;
-import com.jsy.community.api.IProprietorMarketService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.proprietor.ProprietorMarketCategoryEntity;
-import com.jsy.community.entity.proprietor.ProprietorMarketEntity;
-import com.jsy.community.exception.JSYException;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.PropertyMarketQO;
-import com.jsy.community.qo.proprietor.ProprietorMarketQO;
 import com.jsy.community.utils.MinioUtils;
-import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.proprietor.ProprietorMarketVO;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -25,14 +17,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Map;
 
 @Api(tags = "社区集市")
 @RestController
 @RequestMapping("/market")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyMarketController {
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IPropertyMarketService marketService;
@@ -55,7 +46,7 @@ public class PropertyMarketController {
 //    @ApiOperation("社区集市发布商品")
 //    @Login
 //    public CommonResult addMarket(@RequestBody ProprietorMarketQO marketQO){
-//        String userId = UserUtils.getUserId();
+//        String userId = UserUtils.getId();
 //        int i = marketQO.getPrice().compareTo(BigDecimal.valueOf(BigDecimal.ROUND_DOWN));
 //        if (marketQO.getNegotiable()==0){   //选择不面议  价格不能小于0
 //                if (i<0){
@@ -79,7 +70,7 @@ public class PropertyMarketController {
 //    @ApiOperation("社区集市发布商品")
 //    @Login
 //    public CommonResult updateMarket(@RequestBody ProprietorMarketQO marketQO){
-//        String userId = UserUtils.getUserId();
+//        String userId = UserUtils.getId();
 //       if (marketQO.getNegotiable()==0){   //选择不面议  价格不能小于0
 //           if (marketQO.getPrice()==null){
 //               throw new JSYException("价格有误,请重新输入");
@@ -103,7 +94,7 @@ public class PropertyMarketController {
      **/
     @DeleteMapping("/deleteBlacklist")
     @ApiOperation("社区集市删除商品")
-    @Login
+    @Permit("community:property:market:deleteBlacklist")
     public CommonResult deleteBlacklist(@RequestParam("id") Long id){
 
         boolean b = marketService.deleteBlacklist(id);
@@ -124,7 +115,7 @@ public class PropertyMarketController {
 //    @ApiOperation("查询用户已发布或已下架的商品")
 //    @Login
 //    public CommonResult selectMarketPage(@RequestBody  BaseQO<ProprietorMarketEntity> baseQO){
-//        String userId = UserUtils.getUserId();
+//        String userId = UserUtils.getId();
 //        ValidatorUtils.validatePageParam(baseQO);
 //        if (baseQO.getQuery()==null) {
 //            baseQO.setQuery(new ProprietorMarketEntity());
@@ -141,7 +132,7 @@ public class PropertyMarketController {
      **/
     @GetMapping("/SelectOneMarket")
     @ApiOperation("查询单条商品详情")
-    @Login
+    @Permit("community:property:market:SelectOneMarket")
     public CommonResult SelectOneMarket(@RequestParam("id") Long id){
       ProprietorMarketVO marketVO =  marketService.findOne(id);
         return CommonResult.ok(marketVO,"查询成功");
@@ -157,7 +148,7 @@ public class PropertyMarketController {
      **/
     @PostMapping("/selectMarketAllPage")
     @ApiOperation("社区集市所有已发布商品")
-    @Login
+    @Permit("community:property:market:selectMarketAllPage")
     public CommonResult selectMarketAllPage(@RequestBody  BaseQO<PropertyMarketQO> baseQO){
         ValidatorUtils.validatePageParam(baseQO);
         if (baseQO.getQuery()==null){
@@ -179,7 +170,7 @@ public class PropertyMarketController {
      **/
     @PostMapping("/selectMarketBlacklist")
     @ApiOperation("查询黑名单的商品")
-    @Login
+    @Permit("community:property:market:selectMarketBlacklist")
     public CommonResult selectMarketBlacklist(@RequestBody  BaseQO baseQO){
         ValidatorUtils.validatePageParam(baseQO);
         Map<String,Object> map =  marketService.selectMarketBlacklist(baseQO);
@@ -196,7 +187,7 @@ public class PropertyMarketController {
      **/
     @PostMapping("/updateState")
     @ApiOperation("修改上下架商品")
-    @Login
+    @Permit("community:property:market:updateState")
     public CommonResult updateState(@RequestParam("id")Long id,@RequestParam("state") Integer state){
         boolean b = marketService.updateState(id,state);
         return CommonResult.ok("修改成功");
@@ -211,7 +202,7 @@ public class PropertyMarketController {
      **/
     @PostMapping("/updateShield")
     @ApiOperation("修改屏蔽商品")
-    @Login
+    @Permit("community:property:market:updateShield")
     public CommonResult updateShield(@RequestParam("id")Long id,@RequestParam("shield") Integer shield){
         boolean b = marketService.updateShield(id,shield);
         return CommonResult.ok("修改成功");
@@ -225,9 +216,9 @@ public class PropertyMarketController {
      * @Param:
      * @return:
      */
-    @Login
     @ApiOperation("社区集市商品图片上传")
     @PostMapping(value = "/uploadMarketImages")
+    @Permit("community:property:market:uploadMarketImages")
     public CommonResult uploadMarketImages(@RequestParam("images") MultipartFile[] images, HttpServletRequest request)  {
         for (MultipartFile imag : images) {
             //获取文件名
@@ -260,9 +251,9 @@ public class PropertyMarketController {
         return CommonResult.ok(split,"上传成功");
     }
 
-    @Login
     @ApiOperation("社区集市商品图片删除")
     @DeleteMapping(value = "/deleteMarketImages")
+    @Permit("community:property:market:deleteMarketImages")
     public CommonResult deleteMarketImages(@RequestParam("images") String images) throws Exception {
         //返回文件上传地址
         MinioUtils.removeFile(images);

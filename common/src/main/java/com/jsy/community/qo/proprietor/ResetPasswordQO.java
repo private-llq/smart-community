@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
@@ -30,6 +31,12 @@ public class ResetPasswordQO implements Serializable {
 	@NotEmpty(groups = {forgetPassVGroup.class,updatePassVGroup.class}, message = "确认密码不能为空")
 	@Length(groups = {forgetPassVGroup.class,updatePassVGroup.class}, min = 8, max = 30, message = "确认密码长度8-30")
 	private String confirmPassword;
+
+	/**
+	 * 重置密码时的短信验证码
+	 */
+	@NotBlank(groups = {forgetPassVGroup.class}, message = "短信验证码不能为空")
+	private String code;
 	
 	/**
 	 * 忘记密码验证

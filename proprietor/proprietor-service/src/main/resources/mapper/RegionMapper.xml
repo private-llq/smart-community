@@ -45,4 +45,10 @@
 		where tr.region_id = #{id}
 	</select>
 
+	<!-- 通过区域名称模糊匹配区域 -->
+	<select id="queryRegionByName" resultType="com.jsy.community.entity.RegionEntity">
+		select * from t_region where level = 2 and name like concat("%", #{regionName}, "%") limit 1
+	</select>
+
+
 </mapper>

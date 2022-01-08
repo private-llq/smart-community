@@ -6,6 +6,7 @@ import com.jsy.community.qo.property.PropertyComplaintsQO;
 import com.jsy.community.vo.ComplainVO;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public interface ComplainsMapper extends BaseMapper<ComplainEntity> {
      * @param size
      * @param query
      */
-    List<ComplainVO> listAll(@Param("page") Long page,@Param("size") Long size,@Param("query")PropertyComplaintsQO query);
+    List<ComplainVO> listAll(@Param("page") Long page, @Param("size") Long size, @Param("query")PropertyComplaintsQO query, @Param("uidList") Collection<String> uidList);
 
     /**
      * @Description: 总条数
@@ -34,5 +35,5 @@ public interface ComplainsMapper extends BaseMapper<ComplainEntity> {
      * @Param:
      * @return:
      */
-    Long findTotel(@Param("query") PropertyComplaintsQO query);
+    Long findTotel( @Param("query")PropertyComplaintsQO query, @Param("uidList") Collection<String> uidList);
 }

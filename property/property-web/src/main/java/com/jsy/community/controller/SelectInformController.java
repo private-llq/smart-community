@@ -6,6 +6,7 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.proprietor.UserInformQO;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -26,7 +27,7 @@ import java.util.Map;
 @RequestMapping("/inform")
 @Api(tags = "查询通知消息已读未读")
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class SelectInformController {
 
     @DubboReference(version = Const.version, group = Const.group, check = false)
@@ -39,6 +40,7 @@ public class SelectInformController {
      * @Param:
      * @return:
      */
+    @LoginIgnore
     @ApiOperation("所有已读通知人员")
     @PostMapping("/list")
     public CommonResult list(@RequestBody UserInformQO userInformQO){
@@ -54,6 +56,7 @@ public class SelectInformController {
      * @Param:
      * @return:
      */
+    @LoginIgnore
     @ApiOperation("所有未读通知人员")
     @PostMapping("/notList")
     public CommonResult notList(@RequestBody UserInformQO userInformQO){

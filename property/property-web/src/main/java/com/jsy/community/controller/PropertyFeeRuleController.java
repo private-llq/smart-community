@@ -1,8 +1,6 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.PropertyFinanceLog;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IFinanceBillService;
 import com.jsy.community.api.IPropertyFeeRuleConstService;
@@ -19,6 +17,8 @@ import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -36,7 +36,7 @@ import java.util.Map;
 @Api(tags = "小区物业收费规则")
 @RestController
 @RequestMapping("/feeRule")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyFeeRuleController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -50,7 +50,7 @@ public class PropertyFeeRuleController {
 
     @ApiOperation("查询当前小区物业收费规则")
     @PostMapping("/list")
-    @Login
+    @Permit("community:property:feeRule:list")
     public CommonResult feeRule(@RequestBody BaseQO<FeeRuleQO> baseQO){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         Map<Object, Object> map=propertyFeeRuleService.findList(baseQO,userInfo.getCommunityId());
@@ -60,7 +60,7 @@ public class PropertyFeeRuleController {
 
     @ApiOperation("查询一条详情")
     @GetMapping("/selectOne")
-    @Login
+    @Permit("community:property:feeRule:selectOne")
     public CommonResult selectOne(@RequestParam("id")Long id){
         PropertyFeeRuleEntity propertyFeeRuleEntity=propertyFeeRuleService.selectByOne(id);
         return CommonResult.ok(propertyFeeRuleEntity);
@@ -68,7 +68,7 @@ public class PropertyFeeRuleController {
 
     @ApiOperation("删除关联的房屋或者车辆")
     @DeleteMapping("/deleteRelevance")
-    @Login
+    @Permit("community:property:feeRule:deleteRelevance")
     public CommonResult deleteRelevance(@RequestParam("id")Long id){
         propertyFeeRuleService.deleteRelevance(id);
         return CommonResult.ok();
@@ -76,14 +76,14 @@ public class PropertyFeeRuleController {
 
     @ApiOperation("添加关联的房屋或者车辆")
     @PostMapping("/addRelevance")
-    @Login
+    @Permit("community:property:feeRule:addRelevance")
     public CommonResult addRelevance(@RequestBody UpdateRelevanceQO updateRelevanceQO){
         propertyFeeRuleService.addRelevance(updateRelevanceQO);
         return CommonResult.ok();
     }
     @ApiOperation("查询当前小区业主认证过的房屋集合")
     @GetMapping("/getHouse")
-    @Login
+    @Permit("community:property:feeRule:getHouse")
     public CommonResult getHouse(){
         List<FeeRelevanceTypeVo> list = propertyFeeRuleService.getHouse(UserUtils.getAdminCommunityId());
         return CommonResult.ok(list);
@@ -91,7 +91,7 @@ public class PropertyFeeRuleController {
 
     @ApiOperation("查询当前小区的月租或属于业主的车位")
     @GetMapping("/getCarPosition")
-    @Login
+    @Permit("community:property:feeRule:getCarPosition")
     public CommonResult getCarPosition(@RequestParam Integer type){
         List<FeeRelevanceTypeVo> list = propertyFeeRuleService.getCarPosition(UserUtils.getAdminCommunityId(),type);
         return CommonResult.ok(list);
@@ -100,7 +100,7 @@ public class PropertyFeeRuleController {
 
     @ApiOperation("查询关联目标")
     @PostMapping("/selectRelevance")
-    @Login
+    @Permit("community:property:feeRule:selectRelevance")
     public CommonResult selectRelevance(@RequestBody FeeRuleRelevanceQO feeRuleRelevanceQO){
         List<Object> list = propertyFeeRuleService.selectRelevance(feeRuleRelevanceQO);
         return CommonResult.ok(list);
@@ -108,8 +108,8 @@ public class PropertyFeeRuleController {
 
     @ApiOperation("启用或者停用")
     @GetMapping("/startOrOut")
-    @Login
     @PropertyFinanceLog(operation = "收费项目：",type = 1)
+    @Permit("community:property:feeRule:startOrOut")
     public CommonResult startOrOut(@RequestParam("status")Integer status,@RequestParam("id") Long id){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFeeRuleService.startOrOut(userInfo,status,id);
@@ -117,7 +117,7 @@ public class PropertyFeeRuleController {
     }
     @ApiOperation("启用或者停用报表展示")
     @GetMapping("/statementStatus")
-    @Login
+    @Permit("community:property:feeRule:statementStatus")
     public CommonResult statementStatus(@RequestParam("status")Integer status,@RequestParam("id") Long id){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFeeRuleService.statementStatus(userInfo,status,id);
@@ -126,9 +126,10 @@ public class PropertyFeeRuleController {
 
     @ApiOperation("修改")
     @PutMapping("/updateById")
-    @Login
     @businessLog(operation = "编辑",content = "更新了【物业收费规则】")
+    @Permit("community:property:feeRule:updateById")
     public CommonResult updateById(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
+        ValidatorUtils.validateEntity(propertyFeeRuleEntity);
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFeeRuleEntity.setCommunityId(UserUtils.getAdminCommunityId());
         propertyFeeRuleService.updateOneRule(userInfo,propertyFeeRuleEntity);
@@ -137,8 +138,8 @@ public class PropertyFeeRuleController {
 
     @ApiOperation("新增")
     @PostMapping("/save")
-    @Login
     @businessLog(operation = "新增",content = "新增了【物业收费规则】")
+    @Permit("community:property:feeRule:save")
     public CommonResult save(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
         ValidatorUtils.validateEntity(propertyFeeRuleEntity, PropertyFeeRuleEntity.PropertyFeeRule.class);
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
@@ -150,8 +151,8 @@ public class PropertyFeeRuleController {
 
     @ApiOperation("删除")
     @DeleteMapping("/delete")
-    @Login
     @businessLog(operation = "删除",content = "删除了【物业收费规则】")
+    @Permit("community:property:feeRule:delete")
     public CommonResult delete(@RequestParam Long id){
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFeeRuleService.delete(id);
@@ -160,11 +161,12 @@ public class PropertyFeeRuleController {
 
     @ApiOperation("查询公共常量")
     @PostMapping("/getConst")
-    @Login
+    @Permit("community:property:feeRule:getConst")
     public CommonResult getConst(){
         return CommonResult.ok(propertyFeeRuleConstService.listAll());
     }
 
+    @LoginIgnore
     @ApiOperation("查询公共常量")
     @GetMapping("/get")
     public CommonResult get(){

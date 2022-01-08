@@ -1,4 +1,5 @@
 package com.jsy.community.service.impl;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -9,7 +10,11 @@ import com.jsy.community.config.LeaseTopicExConfig;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.*;
+import com.jsy.community.constant.ConstClasses;
+import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.CompanyPayConfigEntity;
+import com.jsy.community.entity.PayConfigureEntity;
+import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.entity.lease.AiliAppPayRecordEntity;
 import com.jsy.community.entity.lease.HouseLeaseEntity;
 import com.jsy.community.entity.payment.WeChatOrderEntity;
@@ -23,10 +28,18 @@ import com.jsy.community.untils.wechat.PublicConfig;
 import com.jsy.community.untils.wechat.WechatConfig;
 import com.jsy.community.util.HouseHelper;
 import com.jsy.community.utils.*;
-import com.jsy.community.utils.imutils.entity.ImResponseEntity;
 import com.jsy.community.utils.signature.ZhsjUtil;
 import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.lease.HouseLeaseContractVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.PayCallNotice;
+import com.zhsj.base.api.entity.TransferEntity;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBasePayRpcService;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.basecommon.utils.MD5Util;
+import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -66,6 +79,8 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     private String SIGN_USER_PORT;
     @Value("${sign.user.api.contract_overdue}")
     private String CONTRACT_OVERDUE;
+    @Value("${sign.user.api.update-contract-pay-status}")
+    private String MODIFY_ORDER_PAY_STATUS;
 
     @Autowired
     private AssetLeaseRecordMapper assetLeaseRecordMapper;
@@ -119,6 +134,21 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseUserInfoRpcService userInfoRpcService;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBasePayRpcService basePayRpcService;
+
+    @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check=false)
+    private IImChatPublicPushRpcService iImChatPublicPushRpcService;
+
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private IPayConfigureService payConfigureService;
+
+    @DubboReference(version = Const.version, group = Const.group_payment, check = false)
+    private HousingRentalOrderService housingRentalOrderService;
+
     /**
      * @param assetLeaseRecordEntity : 房屋租赁记录表实体
      * @author: Pipi
@@ -131,7 +161,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
     public String addLeaseRecord(AssetLeaseRecordEntity assetLeaseRecordEntity) {
         // 检查租户是否实名认证
         Integer integer = userService.userIsRealAuth(assetLeaseRecordEntity.getTenantUid());
-        if (integer <= 0) {
+        if (integer != 2) {
             throw new LeaseException(JSYError.NO_REAL_NAME_AUTH);
         }
         // 检查签约是否已经存在(未完成签约或已签约但是还没到期的签约)
@@ -208,16 +238,16 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         assetLeaseRecordMapper.insert(assetLeaseRecordEntity);
 
         //消息推送
-        UserIMEntity userIMEntity = userImService.selectUid(assetLeaseRecordEntity.getHomeOwnerUid());
-        UserEntity userEntity = userService.getUser(assetLeaseRecordEntity.getTenantUid());
+        UserImVo userIm = userInfoRpcService.getEHomeUserIm(assetLeaseRecordEntity.getHomeOwnerUid());
+        UserDetail userDetail = userInfoRpcService.getUserDetail(assetLeaseRecordEntity.getTenantUid());
         HashMap<Object, Object> map = new HashMap<>();
         map.put("type",6);
         map.put("dataId",null);
-        PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
+        PushInfoUtil.PushPublicTextMsg(iImChatPublicPushRpcService,userIm.getImId(),
                 "合同签约",
-                userEntity.getRealName()+"向你发起了房屋签约！",
+                userDetail.getNickName()+"向你发起了房屋签约！",
                 null,
-                userEntity.getRealName()+"向你发起了房屋签约请求，在我的租赁中去查看吧，请在7天时间内处理房屋签约请求，过时系统将自动取消。",
+                userDetail.getNickName()+"向你发起了房屋签约请求，在我的租赁中去查看吧，请在7天时间内处理房屋签约请求，过时系统将自动取消。",
                 map,
                 BusinessEnum.PushInfromEnum.CONTRACTSIGNING.getName());
         return String.valueOf(assetLeaseRecordEntity.getId());
@@ -630,7 +660,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     }
                 }
                 List<AssetLeaseRecordEntity> unexpired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() == 0).collect(Collectors.toList());
-                List<AssetLeaseRecordEntity> expired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() == 1).collect(Collectors.toList());
+                List<AssetLeaseRecordEntity> expired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() != 0).collect(Collectors.toList());
                 for (AssetLeaseRecordEntity record : unexpired) {
                     switch (record.getOperation()) {
                         case 1:
@@ -798,7 +828,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     }
                 }
                 List<AssetLeaseRecordEntity> unexpired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() == 0).collect(Collectors.toList());
-                List<AssetLeaseRecordEntity> expired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() == 1).collect(Collectors.toList());
+                List<AssetLeaseRecordEntity> expired = assetLeaseRecordEntities.stream().filter(recordEntity -> recordEntity.getDeleted() != 0).collect(Collectors.toList());
                 for (AssetLeaseRecordEntity record : unexpired) {
                     switch (record.getOperation()) {
                         case 1:
@@ -954,6 +984,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 shopImgEntityQueryWrapper.last("limit 1");
                 ShopImgEntity shopImgEntity = shopImgMapper.selectOne(shopImgEntityQueryWrapper);
                 for (AssetLeaseRecordEntity leaseRecordEntity : assetLeaseRecordEntities) {
+                    UserDetail userDetail = userInfoRpcService.getUserDetail(leaseRecordEntity.getTenantUid());
+                    leaseRecordEntity.setRealName(userDetail.getNickName());
+                    leaseRecordEntity.setAvatarUrl(userDetail.getAvatarThumbnail());
                     leaseRecordEntity.setImageUrl(shopImgEntity == null ? null : shopImgEntity.getImgUrl());
                     leaseRecordEntity.setTitle(shopLeaseEntity.getTitle());
                     leaseRecordEntity.setSummarize(shopLeaseEntity.getSummarize());
@@ -966,41 +999,46 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 QueryWrapper<HouseLeaseEntity> houseLeaseEntityQueryWrapper = new QueryWrapper<>();
                 houseLeaseEntityQueryWrapper.eq("id", assetLeaseRecordEntity.getAssetId());
                 houseLeaseEntity = houseLeaseMapper.selectOne(houseLeaseEntityQueryWrapper);
-                List<String> houseImgList = houseLeaseMapper.queryHouseAllImgById(houseLeaseEntity.getHouseImageId());
-                // 朝向
-                houseLeaseEntity.setHouseDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(houseLeaseEntity.getHouseDirectionId())));
-                // 查出 房屋标签 ...
-                List<Long> advantageId = MyMathUtils.analysisTypeCode(houseLeaseEntity.getHouseAdvantageId());
-                if (!CollectionUtils.isEmpty(advantageId)) {
-                    houseLeaseEntity.setHouseAdvantageMap(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
-                }
-                for (AssetLeaseRecordEntity leaseRecordEntity : assetLeaseRecordEntities) {
-                    if (leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.INITIATE_CONTRACT.getCode()
+                if (houseLeaseEntity != null) {
+                    List<String> houseImgList = houseLeaseMapper.queryHouseAllImgById(houseLeaseEntity.getHouseImageId());
+                    // 朝向
+                    houseLeaseEntity.setHouseDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(houseLeaseEntity.getHouseDirectionId())));
+                    // 查出 房屋标签 ...
+                    List<Long> advantageId = MyMathUtils.analysisTypeCode(houseLeaseEntity.getHouseAdvantageId());
+                    if (!CollectionUtils.isEmpty(advantageId)) {
+                        houseLeaseEntity.setHouseAdvantageMap(houseConstService.getConstByTypeCodeForList(advantageId, 4L));
+                    }
+                    for (AssetLeaseRecordEntity leaseRecordEntity : assetLeaseRecordEntities) {
+                        if (leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.INITIATE_CONTRACT.getCode()
                             || leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.CANCELLATION_REQUEST.getCode()
                             || leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.REJECTION_OF_APPLICATION.getCode()
                             || leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.REAPPLY.getCode()
                             || leaseRecordEntity.getOperation() == BusinessEnum.ContractingProcessStatusEnum.EXPIRED.getCode()
-                    ) {
-                        leaseRecordEntity.setImageUrl(CollectionUtils.isEmpty(houseImgList) ? null : houseImgList.get(0));
-                        leaseRecordEntity.setTitle(houseLeaseEntity.getHouseTitle());
-                        leaseRecordEntity.setPrice(houseLeaseEntity.getHousePrice());
-                        leaseRecordEntity.setAdvantageId(houseLeaseEntity.getHouseAdvantageId());
-                        leaseRecordEntity.setTypeCode(houseLeaseEntity.getHouseTypeCode());
-                        leaseRecordEntity.setHouseType(HouseHelper.parseHouseType(houseLeaseEntity.getHouseTypeCode()));
-                        leaseRecordEntity.setDirectionId(houseLeaseEntity.getHouseDirectionId());
-                        leaseRecordEntity.setHouseAdvantageCode(houseLeaseEntity.getHouseAdvantageMap());
-                    } else {
-                        // 查出 房屋标签 ...
-                        List<Long> advantageCode = MyMathUtils.analysisTypeCode(leaseRecordEntity.getAdvantageId());
-                        if (!CollectionUtils.isEmpty(advantageCode)) {
-                            leaseRecordEntity.setHouseAdvantageCode(houseConstService.getConstByTypeCodeForList(advantageCode, 4L));
+                        ) {
+                            UserDetail userDetail = userInfoRpcService.getUserDetail(leaseRecordEntity.getTenantUid());
+                            leaseRecordEntity.setRealName(userDetail.getNickName());
+                            leaseRecordEntity.setAvatarUrl(userDetail.getAvatarThumbnail());
+                            leaseRecordEntity.setImageUrl(CollectionUtils.isEmpty(houseImgList) ? null : houseImgList.get(0));
+                            leaseRecordEntity.setTitle(houseLeaseEntity.getHouseTitle());
+                            leaseRecordEntity.setPrice(houseLeaseEntity.getHousePrice());
+                            leaseRecordEntity.setAdvantageId(houseLeaseEntity.getHouseAdvantageId());
+                            leaseRecordEntity.setTypeCode(houseLeaseEntity.getHouseTypeCode());
+                            leaseRecordEntity.setHouseType(HouseHelper.parseHouseType(houseLeaseEntity.getHouseTypeCode()));
+                            leaseRecordEntity.setDirectionId(houseLeaseEntity.getHouseDirectionId());
+                            leaseRecordEntity.setHouseAdvantageCode(houseLeaseEntity.getHouseAdvantageMap());
+                        } else {
+                            // 查出 房屋标签 ...
+                            List<Long> advantageCode = MyMathUtils.analysisTypeCode(leaseRecordEntity.getAdvantageId());
+                            if (!CollectionUtils.isEmpty(advantageCode)) {
+                                leaseRecordEntity.setHouseAdvantageCode(houseConstService.getConstByTypeCodeForList(advantageCode, 4L));
+                            }
+                            // 房屋类型 code转换为文本 如 4室2厅1卫
+                            leaseRecordEntity.setHouseType(HouseHelper.parseHouseType(leaseRecordEntity.getTypeCode()));
+                            // 朝向
+                            leaseRecordEntity.setDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(leaseRecordEntity.getDirectionId())));
                         }
-                        // 房屋类型 code转换为文本 如 4室2厅1卫
-                        leaseRecordEntity.setHouseType(HouseHelper.parseHouseType(leaseRecordEntity.getTypeCode()));
-                        // 朝向
-                        leaseRecordEntity.setDirectionId(BusinessEnum.HouseDirectionEnum.getDirectionName(Integer.valueOf(leaseRecordEntity.getDirectionId())));
+                        setCountdown(leaseRecordEntity);
                     }
-                    setCountdown(leaseRecordEntity);
                 }
             }
         }
@@ -1121,6 +1159,20 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
         leaseRecordEntity.setTenantIdCard(userInfoVo.getIdCard());
         setCountdown(leaseRecordEntity);
         return leaseRecordEntity;
+    }
+
+    /**
+     * @param conId : 合同Id
+     * @author: Pipi
+     * @description: 查询签约详情
+     * @return: {@link AssetLeaseRecordEntity}
+     * @date: 2021/12/22 11:31
+     **/
+    @Override
+    public AssetLeaseRecordEntity contractDetail(String conId) {
+        QueryWrapper<AssetLeaseRecordEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("con_id", conId);
+        return assetLeaseRecordMapper.selectOne(queryWrapper);
     }
 
     /**
@@ -1338,8 +1390,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
             CommunityEntity communityEntity = communityService.getCommunityNameById(leaseRecordEntity.getCommunityId());
             //租客
-            UserIMEntity userIM = userImService.selectUid(leaseRecordEntity.getTenantUid());
-            UserEntity user = userService.getUser(leaseRecordEntity.getTenantUid());
+            UserImVo eHomeUserIm = userInfoRpcService.getEHomeUserIm(leaseRecordEntity.getTenantUid());
+            /*UserIMEntity userIM = userImService.selectUid(leaseRecordEntity.getTenantUid());
+            UserEntity user = userService.getUser(leaseRecordEntity.getTenantUid());*/
 
             //房东
 //            UserIMEntity userIMEntity = userImService.selectUid(leaseRecordEntity.getHomeOwnerUid());
@@ -1510,16 +1563,16 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             assetLeaseRecordMapper.updateById(assetLeaseRecordEntity);
 
 
-            UserIMEntity userIMEntity = userImService.selectUid(assetLeaseRecordEntity.getTenantUid());
+            UserImVo userIm = userInfoRpcService.getEHomeUserIm(assetLeaseRecordEntity.getTenantUid());
             PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(assetLeaseRecordEntity.getCommunityId());
-            UserEntity userEntity = userService.getUser(assetLeaseRecordEntity.getTenantUid());
+            UserDetail userDetail = userInfoRpcService.getUserDetail(assetLeaseRecordEntity.getTenantUid());
             //支付上链
-            CochainResponseEntity cochainResponseEntity = OrderCochainUtil.orderCochain("停车费",
+            CochainResponseEntity cochainResponseEntity = OrderCochainUtil.orderCochain("房屋租金",
                     1,
                     payType,
                     total,
                     orderNum,
-                    userEntity.getUid(),
+                    userDetail.getAccount(),
                     companyEntity.getUnifiedSocialCreditCode(),
                     "房屋租金支付",
                     null);
@@ -1530,16 +1583,143 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             map.put("type", 10);
             map.put("dataId", conId);
             map.put("orderNum", orderNum);
-            ImResponseEntity imResponseEntity = PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+            PushInfoUtil.pushPayAppMsg(iImChatPublicPushRpcService,userIm.getImId(),
                     payType,
                     total.toString(),
                     null,
                     "租赁缴费",
                     map,
                     BusinessEnum.PushInfromEnum.HOUSEMANAGE.getName());
-            log.info("支付上链："+imResponseEntity);
         } else {
             log.info("没有找到合同:{}相关的签约ID", conId);
+        }
+    }
+
+    /**
+     * @param payCallNotice :
+     * @author: Pipi
+     * @description: 签约支付后的回调处理
+     * @return:
+     * @date: 2021/12/21 18:09
+     **/
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean updateOperationPayStatus(PayCallNotice payCallNotice) {
+        try {
+            String sysOrderNo = payCallNotice.getSysOrderNo();
+            BigDecimal payAmount = payCallNotice.getPayAmount();
+            AssetLeaseRecordEntity leaseRecordEntity = queryRecordByConId(payCallNotice.getBusOrderNo());
+            if (leaseRecordEntity != null && leaseRecordEntity.getOperation() == 32) {
+                log.info("房东已取消发起");
+                // 签约是房东取消发起状态,则退款,并且不修改合同签约的支付状态,同时删除支付订单
+                // TODO 退款功能需要测试
+                PayConfigureEntity serviceConfig;
+                serviceConfig = payConfigureService.getCompanyConfig(1L);
+                ConstClasses.AliPayDataEntity.setConfig(serviceConfig);
+                AlipayUtils.orderRefund(sysOrderNo, payAmount);
+                ailiAppPayRecordService.deleteByOrderNo(Long.parseLong(sysOrderNo));
+                return false;
+            } else {
+                // 修改签章合同支付状态
+                log.info("开始修改签章合同支付状态1111111");
+                Map<String, Object> map = completeLeasingOrder(sysOrderNo, leaseRecordEntity.getConId());
+                // 修改租房签约支付状态
+                log.info("开始修改租房签约支付状态");
+                updateOperationPayStatus(leaseRecordEntity.getConId(), 2, payAmount, sysOrderNo);
+                if (0 != (int) map.get("code")) {
+                    log.info("修改签章合同支付状态失败");
+                    throw new PaymentException((int) map.get("code"), String.valueOf(map.get("msg")));
+                }
+                // 增加房东余额
+                log.info("开始修改房东余额");
+                TransferEntity transferEntity = new TransferEntity();
+                transferEntity.setSendUid(1456196574147923970L);
+                transferEntity.setSendPayPwd("1234");
+                UserDetail userDetail = userInfoRpcService.getUserDetail(leaseRecordEntity.getHomeOwnerUid());
+                transferEntity.setReceiveUid(userDetail.getId());
+                transferEntity.setCno("RMB");
+                transferEntity.setAmount(payAmount.setScale(2));
+                transferEntity.setRemark("房屋租金入账");
+                transferEntity.setType(BusinessEnum.BaseOrderRevenueTypeEnum.LEASE.getExpensesType());
+                transferEntity.setTitle("房屋租金入账");
+                transferEntity.setSource(BusinessEnum.BaseOrderSourceEnum.LEASE.getSource());
+
+                Map signMap = (Map) JSONObject.toJSON(transferEntity);
+                signMap.put("communicationSecret", BusinessEnum.BaseOrderSourceEnum.LEASE.getSecret());
+                String sign = MD5Util.signStr(signMap);
+                log.info("communicationSecret --> {}", BusinessEnum.BaseOrderSourceEnum.LEASE.getSecret());
+                log.info("签名==========:{},{}", sign, MD5Util.getMd5Str(sign));
+                transferEntity.setSign(MD5Util.getMd5Str(sign));
+                basePayRpcService.transfer(transferEntity);
+                basePayRpcService.receiveCall(payCallNotice.getSysOrderNo());
+                // userAccountService.rentalIncome(leaseRecordEntity.getConId(), tradeAmount, leaseRecordEntity.getHomeOwnerUid());
+                log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + sysOrderNo);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 支付完成之后修改租赁端订单支付状态
+     * @param orderNo: 支付系统订单编号
+     * @param housingContractOderNo: 租赁系统合同编号
+     * @return: java.util.Map<java.lang.String,java.lang.Object>
+     * @date: 2021/8/16 17:05
+     **/
+    public Map<String, Object> completeLeasingOrder(String orderNo, String housingContractOderNo) {
+        log.info("进入修改1");
+        Map<String, Object> returnMap = new HashMap<>();
+        Map<String, Object> bodyMap = new HashMap<>();
+        bodyMap.put("leaseContractUuid", housingContractOderNo);
+        bodyMap.put("isPayment", true);
+        bodyMap.put("orderUuid", orderNo);
+        log.info("进入修改2");
+        log.info("进入修改3,{}",SIGN_USER_PROTOCOL);
+        log.info("进入修改4,{}",SIGN_USER_HOST);
+        log.info("进入修改5,{}",SIGN_USER_PORT);
+        log.info("进入修改6,{}",MODIFY_ORDER_PAY_STATUS);
+        //url
+        String url = SIGN_USER_PROTOCOL + SIGN_USER_HOST + ":" + SIGN_USER_PORT + MODIFY_ORDER_PAY_STATUS;
+        log.info("请求URL:{}", url);
+        // 加密参数
+        String bodyString = ZhsjUtil.postEncrypt(JSON.toJSONString(bodyMap));
+        log.info("请求参数:{}", bodyString);
+        //组装http请求
+        HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(url, bodyString);
+        //设置header
+        MyHttpUtils.setDefaultHeader(httpPost);
+        //设置默认配置
+        MyHttpUtils.setRequestConfig(httpPost);
+        //执行
+        String httpResult;
+        JSONObject result = null;
+        try {
+            //执行请求，解析结果
+            httpResult = (String)MyHttpUtils.exec(httpPost, MyHttpUtils.ANALYZE_TYPE_STR);
+            result = JSON.parseObject(httpResult);
+            if(0 == result.getIntValue("code")){
+                returnMap.put("code",0);
+                log.info("租房订单状态修改完成");
+            }else if(-1 == result.getIntValue("code")){
+                returnMap.put("code",-1);
+                returnMap.put("msg",result.getString("message"));
+                log.error("租房订单状态修改失败，订单不存在");
+            }else{
+                returnMap.put("code",JSYError.INTERNAL.getCode());
+                returnMap.put("msg","订单出错");
+                log.error("租房订单状态修改 - 远程服务出错，返回码：" + result.getIntValue("code") + " ，错误信息：" + result.getString("message"));
+            }
+            return returnMap;
+        } catch (Exception e) {
+            log.error("租房订单状态修改 - http执行或解析异常，json解析结果" + result);
+            log.error(e.getMessage());
+            returnMap.put("code", JSYError.INTERNAL.getCode());
+            returnMap.put("msg","订单出错");
+            return returnMap;
         }
     }
 
@@ -1767,5 +1947,23 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
             houseLeaseContractVO.setIdCardB(userInfoVo.getIdCard());
         }
         return houseLeaseContractVO;
+    }
+    
+    /**
+     * @Description: 根据资产id查询对应的合同编号
+     * @author: DKS
+     * @since: 2022/1/6 9:31
+     * @Param: [assetId]
+     * @return: java.util.Map<java.lang.Long,java.util.List<java.lang.String>>
+     */
+    @Override
+    public Map<Long, List<String>> queryConIdList(Collection<?> assetId) {
+        List<AssetLeaseRecordEntity> entities = assetLeaseRecordMapper.selectList(new QueryWrapper<AssetLeaseRecordEntity>().in("asset_id", assetId));
+        if (entities == null) {
+            return new HashMap<>();
+        }
+        return entities.stream().filter(assetLeaseRecordEntity -> StringUtils.isNotBlank(assetLeaseRecordEntity.getConId()))
+            .collect(Collectors.groupingBy(AssetLeaseRecordEntity::getAssetId,
+            Collectors.mapping(AssetLeaseRecordEntity::getConId, Collectors.toList())));
     }
 }

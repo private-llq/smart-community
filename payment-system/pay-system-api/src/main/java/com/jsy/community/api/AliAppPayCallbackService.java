@@ -27,6 +27,6 @@ public interface AliAppPayCallbackService {
 	 * @Author: chq459799974
 	 * @Date: 2021/4/8
 	**/
-	void dealOrder(AiliAppPayRecordEntity order);
+	Boolean dealOrder(AiliAppPayRecordEntity order);
 	
 }

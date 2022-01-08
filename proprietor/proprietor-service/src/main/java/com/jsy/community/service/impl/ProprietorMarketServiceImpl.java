@@ -1,15 +1,14 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IProprietorMarketService;
 import com.jsy.community.constant.Const;
-import com.jsy.community.entity.UserEntity;
-import com.jsy.community.entity.proprietor.ProprietorMarketCategoryEntity;
 import com.jsy.community.entity.proprietor.ProprietorMarketEntity;
-import com.jsy.community.entity.proprietor.ProprietorMarketLabelEntity;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.ProprietorMarketCategoryMapper;
 import com.jsy.community.mapper.ProprietorMarketLabelMapper;
 import com.jsy.community.mapper.ProprietorMarketMapper;
@@ -18,6 +17,12 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.proprietor.ProprietorMarketQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.proprietor.ProprietorMarketVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import jodd.util.StringUtil;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +48,9 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
 
     @Autowired
     private UserMapper userMapper;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
 
     /**
      * @Description: 发布商品信息
@@ -148,8 +156,6 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
         HashMap<String, Object> map = new HashMap<>();
         map.put("total",total);
         map.put("list",arrayList);
-        System.out.println(list);
-        System.out.println(total);
         return map;
 
     }
@@ -198,7 +204,25 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
      **/
     @Override
     public ProprietorMarketEntity findOne(Long id) {
-          ProprietorMarketEntity marketEntity =  marketMapper.selectMarketOne(id);
+        ProprietorMarketEntity marketEntity =  marketMapper.selectMarketOne(id);
+        if(ObjectUtil.isNull(marketEntity)){
+            throw new JSYException("商品为空");
+        }
+        marketEntity.setClick(marketEntity.getClick()+1);
+        marketMapper.updateById(marketEntity);
+        if (marketEntity != null && StringUtil.isNotBlank(marketEntity.getUid())) {
+            UserDetail userDetail = baseUserInfoRpcService.getUserDetail(marketEntity.getUid());
+            if (userDetail != null) {
+                marketEntity.setNickName(userDetail.getNickName());
+                marketEntity.setAvatarUrl(userDetail.getAvatarThumbnail());
+            }
+            RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(marketEntity.getUid());
+            marketEntity.setIsRealAuth(0);
+            if (idCardRealInfo != null) {
+                marketEntity.setIsRealAuth(1);
+                marketEntity.setRealName(idCardRealInfo.getIdCardName());
+            }
+        }
         return marketEntity;
     }
 
@@ -224,13 +248,13 @@ public class ProprietorMarketServiceImpl extends ServiceImpl<ProprietorMarketMap
         page1 =(baseQO.getPage()-1)*baseQO.getSize();
 
         ArrayList<ProprietorMarketVO> arrayList = new ArrayList<>();
-        List<ProprietorMarketQO> list =  marketMapper.selectMarketLikePage(page1,baseQO.getSize());
+        List<ProprietorMarketQO> list =  marketMapper.selectMarketLikePage(page1,baseQO.getSize(),baseQO.getQuery());
         for (ProprietorMarketQO li : list){
             ProprietorMarketVO marketVO = new ProprietorMarketVO();
             BeanUtils.copyProperties(li,marketVO);
             arrayList.add(marketVO);
         }
-        Long total = marketMapper.findLikeTotals();
+        Long total = marketMapper.findLikeTotals(baseQO.getQuery());
         HashMap<String, Object> map = new HashMap<>();
         map.put("total",total);
         map.put("list",arrayList);

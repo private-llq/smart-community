@@ -17,6 +17,6 @@ public class AdminCommunityEntity implements Serializable {
 	//管理员uid
 	private String uid;
 	//社区id
-	private Long communityId;
+	private String communityId;
 	
 }

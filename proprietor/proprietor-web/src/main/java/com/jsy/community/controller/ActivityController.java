@@ -10,6 +10,7 @@ import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
  **/
 @RestController
 @RequestMapping("/activity")
-@ApiJSYController
+// @ApiJSYController
 public class ActivityController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IActivityService activityService;
@@ -31,12 +32,14 @@ public class ActivityController {
 
     @ApiOperation("该小区所有活动")
     @PostMapping("/list")
+    // @Permit("community:proprietor:activity:list")
     public CommonResult list(@RequestBody BaseQO<ActivityEntity> baseQO) {
         return CommonResult.ok(activityService.list(baseQO));
     }
 
     @ApiOperation("活动报名")
     @PostMapping("/apply")
+    // @Permit("community:proprietor:activity:apply")
     public CommonResult apply(@RequestBody ActivityUserEntity activityUserEntity) {
         ValidatorUtils.validateEntity(activityUserEntity,ActivityUserEntity.ActivityUserVerification.class);
         activityUserEntity.setUid(UserUtils.getUserId());
@@ -46,6 +49,7 @@ public class ActivityController {
 
     @ApiOperation("取消报名报名")
     @DeleteMapping("/cancel")
+    // @Permit("community:proprietor:activity:cancel")
     public CommonResult cancel(@RequestParam("id") Long id){
         activityService.cancel(id,UserUtils.getUserId());
         return CommonResult.ok();
@@ -53,12 +57,14 @@ public class ActivityController {
 
     @ApiOperation("查询一条活动详情")
     @GetMapping("/selectOne")
+    // @Permit("community:proprietor:activity:selectOne")
     public CommonResult selectOne(@RequestParam("id") Long id){
         return CommonResult.ok(activityService.selectOne(id,UserUtils.getUserId()));
     }
 
     @ApiOperation("上传图片")
     @PostMapping("/file")
+    // @Permit("community:proprietor:activity:file")
     public CommonResult file(@RequestParam MultipartFile file){
         String upload = MinioUtils.upload(file, "activity");
         return CommonResult.ok(upload);

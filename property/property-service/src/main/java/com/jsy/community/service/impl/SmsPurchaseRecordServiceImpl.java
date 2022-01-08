@@ -64,10 +64,32 @@ public class SmsPurchaseRecordServiceImpl extends ServiceImpl<SmsPurchaseRecordM
 		}
 		// 补充状态
 		for (SmsPurchaseRecordEntity smsPurchaseRecordEntity : smsPurchaseRecordEntities) {
-			if (smsPurchaseRecordEntity.getStatus() == 1) {
-				smsPurchaseRecordEntity.setStatusName("已支付 已收货");
-			}
+			smsPurchaseRecordEntity.setStatusName(smsPurchaseRecordEntity.getStatus() == 1 ? "已支付 已收货" : "未付款");
 		}
 		return smsPurchaseRecordEntities;
+	}
+	
+	/**
+	 * @Description: 根据订单编号查询短信购买记录详情
+	 * @author: DKS
+	 * @since: 2021/12/13 14:35
+	 * @Param: [orderNum]
+	 * @return: com.jsy.community.entity.SmsPurchaseRecordEntity
+	 */
+	@Override
+	public SmsPurchaseRecordEntity querySmsPurchaseByOrderNum(String orderNum) {
+		return smsPurchaseRecordMapper.selectOne(new QueryWrapper<SmsPurchaseRecordEntity>().eq("order_num", orderNum).eq("deleted", 0));
+	}
+	
+	/**
+	 * @Description: 修改短信购买记录
+	 * @author: DKS
+	 * @since: 2021/12/13 16:52
+	 * @Param: [smsPurchaseRecordEntity]
+	 * @return: void
+	 */
+	@Override
+	public void updateSmsPurchase(SmsPurchaseRecordEntity smsPurchaseRecordEntity) {
+		smsPurchaseRecordMapper.updateById(smsPurchaseRecordEntity);
 	}
 }

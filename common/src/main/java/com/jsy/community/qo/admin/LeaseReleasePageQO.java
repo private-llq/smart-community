@@ -11,11 +11,13 @@ public class LeaseReleasePageQO implements Serializable {
     private Long communityId;
 
     @ApiModelProperty("房屋类型：（普通住宅/商铺）")
-    private String type;
+    private Integer type;
 
     @ApiModelProperty("租赁状态;0:未出租;1已出租")
     private Integer leaseStatus;
 
     @ApiModelProperty("业主信息（电话或姓名）,前后均模糊匹配")
-    private String info;
+    private String phone;
+    
+    private String nickName;
 }

@@ -5,9 +5,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IPropertyCompanyService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PropertyCompanyEntity;
+import com.jsy.community.entity.admin.AdminUserCompanyEntity;
+import com.jsy.community.mapper.AdminUserCompanyMapper;
 import com.jsy.community.mapper.PropertyCompanyMapper;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.Resource;
 
 /**
  * @program: com.jsy.community
@@ -17,8 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  **/
 @DubboService(version = Const.version, group = Const.group_property)
 public class PropertyCompanyServiceImpl extends ServiceImpl<PropertyCompanyMapper, PropertyCompanyEntity> implements IPropertyCompanyService {
-    @Autowired
+    @Resource
     private PropertyCompanyMapper propertyCompanyMapper;
+    
+    @Resource
+    private AdminUserCompanyMapper adminUserCompanyMapper;
 
 
     /**
@@ -72,5 +78,30 @@ public class PropertyCompanyServiceImpl extends ServiceImpl<PropertyCompanyMappe
     @Override
     public PropertyCompanyEntity selectCompany(Long companyId) {
         return propertyCompanyMapper.selectOne(new QueryWrapper<PropertyCompanyEntity>().select("*").eq("id", companyId));
+    }
+    
+    /**
+     * @Description: 修改物业公司
+     * @author: DKS
+     * @since: 2021/12/13 17:05
+     * @Param: [propertyCompanyEntity]
+     * @return: void
+     */
+    @Override
+    public void updatePropertyCompany(PropertyCompanyEntity propertyCompanyEntity) {
+        propertyCompanyMapper.updateById(propertyCompanyEntity);
+    }
+    
+    /**
+     * @Description: 根据uid查询物业公司id
+     * @author: DKS
+     * @since: 2021/12/21 15:21
+     * @Param: [uid]
+     * @return: java.lang.Long
+     */
+    @Override
+    public Long getPropertyCompanyIdByUid(String uid) {
+        AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", uid).eq("deleted", 0));
+        return entity.getCompanyId();
     }
 }

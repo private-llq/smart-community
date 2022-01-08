@@ -10,7 +10,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.List;
 
 @Data
 public class LeaseReleasePageVO implements Serializable {
@@ -49,5 +49,9 @@ public class LeaseReleasePageVO implements Serializable {
 
     @ApiModelProperty("状态")
     private String leaseStatus;
-
+    
+    /**
+     * 合同Id
+     */
+    private List<String> conId;
 }

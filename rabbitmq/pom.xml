@@ -5,7 +5,7 @@
     <parent>
         <artifactId>com.jsy.community</artifactId>
         <groupId>com.jsy</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -30,12 +30,12 @@
         <dependency>
             <groupId>com.jsy</groupId>
             <artifactId>pay-system-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.jsy</groupId>
             <artifactId>property-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.jsy</groupId>

@@ -1,13 +1,12 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.PeopleHistoryService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.PeopleHistoryEntity;
 import com.jsy.community.qo.BaseQO;
-import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @Version: 1.0
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/peopleHistory")
 public class PeopleHistoryController {
 
@@ -35,8 +34,8 @@ public class PeopleHistoryController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/8/27 10:23
      **/
-    @Login
     @PostMapping("/v2/pagePeopleHistory")
+    @Permit("community:property:peopleHistory:v2:pagePeopleHistory")
     public CommonResult pagePeopleHistory(@RequestBody BaseQO<PeopleHistoryEntity> baseQO) {
         return CommonResult.ok(peopleHistoryService.pagePeopleHistory(baseQO));
     }

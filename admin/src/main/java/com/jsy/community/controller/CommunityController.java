@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.exception.JSYError;
@@ -13,12 +12,13 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.CommunityPropertyListVO;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -28,13 +28,12 @@ import java.util.List;
  **/
 @RequestMapping("community")
 @Api(tags = "社区控制器")
-@Login(allowAnonymous = true)
 @Slf4j
 @RestController
-@ApiJSYController
+// @ApiJSYController
 public class CommunityController {
 
-    @Autowired
+    @Resource
     private ICommunityService communityService;
 
     /**
@@ -44,9 +43,9 @@ public class CommunityController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/10/18 11:43
      **/
-    @Login
     @PostMapping("/add")
     @businessLog(operation = "新增", content = "新增了【社区】")
+    @Permit("community:admin:community:add")
     public CommonResult addCommunity(@RequestBody CommunityEntity communityEntity) {
         ValidatorUtils.validateEntity(communityEntity, CommunityEntity.ProperyuAddValidatedGroup.class);
         // 新增数据
@@ -60,8 +59,8 @@ public class CommunityController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/10/18 11:43
      **/
-    @Login
     @PostMapping("/query")
+    @Permit("community:admin:community:query")
     public CommonResult<PageInfo<CommunityEntity>> communityList(@RequestBody BaseQO<CommunityQO> baseQO) {
         PageInfo<CommunityEntity> communityEntityPage = communityService.queryCommunity(baseQO);
         return CommonResult.ok(communityEntityPage);
@@ -74,9 +73,9 @@ public class CommunityController {
      * @return: com.jsy.community.vo.CommonResult
      * @date: 2021/10/18 11:39
      **/
-    @Login
     @PutMapping("/update")
     @businessLog(operation = "更新", content = "更新了【社区】")
+    @Permit("community:admin:community:update")
     public CommonResult updateCommunity(@RequestBody CommunityEntity communityEntity) {
         if (communityEntity.getId() == null) {
             throw new JSYException(400, "社区ID不能为空!");
@@ -92,9 +91,9 @@ public class CommunityController {
      * @Author: DKS
      * @Date: 2021/10/18
      **/
-    @Login
     @DeleteMapping("delete")
     @businessLog(operation = "删除", content = "删除了【社区】")
+    @Permit("community:admin:community:delete")
     public CommonResult<Boolean> delCommunity(@RequestParam("id") Long id) {
         return communityService.delCommunity(id) ? CommonResult.ok("删除成功") : CommonResult.error(JSYError.INTERNAL.getCode(), "删除失败");
     }
@@ -106,15 +105,15 @@ public class CommunityController {
      * @Author: DKS
      * @Date: 2021/10/19
      **/
-    @Login
     @GetMapping("list")
+    @Permit("community:admin:community:list")
     public CommonResult<List<CommunityEntity>> queryCommunityList() {
         return CommonResult.ok(communityService.queryCommunityList());
     }
 
     @ApiOperation("查询小区名字和物业公司名字")
-    @Login
     @GetMapping("/property/list")
+    @Permit("community:admin:community:property:list")
     public CommonResult<List<CommunityPropertyListVO>> queryCommunityAndPropertyList() {
         return CommonResult.ok(communityService.queryCommunityAndPropertyList());
     }

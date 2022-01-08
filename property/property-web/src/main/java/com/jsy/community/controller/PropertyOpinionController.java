@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyOpinionService;
 import com.jsy.community.constant.Const;
@@ -12,6 +11,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.admin.AdminInfoVo;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Api(tags = "物业意见反馈")
 @RestController
 @RequestMapping("/propertyOpinion")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyOpinionController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -35,8 +35,8 @@ public class PropertyOpinionController {
 
     @ApiOperation("创建意见反馈")
     @PostMapping("/create")
-    @Login
     @businessLog(operation = "新增",content = "新增了【意见反馈】")
+    @Permit("community:property:propertyOpinion:create")
     public CommonResult create(@RequestBody PropertyOpinionEntity propertyOpinionEntity){
         ValidatorUtils.validateEntity(propertyOpinionEntity,PropertyOpinionEntity.PropertyOpinionValidated.class);
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
@@ -49,7 +49,7 @@ public class PropertyOpinionController {
     }
     @ApiOperation("上传图片")
     @PostMapping("/upload")
-    @Login
+    @Permit("community:property:propertyOpinion:upload")
     public CommonResult upload(@RequestParam("files")MultipartFile[] files){
         if (files.length>5){
             return CommonResult.error("图片不能超过5张！");

@@ -207,6 +207,24 @@ public class AssetLeaseRecordEntity extends BaseEntity {
     @ApiModelProperty(value = "合同签约状态名称:1:未签约;2:签约中;3已签约;4已过期")
     @TableField(exist = false)
     private String contractStatusName;
+    
+    /**
+     * 社区名称
+     */
+    @TableField(exist = false)
+    private String communityName;
+    
+    /**
+     * 状态编号
+     */
+    @TableField(exist = false)
+    private String LeaseStatusName;
+    
+    /**
+     * 房源类型名称
+     */
+    @TableField(exist = false)
+    private String typeName;
 
     /**
      * 发起签约验证组

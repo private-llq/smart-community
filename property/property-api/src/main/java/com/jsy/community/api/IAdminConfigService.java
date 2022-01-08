@@ -8,7 +8,8 @@ import com.jsy.community.entity.admin.AdminUserRoleEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminMenuQO;
 import com.jsy.community.qo.admin.AdminRoleQO;
-import com.jsy.community.utils.PageInfo;
+import com.zhsj.base.api.domain.PermitMenu;
+import com.zhsj.base.api.vo.PageVO;
 
 import java.util.List;
 
@@ -56,6 +57,15 @@ public interface IAdminConfigService {
 	 **/
 	List<AdminMenuEntity> listOfMenu();
 	
+	/**
+	 * @Description: 根据角色类型查询所有菜单
+	 * @author: DKS
+	 * @since: 2021/12/25 9:23
+	 * @Param: [roleType, id]
+	 * @return: java.util.List<com.zhsj.base.api.domain.PermitMenu>
+	 */
+	List<PermitMenu> MenuPage(Integer roleType, Long id);
+	
 	//==================================================== Role角色 ===============================================================
 	/**
 	* @Description: 添加角色
@@ -64,7 +74,7 @@ public interface IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	boolean addRole(AdminRoleEntity adminRoleEntity);
+	void addRole(AdminRoleEntity adminRoleEntity);
 	
 	/**
 	* @Description: 删除角色
@@ -73,7 +83,7 @@ public interface IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	boolean delRole(Long id, Long companyId);
+	void delRole(List<Long> roleIds, Long companyId);
 	
 	/**
 	* @Description: 修改角色
@@ -82,7 +92,7 @@ public interface IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	boolean updateRole(AdminRoleQO adminRoleQO);
+	void updateRole(AdminRoleQO adminRoleQO, Long id);
 	
 	/**
 	* @Description: 角色列表 分页查询
@@ -91,7 +101,9 @@ public interface IAdminConfigService {
 	 * @Author: chq459799974
 	 * @Date: 2020/12/14
 	**/
-	PageInfo<AdminRoleEntity> queryPage(BaseQO<AdminRoleEntity> baseQO);
+	PageVO<AdminRoleEntity> queryPage(BaseQO<AdminRoleEntity> baseQO);
+
+	PageVO<AdminRoleEntity> queryPageAll(BaseQO<AdminRoleEntity> baseQO);
 
 	/**
 	 * @author: Pipi

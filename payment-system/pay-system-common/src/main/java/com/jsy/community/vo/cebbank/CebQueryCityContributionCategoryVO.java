@@ -1,5 +1,4 @@
 package com.jsy.community.vo.cebbank;
-
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,7 +13,7 @@ import java.util.List;
 @Data
 public class CebQueryCityContributionCategoryVO implements Serializable {
     // 缴费类别的Model 做外层
-    private String paymentCitiesForClientModel;
+    private CebQueryCityContributionCategoryVO paymentCitiesForClientModel;
 
     //缴费类别的列表
     private List<CebCategoryVO> cebPaymentCategoriesList;

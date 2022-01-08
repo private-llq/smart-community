@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -22,17 +21,17 @@ import java.util.Objects;
  */
 @RestControllerAdvice
 @Slf4j
-public class AdminExceptionHandler {
+public class AdminExceptionHandler extends JSYExceptionHandler {
 	
 	private static final Map<String,String> UNI_INDEX_MAP = new HashMap<>();
 	static {
 		UNI_INDEX_MAP.put("'t_community.uni_lon_lat'","社区经纬度重复");
 	}
 
-	@ExceptionHandler(JSYException.class)
-	public CommonResult<Boolean> handlerProprietorException(JSYException e) {
-		return CommonResult.error(e.getCode(), e.getMessage());
-	}
+//	@ExceptionHandler(JSYException.class)
+//	public CommonResult<Boolean> handlerProprietorException(JSYException e) {
+//		return CommonResult.error(e.getCode(), e.getMessage());
+//	}
 	
 	@ExceptionHandler(Exception.class)
 	public CommonResult<Boolean> handleException(Exception e) {
@@ -49,11 +48,11 @@ public class AdminExceptionHandler {
 		return CommonResult.error(JSYError.DUPLICATE_KEY);
 	}
 	
-	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-	public CommonResult<Boolean> handleException(HttpRequestMethodNotSupportedException e) {
-		log.error(e.getMessage(), e);
-		return CommonResult.error(JSYError.BAD_REQUEST);
-	}
+//	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+//	public CommonResult<Boolean> handleException(HttpRequestMethodNotSupportedException e) {
+//		log.error(e.getMessage(), e);
+//		return CommonResult.error(JSYError.BAD_REQUEST);
+//	}
 	/**
 	 * 请求Content-type类型错误
 	 */

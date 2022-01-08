@@ -1,8 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
-import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICarBlackListService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarBlackListEntity;
@@ -11,6 +9,8 @@ import com.jsy.community.util.CarOperation;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "车辆黑名单")
 @RestController
 @RequestMapping("/carBlackList")
-@ApiJSYController
+// @ApiJSYController
 public class CarBlackListController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -31,8 +31,8 @@ public class CarBlackListController {
      * @param baseQO 车牌号
      * @return
      */
-    @Login
     @PostMapping("carBlackListPage")
+    @Permit("community:property:carBlackList:carBlackListPage")
     public CommonResult<PageInfo> carBlackListPage(@RequestBody BaseQO<String> baseQO){
         PageInfo<CarBlackListEntity> pageInfo = blackListService.carBlackListPage(baseQO, UserUtils.getAdminCommunityId());
         return CommonResult.ok(pageInfo);
@@ -42,8 +42,8 @@ public class CarBlackListController {
      * @param
      * @return
      */
-    @Login
     @PostMapping("carBlackListOne")
+    @Permit("community:property:carBlackList:carBlackListOne")
     public CommonResult carBlackListEntity(@RequestParam("carNumber")String carNumber){
         Long adminCommunityId = UserUtils.getAdminCommunityId();
 
@@ -58,9 +58,9 @@ public class CarBlackListController {
      * @param carBlackListEntity
      * @return
      */
-    @Login
     @PostMapping("saveBlackList")
     @CarOperation(operation = "新增了【车辆黑名单】")
+    @Permit("community:property:carBlackList:saveBlackList")
     public CommonResult saveBlackList(@RequestBody CarBlackListEntity carBlackListEntity){
         blackListService.saveBlackList(carBlackListEntity,UserUtils.getAdminCommunityId());
         return CommonResult.ok();
@@ -73,6 +73,7 @@ public class CarBlackListController {
      * @param uid
      * @return
      */
+    @LoginIgnore
     @DeleteMapping("delBlackList")
     @CarOperation(operation = "移除了【车辆黑名单】")
     public CommonResult delBlackList(@RequestParam("uid") String uid){

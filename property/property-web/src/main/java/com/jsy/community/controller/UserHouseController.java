@@ -30,7 +30,7 @@
 //@RestController
 //@RequestMapping("/userHouse")
 //@Login(allowAnonymous = true)
-//@ApiJSYController
+//// @ApiJSYController
 //public class UserHouseController {
 //
 //	@DubboReference(version = Const.version, group = Const.group_property, check = false)

@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IWeChatLoginService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.proprietor.BindingMobileQO;
@@ -10,6 +9,9 @@ import com.jsy.community.utils.ios.AppleUtil;
 import com.jsy.community.utils.ios.IOSUtil;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.UserAuthVo;
+import com.zhsj.baseweb.annotation.LoginIgnore;
+import com.zhsj.baseweb.support.ContextHolder;
+import com.zhsj.baseweb.support.LoginUser;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
  * @create: 2021-05-31 16:02
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/Ios")
 public class IosLoginController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
@@ -32,7 +34,9 @@ public class IosLoginController {
      * @Param: [code]
      * @return: com.jsy.community.vo.CommonResult
      */
+    @LoginIgnore
     @PostMapping("/login")
+    // @Permit("community:proprietor:Ios:login")
     public CommonResult login(@RequestParam String identityToken){
         String[] split = identityToken.split("\\.");
         AppleTokenVo userInfo = AppleUtil.getAppleUserInfo(split[1]);
@@ -44,6 +48,7 @@ public class IosLoginController {
         }
         return CommonResult.error("服务器繁忙，请稍后再试！");
     }
+    
     /**
      * @Description: 苹果三方登录接口(不绑定手机)
      * @author: Hu
@@ -51,17 +56,19 @@ public class IosLoginController {
      * @Param: [code]
      * @return: com.jsy.community.vo.CommonResult
      */
+    @LoginIgnore
     @PostMapping("/loginNotMobile")
+    // @Permit("community:proprietor:Ios:loginNotMobile")
     public CommonResult loginNotMobile(@RequestParam String identityToken){
-        String[] split = identityToken.split("\\.");
-        AppleTokenVo userInfo = AppleUtil.getAppleUserInfo(split[1]);
-        if (userInfo != null) {
-            if (AppleUtil.verifyIdentityToken(IOSUtil.getPublicKey(AppleUtil.getKid(split[0])), identityToken, userInfo.getAud(), userInfo.getSub())){
-                UserAuthVo userAuthVo = weChatLoginService.loginNotMobile(userInfo.getSub());
+//        String[] split = identityToken.split("\\.");
+//        AppleTokenVo userInfo = AppleUtil.getAppleUserInfo(split[1]);
+//        if (userInfo != null) {
+//            if (AppleUtil.verifyIdentityToken(IOSUtil.getPublicKey(AppleUtil.getKid(split[0])), identityToken, userInfo.getAud(), userInfo.getSub())){
+                UserAuthVo userAuthVo = weChatLoginService.loginNotMobileV2(identityToken);
                 return CommonResult.ok(userAuthVo);
-            }
-        }
-        return CommonResult.error("服务器繁忙，请稍后再试！");
+//            }
+//        }
+//        return CommonResult.error("服务器繁忙，请稍后再试！");
     }
 
     /**
@@ -71,10 +78,29 @@ public class IosLoginController {
      * @Param: [bindingMobileQO]
      * @return: com.jsy.community.vo.CommonResult
      */
+
     @PostMapping("/bindingMobile")
+    // @Permit("community:proprietor:Ios:bindingMobile")
     public CommonResult bindingMobile(@RequestBody BindingMobileQO bindingMobileQO){
         ValidatorUtils.validateEntity(bindingMobileQO, BindingMobileQO.BindingMobileValidated.class);
-        UserAuthVo userAuthVo=weChatLoginService.bindingMobile(bindingMobileQO);
+        LoginUser loginUser = ContextHolder.getContext().getLoginUser();
+        UserAuthVo userAuthVo=weChatLoginService.iosBindingMobileV2(bindingMobileQO,loginUser);
         return CommonResult.ok(userAuthVo);
+    }
+
+    /**
+     * @Description: 苹果三方登录解绑
+     * @author: Hu
+     * @since: 2021/6/1 9:12
+     * @Param: [bindingMobileQO]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+
+    @PostMapping("/unbind")
+    // @Permit("community:proprietor:Ios:bindingMobile")
+    public CommonResult unbind(@RequestParam String code){
+        LoginUser loginUser = ContextHolder.getContext().getLoginUser();
+        weChatLoginService.unbind(code,loginUser);
+        return CommonResult.ok();
     }
 }

@@ -1,11 +1,11 @@
 package com.jsy.community.service;
 
 
+import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.LeaseReleasePageQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.admin.LeaseReleaseInfoVO;
-import com.jsy.community.vo.admin.LeaseReleasePageVO;
 
 public interface LeaseReleaseService {
     /**
@@ -14,7 +14,7 @@ public interface LeaseReleaseService {
      * @param baseQO 分页条件和查询条件
      * @return
      */
-    PageInfo<LeaseReleasePageVO> queryLeaseReleasePage(BaseQO<LeaseReleasePageQO> baseQO);
+    PageInfo<AssetLeaseRecordEntity> queryLeaseReleasePage(BaseQO<LeaseReleasePageQO> baseQO);
 
     LeaseReleaseInfoVO queryLeaseHouseInfo(Long id, Integer type);
 }

@@ -18,6 +18,10 @@ import com.jsy.community.qo.proprietor.HouseMemberQO;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -49,7 +53,9 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 
 	@Autowired
 	private UserMapper userMapper;
-	
+
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+	private IBaseUserInfoRpcService baseUserInfoRpcService;
 //	@Autowired
 //	private UserMapper userMapper;
 	
@@ -129,8 +135,6 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	 * @Author: chq459799974
 	 * @Date: 2020/11/23
 	 **/
-	//TODO 物业端 houseid
-	//TODO 后台 code(t_house) - id(t_house) - houseid(t_house_member)
 //	@Override
 //	public Page<HouseMemberEntity> queryHouseMemberPage(BaseQO<HouseMemberQO> baseQO){
 //		HouseMemberQO houseMemberQO = baseQO.getQuery();
@@ -266,7 +270,9 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	 **/
 	@Override
 	public Integer addMember(String uid, String homeOwnerUid, Long communityId, Long houseId, LocalDateTime validTime) {
-		UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", uid));
+		UserDetail userDetail = baseUserInfoRpcService.getUserDetail(uid);
+		RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(uid);
+		// UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", uid));
 		HouseMemberEntity houseMemberEntity = new HouseMemberEntity();
 		houseMemberEntity.setId(SnowFlake.nextId());
 		houseMemberEntity.setStatus(1);
@@ -274,13 +280,17 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 		houseMemberEntity.setHouseholderId(homeOwnerUid);
 		houseMemberEntity.setCommunityId(communityId);
 		houseMemberEntity.setHouseId(houseId);
-		houseMemberEntity.setName(userEntity.getRealName());
-		houseMemberEntity.setSex(userEntity.getSex());
-		houseMemberEntity.setMobile(userEntity.getMobile());
+		if (userDetail != null) {
+			houseMemberEntity.setSex(userDetail.getSex());
+			houseMemberEntity.setMobile(userDetail.getPhone());
+		}
 		houseMemberEntity.setRelation(7);
 		houseMemberEntity.setEnterTime(LocalDate.now());
 		houseMemberEntity.setIdentificationType(1);
-		houseMemberEntity.setIdCard(userEntity.getIdCard());
+		if (idCardRealInfo != null) {
+			houseMemberEntity.setName(idCardRealInfo.getIdCardName());
+			houseMemberEntity.setIdCard(idCardRealInfo.getIdCardNumber());
+		}
 		houseMemberEntity.setRemark("");
 		houseMemberEntity.setValidTime(validTime);
 		houseMemberEntity.setDeleted(0L);

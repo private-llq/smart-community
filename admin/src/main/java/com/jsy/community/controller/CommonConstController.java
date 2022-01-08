@@ -9,12 +9,14 @@ import com.jsy.community.service.ICommonConstService;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
 
 /**
  * <p>
@@ -28,12 +30,13 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/const")
-@ApiJSYController
+// @ApiJSYController
 public class CommonConstController {
 	
-	@Autowired
+	@Resource
 	private ICommonConstService commonConstService;
 	
+	@LoginIgnore
 	@ApiOperation("根据常量所属编号查询其所有常量")
 	@PostMapping("/getConst")
 	public CommonResult getConst(@ApiParam("常量所属编号") @RequestParam Integer constId,
@@ -42,6 +45,7 @@ public class CommonConstController {
 		return CommonResult.ok(pageInfo);
 	}
 	
+	@LoginIgnore
 	@ApiOperation("添加常量")
 	@PostMapping("/addConst")
 	@businessLog(operation = "新增",content = "新增了【常量】")

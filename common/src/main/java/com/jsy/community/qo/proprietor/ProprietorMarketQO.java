@@ -44,7 +44,7 @@ public class ProprietorMarketQO extends BaseQO {
     @ApiModelProperty(value = "价格")
     private BigDecimal price;
 
-    @NotBlank(message = "商品说明不能为空")
+//    @NotBlank(message = "商品说明不能为空")
     @ApiModelProperty(value = "商品说明")
     private String goodsExplain;
 

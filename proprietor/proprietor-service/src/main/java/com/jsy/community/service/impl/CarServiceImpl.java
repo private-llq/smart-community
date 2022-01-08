@@ -19,6 +19,12 @@ import com.jsy.community.utils.OrderCochainUtil;
 import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.UserUtils;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -83,6 +89,12 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
     @DubboReference(version = Const.version,  group = Const.group_property, check = false)
     private ICarMonthlyVehicleService carMonthlyVehicleService;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseUserInfoRpcService userInfoRpcService;
+
+    @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check=false)
+    private IImChatPublicPushRpcService iImChatPublicPushRpcService;
 
     @Autowired
     private HouseMemberMapper houseMemberMapper;
@@ -258,7 +270,6 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             tempDateTime = tempDateTime.plusHours( hours );
             long minutes = tempDateTime.until( toDateTime, ChronoUnit.MINUTES);
             PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(communityEntity.getPropertyId());
-            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carOrderEntity.getUid()));
             //支付上链
             OrderCochainUtil.orderCochain("停车费",
                     1,
@@ -271,12 +282,14 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                     null);
 
             //推送消息
-            UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", carOrderEntity.getUid()));
+            UserImVo userIm = userInfoRpcService.getEHomeUserIm(carOrderEntity.getUid());
             HashMap<Object, Object> map = new HashMap<>();
             map.put("type",1);
             map.put("dataId",carOrderEntity.getId());
             map.put("orderNum",outTradeNo);
-            PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+            PushInfoUtil.pushPayAppMsg(
+                    iImChatPublicPushRpcService,
+                    userIm.getImId(),
                     payType,
                     total.toString(),
                     null,
@@ -381,6 +394,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     public BigDecimal payPositionFees(CarEntity carEntity) {
         CarChargeEntity carChargeEntity = carChargeService.selectOne(carEntity.getCommunityId());
+        if (carChargeEntity == null) {
+            throw new ProprietorException("当前小区不允许包月!");
+        }
         return carChargeEntity.getMoney().multiply(new BigDecimal(carEntity.getMonth()));
     }
 
@@ -600,7 +616,6 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             carOrderRecordMapper.updateById(entity);
 
             PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(communityEntity.getPropertyId());
-            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carEntity.getUid()));
             //支付上链
             OrderCochainUtil.orderCochain("停车费",
                     1,
@@ -612,12 +627,14 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                     entity.getMonth()+"月车位租金费",
                     null);
             //推送消息
-            UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", entity.getUid()));
+            UserImVo userIm = userInfoRpcService.getEHomeUserIm(entity.getUid());
             HashMap<Object, Object> map = new HashMap<>();
             map.put("type",2);
             map.put("dataId",carOrderEntity.getId());
             map.put("orderNum",entity.getOrderNum());
-            PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+            PushInfoUtil.pushPayAppMsg(
+                    iImChatPublicPushRpcService,
+                    userIm.getImId(),
                     entity.getPayType(),
                     entity.getMoney().toString(),
                     null,
@@ -669,17 +686,19 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Override
     @TxcTransaction
     public void bindingMonthCar(CarOrderRecordEntity entity) {
-            UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", entity.getUid()));
-            CarEntity carEntity = new CarEntity();
-            if (userEntity != null) {
+        // UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", entity.getUid()));
+        UserDetail userDetail = userInfoRpcService.getUserDetail(entity.getUid());
+        RealInfoDto idCardRealInfo = userInfoRpcService.getIdCardRealInfo(entity.getUid());
+        CarEntity carEntity = new CarEntity();
+            if (userDetail != null && idCardRealInfo != null) {
                 BeanUtils.copyProperties(entity,carEntity);
                 carEntity.setId(SnowFlake.nextId());
                 carEntity.setBeginTime(LocalDateTime.now());
                 carEntity.setOverTime(LocalDateTime.now().plusMonths(carEntity.getMonth()));
                 carEntity.setType(2);
                 carEntity.setCarPositionId(null);
-                carEntity.setOwner(userEntity.getRealName());
-                carEntity.setContact(userEntity.getMobile());
+                carEntity.setOwner(idCardRealInfo.getIdCardName());
+                carEntity.setContact(userDetail.getPhone());
                 carMapper.insert(carEntity);
 
                 //业主绑定车辆后修改车位状态
@@ -757,7 +776,6 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 entity.setStatus(1);
                 carOrderRecordMapper.updateById(entity);
 
-
                 PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(communityEntity.getPropertyId());
                 //支付上链
                 OrderCochainUtil.orderCochain("停车费",
@@ -770,12 +788,14 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                         entity.getMonth()+"月车位租金费",
                         null);
                 //推送消息
-                UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", entity.getUid()));
+                UserImVo userIm = userInfoRpcService.getEHomeUserIm(entity.getUid());
                 HashMap<Object, Object> map = new HashMap<>();
                 map.put("type",2);
                 map.put("dataId",carOrderEntity.getId());
                 map.put("orderNum",entity.getOrderNum());
-                PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+                PushInfoUtil.pushPayAppMsg(
+                        iImChatPublicPushRpcService,
+                        userIm.getImId(),
                         entity.getPayType(),
                         entity.getMoney().toString(),
                         null,
@@ -910,12 +930,16 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
      */
     @Override
     public void addRelationCar(CarEntity carEntity) {
-        UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carEntity.getUid()));
+        // UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", carEntity.getUid()));
+        UserDetail userDetail = userInfoRpcService.getUserDetail(carEntity.getUid());
+        RealInfoDto idCardRealInfo = userInfoRpcService.getIdCardRealInfo(carEntity.getUid());
+        if (userDetail != null && idCardRealInfo != null) {
             carEntity.setId(SnowFlake.nextId());
-            carEntity.setContact(userEntity.getMobile());
-            carEntity.setOwner(userEntity.getRealName());
+            carEntity.setContact(userDetail.getPhone());
+            carEntity.setOwner(idCardRealInfo.getIdCardName());
             carEntity.setType(3);
             carMapper.insert(carEntity);
+        }
     }
 
     @Override

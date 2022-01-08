@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IRelationService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.UserHouseEntity;
@@ -13,6 +12,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.RelationVO;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -31,7 +31,7 @@ import java.util.Arrays;
 @Api(tags = "添加家属信息")
 @RestController
 @RequestMapping("/relation")
-@ApiJSYController
+// @ApiJSYController
 public class RelationController {
     //图片上传验证
     private final String[] img ={"jpg","png","jpeg"};
@@ -52,7 +52,7 @@ public class RelationController {
      */
     @ApiOperation("添加家属信息")
     @PostMapping("/add")
-    @Login
+    // @Permit("community:proprietor:relation:add")
     public CommonResult addRelation(@RequestBody RelationQO relationQo){
         ValidatorUtils.validateEntity(relationQo, RelationQO.RelationValidated.class);
         relationQo.getCars().forEach( car -> ValidatorUtils.validateEntity(car, RelationCarsQO.proprietorCarValidated.class) );
@@ -77,17 +77,19 @@ public class RelationController {
         relationService.addRelation(relationQo);
         return CommonResult.ok();
     }
+    
     @ApiOperation("删除家属信息及其车辆")
     @DeleteMapping("/delete")
-    @Login
+    // @Permit("community:proprietor:relation:delete")
     public CommonResult delete(@RequestParam("id") Long id){
         String userId = UserUtils.getUserId();
         relationService.deleteHouseMemberCars(id,userId);
         return CommonResult.ok();
     }
+    
     @ApiOperation("保存行驶证图片")
     @PostMapping("/uploadDrivingLicenseUrl")
-    @Login
+    // @Permit("community:proprietor:relation:uploadDrivingLicenseUrl")
     public CommonResult uploadDrivingLicenseUrl(@RequestParam("file") MultipartFile file){
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -97,25 +99,28 @@ public class RelationController {
         String upload = MinioUtils.upload(file, "wocao");
         return CommonResult.ok(upload,"上传成功");
     }
+    
     @ApiOperation("删除车辆")
     @DeleteMapping("/delCar")
-    @Login
+    // @Permit("community:proprietor:relation:delCar")
     public CommonResult delCar(@RequestParam("id") Long id){
         String userId = UserUtils.getUserId();
         relationService.delCar(userId, id);
         return CommonResult.ok();
     }
+    
     @ApiOperation("查询一个家属详情")
     @GetMapping("/selectUserRelationDetails")
-    @Login
+    // @Permit("community:proprietor:relation:selectUserRelationDetails")
     public CommonResult selectRelationOne(@RequestParam("id") Long id){
         String userId = UserUtils.getUserId();
         RelationVO relationVO = relationService.selectOne(id, userId);
         return CommonResult.ok(relationVO);
     }
+    
     @ApiOperation("修改家属信息加汽车信息")
     @PutMapping("/updateUserRelationDetails")
-    @Login
+    // @Permit("community:proprietor:relation:updateUserRelationDetails")
     public CommonResult updateByRelationId(@RequestBody RelationQO relationQo){
         ValidatorUtils.validateEntity(relationQo, RelationQO.RelationValidated.class);
         relationQo.getCars().forEach( car -> ValidatorUtils.validateEntity(car,RelationCarsQO.proprietorCarValidated.class) );

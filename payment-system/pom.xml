@@ -5,7 +5,7 @@
     <parent>
         <artifactId>com.jsy.community</artifactId>
         <groupId>com.jsy</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -19,6 +19,7 @@
         <module>pay-system-common</module>
     </modules>
     <dependencies>
+
         <dependency>
             <groupId>com.jsy</groupId>
             <artifactId>common</artifactId>
@@ -38,17 +39,17 @@
         <dependency>
             <groupId>com.jsy</groupId>
             <artifactId>proprietor-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.jsy</groupId>
             <artifactId>property-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.jsy</groupId>
             <artifactId>lease-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

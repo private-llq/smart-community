@@ -6,6 +6,7 @@ import com.jsy.community.api.IRepairTypeService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.RepairTypeEntity;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ import java.util.List;
  */
 @Api(tags = "报修类别控制器")
 @Slf4j
-@ApiJSYController
+// @ApiJSYController
 @RestController
 @RequestMapping("/repairType")
 @Deprecated
@@ -37,6 +38,7 @@ public class RepairTypeController {
 	
 	@ApiOperation("报修类别查询")
 	@GetMapping("/getType")
+	// @Permit("community:proprietor:repairType:getType")
 	public CommonResult getType() {
 		List<RepairTypeEntity> list = repairTypeService.getType();
 		return CommonResult.ok(list);

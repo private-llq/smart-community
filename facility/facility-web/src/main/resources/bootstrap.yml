@@ -34,13 +34,15 @@ spring:
       name: facility-web,common,common-web  #配置文件名字   dev是环境
       profile: dev #环境  组成完整的文件名：gateway-service-dev.yml
       label: master #主分支
+      username: ecf50273a250499a9ec28953c2c494ab
+      password: ecf50273a250499a9ec28953c2c494ab
 
 #服务发现
 eureka:
   client:
     serviceUrl:
 #      defaultZone: http://192.168.12.49:36366/eureka/ #注册中心地址
-      defaultZone: ${server.eureka-service-address}
+      defaultZone: http://222.178.213.183:36366/eureka
   instance:
     prefer-ip-address: true #使用ip地址注册
     instance-id: facility-web:9001  #指定服务的id

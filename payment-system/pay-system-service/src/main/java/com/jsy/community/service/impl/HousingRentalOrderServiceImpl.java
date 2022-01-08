@@ -53,8 +53,10 @@ public class HousingRentalOrderServiceImpl implements HousingRentalOrderService 
         bodyMap.put("orderUuid", orderNo);
         //url
         String url = SIGN_USER_PROTOCOL + SIGN_USER_HOST + ":" + SIGN_USER_PORT + MODIFY_ORDER_PAY_STATUS;
+        log.info("请求URL:{}", url);
         // 加密参数
         String bodyString = ZhsjUtil.postEncrypt(JSON.toJSONString(bodyMap));
+        log.info("请求参数:{}", bodyString);
         //组装http请求
         HttpPost httpPost = MyHttpUtils.httpPostWithoutParams(url, bodyString);
         //设置header

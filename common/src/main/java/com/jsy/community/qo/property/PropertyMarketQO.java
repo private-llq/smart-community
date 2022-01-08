@@ -4,6 +4,8 @@ import com.jsy.community.qo.BaseQO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 
 @Data
 public class PropertyMarketQO extends BaseQO {
@@ -21,5 +23,10 @@ public class PropertyMarketQO extends BaseQO {
 
     @ApiModelProperty(value = "社区id")
     private  Long communityId;
+    
+    /**
+     * 用户uid列表
+     */
+    private List<String> userDetailIds;
 
 }

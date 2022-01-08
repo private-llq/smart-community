@@ -160,13 +160,11 @@ public class CommonServiceImpl implements ICommonService {
 //            return unitList;
 //        }
 //        //2. 如果 按 楼栋id 查到的单元为空 则 按 楼栋id 查询所有楼层
-//        //TODO 楼栋没挂单元 直接挂的房屋，先给出楼层
 //        List<Map<String, Object>> floorByBuildingId = commonMapper.getFloorByBuildingId(id);
 //        if( CollectionUtil.isNotEmpty(floorByBuildingId) ){
 //            return floorByBuildingId;
 //        }
 //        //3. 如果 按 以上id 当做楼栋去查 楼层都为空 那说明传的是一个 单元id 则按单元id查楼层
-//        //TODO 单元挂房屋？(大多数情况)
 ////        return getFloorByUnitId(id, page, pageSize);
 //        return commonMapper.getFloorByUnitId(id, page, pageSize);
 //    }
@@ -678,6 +676,18 @@ public class CommonServiceImpl implements ICommonService {
                 valueOperations.getOperations().delete(BusinessConst.HOT_KEY_TIME_PREFIX + ":" + word);
             }
         });
+    }
+
+    /**
+     * @param regionName : 区域名称
+     * @author: Pipi
+     * @description: 通过区域名称模糊匹配区域
+     * @return: {@link RegionEntity}
+     * @date: 2022/1/4 15:25
+     **/
+    @Override
+    public RegionEntity queryRegionByName(String regionName) {
+        return regionMapper.queryRegionByName(regionName);
     }
 
     /**

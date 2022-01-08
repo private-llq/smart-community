@@ -1,15 +1,14 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.CommunityRfService;
 import com.jsy.community.api.CommunityRfSycRecordService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CommunityRfEntity;
-import com.jsy.community.entity.property.CommunityRfSycRecordEntity;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,9 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
  * @Version: 1.0
  **/
 @RestController
-@ApiJSYController
+// @ApiJSYController
 @RequestMapping("/rf")
-@Login
 public class CommunityRfController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -42,6 +40,7 @@ public class CommunityRfController {
      * @date: 2021/11/5 14:24
      **/
     @PostMapping("/v2/addRf")
+    @Permit("community:property:rf:v2:addRf")
     public CommonResult addRf(@RequestBody CommunityRfEntity rfEntity) {
         ValidatorUtils.validateEntity(rfEntity, CommunityRfEntity.addEfValidateGroup.class);
         if (rfEntity.getEnableStatus() == null) {

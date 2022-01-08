@@ -18,9 +18,13 @@ import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.*;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.elasticsearch.search.sort.MinAndMax;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +75,9 @@ public class VisitorServiceImpl implements IVisitorService {
     @Autowired
     private CommunityHardWareMapper communityHardWareMapper;
 
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
+
     /**
      * @Description: 访客记录 分页查询(现在主表数据是t_visitor,连表查询，以后主表可能会改为t_people_history)
      * @Param: [baseQO]
@@ -87,7 +94,6 @@ public class VisitorServiceImpl implements IVisitorService {
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return new PageInfo<>();
         }
-        // TODO 纠错
 		/*Set<Long> visitorIds = new HashSet<>();
 		for(PeopleHistoryEntity historyEntity : pageData.getRecords()){
 			visitorIds.add(historyEntity.getVisitorId());
@@ -117,7 +123,11 @@ public class VisitorServiceImpl implements IVisitorService {
         QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("*, TIMESTAMPDIFF(MINUTE, start_time, end_time) as effectiveMinutes");
         if (!StringUtils.isEmpty(query.getName())) {
-            queryWrapper.and(wrapper -> wrapper.like("name", query.getName()).or().like("contact", query.getName()));
+            queryWrapper.and(wrapper -> wrapper.eq("check_type", 2).like("name", query.getName()).or().like("contact", query.getName()));
+            Set<String> strings = baseUserInfoRpcService.queryRealUserDetail(query.getName(), query.getName());
+            if (!CollectionUtils.isEmpty(strings)) {
+                queryWrapper.or(wrapper -> wrapper.eq("check_type", 1).in("uid", strings));
+            }
         }
         if (!StringUtils.isEmpty(query.getBuildingId())) {
             queryWrapper.eq("building_id", query.getBuildingId());
@@ -132,22 +142,17 @@ public class VisitorServiceImpl implements IVisitorService {
                 if (visitorEntity.getUid() != null) {
                     if (visitorEntity.getCheckType() == 1) {
                         visitorEntity.setCheckTypeStr(PropertyConstsEnum.CheckTypeEnum.getName(visitorEntity.getCheckType()));
-                        //业主审核,查询业主信息
-                        UserEntity userEntity = userService.selectOne(visitorEntity.getUid());
-                        if (userEntity != null) {
-                            visitorEntity.setNameOfAuthorizedPerson(userEntity.getRealName());
-                            visitorEntity.setMobileOfAuthorizedPerson(userEntity.getMobile());
-                        }
-                    } else {
-                        // 物业审核,查询物业管理员信息
-                        AdminUserEntity adminUserEntity = adminUserService.queryByUid(visitorEntity.getUid());
-                        if (adminUserEntity != null) {
-                            visitorEntity.setNameOfAuthorizedPerson(adminUserEntity.getRealName());
-                            visitorEntity.setMobileOfAuthorizedPerson(adminUserEntity.getMobile());
-                        }
+                    }
+                    UserEntity userEntity = userService.selectOne(visitorEntity.getUid());
+                    UserDetail userDetail = baseUserInfoRpcService.getUserDetail(visitorEntity.getUid());
+                    if (userDetail != null) {
+                        visitorEntity.setMobileOfAuthorizedPerson(userDetail.getPhone());
+                    }
+                    RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(visitorEntity.getUid());
+                    if (idCardRealInfo != null) {
+                        visitorEntity.setNameOfAuthorizedPerson(idCardRealInfo.getIdCardName());
                     }
                 }
-
             }
         }
         PageInfo<VisitorEntity> visitorEntityPageInfo = new PageInfo<>();

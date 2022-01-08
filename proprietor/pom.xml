@@ -6,9 +6,9 @@
 	<packaging>pom</packaging>
 	
 	<parent>
-		<groupId>com.jsy</groupId>
 		<artifactId>com.jsy.community</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<groupId>com.jsy</groupId>
+		<version>1.0-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>proprietor</artifactId>

@@ -3,6 +3,7 @@ package com.jsy.community.service;
 import com.jsy.community.constant.ConstError;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
+import com.zhsj.basecommon.enums.ErrorEnum;
 
 /**
  * 大后台端异常类
@@ -26,4 +27,8 @@ public class AdminException extends JSYException {
 	public AdminException(JSYError error) {
 		super(error);
 	}
+	
+	/*public AdminException(ErrorEnum errorEnum) {
+		super(errorEnum);
+	}*/
 }

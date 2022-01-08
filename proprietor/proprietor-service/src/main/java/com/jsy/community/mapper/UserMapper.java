@@ -27,7 +27,7 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	 * @Date: 2021/3/31
 	**/
 	@Update("update t_user set reg_id = #{regId} where uid = #{uid} and deleted = 0")
-	int updateUserRegId(String regId, String uid);
+	int updateUserRegId(@Param("regId") String regId, @Param("uid") String uid);
 	
 	/**
 	* @Description: uid查用户
@@ -48,8 +48,7 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 	**/
 	@Select("select mobile from t_user where uid = #{uid} and deleted = 0")
 	String queryUserMobileByUid(String uid);
-	
-	//TODO user表householder_id字段暂未使用
+
 	@Update("update t_user set householder_id = #{householderId} where id = #{uid}")
 	int setUserBelongTo(Long householderId,Long uid);
 

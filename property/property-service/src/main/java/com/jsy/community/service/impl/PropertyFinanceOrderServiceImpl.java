@@ -7,7 +7,9 @@ import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
-import com.jsy.community.entity.*;
+import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.entity.property.*;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
@@ -17,10 +19,13 @@ import com.jsy.community.qo.property.FinanceOrderOperationQO;
 import com.jsy.community.qo.property.FinanceOrderQO;
 import com.jsy.community.qo.property.StatementNumQO;
 import com.jsy.community.utils.*;
-import com.jsy.community.utils.imutils.entity.ImResponseEntity;
 import com.jsy.community.vo.admin.AdminInfoVo;
-import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import com.jsy.community.vo.property.FinanceOrderAndCarOrHouseInfoVO;
+import com.jsy.community.vo.property.PropertyFinanceOrderVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -97,6 +102,12 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 
     @Autowired
     private IPropertyFinanceTicketTemplateFieldService ticketTemplateFieldService;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseUserInfoRpcService userInfoRpcService;
+
+    @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check=false)
+    private IImChatPublicPushRpcService iImChatPublicPushRpcService;
 
     /**
      * @Description: 查询房间所有未缴账单
@@ -692,7 +703,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
         StringBuilder detailedList = new StringBuilder();
         PropertyFinanceOrderEntity orderEntity = propertyFinanceOrderMapper.selectById(ids[0]);
-        UserIMEntity userIMEntity = userImService.selectUid(orderEntity.getUid());
+        UserImVo userIm = userInfoRpcService.getEHomeUserIm(orderEntity.getUid());
         CommunityEntity communityEntity = communityMapper.selectById(orderEntity.getCommunityId());
         PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(communityEntity.getPropertyId());
 
@@ -719,15 +730,15 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         map.put("type", 3);
         map.put("dataId", tripartiteOrder);
         map.put("orderNum", tripartiteOrder);
-        ImResponseEntity imResponseEntity = PushInfoUtil.pushPayAppMsg(userIMEntity.getImId(),
+        PushInfoUtil.pushPayAppMsg(
+                iImChatPublicPushRpcService,
+                userIm.getImId(),
                 payType,
                 total.toString(),
                 null,
                 "物业缴费",
                 map,
                 BusinessEnum.PushInfromEnum.PROPERTYPAYMENT.getName());
-        log.info("支付助手："+imResponseEntity);
-
     }
 
     /**
@@ -813,6 +824,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         List<PropertyFinanceFormEntity> propertyFinanceFormEntityList = new LinkedList<>();
         // 押金查询
         QueryWrapper<PropertyDepositEntity> DepositWrapper = new QueryWrapper<>();
+        DepositWrapper.ne("status", 1);
         if (qo.getStartTime() != null) {
             DepositWrapper.ge("create_time", qo.getStartTime());
         }
@@ -822,7 +834,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             DepositWrapper.eq("community_id", qo.getCommunityId());
         } else {
-            DepositWrapper.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                DepositWrapper.in("community_id", communityIdList);
+            }
         }
         DepositWrapper.eq("deleted", 0);
         // 查询一段时间内押金实体
@@ -861,7 +875,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             advanceDepositRecordWrapper.eq("community_id", qo.getCommunityId());
         } else {
-            advanceDepositRecordWrapper.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                advanceDepositRecordWrapper.in("community_id", communityIdList);
+            }
         }
         advanceDepositRecordWrapper.eq("deleted", 0);
         // 查询一段时间内预存款实体
@@ -902,7 +918,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             financeOrderWrapper.eq("community_id", qo.getCommunityId());
         } else {
-            financeOrderWrapper.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                financeOrderWrapper.in("community_id", communityIdList);
+            }
         }
         financeOrderWrapper.eq("deleted", 0);
         // 查询一段时间内小区账单实体
@@ -1289,7 +1307,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 communityIds.add(String.valueOf(qo.getCommunityId()));
                 FeeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIds, qo.getFeeRuleName());
             } else {
-                FeeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIdList, qo.getFeeRuleName());
+                if (!CollectionUtils.isEmpty(communityIdList)) {
+                    FeeRuleIdList = propertyFeeRuleMapper.selectFeeRuleIdList(communityIdList, qo.getFeeRuleName());
+                }
             }
         }
 
@@ -1304,7 +1324,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             queryWrapper.eq("community_id", qo.getCommunityId());
         } else {
-            queryWrapper.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                queryWrapper.in("community_id", communityIdList);
+            }
         }
         if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             queryWrapper.in("fee_rule_id", FeeRuleIdList);
@@ -1340,7 +1362,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             query.eq("community_id", qo.getCommunityId());
         } else {
-            query.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                query.in("community_id", communityIdList);
+            }
         }
         if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             query.in("fee_rule_id", FeeRuleIdList);
@@ -1371,7 +1395,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             wrapper.eq("community_id", qo.getCommunityId());
         } else {
-            wrapper.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                wrapper.in("community_id", communityIdList);
+            }
         }
         if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             wrapper.in("fee_rule_id", FeeRuleIdList);
@@ -1402,7 +1428,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             entityQueryWrapper.eq("community_id", qo.getCommunityId());
         } else {
-            entityQueryWrapper.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                entityQueryWrapper.in("community_id", communityIdList);
+            }
         }
         if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             entityQueryWrapper.in("fee_rule_id", FeeRuleIdList);
@@ -1433,7 +1461,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             orderEntityQueryWrapper.eq("community_id", qo.getCommunityId());
         } else {
-            orderEntityQueryWrapper.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                orderEntityQueryWrapper.in("community_id", communityIdList);
+            }
         }
         if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             orderEntityQueryWrapper.in("fee_rule_id", FeeRuleIdList);
@@ -1464,7 +1494,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             wrapper1.eq("community_id", qo.getCommunityId());
         } else {
-            wrapper1.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                wrapper1.in("community_id", communityIdList);
+            }
         }
         if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             wrapper1.in("fee_rule_id", FeeRuleIdList);
@@ -1495,7 +1527,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         if (qo.getCommunityId() != null) {
             queryWrapper1.eq("community_id", qo.getCommunityId());
         } else {
-            queryWrapper1.in("community_id", communityIdList);
+            if (!CollectionUtils.isEmpty(communityIdList)) {
+                queryWrapper1.in("community_id", communityIdList);
+            }
         }
         if (qo.getFeeRuleName() != null && FeeRuleIdList.size() > 0) {
             queryWrapper1.in("fee_rule_id", FeeRuleIdList);
@@ -1992,65 +2026,6 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 
         //更新收款状态为已支付
         row = propertyFinanceOrderMapper.collection(ids, 2);
-
-//        if (row == 1) {
-//            for (Long id : ids) {
-//                if (payType == 7) {
-//                    PropertyFinanceOrderEntity propertyFinanceOrderEntity = propertyFinanceOrderMapper.selectById(id);
-//                    propertyFinanceOrderEntity.setDeduction(propertyFinanceOrderEntity.getTotalMoney());
-//                    propertyFinanceOrderMapper.updateById(propertyFinanceOrderEntity);
-//
-//                    // 关联类型是车位的话，需查出车位绑定的房屋
-//                    if (propertyFinanceOrderEntity.getAssociatedType() == 2) {
-//                        CarPositionEntity carPositionEntity = carPositionMapper.selectById(propertyFinanceOrderEntity.getTargetId());
-//                        PropertyAdvanceDepositEntity propertyAdvanceDepositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(carPositionEntity.getHouseId(), communityId);
-//                        // 放入这次抵扣的金额
-//                        propertyAdvanceDepositEntity.setBalanceRecord(propertyFinanceOrderEntity.getTotalMoney());
-//                        propertyAdvanceDepositEntity.setBalance(propertyAdvanceDepositEntity.getBalance().add(propertyFinanceOrderEntity.getTotalMoney().negate()));
-//                        propertyAdvanceDepositEntity.setUpdateTime(LocalDateTime.now());
-//                        // 更新预存款余额
-//                        propertyAdvanceDepositMapper.updateById(propertyAdvanceDepositEntity);
-//                        // 抵扣成功后，立即生成预存款变更明细记录
-//                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity = new PropertyAdvanceDepositRecordEntity();
-//                        propertyAdvanceDepositRecordEntity.setCommunityId(propertyAdvanceDepositEntity.getCommunityId());
-//                        propertyAdvanceDepositRecordEntity.setType(1);
-//                        propertyAdvanceDepositRecordEntity.setOrderId(id);
-//                        // 查最新一次记录并设置余额明细
-//                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity1 = propertyAdvanceDepositRecordMapper.queryMaxCreateTimeRecord(
-//                            propertyAdvanceDepositEntity.getId(), propertyAdvanceDepositEntity.getCommunityId());
-//                        propertyAdvanceDepositRecordEntity.setPayAmount(propertyAdvanceDepositEntity.getBalanceRecord());
-//                        propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositRecordEntity1.getBalanceRecord().add(propertyAdvanceDepositEntity.getBalanceRecord().negate()));
-//                        propertyAdvanceDepositRecordEntity.setAdvanceDepositId(propertyAdvanceDepositEntity.getId());
-//                        propertyAdvanceDepositRecordEntity.setComment(propertyAdvanceDepositEntity.getComment());
-//                        propertyAdvanceDepositRecordEntity.setUpdateBy(propertyAdvanceDepositEntity.getUpdateBy());
-//                        PropertyAdvanceDepositRecordService.addPropertyAdvanceDepositRecord(propertyAdvanceDepositRecordEntity);
-//                    } else if (propertyFinanceOrderEntity.getAssociatedType() == 1) {
-//                        PropertyAdvanceDepositEntity propertyAdvanceDepositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(propertyFinanceOrderEntity.getTargetId(), communityId);
-//                        // 放入这次抵扣的金额
-//                        propertyAdvanceDepositEntity.setBalanceRecord(propertyFinanceOrderEntity.getTotalMoney());
-//                        propertyAdvanceDepositEntity.setBalance(propertyAdvanceDepositEntity.getBalance().add(propertyFinanceOrderEntity.getTotalMoney().negate()));
-//                        propertyAdvanceDepositEntity.setUpdateTime(LocalDateTime.now());
-//                        // 更新预存款余额
-//                        propertyAdvanceDepositMapper.updateById(propertyAdvanceDepositEntity);
-//                        // 抵扣成功后，立即生成预存款变更明细记录
-//                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity = new PropertyAdvanceDepositRecordEntity();
-//                        propertyAdvanceDepositRecordEntity.setCommunityId(propertyAdvanceDepositEntity.getCommunityId());
-//                        propertyAdvanceDepositRecordEntity.setType(1);
-//                        propertyAdvanceDepositRecordEntity.setOrderId(id);
-//                        // 查最新一次记录并设置余额明细
-//                        PropertyAdvanceDepositRecordEntity propertyAdvanceDepositRecordEntity1 = propertyAdvanceDepositRecordMapper.queryMaxCreateTimeRecord(
-//                            propertyAdvanceDepositEntity.getId(), propertyAdvanceDepositEntity.getCommunityId());
-//                        propertyAdvanceDepositRecordEntity.setPayAmount(propertyAdvanceDepositEntity.getBalanceRecord());
-//                        propertyAdvanceDepositRecordEntity.setBalanceRecord(propertyAdvanceDepositRecordEntity1.getBalanceRecord().add(propertyAdvanceDepositEntity.getBalanceRecord().negate()));
-//                        propertyAdvanceDepositRecordEntity.setAdvanceDepositId(propertyAdvanceDepositEntity.getId());
-//                        propertyAdvanceDepositRecordEntity.setComment(propertyAdvanceDepositEntity.getComment());
-//                        propertyAdvanceDepositRecordEntity.setUpdateBy(propertyAdvanceDepositEntity.getUpdateBy());
-//                        PropertyAdvanceDepositRecordService.addPropertyAdvanceDepositRecord(propertyAdvanceDepositRecordEntity);
-//                    }
-//                }
-//            }
-//        }
-
         return row >= 1;
     }
 
@@ -2151,12 +2126,14 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 entity.setAddress(houseMap.get(entity.getTargetId()));
             } else {
                 String[] split = carPositionMap.get(entity.getTargetId()).split(",");
-                entity.setAddress(split[0]);
-                PropertyAdvanceDepositEntity depositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(Long.parseLong(split[1]), adminCommunityId);
-                if (depositEntity != null) {
-                    entity.setDeduction(depositEntity.getBalance());
-                } else {
-                    entity.setDeduction(new BigDecimal(0));
+                if (split.length > 0) {
+                    entity.setAddress(split[0]);
+                    PropertyAdvanceDepositEntity depositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(Long.parseLong(split[1]), adminCommunityId);
+                    if (depositEntity != null) {
+                        entity.setDeduction(depositEntity.getBalance());
+                    } else {
+                        entity.setDeduction(new BigDecimal(0));
+                    }
                 }
             }
         }

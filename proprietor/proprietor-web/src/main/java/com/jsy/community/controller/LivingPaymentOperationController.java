@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ILivingPaymentOperationService;
 import com.jsy.community.api.IPayGroupService;
 import com.jsy.community.constant.Const;
@@ -11,6 +10,7 @@ import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,7 +29,7 @@ import java.util.Arrays;
 @Api(tags = "生活缴费前端控制器--增删改")
 @RestController
 @RequestMapping("/livingpaymentoperation")
-@ApiJSYController
+// @ApiJSYController
 public class LivingPaymentOperationController {
 
     private final String[] img ={"jpg","png","jpeg"};
@@ -42,15 +42,16 @@ public class LivingPaymentOperationController {
 
     @ApiOperation("新增分组")
     @PostMapping("/saveGroupName")
-    @Login
+        // @Permit("community:proprietor:livingpaymentoperation:saveGroupName")
     public CommonResult saveGroup(@ApiParam("组名") @RequestParam String name){
         String userId = UserUtils.getUserId();
         payGroupService.insertGroup(name,userId);
         return CommonResult.ok();
     }
+    
     @ApiOperation("修改组名")
     @PutMapping("/updateGroupName")
-    @Login
+    // @Permit("community:proprietor:livingpaymentoperation:updateGroupName")
     public CommonResult updateGroup(@ApiParam("id") @RequestParam Long id,@ApiParam("name") String name){
         String userId = UserUtils.getUserId();
         payGroupService.updateGroup(id,name,userId);
@@ -59,12 +60,13 @@ public class LivingPaymentOperationController {
 
     @ApiOperation("删除分组")
     @DeleteMapping("/deleteGroupName")
-    @Login
+    // @Permit("community:proprietor:livingpaymentoperation:deleteGroupName")
     public CommonResult deleteGroupName(@ApiParam("组名") @RequestParam String name){
         String userId = UserUtils.getUserId();
         payGroupService.delete(name,userId);
         return CommonResult.ok();
     }
+    
     /**
      * 添加缴费记录
      * @param livingPaymentQO
@@ -72,7 +74,7 @@ public class LivingPaymentOperationController {
      */
     @ApiOperation("生活缴费")
     @PostMapping("/add")
-    @Login
+    // @Permit("community:proprietor:livingpaymentoperation:add")
     public CommonResult add(@RequestBody LivingPaymentQO livingPaymentQO){
         ValidatorUtils.validateEntity(livingPaymentQO, LivingPaymentQO.LivingPaymentValidated.class);
 //            if (new BigDecimal(livingPaymentQO.getAccountBalance().abs().intValue()).compareTo(livingPaymentQO.getAccountBalance().abs())==0){
@@ -99,13 +101,14 @@ public class LivingPaymentOperationController {
      */
     @ApiOperation("添加备注")
     @PostMapping("/addRemark")
-    @Login
+    // @Permit("community:proprietor:livingpaymentoperation:addRemark")
     public CommonResult addRemark(@RequestBody RemarkQO remarkQO){
         String userId = UserUtils.getUserId();
         remarkQO.setUid(userId);
         livingPaymentOperationService.addRemark(remarkQO);
         return CommonResult.ok();
     }
+    
     /**
      * 添加备注图片
      * @param
@@ -113,7 +116,7 @@ public class LivingPaymentOperationController {
      */
     @ApiOperation("添加备注图片")
     @PostMapping("/addRemarkImg")
-    @Login
+    // @Permit("community:proprietor:livingpaymentoperation:addRemarkImg")
     public CommonResult addRemarkImg(@RequestParam("file") MultipartFile file){
         String originalFilename = file.getOriginalFilename();
         String s = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);

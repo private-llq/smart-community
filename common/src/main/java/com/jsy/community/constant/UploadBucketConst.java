@@ -2,7 +2,7 @@ package com.jsy.community.constant;
 
 /**
  * @ClassName：UploadBucketConst
- * @Description：TODO
+ * @Description：
  * @author：lihao
  * @date：2021/1/29 18:37
  * @version：1.0

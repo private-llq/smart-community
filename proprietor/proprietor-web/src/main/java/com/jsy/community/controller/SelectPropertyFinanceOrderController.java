@@ -1,12 +1,12 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.ISelectPropertyFinanceOrderService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.PropertyFinanceOrderEntity;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -24,8 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "物业账单")
 @RestController
 @RequestMapping("/FinanceOrder")
-@ApiJSYController
-@Login
+// @ApiJSYController
 public class SelectPropertyFinanceOrderController {
     
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
@@ -33,6 +32,7 @@ public class SelectPropertyFinanceOrderController {
 
     @ApiOperation("查询物业账单")
     @GetMapping("/list")
+    // @Permit("community:proprietor:FinanceOrder:list")
     public CommonResult getFinanceOrder(@RequestParam Long communityId,Integer orderStatus){
         PropertyFinanceOrderEntity qo = new PropertyFinanceOrderEntity();
         qo.setUid(UserUtils.getUserId());
@@ -40,8 +40,10 @@ public class SelectPropertyFinanceOrderController {
         qo.setOrderStatus(orderStatus);
         return CommonResult.ok(selectPropertyFinanceOrderService.listV2(qo),"查询成功");
     }
+
     @ApiOperation("查询物业账单（详情）")
     @GetMapping("/findOne")
+    // @Permit("community:proprietor:FinanceOrder:findOne")
     public CommonResult findOne(@RequestParam("id") String id,Integer orderStatus){
         return CommonResult.ok(selectPropertyFinanceOrderService.findOne(id,orderStatus),"查询成功");
     }

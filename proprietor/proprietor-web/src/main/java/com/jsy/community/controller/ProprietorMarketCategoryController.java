@@ -1,24 +1,23 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IProprietorMarketCategoryService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.proprietor.ProprietorMarketCategoryEntity;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Api(tags = "社区集市-商品分类")
 @RestController
 @RequestMapping("/marketCategory")
-@ApiJSYController
+// @ApiJSYController
 public class ProprietorMarketCategoryController {
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private IProprietorMarketCategoryService categoryService;
@@ -32,7 +31,7 @@ public class ProprietorMarketCategoryController {
      **/
     @PostMapping("/addMarketCategory")
     @ApiOperation("新增社区集市商品类别")
-    @Login
+    // @Permit("community:proprietor:marketCategory:addMarketCategory")
     public CommonResult addMarketCategory(@RequestBody ProprietorMarketCategoryEntity  categoryEntity){
         boolean b = categoryService.addMarketCategory(categoryEntity);
         return CommonResult.ok("添加成功");
@@ -47,7 +46,7 @@ public class ProprietorMarketCategoryController {
      **/
     @PostMapping("/updateMarketCategory")
     @ApiOperation("修改社区集市商品类别")
-    @Login
+    // @Permit("community:proprietor:marketCategory:updateMarketCategory")
     public CommonResult updateMarketCategory(@RequestBody ProprietorMarketCategoryEntity categoryEntity){
         boolean b = categoryService.updateMarketCategory(categoryEntity);
         return CommonResult.ok("修改成功");
@@ -61,7 +60,7 @@ public class ProprietorMarketCategoryController {
      **/
     @DeleteMapping("/deleteMarketCategory")
     @ApiOperation("删除社区集市商品类别")
-    @Login
+    // @Permit("community:proprietor:marketCategory:deleteMarketCategory")
     public CommonResult deleteMarketCategory(@RequestParam("id")Long id){
         boolean b = categoryService.deleteMarketCategory(id);
         return CommonResult.ok("删除成功");
@@ -76,7 +75,7 @@ public class ProprietorMarketCategoryController {
      **/
     @GetMapping("/selectMarketCategory")
     @ApiOperation("查询社区集市商品类别")
-    @Login
+    // @Permit("community:proprietor:marketCategory:selectMarketCategory")
     public CommonResult selectMarketcategory(){
         List<ProprietorMarketCategoryEntity> list = categoryService.selectMarketCategory();
 
@@ -88,11 +87,11 @@ public class ProprietorMarketCategoryController {
      * @Param: [categoryEntity]
      * @Return: List
      * @Author: Tian
-     * @Date: 2021/8/21-9:44
+     * @Date: 2021/8/21-9:44  selectMarketcategoryList
      **/
     @GetMapping("/selectMarketcategoryList")
     @ApiOperation("查询社区集市商品类别")
-    @Login
+    // @Permit("community:proprietor:marketCategory:selectMarketcategoryList")
     public CommonResult selectMarketcategoryList(){
         List<ProprietorMarketCategoryEntity> list = categoryService.selectMarketCategory();
         List<ProprietorMarketCategoryEntity> list1 = list.stream().filter(s->s.getId()!=94113194666233856l).collect(Collectors.toList());

@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IOpLogService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.OpLogEntity;
@@ -11,6 +10,7 @@ import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.OpLogQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "操作日志控制器")
 @RestController
 @RequestMapping("/op/log")
-@ApiJSYController
+// @ApiJSYController
 public class OpLogController {
 	
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -40,9 +40,9 @@ public class OpLogController {
 	 * @Author: DKS
 	 * @Date: 2021/08/05
 	 **/
-	@Login
 	@ApiOperation("操作日志分页查询")
 	@PostMapping("/query")
+	@Permit("community:property:op:log:query")
 	public CommonResult<PageInfo<OpLogEntity>> queryOpLogPage(@RequestBody BaseQO<OpLogQO> baseQO) {
 		OpLogQO query = baseQO.getQuery();
 		if(query == null){

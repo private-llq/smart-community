@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPropertyFinanceStatementService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.exception.JSYError;
@@ -13,6 +12,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.StatementVO;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -23,7 +23,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -39,7 +42,7 @@ import java.util.List;
 @RestController
 @Api("物业财务-结算单控制器")
 @RequestMapping("/statement")
-@ApiJSYController
+// @ApiJSYController
 public class PropertyFinanceStatementController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -55,9 +58,9 @@ public class PropertyFinanceStatementController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/23 16:40
      **/
-    @Login
     @ApiOperation("物业财务-结算单列表")
     @PostMapping("/statementList")
+    @Permit("community:property:statement:statementList")
     public CommonResult statementList(@RequestBody BaseQO<StatementQO> statementQO) {
         statementQO.getQuery().setCommunityId(UserUtils.getAdminCommunityId());
         ValidatorUtils.validatePageParam(statementQO);
@@ -74,9 +77,9 @@ public class PropertyFinanceStatementController {
      *@Return: org.springframework.http.ResponseEntity<byte[]>
      *@Date: 2021/4/24 15:21
      **/
-    @Login
     @ApiOperation("物业财务-导出结算单")
     @PostMapping("/downloadStatementList")
+    @Permit("community:property:statement:downloadStatementList")
     public ResponseEntity<byte[]> downloadStatementList(@RequestBody StatementQO statementQO) {
         ValidatorUtils.validateEntity(statementQO, StatementQO.ExportValiadate.class);
         statementQO.setCommunityId(UserUtils.getAdminCommunityId());

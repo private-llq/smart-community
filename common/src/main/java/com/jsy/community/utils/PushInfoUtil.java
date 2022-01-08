@@ -4,10 +4,16 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
-import com.jsy.community.utils.imutils.entity.*;
+import com.jsy.community.utils.imutils.entity.ImResponseEntity;
+import com.jsy.community.utils.imutils.entity.RegisterDto;
 import com.jsy.community.utils.imutils.open.EncryptHelper;
+import com.zhsj.im.chat.api.appmsg.impl.PayAppMsg;
+import com.zhsj.im.chat.api.appmsg.impl.TextAppMsg;
+import com.zhsj.im.chat.api.entity.Links;
+import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
 
-import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,36 +64,39 @@ public class PushInfoUtil {
      * content：类容
      * @return: ImResponseEntity
      */
-    public static ImResponseEntity PushPublicTextMsg(String imId, String title, String desc, String url, String content, Map map, String fromImId) {
-        String str = IdUtil.fastUUID();
+    public static void PushPublicTextMsg(IImChatPublicPushRpcService iImChatPublicPushRpcService, String imId, String title, String desc, String url, String content, Map map, String fromImId) {
 
-        PushAppMsg pushAppMsg = new PushAppMsg();
-        pushAppMsg.setType(1);
+        iImChatPublicPushRpcService.sendMessage(new TextAppMsg(title,desc,url,null,content,null,fromImId,1,imId,map));
 
-        TextAppMsg textAppMsg = new TextAppMsg();
-        textAppMsg.setTitle(title);
-        textAppMsg.setDesc(desc);
-        textAppMsg.setUrl(url);
-        textAppMsg.setTemplateId("暂无模板");
-        textAppMsg.setContent(content);
-//        textAppMsg.setLinks(Collections.singletonList(new Links(url, "查看详情")));
-        textAppMsg.setExtraDta(map);
-        pushAppMsg.setAppMsg(JSON.toJSONString(textAppMsg));
-        SendInfo sendInfo = new SendInfo();
-        sendInfo.setFromImId(fromImId);
-        sendInfo.setReceiveType(1);
-        sendInfo.setTo(imId);
-        pushAppMsg.setSendInfo(sendInfo);
-//        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/open/public/pushAppMsg")
-        HttpResponse response = HttpUtil.createPost("https://im.zhsj.co:8090/zhsj/im/open/public/pushAppMsg")
-                .header(EncryptHelper.HEAD_OPEN_ID, EncryptHelper.OPEN_ID)
-                .header(EncryptHelper.HEAD_ONLY_REQ, str)
-                .header(EncryptHelper.HEAD_DEVICE, "mobile")
-                .body(EncryptHelper.doPost(JSON.toJSONString(pushAppMsg), str, "mobile"))
-                .execute();
-
-        String body = response.body();
-        return JSON.parseObject(body, ImResponseEntity.class);
+//        String str = IdUtil.fastUUID();
+//
+//        PushAppMsg pushAppMsg = new PushAppMsg();
+//        pushAppMsg.setType(1);
+//
+//        TextAppMsg textAppMsg = new TextAppMsg();
+//        textAppMsg.setTitle(title);
+//        textAppMsg.setDesc(desc);
+//        textAppMsg.setUrl(url);
+//        textAppMsg.setTemplateId("暂无模板");
+//        textAppMsg.setContent(content);
+////        textAppMsg.setLinks(Collections.singletonList(new Links(url, "查看详情")));
+//        textAppMsg.setExtraDta(map);
+//        pushAppMsg.setAppMsg(JSON.toJSONString(textAppMsg));
+//        SendInfo sendInfo = new SendInfo();
+//        sendInfo.setFromImId(fromImId);
+//        sendInfo.setReceiveType(1);
+//        sendInfo.setTo(imId);
+//        pushAppMsg.setSendInfo(sendInfo);
+////        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/open/public/pushAppMsg")
+//        HttpResponse response = HttpUtil.createPost("https://im.zhsj.co:8090/zhsj/im/open/public/pushAppMsg")
+//                .header(EncryptHelper.HEAD_OPEN_ID, EncryptHelper.OPEN_ID)
+//                .header(EncryptHelper.HEAD_ONLY_REQ, str)
+//                .header(EncryptHelper.HEAD_DEVICE, "mobile")
+//                .body(EncryptHelper.doPost(JSON.toJSONString(pushAppMsg), str, "mobile"))
+//                .execute();
+//
+//        String body = response.body();
+//        return JSON.parseObject(body, ImResponseEntity.class);
     }
 
     /**
@@ -102,36 +111,41 @@ public class PushInfoUtil {
      * content：类容
      * @return: ImResponseEntity
      */
-    public static ImResponseEntity PushPublicMsg(String imId, String title, String desc, String url, String content, Map map, String fromImId) {
-        String str = IdUtil.fastUUID();
+    public static void PushPublicMsg(IImChatPublicPushRpcService iImChatPublicPushRpcService,String imId, String title, String desc, String url, String content, Map map, String fromImId) {
+        List<Links> links = new LinkedList<>();
+        links.add(new Links(url, "查看详情"));
 
-        PushAppMsg pushAppMsg = new PushAppMsg();
-        pushAppMsg.setType(1);
+        iImChatPublicPushRpcService.sendMessage(new TextAppMsg(title,desc,url,null,content,links,fromImId,1,imId,map));
 
-        TextAppMsg textAppMsg = new TextAppMsg();
-        textAppMsg.setTitle(title);
-        textAppMsg.setDesc(desc);
-        textAppMsg.setUrl(url);
-        textAppMsg.setTemplateId("暂无模板");
-        textAppMsg.setContent(content);
-        textAppMsg.setLinks(Collections.singletonList(new Links(url, "查看详情")));
-        textAppMsg.setExtraDta(map);
-        pushAppMsg.setAppMsg(JSON.toJSONString(textAppMsg));
-        SendInfo sendInfo = new SendInfo();
-        sendInfo.setFromImId(fromImId);
-        sendInfo.setReceiveType(1);
-        sendInfo.setTo(imId);
-        pushAppMsg.setSendInfo(sendInfo);
-//        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/open/public/pushAppMsg")
-        HttpResponse response = HttpUtil.createPost("https://im.zhsj.co:8090/zhsj/im/open/public/pushAppMsg")
-                .header(EncryptHelper.HEAD_OPEN_ID, EncryptHelper.OPEN_ID)
-                .header(EncryptHelper.HEAD_ONLY_REQ, str)
-                .header(EncryptHelper.HEAD_DEVICE, "mobile")
-                .body(EncryptHelper.doPost(JSON.toJSONString(pushAppMsg), str, "mobile"))
-                .execute();
-
-        String body = response.body();
-        return JSON.parseObject(body, ImResponseEntity.class);
+//        String str = IdUtil.fastUUID();
+//
+//        PushAppMsg pushAppMsg = new PushAppMsg();
+//        pushAppMsg.setType(1);
+//
+//        TextAppMsg textAppMsg = new TextAppMsg();
+//        textAppMsg.setTitle(title);
+//        textAppMsg.setDesc(desc);
+//        textAppMsg.setUrl(url);
+//        textAppMsg.setTemplateId("暂无模板");
+//        textAppMsg.setContent(content);
+//        textAppMsg.setLinks(Collections.singletonList(new Links(url, "查看详情")));
+//        textAppMsg.setExtraDta(map);
+//        pushAppMsg.setAppMsg(JSON.toJSONString(textAppMsg));
+//        SendInfo sendInfo = new SendInfo();
+//        sendInfo.setFromImId(fromImId);
+//        sendInfo.setReceiveType(1);
+//        sendInfo.setTo(imId);
+//        pushAppMsg.setSendInfo(sendInfo);
+////        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/open/public/pushAppMsg")
+//        HttpResponse response = HttpUtil.createPost("https://im.zhsj.co:8090/zhsj/im/open/public/pushAppMsg")
+//                .header(EncryptHelper.HEAD_OPEN_ID, EncryptHelper.OPEN_ID)
+//                .header(EncryptHelper.HEAD_ONLY_REQ, str)
+//                .header(EncryptHelper.HEAD_DEVICE, "mobile")
+//                .body(EncryptHelper.doPost(JSON.toJSONString(pushAppMsg), str, "mobile"))
+//                .execute();
+//
+//        String body = response.body();
+//        return JSON.parseObject(body, ImResponseEntity.class);
     }
 
     /**
@@ -146,45 +160,49 @@ public class PushInfoUtil {
      * desc：描述
      * @return: ImResponseEntity
      */
-    public static ImResponseEntity pushPayAppMsg(String imId,Integer type,String amount,String detailUrl,String desc,Map map,String fromImId){
-        String str = IdUtil.fastUUID();
+    public static void pushPayAppMsg(IImChatPublicPushRpcService iImChatPublicPushRpcService,String imId,Integer type,String amount,String detailUrl,String desc,Map map,String fromImId){
+        List<Links> links = new LinkedList<>();
+        links.add(new Links(detailUrl, "查看详情"));
+        iImChatPublicPushRpcService.sendMessage(new PayAppMsg(amount,desc,"RMB",detailUrl,type==1?"微信支付":"支付宝支付",null,links,fromImId,2,imId,map));
 
-        PushAppMsg pushAppMsg = new PushAppMsg();
-        pushAppMsg.setType(2);
-
-        PayAppMsg payAppMsg = new PayAppMsg();
-        payAppMsg.setAmount(amount);
-        payAppMsg.setDesc(desc);
-        payAppMsg.setCurrency("RMB");
-        payAppMsg.setDetailUrl(detailUrl);
-        if (type==1){
-            payAppMsg.setPayType("微信支付");
-        } else {
-            if (type==2){
-                payAppMsg.setPayType("支付宝支付");
-            }
-        }
-        payAppMsg.setTemplateId("");
-        payAppMsg.setLinks(Collections.singletonList(new Links(detailUrl, "查看详情")));
-        payAppMsg.setExtraDta(map);
-
-        pushAppMsg.setAppMsg(JSON.toJSONString(payAppMsg));
-        SendInfo sendInfo = new SendInfo();
-        sendInfo.setFromImId(fromImId);
-        sendInfo.setReceiveType(1);
-        sendInfo.setTo(imId);
-
-        pushAppMsg.setSendInfo(sendInfo);
-
-//        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/open/public/pushAppMsg")
-        HttpResponse response = HttpUtil.createPost("https://im.zhsj.co:8090/zhsj/im/open/public/pushAppMsg")
-                .header(EncryptHelper.HEAD_OPEN_ID, EncryptHelper.OPEN_ID)
-                .header(EncryptHelper.HEAD_ONLY_REQ, str)
-                .header(EncryptHelper.HEAD_DEVICE, "mobile")
-                .body(EncryptHelper.doPost(JSON.toJSONString(pushAppMsg), str, "mobile"))
-                .execute();
-
-        String body = response.body();
-        return JSON.parseObject(body, ImResponseEntity.class);
+//        String str = IdUtil.fastUUID();
+//
+//        PushAppMsg pushAppMsg = new PushAppMsg();
+//        pushAppMsg.setType(2);
+//
+//        PayAppMsg payAppMsg = new PayAppMsg();
+//        payAppMsg.setAmount(amount);
+//        payAppMsg.setDesc(desc);
+//        payAppMsg.setCurrency("RMB");
+//        payAppMsg.setDetailUrl(detailUrl);
+//        if (type==1){
+//            payAppMsg.setPayType("微信支付");
+//        } else {
+//            if (type==2){
+//                payAppMsg.setPayType("支付宝支付");
+//            }
+//        }
+//        payAppMsg.setTemplateId("");
+//        payAppMsg.setLinks(Collections.singletonList(new Links(detailUrl, "查看详情")));
+//        payAppMsg.setExtraDta(map);
+//
+//        pushAppMsg.setAppMsg(JSON.toJSONString(payAppMsg));
+//        SendInfo sendInfo = new SendInfo();
+//        sendInfo.setFromImId(fromImId);
+//        sendInfo.setReceiveType(1);
+//        sendInfo.setTo(imId);
+//
+//        pushAppMsg.setSendInfo(sendInfo);
+//
+////        HttpResponse response = HttpUtil.createPost("http://222.178.213.183:8090/zhsj/im/open/public/pushAppMsg")
+//        HttpResponse response = HttpUtil.createPost("https://im.zhsj.co:8090/zhsj/im/open/public/pushAppMsg")
+//                .header(EncryptHelper.HEAD_OPEN_ID, EncryptHelper.OPEN_ID)
+//                .header(EncryptHelper.HEAD_ONLY_REQ, str)
+//                .header(EncryptHelper.HEAD_DEVICE, "mobile")
+//                .body(EncryptHelper.doPost(JSON.toJSONString(pushAppMsg), str, "mobile"))
+//                .execute();
+//
+//        String body = response.body();
+//        return JSON.parseObject(body, ImResponseEntity.class);
     }
 }

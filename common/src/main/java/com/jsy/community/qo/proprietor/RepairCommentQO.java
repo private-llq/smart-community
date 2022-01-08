@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @author lihao
  * @ClassName RepairCommentQO
  * @Date 2020/12/26  9:18
- * @Description TODO
+ * @Description
  * @Version 1.0
  **/
 @Data

@@ -8,6 +8,10 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.OpLogEntity;
 import com.jsy.community.utils.HttpUtils;
 import com.jsy.community.utils.UserUtils;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.aspectj.lang.JoinPoint;
@@ -34,6 +38,9 @@ public class OpLogAop extends BaseAop {
 	
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private IProprietorService proprietorService;
+
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+	private IBaseUserInfoRpcService baseUserInfoRpcService;
 	
 	//定义切点 @Pointcut
 	//在注解的位置切入代码
@@ -54,9 +61,9 @@ public class OpLogAop extends BaseAop {
 		Method method = signature.getMethod();
 		
 		//获取用户id和社区id
-		opLog.setUserId(UserUtils.getUserId());
+		opLog.setUserId(UserUtils.getId());
 		opLog.setCommunityId(UserUtils.getAdminCommunityId());
-		opLog.setCreateBy(UserUtils.getUserId());
+		opLog.setCreateBy(UserUtils.getId());
 		
 		//获取操作
 		businessLog businessLog = method.getAnnotation(businessLog.class);
@@ -64,9 +71,9 @@ public class OpLogAop extends BaseAop {
 			String operation = businessLog.operation();
 			String content = businessLog.content();
 			opLog.setOperation(operation);//保存获取的操作
-			String adminRealName = proprietorService.getAdminRealName(UserUtils.getUserId());
-			if (StringUtils.isNotBlank(adminRealName)) {
-				opLog.setContent(adminRealName + content);//保存获取的内容
+			RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(UserUtils.getId());
+			if (idCardRealInfo != null) {
+				opLog.setContent(idCardRealInfo.getIdCardName() + content);//保存获取的内容
 			}
 		}
 		

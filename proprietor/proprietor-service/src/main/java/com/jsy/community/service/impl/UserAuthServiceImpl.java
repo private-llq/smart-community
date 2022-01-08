@@ -1,4 +1,6 @@
 package com.jsy.community.service.impl;
+import java.util.ArrayList;
+import java.util.Date;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -9,9 +11,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.*;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
+import com.jsy.community.constant.ConstClasses;
 import com.jsy.community.dto.signature.SignatureUserDTO;
+import com.jsy.community.entity.SmsEntity;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.exception.JSYError;
+import com.jsy.community.mapper.SmsMapper;
 import com.jsy.community.mapper.UserAuthMapper;
 import com.jsy.community.mapper.UserMapper;
 import com.jsy.community.qo.proprietor.AddPasswordQO;
@@ -20,7 +25,12 @@ import com.jsy.community.qo.proprietor.MobileCodePayPasswordQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.RegexUtils;
 import com.jsy.community.utils.SmsUtil;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.imutils.open.StringUtils;
+import com.jsy.community.vo.proprietor.ThirdPlatformInfoVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.BaseThirdPlatform;
+import com.zhsj.base.api.rpc.IThirdRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -28,12 +38,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 //import org.springframework.integration.redis.util.RedisLockRegistry;
 
@@ -59,12 +68,18 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
 
     @Resource
     private UserMapper userMapper;
+    
+    @Resource
+    private SmsMapper smsMapper;
 
     @DubboReference(version = Const.version, group = Const.group_proprietor, check = false)
     private ISignatureService signatureService;
 
     @Value(value = "${jsy.third-platform-domain:http://www.jsy.com}")
     private String callbackUrl;
+
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IThirdRpcService thirdRpcService;
 
     @Override
     public List<UserAuthEntity> getList(boolean a) {
@@ -292,7 +307,9 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
     @Override
     public void sendPayPasswordVerificationCode(String account) {
         //发送短信验证码
-        String code = SmsUtil.sendVcode(account, BusinessConst.SMS_VCODE_LENGTH_DEFAULT);
+        SmsEntity smsEntity = smsMapper.selectOne(new QueryWrapper<SmsEntity>().eq("deleted", 0));
+        ConstClasses.AliYunDataEntity.setConfig(smsEntity);
+        String code = SmsUtil.sendVcode(account, BusinessConst.SMS_VCODE_LENGTH_DEFAULT, smsEntity.getSmsSign());
         //5分钟有效期
         redisTemplate.opsForValue().set("vProprietorCodePayPassword" + account, code, 5, TimeUnit.MINUTES);
     }
@@ -319,6 +336,69 @@ public class UserAuthServiceImpl extends ServiceImpl<UserAuthMapper, UserAuthEnt
         redisTemplate.delete("vProprietorCodePayPassword" + account);
         //修改支付密码
         updatePayPassword(qo.getPayPassword(), uid);
+    }
+
+    /**
+     * @param id : 用户id
+     * @author: Pipi
+     * @description: 查询三方平台绑定信息
+     * @return: {@link ThirdPlatformInfoVO}
+     * @date: 2021/12/16 16:21
+     **/
+    @Override
+    public List<ThirdPlatformInfoVO> queryThirdPlatformInfo(Long id) {
+        List<BaseThirdPlatform> baseThirdPlatforms = thirdRpcService.allBindThird(id);
+        ArrayList<ThirdPlatformInfoVO> thirdPlatformInfoVOS = new ArrayList<>();
+        ThirdPlatformInfoVO wechat = new ThirdPlatformInfoVO();
+        wechat.setId(id);
+        wechat.setThirdPlatformType("WECHAT");
+        wechat.setThirdPlatformTypeString("微信");
+        wechat.setThirdPlatformBindStatus(false);
+        ThirdPlatformInfoVO ios = new ThirdPlatformInfoVO();
+        ios.setId(id);
+        ios.setThirdPlatformType("IOS");
+        ios.setThirdPlatformTypeString("IOS");
+        ios.setThirdPlatformBindStatus(false);
+        ThirdPlatformInfoVO alipay = new ThirdPlatformInfoVO();
+        alipay.setId(id);
+        alipay.setThirdPlatformType("ALIPAY");
+        alipay.setThirdPlatformTypeString("支付宝");
+        alipay.setThirdPlatformBindStatus(false);
+        if (!CollectionUtils.isEmpty(baseThirdPlatforms)) {
+            for (BaseThirdPlatform baseThirdPlatform : baseThirdPlatforms) {
+                if ("WECHAT".equals(baseThirdPlatform.getThirdPlatformType())) {
+                    wechat.setThirdPlatformId(baseThirdPlatform.getThirdPlatformId());
+                    wechat.setNickName(baseThirdPlatform.getNickName());
+                    wechat.setAvatarUrl(baseThirdPlatform.getAvatarUrl());;
+                    wechat.setIsDeleted(baseThirdPlatform.getIsDeleted());
+                    wechat.setUtcUpdate(baseThirdPlatform.getUtcUpdate());
+                    wechat.setUtcCreate(baseThirdPlatform.getUtcCreate());
+                    wechat.setThirdPlatformBindStatus(true);
+                }
+                if ("ALIPAY".equals(baseThirdPlatform.getThirdPlatformType())) {
+                    alipay.setThirdPlatformId(baseThirdPlatform.getThirdPlatformId());
+                    alipay.setNickName(baseThirdPlatform.getNickName());
+                    alipay.setAvatarUrl(baseThirdPlatform.getAvatarUrl());;
+                    alipay.setIsDeleted(baseThirdPlatform.getIsDeleted());
+                    alipay.setUtcUpdate(baseThirdPlatform.getUtcUpdate());
+                    alipay.setUtcCreate(baseThirdPlatform.getUtcCreate());
+                    alipay.setThirdPlatformBindStatus(true);
+                }
+                if ("IOS".equals(baseThirdPlatform.getThirdPlatformType())) {
+                    ios.setThirdPlatformId(baseThirdPlatform.getThirdPlatformId());
+                    ios.setNickName(baseThirdPlatform.getNickName());
+                    ios.setAvatarUrl(baseThirdPlatform.getAvatarUrl());;
+                    ios.setIsDeleted(baseThirdPlatform.getIsDeleted());
+                    ios.setUtcUpdate(baseThirdPlatform.getUtcUpdate());
+                    ios.setUtcCreate(baseThirdPlatform.getUtcCreate());
+                    ios.setThirdPlatformBindStatus(true);
+                }
+            }
+        }
+        thirdPlatformInfoVOS.add(wechat);
+        thirdPlatformInfoVOS.add(ios);
+        thirdPlatformInfoVOS.add(alipay);
+        return thirdPlatformInfoVOS;
     }
 
     /**

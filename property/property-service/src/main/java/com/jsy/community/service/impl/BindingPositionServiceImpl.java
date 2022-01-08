@@ -138,7 +138,7 @@ public class BindingPositionServiceImpl extends ServiceImpl<BindingPositionMappe
     @Override
     @Transactional
     public void deleteBinding(String uid) {
-        //todo 新增的包月车辆默认是已绑定车位那一辆车
+        // 新增的包月车辆默认是已绑定车位那一辆车
         BindingPositionEntity entity = bindingPositionMapper.selectOne(new QueryWrapper<BindingPositionEntity>().eq("uid", uid));
          if (entity.getBindingStatus()==1){
              throw new PropertyException("该车辆已绑定车位，如需删除请先换绑另一辆车！");

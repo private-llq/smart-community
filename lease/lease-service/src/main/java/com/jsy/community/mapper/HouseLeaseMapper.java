@@ -68,7 +68,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param type        常量类型
      * @return 返回名称集合
      */
-    List<String> queryHouseConstNameByFurnitureId(List<Long> furnitureId, long type);
+    List<String> queryHouseConstNameByFurnitureId(@Param("furnitureId") List<Long> furnitureId, @Param("type") long type);
 
 
     /**
@@ -222,7 +222,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param uid     用户id
      * @return 返回这条数据的详情
      */
-    HouseLeaseVO editDetails(Long houseId, String uid);
+    HouseLeaseVO editDetails(@Param("houseId") Long houseId, @Param("uid") String uid);
 
     /**
      * 整租插入房源数据
@@ -274,7 +274,7 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param houseId          房屋id
      * @return 返回社区名称和房屋名称
      */
-    Map<String, String> getUserAddrById(Long houseCommunityId, Long houseId);
+    Map<String, String> getUserAddrById(@Param("houseCommunityId") Long houseCommunityId, @Param("houseId") Long houseId);
 
 
     /**
@@ -283,5 +283,5 @@ public interface HouseLeaseMapper extends BaseMapper<HouseLeaseEntity> {
      * @param voImageIds 图片id集合
      * @return 返回图片关系对象
      */
-    List<HouseImageVo> selectBatchImage(List<Long> voImageIds);
+    List<HouseImageVo> selectBatchImage(@Param("list") List<Long> voImageIds);
 }

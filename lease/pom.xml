@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>com.jsy</groupId>
 		<artifactId>com.jsy.community</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>lease</artifactId>
@@ -23,12 +23,6 @@
 	</modules>
 	
 	<dependencies>
-
-<!--		<dependency>-->
-<!--			<groupId>net.java.dev.jna</groupId>-->
-<!--			<artifactId>jna</artifactId>-->
-<!--			<version>5.8.0</version>-->
-<!--		</dependency>-->
 		<dependency>
 			<groupId>com.jsy</groupId>
 			<artifactId>common</artifactId>
@@ -37,6 +31,10 @@
 				<exclusion>
 					<groupId>com.baomidou</groupId>
 					<artifactId>mybatis-plus-boot-starter</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>mysql</groupId>
+					<artifactId>mysql-connector-java</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

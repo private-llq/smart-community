@@ -10,14 +10,18 @@ import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommonConst;
 import com.jsy.community.entity.RepairEntity;
 import com.jsy.community.entity.RepairOrderEntity;
-import com.jsy.community.entity.UserIMEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.proprietor.RepairCommentQO;
 import com.jsy.community.utils.MyMathUtils;
 import com.jsy.community.utils.PushInfoUtil;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.repair.RepairVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +66,12 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 
 	@Autowired
 	private UserIMMapper userIMMapper;
+
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+	private IBaseUserInfoRpcService userInfoRpcService;
+
+	@DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check=false)
+	private IImChatPublicPushRpcService iImChatPublicPushRpcService;
 	
 	// 个人报修事项
 	private static final int TYPEPERSON = 1;
@@ -144,9 +154,11 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		orderEntity.setOrderTime(repairEntity.getCreateTime());
 		repairOrderMapper.insert(orderEntity);
 
-		UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().eq("uid", repairEntity.getUserId()));
-		if (userIMEntity!=null){
-			PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
+		UserImVo userIm = userInfoRpcService.getEHomeUserIm(repairEntity.getUserId());
+		if (userIm!=null){
+			PushInfoUtil.PushPublicTextMsg(
+					iImChatPublicPushRpcService,
+					userIm.getImId(),
 					"报修通知",
 					"报修事项提交成功",
 					null,"报修事项提交成功\n请耐心等待工作人员处理。",null, BusinessEnum.PushInfromEnum.REPAIRNOTICE.getName());
@@ -315,7 +327,7 @@ public class RepairServiceImpl extends ServiceImpl<RepairMapper, RepairEntity> i
 		QueryWrapper<RepairOrderEntity> wrapper = new QueryWrapper<>();
 		wrapper.eq("repair_id", id);
 		RepairOrderEntity orderEntity = repairOrderMapper.selectOne(wrapper);
-		orderEntity.setComment("");  // TODO 因为mybatis-plus动态sql 所以删除评论是对其评论设置的 ""   app前台判断未评价 已评价的时候 要注意赛选条件
+		orderEntity.setComment("");
 		repairOrderMapper.updateById(orderEntity);
 	}
 	

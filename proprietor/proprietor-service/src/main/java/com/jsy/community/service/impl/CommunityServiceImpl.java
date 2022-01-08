@@ -20,6 +20,7 @@ import com.jsy.community.utils.DistanceUtil;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.vo.ControlVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -35,6 +36,7 @@ import java.util.*;
  * @description 社区实现类
  * @since 2020-11-19 16:57
  **/
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_proprietor)
 public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityEntity> implements ProprietorCommunityService {
 	
@@ -186,6 +188,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		List<HouseMemberEntity> userHouseList = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("uid",uid));
 
 		if (userHouseList.size()!=0){
+			log.info("有房子");
 			for (HouseMemberEntity entity : userHouseList) {
 				//身份是业主的小区
 				if (entity.getRelation()==1){
@@ -198,15 +201,19 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 				communityIds.add(entity.getCommunityId());
 			}
 		} else {
+			log.info("没房子");
 			//定位
 			communityEntity = communityMapper.locateCommunity(communityIds, location);
+			log.info("没房子的结果:{}", communityEntity);
 			return communityEntity;
 		}
 
 		//如果身份是业主的小区只有一个那么直接返回
 		if (userCommunityIds.size()==1){
-			CommunityEntity communityEntity1 = communityMapper.selectById(userHouseList.get(0));
-			communityEntity1.setHouseId(communityHouseMap.get(communityEntity1.getId()));
+			CommunityEntity communityEntity1 = communityMapper.selectById(userHouseList.get(0).getCommunityId());
+			if (communityEntity1 != null) {
+				communityEntity1.setHouseId(communityHouseMap.get(communityEntity1.getId()));
+			}
 			return communityEntity1;
 		}
 		//那个大于1代表有多个，通过金纬度获取最近的小区
@@ -218,7 +225,7 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		}
 		//如果身份不是业主且数据只有一条直接返回
 		else  if (communityIds.size()==1) {
-			CommunityEntity communityEntity1 = communityMapper.selectById(userHouseList.get(0));
+			CommunityEntity communityEntity1 = communityMapper.selectById(userHouseList.get(0).getCommunityId());
 			communityEntity1.setHouseId(communityHouseMap.get(communityEntity1.getId()));
 			return communityEntity1;
 		}

@@ -22,6 +22,9 @@ import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.utils.imutils.open.StringUtils;
 import com.jsy.community.vo.UserAccountVO;
 import com.jsy.community.vo.WithdrawalResulrVO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.domain.BaseWallet;
+import com.zhsj.base.api.rpc.IBaseWalletRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -70,6 +73,9 @@ public class UserAccountServiceImpl implements IUserAccountService {
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private UserAccountWithdrawalService userAccountWithdrawalService;
 
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseWalletRpcService baseWalletRpcService;
+
     private static final String ZHIFUBAO_WITHDRAWAL_INFO_KEY = "ZHIFUBAO_WITHDRAWAL_INFO_KEY";
 
     /**
@@ -96,9 +102,15 @@ public class UserAccountServiceImpl implements IUserAccountService {
      **/
     @Override
     public UserAccountVO queryBalance(String uid) {
-        UserAccountEntity userAccountEntity = userAccountMapper.selectOne(new QueryWrapper<UserAccountEntity>().select("uid", "balance").eq("uid", uid));
+        BaseWallet wallet = baseWalletRpcService.getWalletByCon(uid, "RMB");
+        // UserAccountEntity userAccountEntity = userAccountMapper.selectOne(new QueryWrapper<UserAccountEntity>().select("uid", "balance").eq("uid", uid));
         UserAccountVO userAccountVO = new UserAccountVO();
-        BeanUtils.copyProperties(userAccountEntity, userAccountVO);
+        userAccountVO.setUid(uid);
+        if (wallet != null) {
+            userAccountVO.setBalance(new BigDecimal(0E-8).compareTo(wallet.getBalance()) == 0 ? new BigDecimal(0.00) : wallet.getBalance());
+        } else {
+            userAccountVO.setBalance(new BigDecimal(0.00));
+        }
         return userAccountVO;
     }
 
@@ -200,7 +212,6 @@ public class UserAccountServiceImpl implements IUserAccountService {
         return pageInfo;
     }
 
-    //TODO 券相关操作改为支付(账户操作)时抵用 结果由本平台计算 展示项目结束后修改
 
     /**
      * @Description: id单查

@@ -29,7 +29,16 @@ public interface IAppVersionService extends IService<AppVersionEntity> {
 	 * @Date: 2021/7/12
 	**/
 	void addAppVersion(AppVersionEntity appVersionEntity);
-	
+
+	/**
+	 * @author: Pipi
+	 * @description: 更新版本信息
+	 * @param appVersionEntity:
+	 * @return: {@link Boolean}
+	 * @date: 2021/12/27 15:15
+	 **/
+	Boolean updateAppVersion(AppVersionEntity appVersionEntity);
+
 	/**
 	 * @Description: 查询APP版本详情 1.安卓 2.IOS
 	 * @Param: [sysType]

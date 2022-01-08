@@ -1,7 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
-import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IAdminCommunityInformService;
 import com.jsy.community.constant.Const;
@@ -13,6 +11,8 @@ import com.jsy.community.qo.proprietor.PushInformQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.admin.AdminInfoVo;
+import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "社区消息控制器")
 @RestController
 @RequestMapping("/community/inform")
-@ApiJSYController
+// @ApiJSYController
 public class AdminCommunityInformController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -38,10 +38,10 @@ public class AdminCommunityInformController {
      * @param qo 新增推送消息
      * @return 返回是否新增成功
      */
-    @Login
     @PostMapping("/add")
     @ApiOperation("添加社区推送通知消息")
     @businessLog(operation = "新增",content = "新增了【社区推送通知消息】")
+    @Permit("community:property:community:inform:add")
     public CommonResult<Boolean> addPushInform(@RequestBody PushInformQO qo) {
         qo.setPushTarget(1);
         if (qo.getPushTag() == null) {
@@ -49,7 +49,15 @@ public class AdminCommunityInformController {
             qo.setPushTag(0);
         }
         ValidatorUtils.validateEntity(qo, PushInformQO.AddPushInformValidateGroup.class);
-        qo.setUid(UserUtils.getUserId());
+        qo.setUid(UserUtils.getId());
+        AdminInfoVo adminInfo = UserUtils.getAdminInfo();
+        if (adminInfo.getCommunityId() == null) {
+            qo.setAcctId(adminInfo.getCompanyId());
+            qo.setAcctName(adminInfo.getCompanyName());
+        } else {
+            qo.setAcctId(adminInfo.getCommunityId());
+            qo.setAcctName(adminInfo.getCommunityName());
+        }
         return communityInformService.addPushInform(qo) ? CommonResult.ok("添加成功!") : CommonResult.error("添加失败!");
     }
 
@@ -58,12 +66,12 @@ public class AdminCommunityInformController {
      * @param id 消息id
      * @return 返回修改成功值
      */
-    @Login
     @DeleteMapping("/delete")
     @ApiOperation("删除推送通知消息")
     @businessLog(operation = "删除",content = "删除了【社区推送通知消息】")
+    @Permit("community:property:community:inform:delete")
     public CommonResult<Boolean> deletePushInform(@RequestParam Long id) {
-        return communityInformService.deletePushInform(id, UserUtils.getUserId()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        return communityInformService.deletePushInform(id, UserUtils.getId()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
     /**
@@ -74,12 +82,12 @@ public class AdminCommunityInformController {
      *@Return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
      *@Date: 2021/4/20 15:11
      **/
-    @Login
     @PostMapping("/updateTopState")
     @ApiOperation("更新置顶状态")
     @businessLog(operation = "编辑",content = "更新了【社区消息置顶状态】")
+    @Permit("community:property:community:inform:updateTopState")
     public CommonResult<Boolean> updateTopState(@RequestBody OldPushInformQO qo) {
-        qo.setUpdateBy(UserUtils.getUserId());
+        qo.setUpdateBy(UserUtils.getId());
         ValidatorUtils.validateEntity(qo, OldPushInformQO.UpdateTopStateValidate.class);
         return communityInformService.updateTopState(qo) ? CommonResult.ok("操作成功!") : CommonResult.error("操作失败!");
     }
@@ -92,12 +100,12 @@ public class AdminCommunityInformController {
      *@Return: com.jsy.community.vo.CommonResult<java.lang.Boolean>
      *@Date: 2021/4/20 15:55
      **/
-    @Login
     @PostMapping("/updatePushState")
     @ApiOperation("更新发布状态")
     @businessLog(operation = "编辑",content = "更新了【社区消息发布状态】")
+    @Permit("community:property:community:inform:updatePushState")
     public CommonResult<Boolean> updatePushState(@RequestBody OldPushInformQO qo) {
-        qo.setUpdateBy(UserUtils.getUserId());
+        qo.setUpdateBy(UserUtils.getId());
         ValidatorUtils.validateEntity(qo, OldPushInformQO.UpdatePushStateValidate.class);
         if (qo.getPushState() < 1) {
             // 发布状态只能在发布与撤销间反复横跳
@@ -113,9 +121,9 @@ public class AdminCommunityInformController {
      *@Return: com.jsy.community.vo.CommonResult<?>
      *@Date: 2021/4/20 13:33
      **/
-    @Login
     @PostMapping("/list")
     @ApiOperation("按条件查询公告列表")
+    @Permit("community:property:community:inform:list")
     public CommonResult<?> listInform(@RequestBody BaseQO<PushInformQO> baseQO) {
         if (baseQO.getQuery() == null) {
             baseQO.setQuery(new PushInformQO());
@@ -137,16 +145,16 @@ public class AdminCommunityInformController {
      * @param qo    查询参数 其中pushInform仅仅包含communityId
      * @return      返回查询结果
      */
-    @Login
     @PostMapping(value = "/page", produces = "application/json;charset=utf-8")
     @ApiOperation("查询社区通知消息")
+    @Permit("community:property:community:inform:page")
     public CommonResult<?> listCommunityInform(@RequestBody BaseQO<OldPushInformQO> qo) {
         ValidatorUtils.validatePageParam(qo);
         if (qo.getQuery() == null) {
             return CommonResult.error(JSYError.BAD_REQUEST);
         }
         ValidatorUtils.validateEntity(qo.getQuery(), OldPushInformQO.CommunityPushInformValidate.class);
-        qo.getQuery().setUid(UserUtils.getUserId());
+        qo.getQuery().setUid(UserUtils.getId());
         return CommonResult.ok(communityInformService.queryCommunityInform(qo), "查询成功!");
     }
 
@@ -157,9 +165,9 @@ public class AdminCommunityInformController {
      *@Return: com.jsy.community.vo.CommonResult<?>
      *@Date: 2021/4/20 16:22
      **/
-    @Login
     @GetMapping("/getDetatil")
     @ApiOperation("(物业端)获取单条消息详情")
+    @Permit("community:property:community:inform:getDetatil")
     public CommonResult<?> getDetatil(@RequestParam Long id) {
         return CommonResult.ok(communityInformService.getDetail(id));
     }
@@ -171,13 +179,21 @@ public class AdminCommunityInformController {
      *@Return: com.jsy.community.vo.CommonResult
      *@Date: 2021/4/20 16:32
      **/
-    @Login
     @PutMapping("/updateDetail")
     @ApiOperation("(物业端)更新消息接口")
     @businessLog(operation = "编辑",content = "更新了【社区消息接口】")
+    @Permit("community:property:community:inform:updateDetail")
     public CommonResult updateDetail(@RequestBody PushInformQO qo) {
         ValidatorUtils.validateEntity(qo, PushInformQO.UpdateDetailValidate.class);
-        qo.setUid(UserUtils.getUserId());
+        qo.setUid(UserUtils.getId());
+        AdminInfoVo adminInfo = UserUtils.getAdminInfo();
+        if (adminInfo.getCommunityId() == null) {
+            qo.setAcctId(adminInfo.getCompanyId());
+            qo.setAcctName(adminInfo.getCompanyName());
+        } else {
+            qo.setAcctId(adminInfo.getCommunityId());
+            qo.setAcctName(adminInfo.getCommunityName());
+        }
         return communityInformService.updatePushInform(qo) ? CommonResult.ok("更新成功!") : CommonResult.error("更新失败");
     }
 

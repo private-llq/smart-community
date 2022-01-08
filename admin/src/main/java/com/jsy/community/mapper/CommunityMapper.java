@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.vo.admin.CommunityPropertyListVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,6 +21,6 @@ public interface CommunityMapper extends BaseMapper<CommunityEntity> {
      *
      * @return
      */
-    List<CommunityPropertyListVO> queryCommunityAndPropertyListByArea(Integer provinceId, Integer cityId, Integer areaId);
+    List<CommunityPropertyListVO> queryCommunityAndPropertyListByArea( @Param("provinceId")Integer provinceId, @Param("cityId")Integer cityId, @Param("areaId")Integer areaId);
 
 }

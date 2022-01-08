@@ -22,14 +22,29 @@
 		</foreach>
 	</insert>
 	<select id="selectLoginUser" resultType="com.jsy.community.vo.UserHouseVO">
-        select thm.house_id,thm.name,thm.mobile,thm.relation,thm.community_id,tu.avatar_url
-        from  t_house_member thm join t_user tu on thm.uid=tu.uid
-        where thm.deleted=0 and tu.deleted=0 and thm.house_id = #{houseId} and thm.community_id = #{communityId} and thm.uid=#{uid} and thm.relation=#{relation}
+        select
+               thm.house_id,
+               thm.name,
+               thm.mobile,
+               thm.relation,
+               thm.community_id
+        from  t_house_member thm
+        where thm.deleted=0
+          and thm.house_id = #{houseId}
+          and thm.community_id = #{communityId}
+          and thm.uid=#{uid}
+          and thm.relation=#{relation}
     </select>
 	<select id="selectRelation" resultType="com.jsy.community.vo.MembersVO">
-        select thm.id,thm.name,thm.mobile,thm.relation,tu.avatar_url
-        from  t_house_member thm join t_user tu on thm.uid=tu.uid
-        where thm.deleted=0 and tu.deleted=0 and thm.house_id = #{houseId} and thm.community_id = #{communityId}
+        select
+               thm.id,
+               thm.name,
+               thm.mobile,
+               thm.relation
+        from  t_house_member thm
+        where thm.deleted=0
+          and thm.house_id = #{houseId}
+          and thm.community_id = #{communityId}
         <if test="relation!=0">
 			and thm.relation=#{relation}
 		</if>
@@ -43,5 +58,7 @@
 			#{id}
 		</foreach>
     </update>
-
+	<select id="selectMembers" resultType="com.jsy.community.vo.HouseMembersQO">
+        select DISTINCT uid,name,mobile from t_house_member where relation=6 and householder_id=#{uid}
+    </select>
 </mapper>
