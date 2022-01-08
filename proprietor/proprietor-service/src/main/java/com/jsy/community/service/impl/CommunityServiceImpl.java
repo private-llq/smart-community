@@ -172,6 +172,18 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 
 
 	/**
+	 * @param location : 经纬度
+	 * @author: Pipi
+	 * @description: 附近的小区, 20条数据
+	 * @return: {@link List< CommunityEntity>}
+	 * @date: 2022/1/8 14:54
+	 **/
+	@Override
+	public List<CommunityEntity> nearbyCommunity(Map<String, Double> location) {
+		return communityMapper.nearbyCommunity(location);
+	}
+
+	/**
 	 * @Description:
 	 * @author: Hu
 	 * @since: 2021/11/3 15:56
@@ -188,7 +200,6 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 		List<HouseMemberEntity> userHouseList = houseMemberMapper.selectList(new QueryWrapper<HouseMemberEntity>().eq("uid",uid));
 
 		if (userHouseList.size()!=0){
-			log.info("有房子");
 			for (HouseMemberEntity entity : userHouseList) {
 				//身份是业主的小区
 				if (entity.getRelation()==1){
@@ -201,12 +212,12 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper,CommunityE
 				communityIds.add(entity.getCommunityId());
 			}
 		} else {
-			log.info("没房子");
 			//定位
 			communityEntity = communityMapper.locateCommunity(communityIds, location);
-			log.info("没房子的结果:{}", communityEntity);
 			return communityEntity;
 		}
+
+
 
 		//如果身份是业主的小区只有一个那么直接返回
 		if (userCommunityIds.size()==1){

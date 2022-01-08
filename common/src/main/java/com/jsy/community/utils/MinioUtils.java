@@ -294,6 +294,49 @@ public class MinioUtils {
 		return resAddress;
 	}
 
+	/**
+	 *  批量上传图片文件
+	 * @author YuLF
+	 * @since  2020/12/9 17:45
+	 * @Param  files		文件数组
+	 * @Param  bucketName	存储文件的目录名称
+	 * @Param  random	是否不随机,false为随机,true为不随机
+	 * @return		返回文件访问地址数组
+	 */
+	public static String[] uploadForBatch(MultipartFile[] files, String bucketName, boolean random){
+		//上传文件之后的结果路径
+		String[] resAddress = new String[files.length];
+		int index = 0;
+		try {
+			minioClient = getMinioClientInstance();
+			createBucket(bucketName);
+			for( MultipartFile file : files ){
+				if( file != null && !file.isEmpty() && isImage(file.getOriginalFilename())){
+					//1.对文件名随机
+//					String randomFileName = getSHA256(file.getOriginalFilename());
+					// TODO: 2021/2/4 将上述   getSHA256    命名方式改成   随机命名，   具体后面到底采用随机命名方式还是  SHA256 方式 再说
+					String objectName = "";
+					if (random) {
+						objectName = file.getOriginalFilename();
+					} else {
+						objectName = getRandomFileName(file.getOriginalFilename());
+					}
+
+
+					//2.存储文件
+					minioClient.putObject(bucketName, objectName, file.getInputStream(), file.getContentType());
+					//3.获得文件访问路径
+					resAddress[index] = ENDPOINT + ":" + PROT + "/" + bucketName + "/" + objectName;
+					index++;
+				}
+			}
+		} catch (Exception e) {
+			log.error("com.jsy.community.utils.MinioUtils.uploadForBatch：{}", e.getMessage());
+			throw new JSYException("批量上传文件失败!"+e.getMessage());
+		}
+		return resAddress;
+	}
+
 	private static boolean isImage(String name){
 		return FilenameUtils.isExtension(name, allowSuffix);
 	}
