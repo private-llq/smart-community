@@ -331,9 +331,9 @@ public class CarMonthlyVehicleController {
     /**
      * 统计有效包月车数量
      */
-    @GetMapping("getCarNumber")
-    public Integer getCarNumber(){
-        return  vehicleService.getCarNumber();
-    }
+//    @GetMapping("getCarNumber")
+//    public Integer getCarNumber(){
+//        return  vehicleService.getCarNumber();
+//    }
 
 }

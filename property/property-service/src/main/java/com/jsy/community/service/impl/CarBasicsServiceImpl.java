@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarBasicsService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarBasicsEntity;
+import com.jsy.community.exception.JSYError;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.CarBasicsMapper;
 import com.jsy.community.qo.property.CarBasicsMonthQO;
 import com.jsy.community.qo.property.CarBasicsRuleQO;
@@ -25,6 +27,12 @@ public class CarBasicsServiceImpl extends ServiceImpl<CarBasicsMapper,CarBasicsE
     @Override
     public boolean addBasics(CarBasicsRuleQO carBasicsRuleQO, String uid, Long communityId) {
         CarBasicsEntity carBasicsEntity = carBasicsMapper.selectOne(new QueryWrapper<CarBasicsEntity>().eq("community_id", communityId));
+        if(carBasicsRuleQO.getDwellTime()<0){
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "停留时间输入数据有误");
+        }
+        if (carBasicsRuleQO.getMaxNumber()<0){
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "最大入场数输入数据有误");
+        }
         if(carBasicsEntity!=null){
            BeanUtils.copyProperties(carBasicsRuleQO,carBasicsEntity);
           return carBasicsMapper.updateById(carBasicsEntity) == 1;
@@ -65,6 +73,9 @@ public class CarBasicsServiceImpl extends ServiceImpl<CarBasicsMapper,CarBasicsE
     @Override
     public boolean addMonthlyPayment(CarBasicsMonthQO carBasicsMonthQO, String userId, Long adminCommunityId) {
         CarBasicsEntity carBasicsEntity = carBasicsMapper.selectOne(new QueryWrapper<CarBasicsEntity>().eq("community_id", adminCommunityId));
+        if(carBasicsMonthQO.getMonthlyPayment()<0&&carBasicsMonthQO.getMonthMaxTime()<0){
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "输入数据有误");
+        }
         if (carBasicsEntity != null){
             BeanUtils.copyProperties(carBasicsMonthQO,carBasicsEntity);
            return carBasicsMapper.updateById(carBasicsEntity) == 1;

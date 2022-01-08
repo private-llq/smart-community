@@ -4,6 +4,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.ICarPositionService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
@@ -11,6 +12,7 @@ import com.jsy.community.entity.CarEntity;
 import com.jsy.community.entity.HouseEntity;
 import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.CarProprietorEntity;
+import com.jsy.community.mapper.CarMonthlyVehicleMapper;
 import com.jsy.community.mapper.CarPositionMapper;
 import com.jsy.community.mapper.CarProprietorMapper;
 import com.jsy.community.mapper.HouseMapper;
@@ -47,14 +49,18 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
     private CarPositionMapper carPositionMapper;
     @Resource
     private HouseMapper houseMapper;
+    @Resource
+    private ICarMonthlyVehicleService carMonthlyVehicleService;
 
+    //查询车位使用数量（包月+业主）
     @Override
     public  Integer selectCarPositionUseAmount(Long communityId){
         QueryWrapper<CarPositionEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("binding_status", 1);
         queryWrapper.eq("community_id", communityId);
         Integer integer = carPositionMapper.selectCount(queryWrapper);
-        return integer;
+        Integer carNumber = carMonthlyVehicleService.getCarNumber(communityId);
+        return integer+carNumber;
     }
 
     @Override
