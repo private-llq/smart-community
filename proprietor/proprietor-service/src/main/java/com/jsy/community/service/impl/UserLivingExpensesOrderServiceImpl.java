@@ -147,7 +147,7 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		queryWrapper.eq("uid", userLivingExpensesOrderEntity.getUid());
 		queryWrapper.eq("deleted", 0);
 		// 是否查分类
-		if (StringUtils.isNotBlank(userLivingExpensesOrderEntity.getCategoryId())) {
+		if (StringUtils.isNotBlank(userLivingExpensesOrderEntity.getTypeId())) {
 			List<UserLivingExpensesAccountEntity> userLivingExpensesAccountEntities = accountMapper.selectList(new QueryWrapper<UserLivingExpensesAccountEntity>().eq("type_id", userLivingExpensesOrderEntity.getTypeId()));
 			Set<String> accounts = userLivingExpensesAccountEntities.stream().map(UserLivingExpensesAccountEntity::getAccount).collect(Collectors.toSet());
 			queryWrapper.in("bill_key", accounts);
