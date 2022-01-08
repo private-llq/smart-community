@@ -5,8 +5,6 @@ import com.jsy.community.api.IPropertyRelationService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
-import com.jsy.community.entity.lease.HouseLeaseEntity;
-import com.jsy.community.entity.proprietor.AssetLeaseRecordEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.HouseMemberQO;
@@ -29,11 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * @program: com.jsy.community
@@ -315,21 +311,21 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
             map.put("total", 0);
             return map;
         }
-        Set<String> houseIds = list.stream().filter(h -> h.getRelation() == 7).map(HouseMemberVO::getHouseId).collect(Collectors.toSet());
-        List<HouseLeaseEntity> houseLeaseEntityList = houseLeaseMapper.selectList(new QueryWrapper<HouseLeaseEntity>().in("house_id", houseIds));
-        Map<Long, List<Long>> houseLeaseMap = houseLeaseEntityList.stream().collect(Collectors.groupingBy(HouseLeaseEntity::getHouseId,
-            Collectors.mapping(HouseLeaseEntity::getId, Collectors.toList())));
-        Set<Long> houseLeaseIds = houseLeaseEntityList.stream().map(HouseLeaseEntity::getId).collect(Collectors.toSet());
-        List<AssetLeaseRecordEntity> entities = assetLeaseRecordMapper.selectList(new QueryWrapper<AssetLeaseRecordEntity>().in("asset_id", houseLeaseIds));
-        Map<Long, LocalDate> endDateMap = entities.stream().collect(Collectors.toMap(AssetLeaseRecordEntity::getAssetId, AssetLeaseRecordEntity::getEndDate));
+//        Set<String> houseIds = list.stream().filter(h -> h.getRelation() == 7).map(HouseMemberVO::getHouseId).collect(Collectors.toSet());
+//        List<HouseLeaseEntity> houseLeaseEntityList = houseLeaseMapper.selectList(new QueryWrapper<HouseLeaseEntity>().in("house_id", houseIds));
+//        Map<Long, List<Long>> houseLeaseMap = houseLeaseEntityList.stream().collect(Collectors.groupingBy(HouseLeaseEntity::getHouseId,
+//            Collectors.mapping(HouseLeaseEntity::getId, Collectors.toList())));
+//        Set<Long> houseLeaseIds = houseLeaseEntityList.stream().map(HouseLeaseEntity::getId).collect(Collectors.toSet());
+//        List<AssetLeaseRecordEntity> entities = assetLeaseRecordMapper.selectList(new QueryWrapper<AssetLeaseRecordEntity>().in("asset_id", houseLeaseIds));
+//        Map<Long, LocalDate> endDateMap = entities.stream().collect(Collectors.toMap(AssetLeaseRecordEntity::getAssetId, AssetLeaseRecordEntity::getEndDate));
         
         for (HouseMemberVO houseMemberVO : list) {
             houseMemberVO.setRelationName(BusinessEnum.RelationshipEnum.getCodeName(houseMemberVO.getRelation()));
-            if (houseMemberVO.getRelation() == 7) {
-                if (CollectionUtils.isEmpty(houseLeaseMap) && CollectionUtils.isEmpty(endDateMap)) {
-                    houseMemberVO.setValidTime(endDateMap.get(houseLeaseMap.get(Long.parseLong(houseMemberVO.getHouseId()))));
-                }
-            }
+//            if (houseMemberVO.getRelation() == 7) {
+//                if (CollectionUtils.isEmpty(houseLeaseMap) && CollectionUtils.isEmpty(endDateMap)) {
+//                    houseMemberVO.setValidTime(endDateMap.get(houseLeaseMap.get(Long.parseLong(houseMemberVO.getHouseId()))));
+//                }
+//            }
         }
         Long total = propertyRelationMapper.pageListTotal(baseQO.getQuery());
         map.put("list",list);
