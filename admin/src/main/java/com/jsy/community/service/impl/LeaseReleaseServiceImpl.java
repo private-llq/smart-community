@@ -195,16 +195,17 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
         if (StringUtils.isEmpty(typeStr)) {
             throw new AdminException("type类型不符合");
         }
+        AssetLeaseRecordEntity assetLeaseRecordEntity = assetLeaseRecordMapper.selectById(id);
         LeaseReleaseInfoVO result;
         if ("住宅".equals(typeStr)) {
-            HouseLeaseEntity house = houseLeaseMapper.selectById(id);
+            HouseLeaseEntity house = houseLeaseMapper.selectById(assetLeaseRecordEntity.getAssetId());
             if (house == null) {
                 result = null;
             } else {
                 result = JSONObject.parseObject(JSONObject.toJSONString(house), LeaseReleaseInfoVO.class);
             }
         } else {
-            ShopLeaseEntity shop = shopLeaseMapper.selectById(id);
+            ShopLeaseEntity shop = shopLeaseMapper.selectById(assetLeaseRecordEntity.getAssetId());
             if (shop == null) {
                 result = null;
             } else {

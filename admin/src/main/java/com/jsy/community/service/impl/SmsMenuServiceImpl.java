@@ -84,6 +84,8 @@ public class SmsMenuServiceImpl extends ServiceImpl<SmsMenuMapper, SmsMenuEntity
                     break;
                 }
             }
+        } else {
+            row = smsMenuMapper.updateById(smsMenuEntity);
         }
         return row == 1;
     }

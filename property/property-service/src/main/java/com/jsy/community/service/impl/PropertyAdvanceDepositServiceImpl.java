@@ -3,7 +3,6 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.codingapi.txlcn.tc.annotation.LcnTransaction;
 import com.jsy.community.api.IPropertyAdvanceDepositRecordService;
 import com.jsy.community.api.IPropertyAdvanceDepositService;
 import com.jsy.community.api.PropertyException;
@@ -110,7 +109,7 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
      * @Date: 2021/08/11
      **/
     @Override
-    @LcnTransaction
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateRechargePropertyAdvanceDeposit(PropertyAdvanceDepositEntity propertyAdvanceDepositEntity){
         if (propertyAdvanceDepositEntity.getId() == null) {
             throw new PropertyException(JSYError.REQUEST_PARAM.getCode(),"请传入id！");

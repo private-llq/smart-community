@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.PropertyFinanceLog;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IFinanceBillService;
@@ -130,6 +129,7 @@ public class PropertyFeeRuleController {
     @businessLog(operation = "编辑",content = "更新了【物业收费规则】")
     @Permit("community:property:feeRule:updateById")
     public CommonResult updateById(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
+        ValidatorUtils.validateEntity(propertyFeeRuleEntity);
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         propertyFeeRuleEntity.setCommunityId(UserUtils.getAdminCommunityId());
         propertyFeeRuleService.updateOneRule(userInfo,propertyFeeRuleEntity);

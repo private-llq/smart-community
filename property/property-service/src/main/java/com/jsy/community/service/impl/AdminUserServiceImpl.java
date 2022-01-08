@@ -590,6 +590,12 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		int result = 1;
 		// 增加用户
 		UserDetail userDetail = null;
+		// 密码正则匹配
+		String password = RSAUtil.privateDecrypt(adminUserQO.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY));
+		String pattern = "^(?=.*[A-Z0-9])(?=.*[a-z0-9])(?=.*[a-zA-Z])(.{6,12})$";
+		if (!password.matches(pattern)) {
+			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "请输入一个正确的6-12位密码,至少包含大写字母或小写字母或数字两种!");
+		}
 		
 		try {
 			// 增加用户
@@ -645,6 +651,13 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void updateOperator(AdminUserQO adminUserQO, Long id){
+		// 密码正则匹配
+		String password = RSAUtil.privateDecrypt(adminUserQO.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY));
+		String pattern = "^(?=.*[A-Z0-9])(?=.*[a-z0-9])(?=.*[a-zA-Z])(.{6,12})$";
+		if (!password.matches(pattern)) {
+			throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "请输入一个正确的6-12位密码,至少包含大写字母或小写字母或数字两种!");
+		}
+		
 		//更新社区权限
 		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
 			adminConfigService.updateAdminCommunityBatch(adminUserQO.getCommunityIdList(), String.valueOf(adminUserQO.getId()));

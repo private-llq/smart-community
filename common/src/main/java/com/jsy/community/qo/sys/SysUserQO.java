@@ -3,7 +3,6 @@ package com.jsy.community.qo.sys;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 /**
@@ -27,7 +26,7 @@ public class SysUserQO implements Serializable {
 	private String phone;
 	
 	@ApiModelProperty(value = "密码")
-	@Pattern(regexp = "^(?=.*[A-Z0-9])(?=.*[a-z0-9])(?=.*[a-zA-Z])(.{6,12})$", message = "请输入一个正确的6-12位密码,至少包含大写字母或小写字母或数字两种!")
+//	@Pattern(regexp = "^(?=.*[A-Z0-9])(?=.*[a-z0-9])(?=.*[a-zA-Z])(.{6,12})$", message = "请输入一个正确的6-12位密码,至少包含大写字母或小写字母或数字两种!")
 	private String password;
 	
 	@ApiModelProperty(value = "身份证号")

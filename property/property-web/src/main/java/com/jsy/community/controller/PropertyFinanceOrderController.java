@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.PropertyFinanceLog;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.*;
@@ -111,6 +110,9 @@ public class PropertyFinanceOrderController {
     @Permit("community:property:financeOrder:updateOrder")
     public CommonResult updateOrder(@RequestParam("id") Long id, @RequestParam("coupon") BigDecimal coupon) {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        if (coupon.compareTo(BigDecimal.ZERO) < 0) {
+            throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "优惠金额不能填写负数");
+        }
         propertyFinanceOrderService.updateOrder(id, coupon);
         return CommonResult.ok();
     }

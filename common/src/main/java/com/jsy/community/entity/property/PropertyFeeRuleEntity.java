@@ -6,6 +6,7 @@ import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -47,6 +48,7 @@ public class PropertyFeeRuleEntity extends BaseEntity {
 
     @ApiModelProperty(value = "金额")
     @NotNull(message = "收费金额不能为空！",groups = PropertyFeeRule.class)
+    @Range(min = 0, message = "收费金额不能填写负数")
     private BigDecimal monetaryUnit;
 
     @ApiModelProperty(value = "违约金")
