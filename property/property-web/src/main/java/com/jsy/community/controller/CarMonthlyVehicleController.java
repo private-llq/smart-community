@@ -21,6 +21,7 @@ import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -327,5 +328,13 @@ public class CarMonthlyVehicleController {
         return "http://222.178.212.29:9000/template/485336f8ed1d46fea3d26f6475770f5a";
     }
 
+
+    /**
+     * 统计有效包月车数量
+     */
+    @GetMapping("getCarNumber")
+    public Integer getCarNumber(){
+        return  vehicleService.getCarNumber();
+    }
 
 }

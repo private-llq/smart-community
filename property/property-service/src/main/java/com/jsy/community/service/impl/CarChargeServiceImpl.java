@@ -90,7 +90,6 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
         return del;
     }
 
-
     /**
      * 查询所有模板
      * @param type

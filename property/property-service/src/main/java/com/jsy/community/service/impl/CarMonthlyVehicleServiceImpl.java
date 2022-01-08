@@ -1301,6 +1301,11 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         return resultMap;
     }
 
+    @Override
+    public Integer getCarNumber() {
+        Integer count = carMonthlyVehicleMapper.selectCount(new QueryWrapper<CarMonthlyVehicle>().le("end_time", LocalDateTime.now()));
+        return count;
+    }
 
 
 }
