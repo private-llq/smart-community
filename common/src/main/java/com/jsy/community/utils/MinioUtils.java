@@ -143,7 +143,45 @@ public class MinioUtils {
 		} catch (Exception e) {
 			throw new JSYException("上传失败,MinioUtils.upload()方法出现异常：" + e.getMessage());
 		}
-	}/**
+	}
+
+	/**
+	 * 文件上传
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	public static String uploadFile(MultipartFile file, String bucketName) {
+		try {
+			//获取minio客户端实例
+			minioClient = getMinioClientInstance();
+			//创建存储桶
+			createBucket(bucketName);
+			// 文件存储的目录结构
+			if(file == null){
+				throw new JSYException("请上传文件");
+			}
+			String endName;
+			String suffix;
+			String objectName;
+			if (!StringUtils.isEmpty(file.getOriginalFilename())) {
+				endName = file.getOriginalFilename();
+				suffix = endName.substring(endName.lastIndexOf("."));
+				objectName = getRandomFileName(endName) + suffix;
+			}else{
+				objectName = getRandomFileName("");
+			}
+			// 存储文件
+			minioClient.putObject(BUCKETNAME, objectName, file.getInputStream(), file.getContentType());
+			//返回路径
+			return ENDPOINT + ":" + PROT + "/" + BUCKETNAME + "/" + objectName;
+		} catch (Exception e) {
+			throw new JSYException("上传失败,MinioUtils.upload()方法出现异常：" + e.getMessage());
+		}
+	}
+
+
+	/**
 	 * 文件上传
 	 * @param file
 	 * @return

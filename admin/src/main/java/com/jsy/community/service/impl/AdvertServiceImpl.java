@@ -15,14 +15,17 @@ import com.jsy.community.qo.admin.AddAdvertQO;
 import com.jsy.community.qo.admin.AdvertQO;
 import com.jsy.community.service.AdminException;
 import com.jsy.community.service.AdvertService;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.vo.property.PageVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.management.JMException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +42,8 @@ public class AdvertServiceImpl extends ServiceImpl<AdvertMapper, AdvertEntity> i
 
     @Autowired
     private AdvertMapper advertMapper;
+
+    private static final String ADVERT_IMG = "advert-img";
 
     /**
      * 新增广告
@@ -74,6 +79,11 @@ public class AdvertServiceImpl extends ServiceImpl<AdvertMapper, AdvertEntity> i
     public boolean updateAdvert(AdvertEntity entity) {
         entity.setUpdateTime(LocalDateTime.now());
         return updateById(entity);
+    }
+
+    @Override
+    public String fileUpload(MultipartFile file) {
+        return MinioUtils.uploadFile(file, String.valueOf(LocalDate.now()+ADVERT_IMG));
     }
 
     /**
