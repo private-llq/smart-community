@@ -16,8 +16,10 @@ import com.jsy.community.mapper.UserLivingExpensesAccountMapper;
 import com.jsy.community.mapper.UserLivingExpensesBillMapper;
 import com.jsy.community.mapper.UserLivingExpensesGroupMapper;
 import com.jsy.community.qo.cebbank.CebQueryBillInfoQO;
+import com.jsy.community.qo.cebbank.CebQueryMobileBillQO;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.cebbank.CebQueryBillInfoVO;
+import com.jsy.community.vo.cebbank.CebQueryMobileBillVO;
 import com.jsy.community.vo.cebbank.test.CebBillQueryResultDataModelVO;
 import com.jsy.community.vo.cebbank.test.CebCreatePaymentBillParamsModelVO;
 import com.zhsj.basecommon.exception.BaseException;
@@ -65,13 +67,12 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
     public Long addAccount(UserLivingExpensesAccountEntity accountEntity) {
         accountEntity.setId(SnowFlake.nextId());
         if (accountEntity.getBusinessFlow() == 1) {
-            throw new ProprietorException("直缴业务不用绑定,请走直接缴费接口");
-        } else if (accountEntity.getBusinessFlow() == 0 || accountEntity.getBusinessFlow() == 2) {
+            // 查询缴费信息,无返回值,目的是验证填写信息是否正确,不正确会抛出异常,不往下走
+            directBillInfo(accountEntity);
+        } else {
             // 查询用户信息和账单,并添加
             CebQueryBillInfoVO cebQueryBillInfoVO = queryBillInfo(accountEntity);
             addBill(accountEntity, cebQueryBillInfoVO);
-        } else {
-            throw new ProprietorException("业务流程不明确");
         }
         // 如果没有选择分组,则分配到默认分组
         if (StringUtil.isBlank(accountEntity.getGroupId())) {
@@ -156,9 +157,14 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
             }
             billEntityQueryWrapper.eq("bill_status", 0);
             billMapper.delete(billEntityQueryWrapper);
-            // 查询用户信息和账单,并添加
-            CebQueryBillInfoVO cebQueryBillInfoVO = queryBillInfo(accountEntity);
-            addBill(accountEntity, cebQueryBillInfoVO);
+            if (accountEntity.getBusinessFlow() == 1) {
+                // 查询缴费信息,无返回值,目的是验证填写信息是否正确,不正确会抛出异常,不往下走
+                directBillInfo(accountEntity);
+            } else {
+                // 查询用户信息和账单,并添加
+                CebQueryBillInfoVO cebQueryBillInfoVO = queryBillInfo(accountEntity);
+                addBill(accountEntity, cebQueryBillInfoVO);
+            }
         } else {
             // 修改了分组
             recordAccountEntity.setGroupId(accountEntity.getGroupId());
@@ -195,7 +201,7 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
 
     /**
      * @author: Pipi
-     * @description: 查询缴费账单信息
+     * @description: 查询查缴类型缴费账单信息
      * @param accountEntity:
      * @return: {@link CebQueryBillInfoVO}
      * @date: 2021/12/28 18:14
@@ -213,6 +219,22 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
         billInfoQO.setDeviceType(accountEntity.getDeviceType());
         billInfoQO.setBusinessFlow(accountEntity.getBusinessFlow());
         return cebBankService.queryBillInfo(billInfoQO);
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 查询直缴类型缴费账单信息
+     * @param accountEntity:
+     * @return: {@link CebQueryBillInfoVO}
+     * @date: 2022/1/8 16:22
+     **/
+    protected void directBillInfo(UserLivingExpensesAccountEntity accountEntity) {
+        CebQueryMobileBillQO cebQueryMobileBillQO = new CebQueryMobileBillQO();
+        cebQueryMobileBillQO.setSessionId(cebBankService.getCebBankSessionId(accountEntity.getMobile(), accountEntity.getDeviceType()));
+        cebQueryMobileBillQO.setCategoryType(accountEntity.getTypeId());
+        cebQueryMobileBillQO.setMobile(accountEntity.getAccount());
+        cebQueryMobileBillQO.setDeviceType(accountEntity.getDeviceType());
+        cebBankService.queryMobileBill(cebQueryMobileBillQO);
     }
 
     /**

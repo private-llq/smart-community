@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.excel.util.CollectionUtils;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,10 +50,7 @@ public class UserLivingExpensesBillServiceImpl extends ServiceImpl<UserLivingExp
     public UserLivingExpensesBillEntity queryBill(UserLivingExpensesBillEntity billEntity) {
         QueryWrapper<UserLivingExpensesBillEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("uid", billEntity.getUid());
-        queryWrapper.eq("bill_key", billEntity.getBillKey());
-        queryWrapper.eq("bill_status", BusinessEnum.PaymentStatusEnum.UNPAID.getCode());
-        // 只展示一条未缴纳
-        queryWrapper.last("limit 1");
+        queryWrapper.eq("id", billEntity.getId());
         UserLivingExpensesBillEntity userLivingExpensesBillEntity = billMapper.selectOne(queryWrapper);
         if (ObjectUtil.isNotNull(userLivingExpensesBillEntity)) {
             QueryWrapper<UserLivingExpensesAccountEntity> accountEntityQueryWrapper = new QueryWrapper<>();
@@ -64,8 +64,24 @@ public class UserLivingExpensesBillServiceImpl extends ServiceImpl<UserLivingExp
             String costIcon = redisTemplate.opsForValue().get("costIcon");
             Map<Integer, String> map = JSON.parseObject(costIcon, Map.class);
             userLivingExpensesBillEntity.setTypePicUrl(map.get(Integer.valueOf(userLivingExpensesBillEntity.getTypeId())));
-
         }
         return userLivingExpensesBillEntity;
+    }
+
+    /**
+     * @param billEntity :
+     * @author: Pipi
+     * @description: 查询账单列表
+     * @return: {@link List < Map< String,  BigDecimal >>}
+     * @date: 2022/1/8 17:59
+     **/
+    @Override
+    public List<UserLivingExpensesBillEntity> queryBillList(UserLivingExpensesBillEntity billEntity) {
+        QueryWrapper<UserLivingExpensesBillEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id,begin_date,bill_amount");
+        queryWrapper.eq("uid", billEntity.getUid());
+        queryWrapper.eq("bill_key", billEntity.getBillKey());
+        queryWrapper.eq("bill_status", BusinessEnum.PaymentStatusEnum.UNPAID.getCode());
+        return billMapper.selectList(queryWrapper);
     }
 }
