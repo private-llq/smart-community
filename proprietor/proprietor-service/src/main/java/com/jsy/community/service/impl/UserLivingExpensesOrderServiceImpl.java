@@ -164,7 +164,9 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		}
 		
 		Set<String> accounts = userLivingExpensesOrderEntities.stream().map(UserLivingExpensesOrderEntity::getBillKey).collect(Collectors.toSet());
-		List<UserLivingExpensesAccountEntity> userLivingExpensesAccountEntityByAccount = accountMapper.selectList(new QueryWrapper<UserLivingExpensesAccountEntity>().in("account", accounts));
+		List<UserLivingExpensesAccountEntity> userLivingExpensesAccountEntityByAccount = accountMapper.selectList(
+				new QueryWrapper<UserLivingExpensesAccountEntity>().eq("uid", userLivingExpensesOrderEntity.getUid())
+						.in("account", accounts));
 		// 查询生活缴费户号列表
 		Map<String, UserLivingExpensesAccountEntity> userLivingExpensesAccountEntityMap = userLivingExpensesAccountEntityByAccount.stream()
 			.collect(Collectors.toMap(UserLivingExpensesAccountEntity::getAccount, Function.identity()));

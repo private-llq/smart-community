@@ -74,6 +74,18 @@ public class CommunityController {
 		return CommonResult.ok(communityEntity);
 	}
 
+	/**
+	 * @author: Pipi
+	 * @description: 附近的小区,20条数据
+	 * @param location: 金纬度对象
+	 * @return: {@link CommonResult< CommunityEntity>}
+	 * @date: 2022/1/8 14:53
+	 **/
+	@PostMapping("/v2/nearbyCommunity")
+	public CommonResult<List<CommunityEntity>> nearbyCommunity(@RequestBody Map<String,Double> location) {
+		return CommonResult.ok(iCommunityService.nearbyCommunity(location));
+	}
+
 	@ApiOperation("获取当前小区的物业公司信息")
 	@GetMapping("company")
 	// @Permit("community:proprietor:community:company")

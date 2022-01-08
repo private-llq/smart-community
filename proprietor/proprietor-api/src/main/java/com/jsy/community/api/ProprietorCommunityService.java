@@ -53,6 +53,15 @@ public interface ProprietorCommunityService extends IService<CommunityEntity> {
      * @Param:
 	 */
 	CommunityEntity locateCommunityV2(String uid, Map<String,Double> location);
+
+	/**
+	 * @author: Pipi
+	 * @description: 附近的小区,20条数据
+	 * @param location: 经纬度
+	 * @return: {@link List< CommunityEntity>}
+	 * @date: 2022/1/8 14:54
+	 **/
+	List<CommunityEntity> nearbyCommunity(Map<String, Double> location);
 	
 	/**
 	 * @Description: 根据社区id批量查询社区名

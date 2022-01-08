@@ -34,6 +34,15 @@ public interface CommunityMapper extends BaseMapper<CommunityEntity> {
      * @Date: 2020/11/25
     **/
     CommunityEntity locateCommunity(@Param("ids")List<Long> ids, @Param("location")Map<String,Double> location);
+
+    /**
+     * @author: Pipi
+     * @description: 附近的小区,20条数据
+     * @param location: 经纬度
+     * @return: {@link List< CommunityEntity>}
+     * @date: 2022/1/8 14:58
+     **/
+    List<CommunityEntity> nearbyCommunity(@Param("location") Map<String, Double> location);
     
     /**
     * @Description: 根据社区id批量查询社区名
