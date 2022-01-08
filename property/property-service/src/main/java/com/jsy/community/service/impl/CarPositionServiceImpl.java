@@ -48,6 +48,14 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
     @Resource
     private HouseMapper houseMapper;
 
+    @Override
+    public  Integer selectCarPositionUseAmount(Long communityId){
+        QueryWrapper<CarPositionEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("binding_status", 1);
+        queryWrapper.eq("community_id", communityId);
+        Integer integer = carPositionMapper.selectCount(queryWrapper);
+        return integer;
+    }
 
     @Override
     public List<CarPositionEntity> selectCarPostionBystatustatus() {

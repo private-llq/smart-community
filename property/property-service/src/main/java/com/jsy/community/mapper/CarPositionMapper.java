@@ -15,6 +15,10 @@ public interface CarPositionMapper extends BaseMapper<CarPositionEntity> {
 
     List<CarPositionEntity> selectCarPosition(CarPositionEntity qo);
 
+
+
+
+
     /**
      *@Author: DKS
      *@Description: 查询小区下所有的车位
