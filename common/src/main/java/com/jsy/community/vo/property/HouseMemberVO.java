@@ -3,6 +3,7 @@ package com.jsy.community.vo.property;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -56,7 +57,7 @@ public class HouseMemberVO implements Serializable {
     /**
      * 租户有效时间
      */
-    private LocalDateTime validTime;
+    private LocalDate validTime;
 
     /**
      * 登录时间

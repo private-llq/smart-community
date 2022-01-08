@@ -70,7 +70,7 @@ public class PropertyRelationController {
     @PostMapping("/pageList")
     @Permit("community:property:members:pageList")
     public CommonResult pageList(@RequestBody BaseQO<HouseMemberQO> baseQO){
-    return CommonResult.ok(propertyRelationService.pageList(baseQO));
+        return CommonResult.ok(propertyRelationService.pageList(baseQO));
     }
 
     @ApiOperation("下载成员信息导入模板")

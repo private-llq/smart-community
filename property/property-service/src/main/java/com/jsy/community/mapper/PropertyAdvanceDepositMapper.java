@@ -29,7 +29,7 @@ public interface PropertyAdvanceDepositMapper extends BaseMapper<PropertyAdvance
 	 *@Return: com.jsy.community.vo.CommonResult
 	 *@Date: 2021/8/16 10:11
 	 **/
-	PropertyAdvanceDepositEntity queryAdvanceDepositByHouseId (Long houseId, Long communityId);
+	PropertyAdvanceDepositEntity queryAdvanceDepositByHouseId (@Param("houseId") Long houseId, @Param("communityId")Long communityId);
 	
 	/**
 	 *@Author: DKS

@@ -19,6 +19,7 @@ import com.zhsj.base.api.vo.PageVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -83,8 +84,8 @@ public class MarketServiceImpl extends ServiceImpl<MarketMapper, ProprietorMarke
         PropertyMarketQO query = baseQO.getQuery();
         ArrayList<ProprietorMarketVO> arrayList = new ArrayList<>();
     
-        PageVO<UserDetail> userDetailPageVO = baseUserInfoRpcService.queryUser("", query.getRealName(), 0, 999999999);
-        if (userDetailPageVO != null) {
+        PageVO<UserDetail> userDetailPageVO = baseUserInfoRpcService.queryUser(query.getPhone(), query.getRealName(), 0, 999999999);
+        if (!CollectionUtils.isEmpty(userDetailPageVO.getData())) {
             Set<Long> userDetailIds = userDetailPageVO.getData().stream().map(UserDetail::getId).collect(Collectors.toSet());
             List<String> collect = userDetailIds.stream().map(String::valueOf).collect(Collectors.toList());
             query.setUserDetailIds(collect);

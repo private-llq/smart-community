@@ -152,6 +152,11 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
             }
             //封装总金额  总金额=(propertyFee+penalSum)-coupon-deduction
             entity.setTotalMoney(entity.getPropertyFee().add(entity.getPenalSum()).subtract(entity.getCoupon()).subtract(entity.getDeduction()));
+            if (entity.getType() != null) {
+                entity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(entity.getType()));
+            } else {
+                entity.setFeeRuleName(entity.getRise().substring(entity.getRise().indexOf("-") + 1));
+            }
         }
         //查询总条数
         Integer total = propertyFinanceOrderMapper.getTotal(baseQO.getQuery());
@@ -2110,12 +2115,17 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
         }
 
         List<PropertyFinanceOrderEntity> entities = propertyFinanceOrderMapper.selectList(new QueryWrapper<PropertyFinanceOrderEntity>()
-                .select("id,associated_type,target_id,type,begin_time,over_time,property_fee,penal_sum,coupon,total_money")
+                .select("id,associated_type,target_id,type,begin_time,over_time,property_fee,penal_sum,coupon,total_money,rise")
                 .in("id", list));
         for (PropertyFinanceOrderEntity entity : entities) {
 
             entity.setTotalMoney(entity.getPropertyFee().add(entity.getPenalSum().subtract(entity.getCoupon())));
-            entity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(entity.getType()));
+            if (entity.getType() != null) {
+                entity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(entity.getType()));
+            } else {
+                entity.setFeeRuleName(entity.getRise().substring(entity.getRise().indexOf("-") + 1));
+            }
+            
             if (entity.getAssociatedType() == 1) {
                 PropertyAdvanceDepositEntity depositEntity = propertyAdvanceDepositMapper.queryAdvanceDepositByHouseId(entity.getTargetId(), adminCommunityId);
                 if (depositEntity != null) {
