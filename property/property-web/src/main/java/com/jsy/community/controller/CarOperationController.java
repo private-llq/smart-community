@@ -4,6 +4,7 @@ import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.CarOperationService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.property.CarOperationLogQO;
+import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.CommonResult;
 import com.jsy.community.vo.property.PageVO;
 import com.zhsj.baseweb.annotation.Permit;
@@ -29,8 +30,8 @@ public class CarOperationController {
     @RequestMapping(value = "/selectCarOperationLogPag", method = RequestMethod.POST)
     @Permit("community:property:CarOperation:selectCarOperationLogPag")
     public CommonResult<PageVO> selectCarOperationLogPag(@RequestBody CarOperationLogQO qo) {
-
-        PageVO  pageVO = carOperationService.selectCarOperationLogPag(qo);
+        Long adminCommunityId = UserUtils.getAdminCommunityId();
+        PageVO  pageVO = carOperationService.selectCarOperationLogPag(qo,adminCommunityId);
 
         return CommonResult.ok(pageVO, "查询成功");
     }
