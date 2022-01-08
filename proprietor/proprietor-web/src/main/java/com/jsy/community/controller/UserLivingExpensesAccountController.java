@@ -7,15 +7,15 @@ import com.jsy.community.constant.ConstError;
 import com.jsy.community.entity.UserLivingExpensesAccountEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
+import com.jsy.community.utils.MinioUtils;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @Author: Pipi
@@ -50,6 +50,26 @@ public class UserLivingExpensesAccountController {
         }
         Long id = accountService.addAccount(accountEntity);
         return id == null ? CommonResult.error("添加失败") : CommonResult.ok(id.toString(), "添加成功");
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 费种图标上传
+     * @param files:
+     * @return: {@link CommonResult<?>}
+     * @date: 2022/1/8 10:17
+     **/
+    @LoginIgnore
+    @PostMapping("/v2/iconUpload")
+    public CommonResult<?> iconUpload(@RequestParam("files") MultipartFile[] files) {
+        for (MultipartFile file : files) {
+            //获取文件名
+            String originalFilename = file.getOriginalFilename();
+
+        }
+        //返回文件上传地址
+        String[] upload = MinioUtils.uploadForBatch(files, "cost-icon", true);
+        return CommonResult.ok("上传成功");
     }
 
     /**

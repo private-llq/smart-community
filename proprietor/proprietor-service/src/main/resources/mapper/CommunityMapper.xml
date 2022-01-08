@@ -39,4 +39,11 @@
         </foreach>
         and deleted = 0
     </select>
+    <select id="nearbyCommunity" resultType="com.jsy.community.entity.CommunityEntity">
+        select * from t_community
+        <if test="location.lon != null and location.lat != null">
+            order by get_distance(#{location.lon},#{location.lat},lon,lat)
+        </if>
+        limit 20
+    </select>
 </mapper>

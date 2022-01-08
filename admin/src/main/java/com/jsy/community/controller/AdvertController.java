@@ -1,6 +1,7 @@
 package com.jsy.community.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.jsy.community.dto.advert.FileUrlDto;
 import com.jsy.community.entity.admin.AdvertEntity;
 import com.jsy.community.qo.admin.AddAdvertQO;
 import com.jsy.community.qo.admin.AdvertIdList;
@@ -8,12 +9,13 @@ import com.jsy.community.qo.admin.AdvertQO;
 import com.jsy.community.qo.admin.Id;
 import com.jsy.community.service.AdvertService;
 import com.jsy.community.vo.CommonResult;
+import com.jsy.community.vo.FileVo;
 import com.zhsj.baseweb.annotation.Permit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * @author xrq
@@ -102,5 +104,10 @@ public class AdvertController {
     @Permit("community:admin:advert:deleteList")
     public CommonResult deleteList(@RequestBody AdvertIdList ids) {
         return CommonResult.ok(advertService.removeByIds(ids.getIds()) ? "删除成功" : "删除失败");
+    }
+
+    @PostMapping("/fileUpload")
+    public CommonResult fileUpload (@NotNull MultipartFile file) {
+        return CommonResult.ok(new FileUrlDto(advertService.fileUpload(file)), "上传成功");
     }
 }

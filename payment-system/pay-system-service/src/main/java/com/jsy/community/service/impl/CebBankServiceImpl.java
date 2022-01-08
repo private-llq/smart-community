@@ -25,9 +25,11 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * @Author: Pipi
@@ -56,6 +58,12 @@ public class CebBankServiceImpl implements CebBankService {
      */
     @Value("${cebBankRedirectUrl}")
     private String cebBankRedirectUrl;
+
+    /**
+     * 光大云缴费开放的费种
+     */
+    @Value("${choose_type}")
+    private String chooseType;
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -143,13 +151,18 @@ public class CebBankServiceImpl implements CebBankService {
         String costIcon = redisTemplate.opsForValue().get("costIcon");
         Map<Integer, String> map = JSON.parseObject(costIcon, Map.class);
         if (cebQueryCityContributionCategoryVO != null
-                && !CollectionUtils.isEmpty(cebQueryCityContributionCategoryVO.getCebPaymentCategoriesList())
+                && !CollectionUtils.isEmpty(cebQueryCityContributionCategoryVO.getPaymentCitiesForClientModel().getCebPaymentCategoriesList())
                 && !CollectionUtils.isEmpty(map)
         ) {
-            for (CebCategoryVO cebCategoryVO : cebQueryCityContributionCategoryVO.getCebPaymentCategoriesList()) {
-                String picUrl = map.get(Integer.valueOf(cebCategoryVO.getType()));
-                cebCategoryVO.setPicUrlClient(StringUtil.isNotBlank(picUrl) ? picUrl : cebCategoryVO.getPicUrlClient());
-            }
+            ArrayList<String> typeList = new ArrayList<>(Arrays.asList(chooseType.split(",")));
+            List<CebCategoryVO> categoryVOList = cebQueryCityContributionCategoryVO.getPaymentCitiesForClientModel().getCebPaymentCategoriesList().stream()
+                    .filter(cebCategoryVO -> typeList.contains(cebCategoryVO.getType()))
+                    .peek(cebCategoryVO -> {
+                        String picUrl = map.get(Integer.valueOf(cebCategoryVO.getType()));
+                        cebCategoryVO.setPicUrlClient(StringUtil.isNotBlank(picUrl) ? picUrl : cebCategoryVO.getPicUrlClient());
+                    })
+                    .collect(Collectors.toList());
+            cebQueryCityContributionCategoryVO.getPaymentCitiesForClientModel().setCebPaymentCategoriesList(categoryVOList);
         }
         return cebQueryCityContributionCategoryVO;
     }

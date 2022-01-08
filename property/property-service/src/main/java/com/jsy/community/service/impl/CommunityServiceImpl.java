@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.codingapi.txlcn.tc.annotation.LcnTransaction;
-import com.jsy.community.api.IAdminConfigService;
-import com.jsy.community.api.ICommunityService;
-import com.jsy.community.api.IShopLeaseService;
-import com.jsy.community.api.PropertyException;
+import com.jsy.community.api.*;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
 import com.jsy.community.entity.property.CarPositionEntity;
@@ -77,6 +74,9 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 	
 	@Autowired
 	private CarCutOffMapper carCutOffMapper;
+
+	@Autowired
+	private ICarPositionService carPositionService;
 
 	@DubboReference(version = Const.version, group = Const.group_property, check = false)
 	private IAdminConfigService adminConfigService;
@@ -366,16 +366,18 @@ public class CommunityServiceImpl extends ServiceImpl<CommunityMapper, Community
 		communitySurveyEntity.setOwnerCount(allOwner.size());
 		communitySurveyEntity.setTenantCount(allTenant.size());
 		
-		// 已占用车位
-		Integer occupyCarPosition = carPositionMapper.selectAllOccupyCarPositionByCommunityIds(communityIdList);
-		communitySurveyEntity.setOccupyCarPosition(occupyCarPosition);
-		// 查询小区下所有车位和车辆
+		// 查询小区下所有车位
 		List<CarPositionEntity> allCarPosition = carPositionMapper.getAllCarPositionByCommunity(adminCommunityId);
-		List<CarEntity> allCar = carMapper.getAllCarByCommunity(adminCommunityId);
+		//查询小区所以车辆(月租+业主)
+//		List<CarEntity> allCar = carMapper.getAllCarByCommunity(adminCommunityId);
+		Integer allCar = carPositionService.selectCarPositionUseAmount(adminCommunityId);
 		communitySurveyEntity.setCarPositionCount(allCarPosition.size());
-		communitySurveyEntity.setCarCount(allCar.size());
+		communitySurveyEntity.setCarCount(allCar);
+		// 已占用车位  月租+业主
+//		Integer occupyCarPosition = carPositionMapper.selectAllOccupyCarPositionByCommunityIds(communityIdList);
+		communitySurveyEntity.setOccupyCarPosition(allCar);
 		// 未占用车位
-		communitySurveyEntity.setUnoccupiedCarPosition(allCarPosition.size() - occupyCarPosition);
+		communitySurveyEntity.setUnoccupiedCarPosition(allCarPosition.size() - allCar);
 
 		// 小区月物业费收费统计
 		BigDecimal monthByPropertyFee = propertyFinanceOrderMapper.chargeByMonth(startTime, endTime, adminCommunityId);

@@ -23,6 +23,7 @@ import java.util.List;
  */
 public interface ICarPositionService extends IService<CarPositionEntity> {
 
+    Integer selectCarPositionUseAmount(Long communityId);
 
     List<CarPositionEntity> selectCarPostionBystatustatus();
 

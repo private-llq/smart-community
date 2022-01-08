@@ -6,6 +6,7 @@ import com.jsy.community.dto.advert.AdvertDto;
 import com.jsy.community.entity.admin.AdvertEntity;
 import com.jsy.community.qo.admin.AddAdvertQO;
 import com.jsy.community.qo.admin.AdvertQO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,4 +22,6 @@ public interface AdvertService extends IService<AdvertEntity> {
     IPage<AdvertDto> toPage(AdvertQO qo);
 
     boolean updateAdvert(AdvertEntity entity);
+
+    String fileUpload(MultipartFile file);
 }

@@ -80,4 +80,5 @@ public interface ICarMonthlyVehicleService extends IService<CarMonthlyVehicle> {
 
     Map<String, Object> addLinkByExcel2Position(List<String[]> strings, Long communityId);
 
+    Integer getCarNumber(Long communityId);
 }
