@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class CarOperationLogVO implements Serializable {
     private Long id;//id
 
-    private String userRole;//角色
+//    private String userRole;//角色
 
     private String operation;//操作
 
