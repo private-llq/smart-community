@@ -108,6 +108,6 @@ public class AdvertController {
 
     @PostMapping("/fileUpload")
     public CommonResult fileUpload (@NotNull MultipartFile file) {
-        return CommonResult.ok(advertService.fileUpload(file), "上传成功");
+        return CommonResult.ok(new FileUrlDto(advertService.fileUpload(file)), "上传成功");
     }
 }
