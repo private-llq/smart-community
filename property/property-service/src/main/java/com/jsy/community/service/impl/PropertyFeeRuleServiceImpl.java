@@ -370,7 +370,8 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
     public PropertyFeeRuleEntity selectByOne(Long id) {
         PropertyFeeRuleEntity ruleEntity = propertyFeeRuleMapper.selectById(id);
         if (!Objects.isNull(ruleEntity)) {
-            if (ruleEntity.getRelevance() == 1) {
+            ruleEntity.setRelevanceIdList(propertyFeeRuleRelevanceMapper.selectFeeRuleList(id));
+            /*if (ruleEntity.getRelevance() == 1) {
                 // 关联部分
                 ruleEntity.setRelevanceIdList(propertyFeeRuleRelevanceMapper.selectFeeRuleList(id));
             } else {
@@ -386,7 +387,7 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
                     List<String> positionId = allCarPositionByCommunity.stream().map(carPositionEntity -> carPositionEntity.getId() + "").collect(Collectors.toList());
                     ruleEntity.setRelevanceIdList(positionId);
                 }
-            }
+            }*/
             return ruleEntity;
         }
         return null;
