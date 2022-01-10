@@ -229,4 +229,17 @@ public class PermitController {
     public CommonResult queryRealUserDetailByUid(String phone) {
         return CommonResult.ok(userInfoRpcService.queryRealUserDetailByUid(phone, ""));
     }
+    
+    /**
+     * @Description: 手机号、昵称 模糊查询，并可分页
+     * @author: DKS
+     * @since: 2022/1/10 13:55
+     * @Param: [name]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @GetMapping("/queryUser")
+    @LoginIgnore
+    public CommonResult queryUser(String name) {
+        return CommonResult.ok(userInfoRpcService.queryUser("", name, null, 0, 99999999));
+    }
 }

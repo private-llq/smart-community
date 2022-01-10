@@ -628,12 +628,18 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		baseAuthRpcService.addLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, false);
 		roleIds.add(adminUserQO.getRoleId());
 		baseRoleRpcService.userJoinRole(roleIds, userDetail.getId(), Long.valueOf(adminUserQO.getUid()));
-		// 绑定用户和物业公司
-		AdminUserCompanyEntity entity = new AdminUserCompanyEntity();
-		entity.setId(SnowFlake.nextId());
-		entity.setCompanyId(adminUserQO.getCompanyId());
-		entity.setUid(String.valueOf(userDetail.getId()));
-		adminUserCompanyMapper.insert(entity);
+		
+		// 先查询是否已经绑定用户和物业公司
+		AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", userDetail.getId()).eq("company_id", adminUserQO.getCompanyId()));
+		// 没有绑定
+		if (entity == null) {
+			// 绑定用户和物业公司
+			entity = new AdminUserCompanyEntity();
+			entity.setId(SnowFlake.nextId());
+			entity.setCompanyId(adminUserQO.getCompanyId());
+			entity.setUid(String.valueOf(userDetail.getId()));
+			adminUserCompanyMapper.insert(entity);
+		}
 		//添加社区权限
 		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
 			adminConfigService.updateAdminCommunityBatch(adminUserQO.getCommunityIdList(), String.valueOf(userDetail.getId()));
