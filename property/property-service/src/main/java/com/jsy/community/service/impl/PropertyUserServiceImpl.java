@@ -194,6 +194,9 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 		Set<String> uidList = new HashSet<>();
 		if (StringUtil.isNotBlank(baseQO.getQuery().getKeyword())) {
 			uidList = baseUserInfoRpcService.queryRealUserDetail(baseQO.getQuery().getKeyword(), baseQO.getQuery().getKeyword());
+			if (CollectionUtils.isEmpty(uidList)) {
+				return pageInfo;
+			}
 		}
 		List<UserFaceEntity> userFaceEntities = userFaceMapper.queryFacePageList(baseQO.getQuery(), uidList, startNum, baseQO.getSize());
 		List<UserEntity> userEntities = new ArrayList<>();
@@ -254,7 +257,6 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 		// 查询用户信息
 		QueryWrapper<UserFaceEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("uid", userEntity.getUid());
-		queryWrapper.eq("face_deleted", 0);
 		UserFaceEntity userEntityResult = userFaceMapper.selectOne(queryWrapper);
 		if (userEntityResult == null) {
 			throw new PropertyException("未找到该用户");

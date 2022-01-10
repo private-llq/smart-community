@@ -120,14 +120,16 @@ public class VisitorServiceImpl implements IVisitorService {
         Page<VisitorEntity> page = new Page<>();
         MyPageUtils.setPageAndSize(page, baseQO);
         VisitorEntity query = baseQO.getQuery() == null ? new VisitorEntity() : baseQO.getQuery();
+        PageInfo<VisitorEntity> visitorEntityPageInfo = new PageInfo<>();
         QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("*, TIMESTAMPDIFF(MINUTE, start_time, end_time) as effectiveMinutes");
         if (!StringUtils.isEmpty(query.getName())) {
             queryWrapper.and(wrapper -> wrapper.eq("check_type", 2).like("name", query.getName()).or().like("contact", query.getName()));
             Set<String> strings = baseUserInfoRpcService.queryRealUserDetail(query.getName(), query.getName());
-            if (!CollectionUtils.isEmpty(strings)) {
-                queryWrapper.or(wrapper -> wrapper.eq("check_type", 1).in("uid", strings));
+            if (CollectionUtils.isEmpty(strings)) {
+                return visitorEntityPageInfo;
             }
+            queryWrapper.or(wrapper -> wrapper.eq("check_type", 1).in("uid", strings));
         }
         if (!StringUtils.isEmpty(query.getBuildingId())) {
             queryWrapper.eq("building_id", query.getBuildingId());
@@ -155,7 +157,7 @@ public class VisitorServiceImpl implements IVisitorService {
                 }
             }
         }
-        PageInfo<VisitorEntity> visitorEntityPageInfo = new PageInfo<>();
+
         BeanUtils.copyProperties(visitorEntityPage, visitorEntityPageInfo);
 
         return visitorEntityPageInfo;

@@ -185,8 +185,12 @@ public class PropertyMarketServiceImpl extends ServiceImpl<PropertyMarketMapper,
         PropertyMarketQO query = baseQO.getQuery();
         ArrayList<ProprietorMarketVO> arrayList = new ArrayList<>();
         Set<String> uidSet = new HashSet<>();
+        HashMap<String, Object> map = new HashMap<>();
         if (StringUtil.isNotBlank(query.getRealName())) {
             uidSet = baseUserInfoRpcService.queryRealUserDetail(query.getRealName(), query.getRealName());
+            if (CollectionUtils.isEmpty(uidSet)) {
+                return map;
+            }
         }
         List<ProprietorMarketEntity> list =  marketMapper.selectMarketAllPage(query,page1,baseQO.getSize(), uidSet);
         Set<String> resultUidSet = list.stream().map(ProprietorMarketEntity::getUid).collect(Collectors.toSet());
@@ -201,11 +205,12 @@ public class PropertyMarketServiceImpl extends ServiceImpl<PropertyMarketMapper,
             BeanUtils.copyProperties(li,marketVO);
             if (realUserDetail != null) {
                 marketVO.setRealName(realUserDetail.getRealName());
+                marketVO.setPhone(realUserDetail.getPhone());
             }
             arrayList.add(marketVO);
         }
         Long total = marketMapper.findTotals(query, uidSet);
-        HashMap<String, Object> map = new HashMap<>();
+
         map.put("total",total);
         map.put("list",arrayList);
 
