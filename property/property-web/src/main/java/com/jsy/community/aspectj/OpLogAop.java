@@ -9,10 +9,8 @@ import com.jsy.community.entity.OpLogEntity;
 import com.jsy.community.utils.HttpUtils;
 import com.jsy.community.utils.UserUtils;
 import com.zhsj.base.api.constant.RpcConst;
-import com.zhsj.base.api.entity.RealInfoDto;
 import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -71,9 +69,9 @@ public class OpLogAop extends BaseAop {
 			String operation = businessLog.operation();
 			String content = businessLog.content();
 			opLog.setOperation(operation);//保存获取的操作
-			RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(UserUtils.getId());
-			if (idCardRealInfo != null) {
-				opLog.setContent(idCardRealInfo.getIdCardName() + content);//保存获取的内容
+			UserDetail userDetail = baseUserInfoRpcService.getUserDetail(Long.parseLong(UserUtils.getId()));
+			if (userDetail != null) {
+				opLog.setContent(userDetail.getNickName() + content);//保存获取的内容
 			}
 		}
 		
