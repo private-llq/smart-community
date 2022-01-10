@@ -246,6 +246,11 @@ public class AdminUserController {
 			//验证社区权限
 			UserUtils.validateCommunityIds(adminUserQO.getCommunityIdList());
 		}
+		if (!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())) {
+			if (adminUserQO.getCommunityRoleId() == null) {
+				throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "勾选小区的同时请选择小区角色!");
+			}
+		}
 		adminUserQO.setCompanyId(UserUtils.getAdminCompanyId());
 		adminUserQO.setUid(UserUtils.getId());
 		Integer integer = adminUserService.addOperator(adminUserQO);
