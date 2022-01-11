@@ -11,5 +11,10 @@ import com.jsy.community.qo.admin.AddAdvertPositionQO;
  * @date 2021/12/25 16:05
  */
 public interface AdvertPositionService extends IService<AdvertPositionEntity> {
+    /**
+     * 新增广告位
+     * @param qo 新增参数
+     * @return 是否成功
+     */
     boolean insertPosition(AddAdvertPositionQO qo);
 }
