@@ -9,7 +9,6 @@ import com.jsy.community.qo.admin.AdvertQO;
 import com.jsy.community.qo.admin.Id;
 import com.jsy.community.service.AdvertService;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.FileVo;
 import com.zhsj.baseweb.annotation.Permit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.NotNull;
 
 /**
+ * @Description: 广告控制层
  * @author xrq
  * @version 1.0
- * @Description: 广告控制层
  * @date 2021/12/25 11:25
  */
 @RestController
@@ -49,13 +48,14 @@ public class AdvertController {
     @PostMapping("/getOneById")
     @Permit("community:admin:advert:getOneById")
     public CommonResult getOne (@RequestBody AdvertQO qo) {
-        return CommonResult.ok(advertService.getOne(new LambdaQueryWrapper<AdvertEntity>().eq(AdvertEntity::getAdvertId, qo.getAdvertId())));
+        return CommonResult.ok(advertService.getOne(new LambdaQueryWrapper<AdvertEntity>()
+                .eq(AdvertEntity::getAdvertId, qo.getAdvertId())));
     }
 
     /**
      * 新增一条广告
      * @param qo 新增信息
-     * @return boolean
+     * @return 是否成功
      */
     @PostMapping("/insert")
     @Permit("community:admin:advert:insert")
@@ -66,7 +66,7 @@ public class AdvertController {
     /**
      * 修改广告信息
      * @param entity 广告对象
-     * @return boolean
+     * @return 是否成功
      */
     @PostMapping("/update")
     @Permit("community:admin:advert:update")
@@ -87,7 +87,7 @@ public class AdvertController {
     /**
      * 根据ID删除广告
      * @param id 广告id
-     * @return
+     * @return 是否成功
      */
     @PostMapping("/deleteById")
     @Permit("community:admin:advert:deleteById")
@@ -97,8 +97,8 @@ public class AdvertController {
 
     /**
      * 根据id删除多个广告
-     * @param ids
-     * @return
+     * @param ids 广告id列表
+     * @return 是否成功
      */
     @PostMapping("/deleteList")
     @Permit("community:admin:advert:deleteList")
@@ -106,6 +106,11 @@ public class AdvertController {
         return CommonResult.ok(advertService.removeByIds(ids.getIds()) ? "删除成功" : "删除失败");
     }
 
+    /**
+     * 上传广告图片
+     * @param file 文件
+     * @return 文件访问地址
+     */
     @PostMapping("/fileUpload")
     public CommonResult fileUpload (@NotNull MultipartFile file) {
         return CommonResult.ok(new FileUrlDto(advertService.fileUpload(file)), "上传成功");

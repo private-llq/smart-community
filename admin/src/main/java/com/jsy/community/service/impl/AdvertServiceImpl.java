@@ -42,18 +42,20 @@ public class AdvertServiceImpl extends ServiceImpl<AdvertMapper, AdvertEntity> i
 
     @Autowired
     private AdvertMapper advertMapper;
-
-    private static final String ADVERT_IMG = "advert-img";
+    // Minio文件桶名称
+    private static final String ADVERT_IMG = "-advert-img";
 
     /**
      * 新增广告
      * @param param 新增广告参数
+     * @return 是否成功
      */
     @Override
     public boolean insertAdvert(AddAdvertQO param) {
         log.info("param= {}", param);
         AdvertEntity entity = new AdvertEntity();
-        AdvertEntity advertEntity = getOne(new LambdaQueryWrapper<AdvertEntity>().eq(AdvertEntity::getDisplayPosition, param.getDisplayPosition())
+        AdvertEntity advertEntity = getOne(new LambdaQueryWrapper<AdvertEntity>()
+                .eq(AdvertEntity::getDisplayPosition, param.getDisplayPosition())
                 .eq(AdvertEntity::getSort, param.getSort()));
         if (ObjectUtil.isNotNull(advertEntity)) {
             log.error("该顺序已被 id= {} 选择", advertEntity.getId());
@@ -68,6 +70,11 @@ public class AdvertServiceImpl extends ServiceImpl<AdvertMapper, AdvertEntity> i
         return save(entity);
     }
 
+    /**
+     * 广告分页
+     * @param qo 分页参数
+     * @return 分页数据
+     */
     @Override
     public IPage<AdvertDto> toPage(AdvertQO qo) {
         Page<AdvertDto> page = new Page<AdvertDto>(qo.getPage(),qo.getSize());
@@ -75,19 +82,32 @@ public class AdvertServiceImpl extends ServiceImpl<AdvertMapper, AdvertEntity> i
         return iPage;
     }
 
+    /**
+     * 编辑广告
+     * @param entity 广告实体类
+     * @return 是否成功
+     */
     @Override
     public boolean updateAdvert(AdvertEntity entity) {
         entity.setUpdateTime(LocalDateTime.now());
         return updateById(entity);
     }
 
+    /**
+     * 文件上传
+     * @param file 文件
+     * @return 文件访问url
+     */
     @Override
     public String fileUpload(MultipartFile file) {
         return MinioUtils.uploadFile(file, String.valueOf(LocalDate.now()+ADVERT_IMG));
     }
 
     /**
-     * 排序
+     * 排序 TODO 因产品说目前无需进行排序，故该方法暂且未用到
+     * @param position 广告位编号
+     * @param sort 期望顺序
+     * @return 实际当前顺序
      */
     public Integer sort(Integer position, Integer sort) {
         List<AdvertEntity> list = list(new LambdaQueryWrapper<AdvertEntity>().eq(AdvertEntity::getDisplayPosition, position));
@@ -104,6 +124,4 @@ public class AdvertServiceImpl extends ServiceImpl<AdvertMapper, AdvertEntity> i
         });
         return sort;
     }
-
-
 }
