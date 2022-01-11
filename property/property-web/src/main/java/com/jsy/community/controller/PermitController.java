@@ -45,6 +45,8 @@ public class PermitController {
     private IBaseUserInfoRpcService userInfoRpcService;
     @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
     private IBaseAuthRpcService baseAuthRpcService;
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+    private IBaseSmsRpcService baseSmsRpcService;
 
     /***
      * @author: Pipi
@@ -241,5 +243,19 @@ public class PermitController {
     @LoginIgnore
     public CommonResult queryUser(String name) {
         return CommonResult.ok(userInfoRpcService.queryUser("", name, null, 0, 99999999));
+    }
+    
+    /**
+     * @Description: 发送短信验证码
+     * @author: DKS
+     * @since: 2022/1/11 14:02
+     * @Param: [phone]
+     * @return: com.jsy.community.vo.CommonResult
+     */
+    @GetMapping("/sendVerificationCode")
+    @LoginIgnore
+    public CommonResult sendVerificationCode(String phone) {
+        baseSmsRpcService.sendVerificationCode(phone);
+        return CommonResult.ok();
     }
 }

@@ -5,6 +5,7 @@ import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -18,6 +19,7 @@ public class ProprietorMarketCategoryEntity extends BaseEntity implements Serial
     private String categoryId;
 
     @ApiModelProperty(value = "标签排序字段")
+    @Range( min = 0, message = "排序不能为负")
     private Integer sort;
 
     @NotNull

@@ -19,6 +19,7 @@ import com.zhsj.base.api.domain.PermitRole;
 import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import com.zhsj.base.api.rpc.IBaseMenuRpcService;
 import com.zhsj.base.api.rpc.IBaseRoleRpcService;
+import com.zhsj.base.api.rpc.IBaseSmsRpcService;
 import com.zhsj.base.api.vo.LoginVo;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
@@ -68,6 +69,8 @@ public class SysLoginController {
 	private IBaseMenuRpcService baseMenuRpcService;
 	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
 	private IBaseRoleRpcService baseRoleRpcService;
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseSmsRpcService baseSmsRpcService;
 	
 	@Value("${propertyLoginExpireHour}")
 	private long loginExpireHour = 12;
@@ -136,16 +139,13 @@ public class SysLoginController {
 		@ApiImplicitParam(name = "type", value = UserAuthEntity.CODE_TYPE_NOTE, required = true,
 			allowableValues = "1,2,3,4,5,6", paramType = "query")
 	})
-	public CommonResult<Boolean> sendCode(@RequestParam String account,
-	                                      @RequestParam Integer type) {
-		boolean b;
+	public CommonResult<Boolean> sendCode(@RequestParam String account, @RequestParam Integer type) {
 		if (RegexUtils.isMobile(account)) {
-			b = captchaService.sendMobile(account, type);
+			baseSmsRpcService.sendVerificationCode(account);
 		} else {
 			throw new AdminException(JSYError.REQUEST_PARAM);
 		}
-		
-		return b ? CommonResult.ok() : CommonResult.error("验证码发送失败");
+		return CommonResult.ok();
 	}
 	
 	/**
@@ -165,7 +165,7 @@ public class SysLoginController {
 		LoginVo loginVo;
 		// 判断是不是验证码登陆,如果是,判断验证码正不正确
 		if(!StringUtils.isEmpty(form.getCode())){
-			checkVerifyCode(form.getAccount(),form.getCode());
+//			checkVerifyCode(form.getAccount(),form.getCode());
 			loginVo = baseAuthRpcService.login(BusinessConst.ULTIMATE_ADMIN, form.getAccount(), form.getCode(), "PHONE_CODE");
 		} else {
 			loginVo = baseAuthRpcService.login(BusinessConst.ULTIMATE_ADMIN, form.getAccount(), RSAUtil.privateDecrypt(form.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), "PHONE_PWD");

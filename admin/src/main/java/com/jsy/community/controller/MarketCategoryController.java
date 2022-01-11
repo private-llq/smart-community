@@ -1,8 +1,8 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.entity.proprietor.ProprietorMarketCategoryEntity;
 import com.jsy.community.service.IMarketCategoryService;
+import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
@@ -31,6 +31,7 @@ public class MarketCategoryController {
     @ApiOperation("社区集市新增商品分类")
     @Permit("community:admin:marketCategory:addMarketCategory")
     public CommonResult addMarketCategory(@RequestBody ProprietorMarketCategoryEntity categoryEntity){
+        ValidatorUtils.validateEntity(categoryEntity);
         return CommonResult.ok(categoryService.addMarketCategory(categoryEntity) ? "添加成功" : "添加失败");
     }
     
@@ -45,6 +46,7 @@ public class MarketCategoryController {
     @ApiOperation("社区集市修改商品分类")
     @Permit("community:admin:marketCategory:updateMarketCategory")
     public CommonResult updateMarketCategory(@RequestBody ProprietorMarketCategoryEntity categoryEntity){
+        ValidatorUtils.validateEntity(categoryEntity);
         return CommonResult.ok(categoryService.updateMarketCategory(categoryEntity) ? "修改成功" : "修改失败");
     }
     

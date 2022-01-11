@@ -266,6 +266,7 @@ public class SmsController {
     @PostMapping("/menu/add")
     @Permit("community:admin:sms:menu:add")
     public CommonResult addSmsMenu(@RequestBody SmsMenuEntity smsMenuEntity){
+        ValidatorUtils.validateEntity(smsMenuEntity);
         return CommonResult.ok(smsMenuService.addSmsMenu(smsMenuEntity) ? "添加成功" : "添加失败");
     }
     
@@ -279,6 +280,7 @@ public class SmsController {
     @PutMapping("/menu/update")
     @Permit("community:admin:sms:menu:update")
     public CommonResult updateSmsMenu(@RequestBody SmsMenuEntity smsMenuEntity){
+        ValidatorUtils.validateEntity(smsMenuEntity);
         return CommonResult.ok(smsMenuService.updateSmsMenu(smsMenuEntity) ? "修改成功" : "修改失败");
     }
     
