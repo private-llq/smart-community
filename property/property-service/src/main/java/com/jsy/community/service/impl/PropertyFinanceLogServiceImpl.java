@@ -87,7 +87,7 @@ public class PropertyFinanceLogServiceImpl extends ServiceImpl<PropertyFinanceLo
 		// 查时间段
 		if (query.getStartTime() != null && query.getEndTime() != null) {
 			queryWrapper.ge("create_time", query.getStartTime());
-			queryWrapper.le("create_time", query.getEndTime());
+			queryWrapper.lt("create_time", query.getEndTime().plusDays(1));
 		}
 		
 		queryWrapper.orderByDesc("create_time");

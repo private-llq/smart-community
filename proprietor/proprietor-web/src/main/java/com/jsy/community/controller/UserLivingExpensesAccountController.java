@@ -38,9 +38,13 @@ public class UserLivingExpensesAccountController {
      **/
     @PostMapping("/v2/addAccount")
     public CommonResult<?> addAccount(@RequestBody UserLivingExpensesAccountEntity accountEntity) {
-        ValidatorUtils.validateEntity(accountEntity);
+        if (accountEntity.getBusinessFlow() == null) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "业务流程不能为空");
+        }
         if (accountEntity.getBusinessFlow() == 1) {
-            throw new JSYException(ConstError.BAD_REQUEST, "直缴业务不用绑定,请走直接缴费接口");
+            ValidatorUtils.validateEntity(accountEntity, UserLivingExpensesAccountEntity.AddDirectAccountValidateGroup.class);
+        } else {
+            ValidatorUtils.validateEntity(accountEntity, UserLivingExpensesAccountEntity.AddQueryAccountValidateGroup.class);
         }
         accountEntity.setUid(UserUtils.getUserId());
         accountEntity.setMobile(UserUtils.getUserInfo().getMobile());
@@ -81,12 +85,16 @@ public class UserLivingExpensesAccountController {
      **/
     @PostMapping("/v2/modifyAccount")
     public CommonResult<?> modifyAccount(@RequestBody UserLivingExpensesAccountEntity accountEntity) {
-        ValidatorUtils.validateEntity(accountEntity);
-        if (StringUtils.isBlank(accountEntity.getGroupId())) {
-            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "分组ID不能为空");
+        if (accountEntity.getBusinessFlow() == null) {
+            throw new JSYException(JSYError.REQUEST_PARAM);
         }
         if (accountEntity.getBusinessFlow() == 1) {
-            throw new JSYException(ConstError.BAD_REQUEST, "直缴业务不用绑定,请走直接缴费接口");
+            ValidatorUtils.validateEntity(accountEntity, UserLivingExpensesAccountEntity.AddDirectAccountValidateGroup.class);
+        } else {
+            ValidatorUtils.validateEntity(accountEntity, UserLivingExpensesAccountEntity.AddQueryAccountValidateGroup.class);
+        }
+        if (StringUtils.isBlank(accountEntity.getGroupId())) {
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "分组ID不能为空");
         }
         if (accountEntity.getId() == null) {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "账号ID不能为空");

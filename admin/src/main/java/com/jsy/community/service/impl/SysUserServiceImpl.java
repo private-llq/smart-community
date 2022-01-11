@@ -501,7 +501,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		
 		//更新资料
 		baseUpdateUserRpcService.updateUserInfo(sysUserQO.getId(), sysUserQO.getNickName(),
-			sysUserQO.getPhone(), sysUserQO.getPassword(), BusinessConst.ULTIMATE_ADMIN);
+			sysUserQO.getPhone(), password, BusinessConst.ULTIMATE_ADMIN);
 	}
 	
 	/**

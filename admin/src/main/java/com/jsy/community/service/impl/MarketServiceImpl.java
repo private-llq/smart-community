@@ -19,6 +19,7 @@ import com.zhsj.base.api.vo.PageVO;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -83,8 +84,8 @@ public class MarketServiceImpl extends ServiceImpl<MarketMapper, ProprietorMarke
         PropertyMarketQO query = baseQO.getQuery();
         ArrayList<ProprietorMarketVO> arrayList = new ArrayList<>();
     
-        PageVO<UserDetail> userDetailPageVO = baseUserInfoRpcService.queryUser("", query.getRealName(), 0, 999999999);
-        if (userDetailPageVO != null) {
+        PageVO<UserDetail> userDetailPageVO = baseUserInfoRpcService.queryUser(query.getPhone(), query.getRealName(), 0, 999999999);
+        if (!CollectionUtils.isEmpty(userDetailPageVO.getData())) {
             Set<Long> userDetailIds = userDetailPageVO.getData().stream().map(UserDetail::getId).collect(Collectors.toSet());
             List<String> collect = userDetailIds.stream().map(String::valueOf).collect(Collectors.toList());
             query.setUserDetailIds(collect);
@@ -177,12 +178,19 @@ public class MarketServiceImpl extends ServiceImpl<MarketMapper, ProprietorMarke
         page1 =(baseQO.getPage()-1)*baseQO.getSize();
 
         ArrayList<ProprietorMarketVO> arrayList = new ArrayList<>();
+    
+        PageVO<UserDetail> userDetailPageVO = baseUserInfoRpcService.queryUser("", "", 0, 999999999);
+        Map<Long, String> nickNameMap = userDetailPageVO.getData().stream().collect(Collectors.toMap(UserDetail::getId, UserDetail::getNickName));
+        
         List<ProprietorMarketEntity> list =  marketMapper.selectMarketBlacklist(page1,baseQO.getSize());
         for (ProprietorMarketEntity li : list){
             ProprietorMarketVO marketVO = new ProprietorMarketVO();
             BeanUtils.copyProperties(li,marketVO);
             // 补充标价
             marketVO.setPriceName(li.getNegotiable() == 1 ? "面议" : String.valueOf(li.getPrice()));
+            // 补充状态名称
+            marketVO.setStateName(li.getState() == 1 ? "已上架" : "已下架");
+            marketVO.setNickName(nickNameMap.get(Long.parseLong(li.getUid())));
             arrayList.add(marketVO);
         }
         Long total = marketMapper.findCount();

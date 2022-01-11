@@ -37,18 +37,13 @@ public class CarOperationServiceImpl extends ServiceImpl<CarOperationMapper, Car
     private AdminRoleMapper adminRoleMapper;
 
     @Override
-    public PageVO selectCarOperationLogPag(CarOperationLogQO qo) {
+    public PageVO selectCarOperationLogPag(CarOperationLogQO qo,Long adminCommunityId) {
 
-        Long adminCommunityId =UserUtils.getAdminCommunityId();
+
         log.info("社区id"+adminCommunityId);
         PageVO<CarOperationLogVO> pageVO=new PageVO();
-
-
         Page<CarOperationLog> page = new Page<>(qo.getPage(), qo.getSize());
-
         QueryWrapper<CarOperationLog> queryWrapper = new QueryWrapper<>();
-
-
 //        if (!ObjectUtils.isEmpty(qo.getUserRole())) {
 //            queryWrapper.eq("user_role",qo.getUserRole());
 //        }

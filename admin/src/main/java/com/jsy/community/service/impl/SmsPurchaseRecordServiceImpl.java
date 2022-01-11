@@ -11,6 +11,7 @@ import com.jsy.community.service.ISmsPurchaseRecordService;
 import com.jsy.community.utils.MyPageUtils;
 import com.jsy.community.utils.PageInfo;
 import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealUserDetail;
 import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.PageVO;
@@ -26,6 +27,9 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @program: com.jsy.community
@@ -80,13 +84,19 @@ public class SmsPurchaseRecordServiceImpl extends ServiceImpl<SmsPurchaseRecordM
 		if (CollectionUtils.isEmpty(pageData.getRecords())) {
 			return new PageInfo<>();
 		}
+		// 查询账号数据
+		Set<String> payByUid = pageData.getRecords().stream().map(SmsPurchaseRecordEntity::getPayBy).collect(Collectors.toSet());
+		Set<Long> payByUidSet = payByUid.stream().map(Long::parseLong).collect(Collectors.toSet());
+		List<RealUserDetail> realUserDetailsByUid = baseUserInfoRpcService.getRealUserDetailsByUid(payByUidSet);
+		Map<Long, String> realUserMap = realUserDetailsByUid.stream().collect(Collectors.toMap(RealUserDetail::getId, RealUserDetail::getPhone));
+		
 		// 补充数据
 		for (SmsPurchaseRecordEntity smsPurchaseRecordEntity : pageData.getRecords()) {
 			// 补充状态
 			smsPurchaseRecordEntity.setStatusName(smsPurchaseRecordEntity.getStatus() == 1 ? "已付款" : "未付款");
 			// 补充支付账号
 			if (smsPurchaseRecordEntity.getPayBy() != null) {
-				smsPurchaseRecordEntity.setPayByPhone(baseUserInfoRpcService.getUserDetail(Long.parseLong(smsPurchaseRecordEntity.getPayBy())).getPhone());
+				smsPurchaseRecordEntity.setPayByPhone(realUserMap.get(Long.parseLong(smsPurchaseRecordEntity.getPayBy())));
 			}
 		}
 		PageInfo<SmsPurchaseRecordEntity> pageInfo = new PageInfo<>();

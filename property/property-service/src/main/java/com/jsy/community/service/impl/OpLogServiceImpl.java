@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IOpLogService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.OpLogEntity;
-import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.mapper.AdminUserMapper;
 import com.jsy.community.mapper.OpLogMapper;
 import com.jsy.community.qo.BaseQO;
@@ -92,13 +91,14 @@ public class OpLogServiceImpl extends ServiceImpl<OpLogMapper, OpLogEntity> impl
 		}
 		// 补充用户名
 		Set<String> uidSet = pageData.getRecords().stream().map(OpLogEntity::getUserId).collect(Collectors.toSet());
-		List<RealUserDetail> realUserDetails = baseUserInfoRpcService.getRealUserDetails(uidSet);
-		Map<String, RealUserDetail> userDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
+		Set<Long> uidsSet = uidSet.stream().map(Long::parseLong).collect(Collectors.toSet());
+		List<RealUserDetail> realUserDetails = baseUserInfoRpcService.getRealUserDetailsByUid(uidsSet);
+		Map<Long, RealUserDetail> userDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getId, Function.identity()));
 		for (OpLogEntity entity : pageData.getRecords()) {
 			if (entity.getUserId() != null) {
-				RealUserDetail realUserDetail = userDetailMap.get(entity.getUserId());
+				RealUserDetail realUserDetail = userDetailMap.get(Long.parseLong(entity.getUserId()));
 				if (realUserDetail != null) {
-					entity.setUserName(realUserDetail.getRealName());
+					entity.setUserName(realUserDetail.getNickName());
 				}
 			}
 		}

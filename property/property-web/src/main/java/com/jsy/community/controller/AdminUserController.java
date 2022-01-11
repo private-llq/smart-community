@@ -17,6 +17,9 @@ import com.jsy.community.qo.admin.AdminUserQO;
 import com.jsy.community.qo.proprietor.ResetPasswordQO;
 import com.jsy.community.utils.*;
 import com.jsy.community.vo.CommonResult;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -242,6 +245,11 @@ public class AdminUserController {
 		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
 			//验证社区权限
 			UserUtils.validateCommunityIds(adminUserQO.getCommunityIdList());
+		}
+		if (!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())) {
+			if (adminUserQO.getCommunityRoleId() == null) {
+				throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "勾选小区的同时请选择小区角色!");
+			}
 		}
 		adminUserQO.setCompanyId(UserUtils.getAdminCompanyId());
 		adminUserQO.setUid(UserUtils.getId());

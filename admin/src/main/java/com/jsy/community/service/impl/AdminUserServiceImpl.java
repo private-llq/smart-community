@@ -110,7 +110,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 		for (UserDetail userDetail : userDetailPageVO.getData()) {
 			AdminUserEntity adminUserEntity = new AdminUserEntity();
 			// 补充物业公司名称
-			AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", userDetail.getId()).eq("deleted", 0));
+			AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", userDetail.getId()));
 			if (entity != null) {
 				PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(entity.getCompanyId());
 				if (companyEntity != null) {
@@ -168,12 +168,17 @@ public class AdminUserServiceImpl implements IAdminUserService {
 //		List<Long> roleIds = new ArrayList<>();
 //		roleIds.add(adminUserQO.getRoleId());
 //		baseRoleRpcService.userJoinRole(roleIds, userDetail.getId(), 1460884237115367425L);
-		// 绑定用户和物业公司
-		AdminUserCompanyEntity entity = new AdminUserCompanyEntity();
-		entity.setId(SnowFlake.nextId());
-		entity.setCompanyId(adminUserQO.getCompanyId());
-		entity.setUid(String.valueOf(userDetail.getId()));
-		adminUserCompanyMapper.insert(entity);
+		// 先查询是否已经绑定用户和物业公司
+		AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", userDetail.getId()).eq("company_id", adminUserQO.getCompanyId()));
+		// 没有绑定
+		if (entity == null) {
+			// 绑定用户和物业公司
+			entity = new AdminUserCompanyEntity();
+			entity.setId(SnowFlake.nextId());
+			entity.setCompanyId(adminUserQO.getCompanyId());
+			entity.setUid(String.valueOf(userDetail.getId()));
+			adminUserCompanyMapper.insert(entity);
+		}
 		return result;
 	}
 	

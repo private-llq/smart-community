@@ -55,11 +55,21 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
                 CarPositionEntity entity = carPositionService.selectOne(propertyFinanceOrderEntity.getTargetId());
                 HouseEntity houseEntity = houseMapper.selectById(entity.getHouseId());
                 propertyFinanceOrderEntity.setAddress(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
-                propertyFinanceOrderEntity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(propertyFinanceOrderEntity.getType()));
+//                propertyFinanceOrderEntity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(propertyFinanceOrderEntity.getType()));
+                if (propertyFinanceOrderEntity.getType() != null) {
+                    propertyFinanceOrderEntity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(propertyFinanceOrderEntity.getType()));
+                } else {
+                    propertyFinanceOrderEntity.setFeeRuleName(propertyFinanceOrderEntity.getRise().substring(propertyFinanceOrderEntity.getRise().indexOf("-") + 1));
+                }
             } else {
                 HouseEntity houseEntity = houseMapper.selectById(propertyFinanceOrderEntity.getTargetId());
                 propertyFinanceOrderEntity.setAddress(houseEntity.getBuilding()+houseEntity.getUnit()+houseEntity.getDoor());
-                propertyFinanceOrderEntity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(propertyFinanceOrderEntity.getType()));
+//                propertyFinanceOrderEntity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(propertyFinanceOrderEntity.getType()));
+                if (propertyFinanceOrderEntity.getType() != null) {
+                    propertyFinanceOrderEntity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(propertyFinanceOrderEntity.getType()));
+                } else {
+                    propertyFinanceOrderEntity.setFeeRuleName(propertyFinanceOrderEntity.getRise().substring(propertyFinanceOrderEntity.getRise().indexOf("-") + 1));
+                }
             }
             if (propertyFinanceOrderEntity.getPenalSum()!=null||!propertyFinanceOrderEntity.getPenalSum().equals(0.00)){
 
@@ -88,7 +98,12 @@ public class SelectPropertyFinanceOrderServiceImpl implements ISelectPropertyFin
                 for (PropertyFinanceOrderEntity entity : list) {
                     entity.setTotalMoney(entity.getPropertyFee().add(entity.getPenalSum()));
                     entity.setAddress((String) houseMap.get(entity.getTargetId()));
-                    entity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(entity.getType()));
+//                    entity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(entity.getType()));
+                    if (entity.getType() != null) {
+                        entity.setFeeRuleName(BusinessEnum.FeeRuleNameEnum.getName(entity.getType()));
+                    } else {
+                        entity.setFeeRuleName(entity.getRise().substring(entity.getRise().indexOf("-") + 1));
+                    }
                 }
             }
             return list;
