@@ -105,6 +105,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     @Override
     @Transactional
     public void appMonth(CarMonthlyVehicle vehicle) {
+
         //查询黑名单中是否存在该车辆
         CarBlackListEntity car_number = carBlackListMapper.selectOne(new QueryWrapper<CarBlackListEntity>().eq("car_number", vehicle.getCarNumber()));
         if (Objects.nonNull(car_number)){
