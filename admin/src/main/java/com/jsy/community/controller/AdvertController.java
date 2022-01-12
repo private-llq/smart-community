@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -59,7 +60,7 @@ public class AdvertController {
      */
     @PostMapping("/insert")
     @Permit("community:admin:advert:insert")
-    public CommonResult insert(@RequestBody AddAdvertQO qo) {
+    public CommonResult insert(@RequestBody @Valid AddAdvertQO qo) {
         return CommonResult.ok(advertService.insertAdvert(qo) ? "添加成功" : "添加失败");
     }
 
