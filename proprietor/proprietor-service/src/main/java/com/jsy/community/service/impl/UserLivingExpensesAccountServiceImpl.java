@@ -1,6 +1,9 @@
 package com.jsy.community.service.impl;
 import com.google.common.collect.Lists;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.CebBankService;
@@ -17,6 +20,7 @@ import com.jsy.community.mapper.UserLivingExpensesBillMapper;
 import com.jsy.community.mapper.UserLivingExpensesGroupMapper;
 import com.jsy.community.qo.cebbank.CebQueryBillInfoQO;
 import com.jsy.community.qo.cebbank.CebQueryMobileBillQO;
+import com.jsy.community.utils.DateCalculateUtil;
 import com.jsy.community.utils.SnowFlake;
 import com.jsy.community.vo.cebbank.CebQueryBillInfoVO;
 import com.jsy.community.vo.cebbank.CebQueryMobileBillVO;
@@ -24,6 +28,7 @@ import com.jsy.community.vo.cebbank.test.CebBillQueryResultDataModelVO;
 import com.jsy.community.vo.cebbank.test.CebCreatePaymentBillParamsModelVO;
 import com.zhsj.basecommon.exception.BaseException;
 import jodd.util.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +44,7 @@ import javax.annotation.Resource;
  * @Date: 2021/12/2 16:55
  * @Version: 1.0
  **/
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_proprietor)
 public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLivingExpensesAccountMapper, UserLivingExpensesAccountEntity> implements UserLivingExpensesAccountService {
     @Autowired
@@ -66,13 +72,14 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
     @Transactional(rollbackFor = Exception.class)
     public Long addAccount(UserLivingExpensesAccountEntity accountEntity) {
         accountEntity.setId(SnowFlake.nextId());
+        Boolean billStatus = false;
         if (accountEntity.getBusinessFlow() == 1) {
             // 查询缴费信息,无返回值,目的是验证填写信息是否正确,不正确会抛出异常,不往下走
             directBillInfo(accountEntity);
         } else {
             // 查询用户信息和账单,并添加
             CebQueryBillInfoVO cebQueryBillInfoVO = queryBillInfo(accountEntity);
-            addBill(accountEntity, cebQueryBillInfoVO);
+            billStatus = addBill(accountEntity, cebQueryBillInfoVO);
         }
         // 如果没有选择分组,则分配到默认分组
         if (StringUtil.isBlank(accountEntity.getGroupId())) {
@@ -92,6 +99,16 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
                 userLivingExpensesGroupEntity1.setId(SnowFlake.nextId());
                 groupMapper.insert(userLivingExpensesGroupEntity1);
                 accountEntity.setGroupId(userLivingExpensesGroupEntity1.getId().toString());
+            }
+        }
+        // 添加查询标记
+        if (billStatus) {
+            accountEntity.setQuerySuccessMark(DateCalculateUtil.getCurrentMonthOddEven());
+        } else {
+            if (DateCalculateUtil.getCurrentMonthOddEven() == 1) {
+                accountEntity.setQuerySuccessMark(2);
+            } else {
+                accountEntity.setQuerySuccessMark(1);
             }
         }
         int insert = accountMapper.insert(accountEntity);
@@ -161,15 +178,26 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
                 // 查询缴费信息,无返回值,目的是验证填写信息是否正确,不正确会抛出异常,不往下走
                 directBillInfo(accountEntity);
             } else {
+                Boolean billStatus = false;
                 // 查询用户信息和账单,并添加
                 CebQueryBillInfoVO cebQueryBillInfoVO = queryBillInfo(accountEntity);
-                addBill(accountEntity, cebQueryBillInfoVO);
+                billStatus = addBill(accountEntity, cebQueryBillInfoVO);
+                // 添加查询标记
+                if (billStatus) {
+                    accountEntity.setQuerySuccessMark(DateCalculateUtil.getCurrentMonthOddEven());
+                } else {
+                    if (DateCalculateUtil.getCurrentMonthOddEven() == 1) {
+                        accountEntity.setQuerySuccessMark(2);
+                    } else {
+                        accountEntity.setQuerySuccessMark(1);
+                    }
+                }
             }
         } else {
             // 修改了分组
             recordAccountEntity.setGroupId(accountEntity.getGroupId());
-            accountMapper.updateById(recordAccountEntity);
         }
+        accountMapper.updateById(recordAccountEntity);
         return true;
     }
 
@@ -197,6 +225,49 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
         billMapper.delete(billEntityQueryWrapper);
         accountMapper.delete(queryWrapper);
         return true;
+    }
+
+    /**
+     * @author: Pipi
+     * @description: 光大云缴费定时查询账单任务
+     * 定时查询账户的账单,查询的对象为查缴类型的(businessFlow等于0或者2)的户号,
+     * 户号拥有标记,标记状态与当月为单数还是双数的状态不一致的则查询
+     * 查询成功后,将标记修改为更当月为单数还是双数的状态一致
+     * 单当月为单数还是双数的状态(1,3,5,7,9,11的标记为1,2,4,6,8,10,12的标记为2)
+     * 每月的最后一次执行任务时,查询之后修改执行的数据的标记为跟当月标记一致
+     * @return: {@link Void}
+     * @date: 2022/1/11 14:07
+     **/
+    @Override
+    public void cebBankQueryTask() {
+        log.info("光大云缴费定时查询账单任务进入内部执行");
+        // 获取当前月是奇月还是偶月
+        Integer currentMonthOddEven = DateCalculateUtil.getCurrentMonthOddEven();
+        // 获取需要执行查询的户号对象
+        QueryWrapper<UserLivingExpensesAccountEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ne("query_success_mark", currentMonthOddEven);
+        queryWrapper.in("business_flow", 0, 2);
+        List<UserLivingExpensesAccountEntity> accountEntities = accountMapper.selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(accountEntities)) {
+            log.info("需要查询的数量:{}", accountEntities.size());
+            for (UserLivingExpensesAccountEntity accountEntity : accountEntities) {
+                // 循环执行查询账户账单
+                try {
+                    accountEntity.setDeviceType("1");
+                    CebQueryBillInfoVO cebQueryBillInfoVO = queryBillInfo(accountEntity);
+                    if (addBill(accountEntity, cebQueryBillInfoVO)) {
+                        log.info("更新账户的查询状态数据");
+                        accountEntity.setQuerySuccessMark(currentMonthOddEven);
+                        accountMapper.updateById(accountEntity);
+                        log.info("更新完成");
+                    }
+                } catch (Exception e) {
+                    log.info("发生异常的账号:{}和ID:{}", accountEntity.getAccount(), accountEntity.getId());
+                    // 捕获异常,让循环得已继续
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     /**
@@ -251,7 +322,17 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
                 String originalCustomerName = resultDataModelVO.getOriginalCustomerName();
                 accountEntity.setHouseholder(StringUtil.isNotBlank(originalCustomerName) ? originalCustomerName : resultDataModelVO.getCustomerName());
                 accountEntity.setAddress(cebQueryBillInfoVO.getBillQueryResultModel().getItem7());
-
+                // 判断账单是不是已经存在
+                QueryWrapper<UserLivingExpensesBillEntity> billEntityQueryWrapper = new QueryWrapper<>();
+                billEntityQueryWrapper.eq("uid", accountEntity.getUid());
+                billEntityQueryWrapper.eq("bill_key", accountEntity.getAccount());
+                billEntityQueryWrapper.eq("contact_no", resultDataModelVO.getContractNo());
+                billEntityQueryWrapper.last("limit 1");
+                if (billMapper.selectOne(billEntityQueryWrapper) != null) {
+                    // 账单已经存在,不用插入新的账单数据,但是为了不影响后去流程,直接返回true
+//                    throw new ProprietorException(JSYError.BILL_EXISTS);
+                    return true;
+                }
                 UserLivingExpensesBillEntity billEntity = new UserLivingExpensesBillEntity();
                 billEntity.setUid(accountEntity.getUid());
                 billEntity.setTypeId(accountEntity.getTypeId());

@@ -29,7 +29,7 @@ public class CarOperationLog implements Serializable {
 
     private String operation;//操作
 
-    private Integer status;//转态0操作失败，1操作成功
+    private Integer status;//转态0操作成功，1失败
 
     private LocalDateTime operationTime;//操作时间
 
