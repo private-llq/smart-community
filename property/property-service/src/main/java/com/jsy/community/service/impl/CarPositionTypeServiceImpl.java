@@ -63,10 +63,19 @@ public class CarPositionTypeServiceImpl extends ServiceImpl<CarPositionTypeMappe
     }
 
     @Override
-    public boolean updateCartPositionType(UpdateCartPositionTypeQO qo) {
+    public boolean updateCartPositionType(UpdateCartPositionTypeQO qo,Long adminCommunityId) {
         CarPositionTypeEntity entity=new CarPositionTypeEntity();
         entity.setDescription(qo.getDescription());
         entity.setId(qo.getId());
+        QueryWrapper<CarPositionTypeEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("description",qo.getDescription());
+        queryWrapper.eq("community_id",adminCommunityId);
+        List<CarPositionTypeEntity> list = carPositionTypeMapper.selectList(queryWrapper);
+        if (list.size()>0) {
+            log.info("该车位分类已经存在");
+            throw new PropertyException(500,"分类已存在");
+        }
+
         int i = carPositionTypeMapper.updateById(entity);
         if(i>0){
             return true;
