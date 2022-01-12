@@ -40,5 +40,8 @@ public class SysUserQO implements Serializable {
 
 	// 角色ID
 	private Long roleId;
+	
+	// 更新用户id
+	private Long updateUid;
 
 }

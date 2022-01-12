@@ -20,6 +20,18 @@ public class UserFaceEntity extends BaseEntity {
      * 人脸照片路径
      */
     private String faceUrl;
+    
+    /**
+     * 手机
+     */
+    @TableField( exist = false )
+    private String mobile;
+    
+    /**
+     * 用户名
+     */
+    @TableField( exist = false )
+    private String realName;
 
     /**
      * 用户uid

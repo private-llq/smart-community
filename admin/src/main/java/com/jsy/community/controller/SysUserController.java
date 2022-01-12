@@ -194,6 +194,7 @@ public class SysUserController {
 	@Permit("community:admin:sys:user:update")
 	public CommonResult updateOperator(@RequestBody SysUserQO sysUserQO){
 		ValidatorUtils.validateEntity(sysUserQO);
+		sysUserQO.setUpdateUid(Long.valueOf(UserUtils.getId()));
 		sysUserService.updateOperator(sysUserQO);
 		return CommonResult.ok("操作成功");
 	}
