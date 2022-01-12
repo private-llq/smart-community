@@ -75,6 +75,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     @Autowired
     private CarOrderMapper carOrderMapper;
 
+
+
+
     /**
      * @Description: app修改月租车辆到期时间
      * @author: Hu
@@ -105,6 +108,7 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
     @Override
     @Transactional
     public void appMonth(CarMonthlyVehicle vehicle) {
+
         //查询黑名单中是否存在该车辆
         CarBlackListEntity car_number = carBlackListMapper.selectOne(new QueryWrapper<CarBlackListEntity>().eq("car_number", vehicle.getCarNumber()));
         if (Objects.nonNull(car_number)){
@@ -814,7 +818,10 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
                 return overdueVo;
             }
 
-            if (maxCarCutOffEntity.get().getState()==0 && now > monthlyVehicle.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli()){
+            long endTime = monthlyVehicle.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+            List<CarOrderEntity> selectList = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>().gt("create_time", endTime));
+
+            if (maxCarCutOffEntity.get().getState()==0 && now > monthlyVehicle.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli() && selectList.size()==0){
                 OverdueVo overdueVo = new OverdueVo();
                 overdueVo.setState(1);
                 overdueVo.setCarMonthlyVehicle(monthlyVehicle);
