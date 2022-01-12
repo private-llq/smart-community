@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.entity.PayConfigureEntity;
 import com.jsy.community.service.IAliConfigService;
 import com.jsy.community.utils.MinioUtils;
@@ -108,6 +107,6 @@ public class AliConfigController {
     @GetMapping("/getConfig")
     @Permit("community:admin:ali:config:getConfig")
     public CommonResult getConfig() {
-        return CommonResult.ok(aliConfigService.getConfig(),"查询成功!");
+        return CommonResult.ok(aliConfigService.getConfig());
     }
 }
