@@ -55,7 +55,7 @@ public class UserLivingExpensesBillServiceImpl extends ServiceImpl<UserLivingExp
         if (ObjectUtil.isNotNull(userLivingExpensesBillEntity)) {
             QueryWrapper<UserLivingExpensesAccountEntity> accountEntityQueryWrapper = new QueryWrapper<>();
             accountEntityQueryWrapper.eq("uid", billEntity.getUid());
-            accountEntityQueryWrapper.eq("account", billEntity.getBillKey());
+            accountEntityQueryWrapper.eq("account", userLivingExpensesBillEntity.getBillKey());
             UserLivingExpensesAccountEntity userLivingExpensesAccountEntity = accountMapper.selectOne(accountEntityQueryWrapper);
             if (userLivingExpensesAccountEntity != null) {
                 userLivingExpensesBillEntity.setCompanyName(userLivingExpensesAccountEntity.getCompany());
@@ -78,7 +78,7 @@ public class UserLivingExpensesBillServiceImpl extends ServiceImpl<UserLivingExp
     @Override
     public List<UserLivingExpensesBillEntity> queryBillList(UserLivingExpensesBillEntity billEntity) {
         QueryWrapper<UserLivingExpensesBillEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id,begin_date,bill_amount");
+        queryWrapper.select("id,begin_date,bill_amount,create_time");
         queryWrapper.eq("uid", billEntity.getUid());
         queryWrapper.eq("bill_key", billEntity.getBillKey());
         queryWrapper.eq("bill_status", BusinessEnum.PaymentStatusEnum.UNPAID.getCode());
