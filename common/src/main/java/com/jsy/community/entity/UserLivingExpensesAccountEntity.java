@@ -101,6 +101,11 @@ public class UserLivingExpensesAccountEntity extends BaseEntity {
     private Integer businessFlow;
 
     /**
+     * 账单查询成功后的标记,与月份的奇偶数一致,则当月的查询成功
+     */
+    private Integer querySuccessMark;
+
+    /**
      * 1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序-部分接口必填
      */
     @NotBlank(groups = {AddQueryAccountValidateGroup.class}, message = "终端类型不能为空;1-PC个人电脑2-手机终端3-微信公众号4-支付宝5-微信小程序")
