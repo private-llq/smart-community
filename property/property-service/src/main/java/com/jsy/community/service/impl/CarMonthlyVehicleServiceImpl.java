@@ -137,6 +137,9 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         if (Objects.isNull(carMonthlyVehicle.getMonthlyFee())){
             throw new PropertyException("包月费用不能为空！");
         }
+        if (carMonthlyVehicle.getMonthlyFee().compareTo(BigDecimal.ZERO) ==-1){
+            throw new JSYException(-1,"包月费用不能小于0！");
+        }
         if (Objects.isNull(carMonthlyVehicle.getPhone())){
             throw new PropertyException("手机号码不能为空！");
         }

@@ -14,6 +14,7 @@ import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.property.CarChargeEntity;
 import com.jsy.community.entity.property.CarCutOffEntity;
 import com.jsy.community.entity.property.CarMonthlyVehicle;
+import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.CarChargeMapper;
 import com.jsy.community.mapper.CarCutOffMapper;
 import com.jsy.community.mapper.CarMonthlyVehicleMapper;
@@ -64,6 +65,13 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
     @Override
     @Transactional
     public Integer SaveCarCharge(CarChargeEntity carChargeEntity,Long communityId) {
+        BigDecimal money = carChargeEntity.getMoney();
+        if (Objects.isNull(money)){
+            throw new JSYException(-1,"月租金额不能为空！");
+        }
+        if(money.compareTo(BigDecimal.ZERO)== -1){
+            throw new JSYException(-1,"月租金额不能为负数！");
+        }
         carChargeEntity.setCommunityId(communityId);
         carChargeEntity.setUid(UserUtils.randomUUID());
         carChargeEntity.setOpen(0);//未启用
@@ -140,6 +148,25 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
     @Override
     @Transactional
     public Integer temporaryParkingSet(CarChargeEntity carChargeEntity, Long adminCommunityId) {
+        BigDecimal chargePrice = carChargeEntity.getChargePrice();//收费价格
+        BigDecimal cappingFee = carChargeEntity.getCappingFee();//封顶费用
+        Integer freeTime = carChargeEntity.getFreeTime();//免费时间
+        if (Objects.isNull(chargePrice)){
+            throw new JSYException(-1,"收费价格不能为空！");
+        }
+        if(chargePrice.compareTo(BigDecimal.ZERO)== -1){
+            throw new JSYException(-1,"收费价格不能为负数！");
+        }
+        if (Objects.nonNull(cappingFee)){
+            if (cappingFee.compareTo(BigDecimal.ZERO)== -1){
+                throw new JSYException(-1,"封顶费用不能为负数！");
+            }
+        }
+        if (Objects.nonNull(freeTime)){
+            if (freeTime<0){
+                throw new JSYException(-1,"免费时间不能为负数！");
+            }
+        }
         carChargeEntity.setCommunityId(adminCommunityId);
         carChargeEntity.setUid(UserUtils.randomUUID());
         int insert = carChargeMapper.insert(carChargeEntity);
