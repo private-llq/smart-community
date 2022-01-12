@@ -4,6 +4,7 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarPositionTypeService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarPositionTypeEntity;
 import com.jsy.community.mapper.CarPositionMapper;
@@ -14,8 +15,10 @@ import com.jsy.community.vo.property.SelectCartPositionTypeVO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.management.JMException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,11 +38,20 @@ public class CarPositionTypeServiceImpl extends ServiceImpl<CarPositionTypeMappe
     private     CarPositionTypeMapper carPositionTypeMapper;
 
     @Override
+    @Transactional
     public Boolean insterCartPositionType(String description ,Long CommunityId) {
+
         CarPositionTypeEntity entity=new CarPositionTypeEntity();
         entity.setDescription(description);
         entity.setCommunityId(CommunityId);
         entity.setTypeId(UUID.randomUUID().toString());
+        QueryWrapper<CarPositionTypeEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("description",description);
+        queryWrapper.eq("community_id",CommunityId);
+        List<CarPositionTypeEntity> list = carPositionTypeMapper.selectList(queryWrapper);
+        if (list.size()>0) {
+            throw new PropertyException(500,"分类已存在");
+        }
         int insert = carPositionTypeMapper.insert(entity);
 
         if(insert>0){
