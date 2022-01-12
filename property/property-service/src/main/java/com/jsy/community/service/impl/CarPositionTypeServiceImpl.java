@@ -12,6 +12,7 @@ import com.jsy.community.mapper.CarPositionTypeMapper;
 import com.jsy.community.qo.property.UpdateCartPositionTypeQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.vo.property.SelectCartPositionTypeVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ import java.util.UUID;
  * @author Arli
  * @since 2021-08-05
  */
-
+@Slf4j
 @DubboService(version = Const.version, group = Const.group_property)
 public class CarPositionTypeServiceImpl extends ServiceImpl<CarPositionTypeMapper, CarPositionTypeEntity> implements ICarPositionTypeService {
     @Resource
@@ -50,6 +51,7 @@ public class CarPositionTypeServiceImpl extends ServiceImpl<CarPositionTypeMappe
         queryWrapper.eq("community_id",CommunityId);
         List<CarPositionTypeEntity> list = carPositionTypeMapper.selectList(queryWrapper);
         if (list.size()>0) {
+            log.info("该车位分类已经存在");
             throw new PropertyException(500,"分类已存在");
         }
         int insert = carPositionTypeMapper.insert(entity);
