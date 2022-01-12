@@ -328,12 +328,12 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		MyPageUtils.setPageAndSize(page, baseQO);
 
 		// 查出所有
-		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(baseQO.getPage().intValue(), 9999, query.getName(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
+		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(1, 9999, query.getName(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
 		if (CollectionUtils.isEmpty(permitRolePageVO.getData())) {
 			return new PageVO<>();
 		}
 		Set<Long> roleIdSet = permitRolePageVO.getData().stream().map(PermitRole::getId).collect(Collectors.toSet());
-		List<AdminRoleCompanyEntity> roleCompanyEntityList = adminRoleCompanyMapper.selectList(new QueryWrapper<AdminRoleCompanyEntity>().in("role_id", roleIdSet));
+		List<AdminRoleCompanyEntity> roleCompanyEntityList = adminRoleCompanyMapper.selectList(new QueryWrapper<AdminRoleCompanyEntity>().eq("company_id", query.getCompanyId()).in("role_id", roleIdSet));
 		if (!CollectionUtils.isEmpty(roleCompanyEntityList)) {
 			List<Long> companyRoleIdSet = roleCompanyEntityList.stream().map(AdminRoleCompanyEntity::getRoleId).collect(Collectors.toList());
 			List<PermitRole> permitRoleList = new ArrayList<>();
@@ -344,7 +344,8 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 			}
 			List<AdminRoleEntity> result = new ArrayList<>();
 			int end = baseQO.getSize() * baseQO.getPage() < permitRoleList.size() ? (int) (baseQO.getSize() * baseQO.getPage()) : permitRoleList.size();
-			for (int i = (int) (baseQO.getPage() - 1); i < end; i++) {
+			int start = (int) (baseQO.getSize() * (baseQO.getPage() - 1));
+			for (int i = start; i < end; i++) {
 				AdminRoleEntity adminRoleEntity = new AdminRoleEntity();
 				adminRoleEntity.setId(permitRoleList.get(i).getId());
 				adminRoleEntity.setIdStr(String.valueOf(permitRoleList.get(i).getId()));

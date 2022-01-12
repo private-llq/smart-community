@@ -15,7 +15,9 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.entity.RealUserDetail;
+import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.PageVO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -79,9 +81,12 @@ public class OpLogServiceImpl extends ServiceImpl<OpLogMapper, OpLogEntity> impl
 		}
 		// 模糊查询用户名
 		if (StringUtils.isNotBlank(query.getUserName())) {
-			List<String> uidList = adminUserMapper.queryUidListByRealName(query.getUserName());
-			if (!CollectionUtils.isEmpty(uidList)) {
-				queryWrapper.in("user_id", uidList);
+			PageVO<UserDetail> pageVO = baseUserInfoRpcService.queryUser("", query.getUserName(), 0, 99999999);
+			Set<Long> userIds = pageVO.getData().stream().map(UserDetail::getId).collect(Collectors.toSet());
+			if (!CollectionUtils.isEmpty(userIds)) {
+				queryWrapper.in("user_id", userIds);
+			} else {
+				return new PageInfo<>();
 			}
 		}
 		queryWrapper.orderByDesc("create_time");
