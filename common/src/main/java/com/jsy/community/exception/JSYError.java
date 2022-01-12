@@ -30,18 +30,19 @@ public enum JSYError {
 	DATA_LOST(ConstError.DATA_LOST,"数据不存在！"),
 	FLOOR_BEYOND(ConstError.FLOOR_BEYOND,"总楼层低于房屋楼层，无法修改！"),
 
-	// 支付模块
+	// 物业模块1
+
+	// 租赁模块2
+
+	// 业主模块3
+	BILL_EXISTS(36001, "账单已经存在"),
+
+	// 支付模块4
 	THIRD_FAILED(46001, "第三方服务调用失败!"),
 	THIRD_QUERY_FAILED(46002, "第三方查询失败!"),
 	DESK_CREATE_ERROR(46003, "收银台失败!"),
 
-	// 租赁模块
-
-	// 业主模块
-
-	// 物业模块
-
-	// 大后台模块
+	// 大后台模块5
 	SMS_TYPE_DUPLICATE(50001, "有存在短信模板的分类无法被删除!"),
 	SMS_TYPE_LOST(50002, "有不存在的短信分类"),
 	SMS_MENU_LOST(50003, "有不存在的短信套餐"),

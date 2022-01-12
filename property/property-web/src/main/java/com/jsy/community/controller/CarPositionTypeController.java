@@ -55,7 +55,8 @@ public class CarPositionTypeController {
     @businessLog(operation = "编辑",content = "更新了【车位类型】")
     @Permit("community:property:carPositionType:updateCartPositionType")
     public CommonResult<Boolean> updateCartPositionType(@RequestBody UpdateCartPositionTypeQO qo) {
-      boolean aBoolean=  iCarPositionTypeService.updateCartPositionType(qo);
+        Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
+      boolean aBoolean=  iCarPositionTypeService.updateCartPositionType(qo,adminCommunityId);
         if (aBoolean) {
             return CommonResult.ok(aBoolean,"修改车位类型成功") ;
         }

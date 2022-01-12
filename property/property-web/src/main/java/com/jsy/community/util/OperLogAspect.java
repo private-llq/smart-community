@@ -86,7 +86,7 @@ public class OperLogAspect {
                 carOperationLog.setCommunityId(adminCommunityId);//社区id
                 carOperationLog.setUserId(userId);//用户id
                 carOperationLog.setOperation(operation);//操作
-                carOperationLog.setStatus(1); // 状态
+                carOperationLog.setStatus(0); // 状态
                 carOperationLog.setOperationTime(LocalDateTime.now());
                 carOperationLog.setDeleted(0L);
                 System.out.println("对象结束赋值");

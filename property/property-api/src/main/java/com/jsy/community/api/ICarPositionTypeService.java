@@ -19,7 +19,7 @@ public interface ICarPositionTypeService extends IService<CarPositionTypeEntity>
 
     Boolean insterCartPositionType(String description,Long CommunityId);
 
-    boolean updateCartPositionType(UpdateCartPositionTypeQO qo);
+    boolean updateCartPositionType(UpdateCartPositionTypeQO qo,Long adminCommunityId);
 
     List<SelectCartPositionTypeVO> selectCartPositionType(Long adminCommunityId);
 

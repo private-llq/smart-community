@@ -26,6 +26,7 @@ import com.zhsj.base.api.domain.PermitRole;
 import com.zhsj.base.api.rpc.IBaseAuthRpcService;
 import com.zhsj.base.api.rpc.IBaseMenuRpcService;
 import com.zhsj.base.api.rpc.IBaseRoleRpcService;
+import com.zhsj.base.api.rpc.IBaseSmsRpcService;
 import com.zhsj.base.api.vo.LoginVo;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
@@ -34,7 +35,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
@@ -75,6 +75,8 @@ public class AdminLoginController {
 	private IBaseRoleRpcService baseRoleRpcService;
 	@DubboReference(version = Const.version, group = Const.group, check = false)
 	private ICommunityService communityService;
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseSmsRpcService baseSmsRpcService;
 
 	
 	@Resource
@@ -120,16 +122,13 @@ public class AdminLoginController {
 			allowableValues = "1,2,3,4,5,6", paramType = "query")
 	})
 	@LoginIgnore
-	public CommonResult<Boolean> sendCode(@RequestParam String account,
-	                                      @RequestParam Integer type) {
-		boolean b;
+	public CommonResult<Boolean> sendCode(@RequestParam String account, @RequestParam Integer type) {
 		if (RegexUtils.isMobile(account)) {
-			b = captchaService.sendMobile(account, type);
+			baseSmsRpcService.sendVerificationCode(account);
 		} else {
 			throw new PropertyException(JSYError.REQUEST_PARAM);
 		}
-		
-		return b ? CommonResult.ok() : CommonResult.error("验证码发送失败");
+		return CommonResult.ok();
 	}
 	
 	/**
@@ -154,7 +153,7 @@ public class AdminLoginController {
 		LoginVo loginVo;
 		// 判断是不是验证码登陆,如果是,判断验证码正不正确并获取用户信息
 		if(!StringUtils.isEmpty(form.getCode())){
-			checkVerifyCode(form.getAccount(),form.getCode());
+//			checkVerifyCode(form.getAccount(),form.getCode());
 			loginVo = baseAuthRpcService.propertyLogin(form.getAccount(), form.getCode(), "PHONE_CODE");
 		} else {
 			loginVo = baseAuthRpcService.propertyLogin(form.getAccount(), RSAUtil.privateDecrypt(form.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), "PHONE_PWD");

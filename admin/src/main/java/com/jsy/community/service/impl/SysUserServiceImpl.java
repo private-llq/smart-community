@@ -492,16 +492,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	 **/
 	@Override
 	public void updateOperator(SysUserQO sysUserQO){
-		// 密码正则匹配
-		String password = RSAUtil.privateDecrypt(sysUserQO.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY));
-		String pattern = "^(?=.*[A-Z0-9])(?=.*[a-z0-9])(?=.*[a-zA-Z])(.{6,12})$";
-		if (!password.matches(pattern)) {
-			throw new AdminException(JSYError.REQUEST_PARAM.getCode(), "请输入一个正确的6-12位密码,至少包含大写字母或小写字母或数字两种!");
-		}
-		
 		//更新资料
 		baseUpdateUserRpcService.updateUserInfo(sysUserQO.getId(), sysUserQO.getNickName(),
-			sysUserQO.getPhone(), password, BusinessConst.ULTIMATE_ADMIN);
+			sysUserQO.getPhone(), null, BusinessConst.ULTIMATE_ADMIN);
 	}
 	
 	/**
