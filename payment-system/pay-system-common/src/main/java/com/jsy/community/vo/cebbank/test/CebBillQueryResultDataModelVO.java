@@ -21,10 +21,10 @@ public class CebBillQueryResultDataModelVO implements Serializable {
     private String originalCustomerName;
 
     // 账单金额,单位分
-    private String payAmount;
+    private Integer payAmount;
 
     // 余额,单位分
-    private String balance;
+    private Integer balance;
 
     // 起始日期
     private String beginDate;
