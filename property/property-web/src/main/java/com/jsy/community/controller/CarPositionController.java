@@ -29,6 +29,7 @@ import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.BeanUtils;
@@ -63,6 +64,7 @@ import java.util.*;
 @RequestMapping("/car-position")
 @RestController
 @Api(tags = "车位模块")
+@Slf4j
 public class CarPositionController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
@@ -290,8 +292,6 @@ public class CarPositionController {
     }
 
 
-
-
     @LoginIgnore
     @ApiOperation("过车记录")
     @RequestMapping(value = "/test", method = RequestMethod.POST)
@@ -318,7 +318,7 @@ public class CarPositionController {
 
         //区分心跳和正常相应
         if (entity.getType().equals("heartbeat")) {
-            System.out.println("心跳" + entity.getType());
+            log.info("心跳" + entity.getType());
             Long aLong = selectResidueCarPositionCount(communityId);//查询临时车余位
             String standard = Crc16Util.getStandard(aLong.intValue());//换算显示格式
             //led显示余位
@@ -336,18 +336,19 @@ public class CarPositionController {
 //        carVO.getWhitelist_data().add(whitelistData);
 
         } else {
-            System.out.println("正常" + entity.getType());
+            log.info("正常" + entity.getType());
             //全景图
             String carInAndOutPicture = base64GetString(entity.getPlateNum(), entity.getStartTime(), entity.getPicture(), "全景");
             //车位号
             String carInAndOutPicture1 = base64GetString(entity.getPlateNum(), entity.getStartTime(), entity.getCloseupPic(), "車牌");
-            System.out.println("全景图" + carInAndOutPicture);
-            System.out.println("车位号图" + carInAndOutPicture1);
+            log.info("全景图" + carInAndOutPicture);
+            log.info("车位号图" + carInAndOutPicture1);
 
 
             //在小区是否是黑名单车辆
             CarBlackListEntity carBlackListEntity = iCarBlackListService.carBlackListOne(entity.getPlateNum(), communityId);
             if (carBlackListEntity == null) {//不是黑名单
+                log.info("不是黑名单");
                 //根据车牌号查询车辆的3种状态
                 Integer next = getInteger(entity, communityId);
 
@@ -465,7 +466,7 @@ public class CarPositionController {
                     Integer exceptionCar = one2.getExceptionCar();//0：不收费  1：收费
                     System.out.println("特殊车辆是否收费" + exceptionCar);
                     if (entity.getPlateColor().equals("白色") && exceptionCar == 0) {//特殊车辆且不收费
-
+                        log.info("特殊车辆不收费");
                         if (entity.getVdcType().equals("in")) {//进口
                             //是否开闸
                             GpioData gpioData = new GpioData();
@@ -507,6 +508,7 @@ public class CarPositionController {
 
                         //临时车最大入场数
                         CarBasicsEntity one1 = iCarBasicsService.findOne(communityId);
+                        log.info("临时车最大入场数"+one1);
                         if (one1 == null) {
                             throw new PropertyException(511, "请设置临时车最大入场数");
                         }
@@ -536,8 +538,8 @@ public class CarPositionController {
                                         long StartTime = visitorEntity.getStartTime().toEpochSecond(ZoneOffset.of("+8"));//开始时间
                                         long EndTime = visitorEntity.getEndTime().toEpochSecond(ZoneOffset.of("+8"));//结束时间
                                         long now = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));//当前时间
-                                        if(StartTime<now && EndTime>now){
-                                            statusInvite=true;
+                                        if (StartTime < now && EndTime > now) {
+                                            statusInvite = true;
                                         }
                                     }
 
@@ -634,6 +636,7 @@ public class CarPositionController {
                 }
 
             } else {//是黑名单的这辆
+                log.info("是黑名单的这辆");
                 String value = null;//黑名单提示信息
                 if (entity.getVdcType().equals("in")) {
                     value = "禁止入场";
@@ -927,17 +930,17 @@ public class CarPositionController {
 
     //新增一个车辆订单对象
     private void insterCarOrder(String plateNum, Long communityId, LocalDateTime beginTime, String plateColor, Integer isRetention) {
-        boolean  statusInvite=false;
-        VisitorEntity visitorEntity=null;
-        if(isRetention!=1){//不能为滞留订单的时候进入
+        boolean statusInvite = false;
+        VisitorEntity visitorEntity = null;
+        if (isRetention != 1) {//不能为滞留订单的时候进入
             //查询车牌是否是业主邀请切在时间之内
-             visitorEntity = visitorService.selectCarNumberIsNoInvite(plateNum, communityId, 1);//状态 1.待入园 2.已入园 3.已出园 4.已失效
+            visitorEntity = visitorService.selectCarNumberIsNoInvite(plateNum, communityId, 1);//状态 1.待入园 2.已入园 3.已出园 4.已失效
             if (visitorEntity != null) {
                 long StartTime = visitorEntity.getStartTime().toEpochSecond(ZoneOffset.of("+8"));//开始时间
                 long EndTime = visitorEntity.getEndTime().toEpochSecond(ZoneOffset.of("+8"));//结束时间
                 long now = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));//当前时间
-                if(StartTime<now && EndTime>now){
-                    statusInvite=true;
+                if (StartTime < now && EndTime > now) {
+                    statusInvite = true;
                 }
             }
         }
@@ -949,7 +952,7 @@ public class CarPositionController {
         entity.setBeginTime(beginTime);//进入的时间
         entity.setOrderStatus(0);//未支付
         entity.setRise("无");
-        if(statusInvite){//有邀请记录就讲uid设置进去
+        if (statusInvite) {//有邀请记录就讲uid设置进去
             entity.setUid(visitorEntity.getUid());//邀请的uid
             //visitorEntity
             //entity.setIsPayAnother(1);//设置为代缴
