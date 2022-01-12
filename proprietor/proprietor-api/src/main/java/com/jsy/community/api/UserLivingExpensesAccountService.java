@@ -55,4 +55,13 @@ public interface UserLivingExpensesAccountService extends IService<UserLivingExp
      **/
     Boolean deleteAccount(UserLivingExpensesAccountEntity accountEntity);
 
+    /**
+     * @author: Pipi
+     * @description: 光大云缴费定时查询账单任务
+     * @param :
+     * @return: {@link Void}
+     * @date: 2022/1/11 14:07
+     **/
+    void cebBankQueryTask();
+
 }

@@ -7,6 +7,8 @@ import com.jsy.community.entity.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -38,10 +40,12 @@ public class VoteEntity extends BaseEntity {
     /**
      * 主题
      */
+    @NotBlank(message = "标题不能为空")
     private String theme;
     /**
      * 内容
      */
+    @NotBlank(message = "内容不能为空")
     private String content;
     /**
      * 1待发布，2进行中，3已结束
@@ -56,11 +60,13 @@ public class VoteEntity extends BaseEntity {
      * 开始时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @NotNull(message = "开始时间不能为空")
     private LocalDateTime beginTime;
     /**
      * 结束时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @NotNull(message = "结束时间不能为空")
     private LocalDateTime overTime;
     /**
      * 图片集合，以逗号分割

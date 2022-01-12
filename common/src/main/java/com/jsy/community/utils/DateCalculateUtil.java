@@ -212,6 +212,22 @@ public class DateCalculateUtil {
 		}
 		return localDate;
 	}
+
+	/**
+	 * @author: Pipi
+	 * @description: 获取当前月份是奇数月还是偶数月
+	 * @param :
+	 * @return: {@link Integer}
+	 * @date: 2022/1/11 14:40
+	 **/
+	public static Integer getCurrentMonthOddEven() {
+		int monthValue = LocalDate.now().getMonthValue();
+		if (monthValue % 2 == 0) {
+			return 2;
+		} else {
+			return 1;
+		}
+	}
 	
 	public static void main(String[] args) throws ParseException {
 		String firstYearDateOfAmount = getFirstYearDateOfAmount(2019);
