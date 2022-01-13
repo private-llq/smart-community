@@ -67,7 +67,7 @@ public class RepairOrderServiceImpl extends ServiceImpl<RepairOrderMapper, Repai
 	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
 	private IBaseUserInfoRpcService userInfoRpcService;
 
-	@DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check=false)
+	@DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check = false)
 	private IImChatPublicPushRpcService iImChatPublicPushRpcService;
 
 	// 房屋报修事项(个人)

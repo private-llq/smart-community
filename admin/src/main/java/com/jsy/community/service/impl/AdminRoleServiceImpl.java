@@ -47,7 +47,7 @@ public class AdminRoleServiceImpl implements AdminRoleService {
     @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
     private IBaseMenuPermissionRpcService baseMenuPermissionRpcService;
     
-    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
     private IBasePermissionRpcService permissionRpcService;
 
     /**

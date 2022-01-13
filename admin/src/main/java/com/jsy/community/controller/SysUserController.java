@@ -51,7 +51,7 @@ public class SysUserController {
 	@Resource
 	private RedisTemplate<String, String> redisTemplate;
 	
-	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
 	private IBaseAuthRpcService baseAuthRpcService;
 
 	/**
