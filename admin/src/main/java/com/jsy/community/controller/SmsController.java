@@ -134,7 +134,7 @@ public class SmsController {
     @GetMapping("/query/setting")
     @Permit("community:admin:sms:query:setting")
     public CommonResult querySmsSetting(){
-        return CommonResult.ok(smsService.querySmsSetting(),"查询成功");
+        return CommonResult.ok(smsService.querySmsSetting());
     }
     
     /**
@@ -187,7 +187,7 @@ public class SmsController {
     @Permit("community:admin:sms:type:query")
     public CommonResult selectSmsType(){
         List<SmsTypeEntity> list = smsTypeService.selectSmsType();
-        return CommonResult.ok(list,"查询成功");
+        return CommonResult.ok(list);
     }
     
     /**
@@ -240,7 +240,7 @@ public class SmsController {
     @Permit("community:admin:sms:template:query")
     public CommonResult selectSmsTemplate(){
         List<SmsTemplateEntity> list = smsTemplateService.selectSmsTemplate();
-        return CommonResult.ok(list,"查询成功");
+        return CommonResult.ok(list);
     }
     
     /**
@@ -308,7 +308,7 @@ public class SmsController {
     @Permit("community:admin:sms:menu:query")
     public CommonResult selectSmsMenu(){
         List<SmsMenuEntity> list = smsMenuService.selectSmsMenu();
-        return CommonResult.ok(list,"查询成功");
+        return CommonResult.ok(list);
     }
     
     /**

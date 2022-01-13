@@ -1,19 +1,15 @@
 package com.jsy.community.service.impl;
-import com.jsy.community.entity.*;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import java.time.LocalDateTime;
-
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.IHouseMemberService;
-import com.jsy.community.api.PropertyUserService;
 import com.jsy.community.api.PropertyException;
+import com.jsy.community.api.PropertyUserService;
 import com.jsy.community.config.PropertyTopicNameEntity;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.dto.face.xu.XUFaceEditPersonDTO;
+import com.jsy.community.entity.*;
 import com.jsy.community.mapper.CommunityHardWareMapper;
 import com.jsy.community.mapper.UserFaceMapper;
 import com.jsy.community.mapper.UserFaceSyncRecordMapper;
@@ -36,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -420,7 +417,7 @@ public class PropertyUserServiceImpl extends ServiceImpl<UserMapper, UserEntity>
 		userFaceEntity.setFaceEnableStatus(userEntity.getFaceEnableStatus());
 		userFaceEntity.setId(SnowFlake.nextId());
 		// 新增用户人脸
-		int updateResult = userFaceMapper.insert(userEntityResult);
+		int updateResult = userFaceMapper.insert(userFaceEntity);
 		if (userEntity.getFaceEnableStatus() == 1) {
 			syncFace(userEntity, new ArrayList<>(Arrays.asList(communityId)));
 		}

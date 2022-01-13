@@ -2,11 +2,14 @@ package com.jsy.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarBlackListService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CommunityEntity;
 import com.jsy.community.entity.property.CarBlackListEntity;
 import com.jsy.community.mapper.CarBlackListMapper;
+import com.jsy.community.mapper.CommunityMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.UserUtils;
@@ -19,8 +22,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @DubboService(version = Const.version, group = Const.group_property)
-public class
-CarBlackListServiceImpl implements ICarBlackListService {
+public class CarBlackListServiceImpl  extends ServiceImpl<CarBlackListMapper, CarBlackListEntity> implements ICarBlackListService  {
 
     @Autowired
     public CarBlackListMapper carBlackListMapper;

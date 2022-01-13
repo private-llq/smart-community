@@ -36,6 +36,7 @@ public class AddAdvertQO {
     /**
      * 文件路径
      */
+    @NotBlank
     private String fileUrl;
     /**
      * 跳转类型

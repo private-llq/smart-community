@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarLocationService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarLocationEntity;
 import com.jsy.community.exception.JSYException;
@@ -45,6 +46,13 @@ public class CarLocationServiceImpl extends ServiceImpl<CarLocationMapper,CarLoc
 
     @Override
     public boolean addLocation(String equipmentLocation, Long communityId) {
+        QueryWrapper<CarLocationEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("community_id",communityId);
+        queryWrapper.eq("equipment_location",equipmentLocation);
+        List<CarLocationEntity> carLocationEntities = locationMapper.selectList(queryWrapper);
+        if (carLocationEntities.size()>0) {
+            throw new PropertyException(500,"该位置已存在");
+        }
         CarLocationEntity locationEntity = new CarLocationEntity();
         locationEntity.setLocationId(UUID.randomUUID().toString());
         locationEntity.setCommunityId(communityId);

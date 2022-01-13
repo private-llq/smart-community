@@ -8,8 +8,6 @@ import com.jsy.community.qo.admin.AddAdvertQO;
 import com.jsy.community.qo.admin.AdvertQO;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 /**
  * @author xrq
  * @version 1.0

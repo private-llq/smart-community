@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.AppVersionEntity;
 import com.jsy.community.service.IAppVersionService;
@@ -77,7 +76,7 @@ public class AppController {
 		if(!BusinessConst.SYS_TYPE_ANDROID.equals(sysType) && !BusinessConst.SYS_TYPE_IOS.equals(sysType)){
 			sysType = null;
 		}
-		return CommonResult.ok(appVersionService.queryAppVersionList(sysType,sysVersion),"查询成功");
+		return CommonResult.ok(appVersionService.queryAppVersionList(sysType,sysVersion));
 	}
 	
 	/**

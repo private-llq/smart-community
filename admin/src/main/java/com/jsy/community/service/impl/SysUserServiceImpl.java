@@ -492,7 +492,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	 **/
 	@Override
 	public void updateOperator(SysUserQO sysUserQO){
-		//更新资料
+		// 更新角色
+		List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(sysUserQO.getId(), BusinessConst.ULTIMATE_ADMIN);
+		if (!CollectionUtils.isEmpty(permitRoles)) {
+			Set<Long> roleIds = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
+			// 移除角色
+			baseRoleRpcService.roleRemoveToUser(roleIds, sysUserQO.getId());
+		}
+		// 增加角色
+		List<Long> addRoles = new ArrayList<>();
+		addRoles.add(sysUserQO.getRoleId());
+		baseRoleRpcService.userJoinRole(addRoles, sysUserQO.getId(), sysUserQO.getUpdateUid());
+		// 更新资料
 		baseUpdateUserRpcService.updateUserInfo(sysUserQO.getId(), sysUserQO.getNickName(),
 			sysUserQO.getPhone(), null, BusinessConst.ULTIMATE_ADMIN);
 	}

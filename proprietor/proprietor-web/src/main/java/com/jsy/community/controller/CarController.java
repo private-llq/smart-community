@@ -73,6 +73,7 @@ public class CarController {
 	public CommonResult bindingMonthCar(@RequestBody CarEntity carEntity) {
 		//0.从JWT取uid
 		carEntity.setUid(UserUtils.getUserId());
+		carEntity.setCommunityId(UserUtils.getAdminCommunityId());
 		//1.效验前端新增车辆参数合法性
 		ValidatorUtils.validateEntity(carEntity, CarEntity.BindingMonthCarValidated.class);
 		return CommonResult.ok(carService.bindingRecord(carEntity));

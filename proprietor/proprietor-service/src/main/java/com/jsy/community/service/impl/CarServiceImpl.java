@@ -99,6 +99,16 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
     @Autowired
     private HouseMemberMapper houseMemberMapper;
 
+    @DubboReference(version = Const.version, group = Const.group_property, check = false)
+    private ICarBlackListService blackListService;
+
+
+    @DubboReference(version = Const.version,group = Const.group_property,check = false)
+    private ICarCutOffService carCutOffService;
+
+
+
+
     /**
      * 根据提供的参数对车辆进行分页查询
      * @param param  车辆分页条件查询参数
@@ -474,6 +484,18 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                 if (list.size()!=0){
                     throw new ProprietorException("您在当前小区存在未缴的物业费账单，请先缴清物业费！");
                 }
+            }
+            //查询黑名单中是否存在该车辆
+            CarBlackListEntity car_number = blackListService.getOne(new QueryWrapper<CarBlackListEntity>().eq("car_number",carEntity.getCarPlate()));
+            if (Objects.nonNull(car_number)){
+                throw new PropertyException("该车辆已进入黑名单，无法进场或离场!");
+            }
+
+            //查询该车辆是否是已经进场的临时车，在场的临时车无法包月，进入之后无法包月，出场之后才能包月
+            List<CarCutOffEntity> carCutOffEntities = carCutOffService.list(new QueryWrapper<CarCutOffEntity>().eq("community_id", carEntity.getCommunityId()).eq("car_number", carEntity.getCarPlate()).eq("belong", 1).eq("state", 0));
+            Optional<CarCutOffEntity> max = carCutOffEntities.stream().max(Comparator.comparing(CarCutOffEntity::getCreateTime));
+            if (max.isPresent()){
+                throw new PropertyException("该车辆为在场的临时车，请离场之后再包月！");
             }
             if (carEntity.getMonth()<=basicsEntity.getMonthMaxTime()){
                 CarOrderRecordEntity entity = new CarOrderRecordEntity();

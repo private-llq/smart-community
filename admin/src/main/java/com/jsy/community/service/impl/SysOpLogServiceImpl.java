@@ -14,7 +14,9 @@ import com.jsy.community.utils.PageInfo;
 import com.jsy.community.utils.SnowFlake;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.entity.RealUserDetail;
+import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.PageVO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
@@ -74,11 +76,13 @@ public class SysOpLogServiceImpl extends ServiceImpl<SysOpLogMapper, SysOpLogEnt
 		}
 		// 模糊查询用户名
 		if (StringUtils.isNotBlank(query.getUserName())) {
-			List<String> idList = sysUserMapper.queryUidListByRealName(query.getUserName());
-			if (idList == null || idList.size() == 0) {
+			PageVO<UserDetail> pageVO = userInfoRpcService.queryUser("", query.getUserName(), 0, 99999999);
+			Set<Long> userIds = pageVO.getData().stream().map(UserDetail::getId).collect(Collectors.toSet());
+			if (!CollectionUtils.isEmpty(userIds)) {
+				queryWrapper.in("user_id", userIds);
+			} else {
 				return new PageInfo<>();
 			}
-			queryWrapper.in("user_id", idList);
 		}
 		queryWrapper.orderByDesc("create_time");
 		Page<SysOpLogEntity> pageData = sysOpLogMapper.selectPage(page, queryWrapper);

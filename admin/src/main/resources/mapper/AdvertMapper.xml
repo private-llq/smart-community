@@ -28,6 +28,8 @@
        </if>
     AND
         a.deleted=0
+    ORDER BY
+       a.display_position, a.sort
    </select>
 
 

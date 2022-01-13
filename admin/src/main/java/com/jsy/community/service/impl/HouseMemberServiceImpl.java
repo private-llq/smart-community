@@ -82,10 +82,12 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
         for (HouseMemberEntity houseMemberEntity : pageData.getRecords()) {
             // 补充物业公司名称
             CommunityEntity communityEntity = communityMapper.selectById(houseMemberEntity.getCommunityId());
-            PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(communityEntity.getPropertyId());
-            houseMemberEntity.setCompanyName(companyEntity.getName());
-            // 补充社区名称
-            houseMemberEntity.setCommunityName(communityEntity.getName());
+            if (communityEntity != null) {
+                PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(communityEntity.getPropertyId());
+                houseMemberEntity.setCompanyName(companyEntity.getName());
+                // 补充社区名称
+                houseMemberEntity.setCommunityName(communityEntity.getName());
+            }
             // 补充身份名称
             houseMemberEntity.setRelationName(houseMemberEntity.getRelation() == 1 ? "业主" : houseMemberEntity.getRelation() == 6 ? "亲属" : houseMemberEntity.getRelation() == 7 ? "租户" : "临时");
             // 补充房屋信息
