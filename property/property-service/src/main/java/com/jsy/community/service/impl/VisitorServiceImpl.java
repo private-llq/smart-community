@@ -137,6 +137,7 @@ public class VisitorServiceImpl implements IVisitorService {
         if (query.getCheckType() != null) {
             queryWrapper.eq("check_type", query.getCheckType());
         }
+        queryWrapper.orderByDesc("create_time");
         Page<VisitorEntity> visitorEntityPage = visitorMapper.selectPage(page, queryWrapper);
 
         if (!CollectionUtils.isEmpty(visitorEntityPage.getRecords())) {
