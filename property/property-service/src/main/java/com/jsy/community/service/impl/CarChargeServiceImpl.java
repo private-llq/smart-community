@@ -491,8 +491,8 @@ public class CarChargeServiceImpl extends ServiceImpl<CarChargeMapper, CarCharge
             }
             carOrderEntity.setType(1);//临时车收费
             carOrderEntity.setOrderNum(String.valueOf(SnowFlake.nextId()));//订单编号
-            carOrderEntity.setOrderTime(LocalDateTime.now());//支付时间
-            carOrderEntity.setBeginTime(monthlyVehicle.getStartTime());//周期开始时间
+            /*carOrderEntity.setOrderTime(LocalDateTime.now());//支付时间*/
+            carOrderEntity.setBeginTime(monthlyVehicle.getEndTime());//周期开始时间
             carOrderEntity.setOverTime(LocalDateTime.now());//周期结束时间
             carOrderEntity.setOrderStatus(0);//未支付
             carOrderEntity.setCommunityId(adminCommunityId);//社区id

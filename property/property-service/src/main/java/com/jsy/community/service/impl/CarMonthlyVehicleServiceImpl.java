@@ -788,19 +788,22 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
      *  0：车牌识别错误 1:逾期 2：正常
      */
     public OverdueVo MonthlyOverdue(String carNumber, Long adminCommunityId){
-        //最后一条包月记录为已过期、并且还在场，没有出去过的车辆为包月逾期车辆
+        //车辆未出车库，包月最后一条数据的结束时间小于现在的时间、在车辆最后一条包月数据之后没有（临时车订单）
 
-        long now = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+        long now = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();//当前时间
 
         List<CarCutOffEntity> carCutOffEntities = carCutOffMapper.selectList(new QueryWrapper<CarCutOffEntity>().eq("community_id", adminCommunityId).eq("car_number", carNumber));
+
+        if (carCutOffEntities.size()<1) {
+            OverdueVo overdueVo = new OverdueVo();
+            overdueVo.setState(0);
+            return overdueVo;//没有进场记录的车（可能是车牌识别错误）
+        }
+
+        //获取最后一条进出记录maxCarCutOffEntity
         Optional<CarCutOffEntity> maxCarCutOffEntity = carCutOffEntities.stream().max(Comparator.comparing(x -> {
             return x.getCreateTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
         }));
-        if (!maxCarCutOffEntity.isPresent()){
-           OverdueVo overdueVo = new OverdueVo();
-           overdueVo.setState(0);
-           return overdueVo;//没有进场记录的车（可能是车牌识别错误）
-        }
 
 
         List<CarMonthlyVehicle> monthlyVehicleList = carMonthlyVehicleMapper.selectList(new QueryWrapper<CarMonthlyVehicle>()
@@ -810,17 +813,19 @@ public class CarMonthlyVehicleServiceImpl extends ServiceImpl<CarMonthlyVehicleM
         Optional<CarMonthlyVehicle> max = monthlyVehicleList.stream().max(Comparator.comparing(x -> {
             return x.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
         }));
+
         if (max.isPresent()){
             CarMonthlyVehicle monthlyVehicle = max.get();
-            if (monthlyVehicle.getIsOverdueFee()==1){//已交费，包月记录为1的 返回正常通行
-                OverdueVo overdueVo = new OverdueVo();
-                overdueVo.setState(2);//正常
-                return overdueVo;
-            }
+//            if (monthlyVehicle.getIsOverdueFee()==1){//已交费，包月记录为1的 返回正常通行
+//                OverdueVo overdueVo = new OverdueVo();
+//                overdueVo.setState(2);//正常
+//                return overdueVo;
+//            }
 
-            long endTime = monthlyVehicle.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli();
-            List<CarOrderEntity> selectList = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>().gt("create_time", endTime));
-
+            LocalDateTime endTime = monthlyVehicle.getEndTime();
+            //查询在在车辆最后一条包月数据之后的（临时车订单）
+            List<CarOrderEntity> selectList = carOrderMapper.selectList(new QueryWrapper<CarOrderEntity>().gt("create_time", endTime).eq("car_plate",carNumber).eq("community_id",adminCommunityId));
+          /*车辆未出车库，包月最后一条数据的结束时间小于现在的时间、在车辆最后一条包月数据之后没有（临时车订单）*/
             if (maxCarCutOffEntity.get().getState()==0 && now > monthlyVehicle.getEndTime().toInstant(ZoneOffset.of("+8")).toEpochMilli() && selectList.size()==0){
                 OverdueVo overdueVo = new OverdueVo();
                 overdueVo.setState(1);

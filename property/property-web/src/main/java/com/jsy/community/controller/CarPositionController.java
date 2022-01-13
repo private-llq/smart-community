@@ -464,7 +464,7 @@ public class CarPositionController {
                         throw new PropertyException(510, "请设置特殊车辆是否收费");
                     }
                     Integer exceptionCar = one2.getExceptionCar();//0：不收费  1：收费
-                    System.out.println("特殊车辆是否收费" + exceptionCar);
+                    log.info("特殊车辆是否收费" + exceptionCar);
                     if (entity.getPlateColor().equals("白色") && exceptionCar == 0) {//特殊车辆且不收费
                         log.info("特殊车辆不收费");
                         if (entity.getVdcType().equals("in")) {//进口
@@ -733,14 +733,14 @@ public class CarPositionController {
 //            }
 
         } else if (vdcType.equals("out")) {//出口
-            //查询没有支付最后订单
-            CarOrderEntity entity = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
-            if (entity != null && entity.getOverdueState() == 0) {//正常订单
-                extracted(plateNum, plateColor, carSubLogo, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carVO, communityId);
 
-            } else {//不是正常订单
-                //0：车牌识别错误 1:逾期 2：正常
-                OverdueVo overdueVo = iCarMonthlyVehicleService.MonthlyOverdue(plateNum, communityId);//1包月逾期0临时车
+//            //查询最后订单
+//            CarOrderEntity entity = iCarOrderService.selectCarOrderStatus(communityId, plateNum, 1);
+//            if (entity != null && entity.getOverdueState() == 0) {//正常订单(是否为包月逾期订单 0 正常 1逾期)
+//                extracted(plateNum, plateColor, carSubLogo, vehicleType, startTime, camId, vdcType, trigerType, carInAndOutPicture, carInAndOutPicture1, carVO, communityId);
+//            } else {//不是正常订单
+
+                OverdueVo overdueVo = iCarMonthlyVehicleService.MonthlyOverdue(plateNum, communityId); //0：车牌识别错误 1:逾期 2：正常
                 if (overdueVo.getState() == 1) {//包月逾期车辆
                     //语音播报内容
                     Rs485Data e2 = new Rs485Data();
@@ -767,8 +767,6 @@ public class CarPositionController {
                     e3.setData(Crc16Util.getUltimatelyValue2(plateNum, "01", "online"));//车牌号
                     carVO.getRs485_data().add(e3);
                 }
-            }
-
 
         }
 
@@ -857,7 +855,6 @@ public class CarPositionController {
             System.out.println("支付时间" + orderTime);
             System.out.println("允许滞留时间" + dwellTime + "分钟");
             System.out.println("时间差" + l + "分钟");
-
             if (l > dwellTime) {//超过了滞留时间
                 //是否开闸
                 GpioData gpioData = new GpioData();
@@ -916,7 +913,6 @@ public class CarPositionController {
 
         }
     }
-
     //查询需要支付的额金额{"社区id,车牌颜色,入场时间,结算时间"}
     private BigDecimal getBigDecimal(String plateColor, Long communityId, LocalDateTime beginTime) {
         CarChargeQO carChargeQO = new CarChargeQO();
