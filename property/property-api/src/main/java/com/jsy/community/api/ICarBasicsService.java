@@ -16,6 +16,8 @@ public interface ICarBasicsService extends IService<CarBasicsEntity> {
      * @Date: 2021/8/3-15:59
      **/
     boolean addBasics(CarBasicsRuleQO carBasicsRuleQO, String uid, Long communityId);
+    //创建社区默认新增一条数据
+    boolean addBasics2(String uid, Long communityId);
     /**
      * @Description: 查找当前社区的车禁设置
      * @Param: [communityId]

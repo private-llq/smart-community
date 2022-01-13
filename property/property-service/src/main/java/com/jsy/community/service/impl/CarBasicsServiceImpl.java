@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.api.ICarBasicsService;
@@ -14,6 +15,7 @@ import com.jsy.community.mapper.CarPositionMapper;
 import com.jsy.community.qo.property.CarBasicsMonthQO;
 import com.jsy.community.qo.property.CarBasicsRuleQO;
 import com.jsy.community.utils.SnowFlake;
+import com.jsy.community.utils.UserUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -35,6 +37,9 @@ public class CarBasicsServiceImpl extends ServiceImpl<CarBasicsMapper,CarBasicsE
     @Override
     public boolean addBasics(CarBasicsRuleQO carBasicsRuleQO, String uid, Long communityId) {
         CarBasicsEntity carBasicsEntity = carBasicsMapper.selectOne(new QueryWrapper<CarBasicsEntity>().eq("community_id", communityId));
+//        if (ObjectUtil.isNull(carBasicsEntity)){
+//            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "当前社区基础设置为空，请先提交！！！");
+//        }
         //已使用车位（月租+业主）
         Integer integer = positionService.selectCarPositionUseAmount(communityId);
         // 查询小区下所有车位
@@ -64,8 +69,26 @@ public class CarBasicsServiceImpl extends ServiceImpl<CarBasicsMapper,CarBasicsE
     }
 
     @Override
+    public boolean addBasics2(String uid, Long communityId) {
+        CarBasicsEntity carBasicsEntity = carBasicsMapper.selectOne(new QueryWrapper<CarBasicsEntity>().eq("community_id", communityId));
+        if (ObjectUtil.isNull(carBasicsEntity)){
+             carBasicsEntity = new CarBasicsEntity();
+            carBasicsEntity.setId(SnowFlake.nextId());
+            carBasicsEntity.setUid(uid);
+            carBasicsEntity.setCommunityId(communityId);
+            return carBasicsMapper.insert(carBasicsEntity) == 1;
+        }
+        return true;
+
+    }
+
+    @Override
     public CarBasicsEntity findOne(Long communityId) {
         CarBasicsEntity carBasicsEntity = carBasicsMapper.selectOne(new QueryWrapper<CarBasicsEntity>().eq("community_id", communityId));
+        if (ObjectUtil.isNull(carBasicsEntity)){
+      //       carBasicsEntity = carBasicsMapper.selectOne(new QueryWrapper<CarBasicsEntity>().eq("community_id", communityId));
+            throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "当前社区基础设置为空，请先提交！！！");
+        }
         return carBasicsEntity;
     }
 

@@ -46,6 +46,7 @@ public class CarBasicsController {
      @Permit("community:property:carBasics:findOne")
      public CommonResult findSpecial(){
          System.out.println(UserUtils.getAdminCommunityId());
+         String userId = UserUtils.getId();
          CarBasicsEntity  carBasicsEntity = carBasics.findOne(UserUtils.getAdminCommunityId());
          return CommonResult.ok(carBasicsEntity);
      }
@@ -72,4 +73,16 @@ public class CarBasicsController {
         return CommonResult.ok("操作成功");
 
      }
+    @ApiOperation("添加或修改包月选项")
+    @PostMapping("/addBasics2")
+    @businessLog(operation = "编辑",content = "更新了【包月选项】")
+    @CarOperation(operation = "更新了【包月选项】")
+    @Permit("community:property:carBasics:addBasics2")
+    public CommonResult addBasics2(){
+        String userId = UserUtils.getId();
+        Long communityId = UserUtils.getAdminCommunityId();
+        boolean b = carBasics.addBasics2(userId,communityId);
+        return CommonResult.ok("操作成功");
+
+    }
 }
