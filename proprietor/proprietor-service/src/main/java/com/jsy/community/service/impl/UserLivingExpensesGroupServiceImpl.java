@@ -155,6 +155,13 @@ public class UserLivingExpensesGroupServiceImpl extends ServiceImpl<UserLivingEx
             for (UserLivingExpensesGroupEntity userLivingExpensesGroupEntity : userLivingExpensesGroupEntities) {
                 userLivingExpensesGroupEntity.setAccountEntityList(accountEntityMap.get(String.valueOf(userLivingExpensesGroupEntity.getId())));
             }
+            userLivingExpensesGroupEntities.sort(Comparator.comparing(userLivingExpensesGroupEntity -> {
+                if (userLivingExpensesGroupEntity.getAccountEntityList() == null) {
+                    return 0;
+                } else {
+                    return -userLivingExpensesGroupEntity.getAccountEntityList().size();
+                }
+            }));
         }
         return userLivingExpensesGroupEntities;
     }

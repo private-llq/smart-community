@@ -41,7 +41,7 @@ public class TimingTaskConfig {
      **/
     @Bean
     public Trigger cebBankQueryTaskTrigger() {
-        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 08 * * * ? *");
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 16 * * * ? *");
         return TriggerBuilder.newTrigger()
                 .forJob(cebBankQueryTaskDetail())
                 .withIdentity("cebBankQueryTaskTrigger")

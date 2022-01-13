@@ -40,7 +40,6 @@ public class ComplainsController {
     public CommonResult list(@RequestBody BaseQO<PropertyComplaintsQO> baseQO) {
         AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
         Map<String, Object> map = complainsService.listAll(baseQO,userInfo);
-
         return CommonResult.ok(map);
     }
     @ApiOperation("反馈内容")

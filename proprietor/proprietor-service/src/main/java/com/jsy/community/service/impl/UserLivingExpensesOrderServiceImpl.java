@@ -16,6 +16,7 @@ import com.jsy.community.entity.UserLivingExpensesOrderEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
 import com.jsy.community.mapper.UserLivingExpensesAccountMapper;
+import com.jsy.community.mapper.UserLivingExpensesBillMapper;
 import com.jsy.community.mapper.UserLivingExpensesOrderMapper;
 import com.jsy.community.qo.cebbank.CebBillQueryResultDataModelQO;
 import com.jsy.community.qo.cebbank.CebCreateCashierDeskQO;
@@ -58,7 +59,10 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 
 	@DubboReference(version = Const.version, group = Const.group_payment, check = false)
 	private CebBankService cebBankService;
-	
+
+	@Autowired
+	private UserLivingExpensesBillMapper billMapper;
+
 	/**
 	 * @Description: 新增生活缴费订单记录
 	 * @author: DKS
@@ -71,9 +75,16 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 	@Transactional(rollbackFor = Exception.class)
 	public CebCashierDeskVO addUserLivingExpensesOrder(UserLivingExpensesBillEntity billEntity, String mobile) {
 		UserLivingExpensesOrderEntity userLivingExpensesOrderEntity = new UserLivingExpensesOrderEntity();
+		CebCreateCashierDeskQO deskQO = new CebCreateCashierDeskQO();
+		deskQO.setType(billEntity.getType());
+		deskQO.setDeviceType(billEntity.getDeviceType());
+		userLivingExpensesOrderEntity.setPayAmount(billEntity.getPayAmount());
+		userLivingExpensesOrderEntity.setUid(billEntity.getUid());
+		if (billEntity.getId() != null) {
+			billEntity = billMapper.selectById(billEntity.getId());
+		}
 		userLivingExpensesOrderEntity.setId(SnowFlake.nextId());
 		// 添加本地订单数据
-		userLivingExpensesOrderEntity.setUid(billEntity.getUid());
 		userLivingExpensesOrderEntity.setTypeId(billEntity.getTypeId());
 		userLivingExpensesOrderEntity.setItemId(billEntity.getItemId());
 		userLivingExpensesOrderEntity.setItemCode(billEntity.getItemCode());
@@ -81,26 +92,21 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		if (billEntity.getId() != null) {
 			userLivingExpensesOrderEntity.setBillId(billEntity.getId().toString());
 		}
-		if (StringUtil.isNotBlank(billEntity.getBillAmount())) {
-			userLivingExpensesOrderEntity.setBillAmount(new BigDecimal(billEntity.getBillAmount()));
-		}
-		userLivingExpensesOrderEntity.setPayAmount(billEntity.getPayAmount());
+		userLivingExpensesOrderEntity.setBillAmount(billEntity.getBillAmount());
 		userLivingExpensesOrderEntity.setCustomerName(billEntity.getCustomerName());
 		userLivingExpensesOrderEntity.setContactNo(billEntity.getContactNo());
 		userLivingExpensesOrderEntity.setOrderStatus(BusinessEnum.CebbankOrderStatusEnum.INIT.getCode());
 		int insert = userLivingExpensesOrderMapper.insert(userLivingExpensesOrderEntity);
 		// 组装支付服务需要的参数
-		CebCreateCashierDeskQO deskQO = new CebCreateCashierDeskQO();
+
 		deskQO.setMerOrderNo(userLivingExpensesOrderEntity.getId().toString());
 		deskQO.setMerOrderDate(LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE));
-		deskQO.setPayAmount(billEntity.getPayAmount());
+		deskQO.setPayAmount(userLivingExpensesOrderEntity.getPayAmount());
 		deskQO.setPaymentItemCode(billEntity.getItemCode());
 		deskQO.setPaymentItemId(billEntity.getItemId());
 		deskQO.setBillKey(billEntity.getBillKey());
 		deskQO.setSessionId(cebBankService.getCebBankSessionId(mobile, billEntity.getDeviceType()));
-		if (billEntity.getBillAmount() != null) {
-			deskQO.setBillAmount(new BigDecimal(billEntity.getBillAmount()));
-		}
+		deskQO.setBillAmount(billEntity.getBillAmount());
 		deskQO.setQueryAcqSsn(billEntity.getQueryAcqSsn());
 		deskQO.setCustomerName(billEntity.getCustomerName());
 		deskQO.setContractNo(billEntity.getContactNo());
@@ -116,8 +122,8 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		resultDataModelQO.setContractNo(billEntity.getContactNo());
 //		resultDataModelQO.setCustomerName("");
 //		resultDataModelQO.setOriginalCustomerName("");
-		resultDataModelQO.setBalance(billEntity.getBalance());
-		resultDataModelQO.setPayAmount(billEntity.getPayAmount().toString());
+		resultDataModelQO.setBalance(billEntity.getBalance() == null ? null : billEntity.getBalance().toString());
+		resultDataModelQO.setPayAmount(userLivingExpensesOrderEntity.getPayAmount().toString());
 		resultDataModelQO.setBeginDate(billEntity.getBeginDate());
 		resultDataModelQO.setEndDate(billEntity.getEndDate());
 		resultDataModelQO.setFiled1(billEntity.getFieldA());
@@ -126,8 +132,6 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		resultDataModelQO.setFiled4(billEntity.getFieldD());
 		resultDataModelQO.setFiled5(billEntity.getFieldE());
 		deskQO.setBillQueryResultDataModel(JSON.toJSONString(resultDataModelQO));
-		deskQO.setType(billEntity.getType());
-		deskQO.setDeviceType(billEntity.getDeviceType());
 		// 调用支付服务下单
 		return cebBankService.createCashierDesk(deskQO);
 	}
@@ -145,6 +149,8 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		QueryWrapper<UserLivingExpensesOrderEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.select("*,DATE_FORMAT(create_time,'%Y-%m') as monthTime");
 		queryWrapper.eq("uid", userLivingExpensesOrderEntity.getUid());
+		queryWrapper.in("order_status", BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_PAYMENT.getCode(),
+				BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_CANCELLATION.getCode());
 		queryWrapper.eq("deleted", 0);
 		// 是否查分类
 		if (StringUtils.isNotBlank(userLivingExpensesOrderEntity.getTypeId())) {
@@ -239,7 +245,9 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public Boolean completeCebOrder(CebCallbackVO cebCallbackVO) {
+		log.info("进入回调");
 		UserLivingExpensesOrderEntity userLivingExpensesOrderEntity = userLivingExpensesOrderMapper.selectById(cebCallbackVO.getMerOrderNo());
+		log.info("查询订单");
 		if (userLivingExpensesOrderEntity == null) {
 			log.info("没有找到云缴费订单:{}", cebCallbackVO.getMerOrderNo());
 			return false;
@@ -249,6 +257,7 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 			return false;
 		}
 		if (userLivingExpensesOrderEntity.getOrderStatus().equals(BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_PAYMENT.getCode())) {
+			log.info("订单已经支付成功,不再做处理");
 			// 订单已经支付成功,不再做处理
 			return true;
 		}
@@ -258,6 +267,15 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		userLivingExpensesOrderEntity.setRepoPayAmount(cebCallbackVO.getPayAmount());
 		userLivingExpensesOrderEntity.setPayType(cebCallbackVO.getPayType());
 		int i = userLivingExpensesOrderMapper.updateById(userLivingExpensesOrderEntity);
+		log.info("订单状态修改完成,修改结果:{}", i);
+		// 修改账单状态
+		log.info("修改账单缴费状态");
+		QueryWrapper<UserLivingExpensesBillEntity> billEntityQueryWrapper = new QueryWrapper<>();
+		billEntityQueryWrapper.eq("id", userLivingExpensesOrderEntity.getBillId());
+		UserLivingExpensesBillEntity userLivingExpensesBillEntity = new UserLivingExpensesBillEntity();
+		userLivingExpensesBillEntity.setBillStatus(BusinessEnum.PaymentStatusEnum.PAID.getCode());
+		billMapper.update(userLivingExpensesBillEntity, billEntityQueryWrapper);
+		log.info("修改账单缴费状态完成");
 		return i == 1;
 	}
 }

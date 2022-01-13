@@ -138,14 +138,14 @@ public class VisitorServiceImpl implements IVisitorService {
             queryWrapper.eq("check_type", query.getCheckType());
         }
         Page<VisitorEntity> visitorEntityPage = visitorMapper.selectPage(page, queryWrapper);
+
         if (!CollectionUtils.isEmpty(visitorEntityPage.getRecords())) {
             for (VisitorEntity visitorEntity : visitorEntityPage.getRecords()) {
                 visitorEntity.setCheckStatusStr(PropertyConstsEnum.CheckStatusEnum.getName(visitorEntity.getCheckStatus()));
+                if (visitorEntity.getCheckType() != null) {
+                    visitorEntity.setCheckTypeStr(PropertyConstsEnum.CheckTypeEnum.getName(visitorEntity.getCheckType()));
+                }
                 if (visitorEntity.getUid() != null) {
-                    if (visitorEntity.getCheckType() == 1) {
-                        visitorEntity.setCheckTypeStr(PropertyConstsEnum.CheckTypeEnum.getName(visitorEntity.getCheckType()));
-                    }
-                    UserEntity userEntity = userService.selectOne(visitorEntity.getUid());
                     UserDetail userDetail = baseUserInfoRpcService.getUserDetail(visitorEntity.getUid());
                     if (userDetail != null) {
                         visitorEntity.setMobileOfAuthorizedPerson(userDetail.getPhone());
