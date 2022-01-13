@@ -3,12 +3,14 @@ package com.jsy.community.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jsy.community.entity.proprietor.ProprietorMarketCategoryEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.MarketCategoryMapper;
 import com.jsy.community.mapper.MarketMapper;
 import com.jsy.community.service.AdminException;
 import com.jsy.community.service.IMarketCategoryService;
 import com.jsy.community.utils.SnowFlake;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -31,11 +33,16 @@ public class MarketCategoryServiceImpl extends ServiceImpl<MarketCategoryMapper,
      * @since: 2021/11/2 11:08
      **/
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean addMarketCategory(ProprietorMarketCategoryEntity categoryEntity) {
+        ProprietorMarketCategoryEntity category = categoryMapper.selectOne(new QueryWrapper<ProprietorMarketCategoryEntity>().eq("category", categoryEntity.getCategory()));
+        if (category != null) {
+            throw new AdminException(JSYError.DUPLICATE_KEY.getCode(), "该社区集市商品类别已存在！");
+        }
         categoryEntity.setId(SnowFlake.nextId());
         categoryEntity.setCategoryId(UUID.randomUUID().toString());
         // 查询是否存在该顺序的商品类别
-        ProprietorMarketCategoryEntity sort = categoryMapper.selectOne(new QueryWrapper<ProprietorMarketCategoryEntity>().eq("sort", categoryEntity.getSort()).eq("deleted", 0));
+        ProprietorMarketCategoryEntity sort = categoryMapper.selectOne(new QueryWrapper<ProprietorMarketCategoryEntity>().eq("sort", categoryEntity.getSort()));
         if (sort != null) {
             // 修改大于等于该顺序的
             categoryMapper.updateSort(categoryEntity.getSort());
@@ -51,6 +58,7 @@ public class MarketCategoryServiceImpl extends ServiceImpl<MarketCategoryMapper,
      * @since: 2021/11/2 11:51
      **/
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateMarketCategory(ProprietorMarketCategoryEntity categoryEntity) {
         // 查询是否存在该顺序的商品类别
         ProprietorMarketCategoryEntity sort = categoryMapper.selectOne(new QueryWrapper<ProprietorMarketCategoryEntity>().eq("sort", categoryEntity.getSort()).eq("deleted", 0));

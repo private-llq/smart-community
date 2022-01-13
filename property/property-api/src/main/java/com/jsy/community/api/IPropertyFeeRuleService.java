@@ -1,12 +1,13 @@
 package com.jsy.community.api;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jsy.community.entity.HouseEntity;
+import com.jsy.community.entity.property.CarPositionEntity;
 import com.jsy.community.entity.property.PropertyFeeRuleEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.FeeRuleQO;
 import com.jsy.community.qo.property.FeeRuleRelevanceQO;
 import com.jsy.community.qo.property.UpdateRelevanceQO;
-import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 
 import java.util.List;
@@ -118,20 +119,20 @@ public interface IPropertyFeeRuleService extends IService<PropertyFeeRuleEntity>
     Long selectFeeRuleIdByFeeRuleName(String feeRuleName, Long communityId);
 
     /**
-     * @Description: 查询当前小区业主认证过的房屋
+     * @Description: 查询当前小区所有的房屋
      * @author: Hu
      * @since: 2021/9/7 11:08
      * @Param:
      * @return:
      */
-    List<FeeRelevanceTypeVo> getHouse(Long communityId);
+    List<HouseEntity> getHouse(Long communityId);
 
     /**
-     * @Description: 查询当前小区的月租或属于业主的车位
+     * @Description: 查询当前小区所有的车位
      * @author: Hu
      * @since: 2021/9/7 11:11
      * @Param:
      * @return:
      */
-    List<FeeRelevanceTypeVo> getCarPosition(Long adminCommunityId, Integer type);
+    List<CarPositionEntity> getCarPosition(Long adminCommunityId);
 }

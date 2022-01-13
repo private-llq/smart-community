@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IVisitorService;
@@ -121,7 +120,7 @@ public class VisitorController {
 		// 默认楼栋门禁为无
 		visitorEntity.setIsCarBanAccess(0);
 		// 审核方式默认为物业审核
-		visitorEntity.setCheckType(2);
+		visitorEntity.setCheckType(1);
 		visitorEntity.setCheckTime(LocalDateTime.now());
 		// 默认入园状态为待入园
 		visitorEntity.setStatus(1);

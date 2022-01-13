@@ -25,7 +25,7 @@ import java.util.List;
 @ApiModel(value="House对象", description="社区楼栋")
 @TableName("t_house")
 public class HouseEntity extends BaseEntity implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty(value = "编号")
@@ -37,14 +37,14 @@ public class HouseEntity extends BaseEntity implements Serializable {
     
     @ApiModelProperty(value = "房间code",hidden = true)
     private String code;
-
+    
     @ApiModelProperty(value = "社区ID")
     private Long communityId;
-
+    
     
     @ApiModelProperty(value = "是否有电梯 0.无 1.有")
     private Integer hasElevator;
-
+    
     @ApiModelProperty(value = "名称")
     @TableField(exist = false)
 //    @Length(groups = {addHouseValidatedGroup.class,updateHouseValidatedGroup.class}, max = 10, message = "名称过长")
@@ -56,24 +56,24 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "楼栋名",hidden = true)
 //    @Length(groups = addHouseValidatedGroup.class, max = 10, message = "楼栋名称过长")
     private String building;
-
+    
     @ApiModelProperty(value = "单元名",hidden = true)
 //    @Length(groups = addHouseValidatedGroup.class, max = 10, message = "单元名称过长")
     private String unit;
-
+    
     @ApiModelProperty(value = "楼层名",hidden = true)
 //    @Length(groups = {addRoomValidatedGroup.class,updateHouseValidatedGroup.class}, max = 20, message = "楼层名称过长")
 //    @NotBlank(groups = addRoomValidatedGroup.class, message = "缺少楼层名称")
     private Integer floor;
-
+    
     @ApiModelProperty(value = "门牌名",hidden = true)
 //    @Length(groups = addHouseValidatedGroup.class, max = 10, message = "门牌名称过长")
     private String door;
-
+    
     @ApiModelProperty(value = "房屋id")
     @TableField(exist = false)
     private Long houseId;
-
+    
     @ApiModelProperty(value = "父级id")
 //    @NotNull(groups = {addHouseValidatedGroup.class}, message = "缺少父级ID")
     @NotNull(groups = {addUnitGroup.class,addRoomValidatedGroup.class}, message = "缺少父级ID")
@@ -82,7 +82,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "父级idStr")
     @TableField(exist = false)
     private String pidStr;
-
+    
     @ApiModelProperty(value = "1.楼栋 2.单元 3.楼层 4.门牌")
 //    @NotNull(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class}, message = "缺少类型")
 //    @Range(groups = {addHouseValidatedGroup.class,addRoomValidatedGroup.class}, min = 1, max = 4, message = "楼宇类型错误")
@@ -138,7 +138,7 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "户型字符串")
     @TableField(exist = false)
     private String houseTypeCodeStr;
-
+    
     @ApiModelProperty(value = "备注")
     private String comment;
     
@@ -172,6 +172,12 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @NotNull(groups = {addBuildingGroup.class}, message = "缺少楼宇分类")
     private Long buildingType;
     
+    /**
+     * 楼宇分类Id字符串
+     */
+    @TableField(exist = false)
+    private String buildingTypeStr;
+    
     @TableField(exist = false)
     @ApiModelProperty(value = "楼宇分类名称")
     private String buildingTypeName;
@@ -187,16 +193,16 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @TableField(exist = false)
     @ApiModelProperty(value = "业主姓名")
     private String owner;
-
-
+    
+    
     @TableField(exist = false)
     @ApiModelProperty(value = "业主uid")
     private String uid;
-
+    
     @TableField(exist = false)
     @ApiModelProperty(value = "楼栋编号")
     private String buildingNumber;
-
+    
     @TableField(exist = false)
     @ApiModelProperty(value = "单元编号")
     private String unitNumber;
@@ -204,6 +210,10 @@ public class HouseEntity extends BaseEntity implements Serializable {
     @TableField(exist = false)
     @ApiModelProperty(value = "物业公司名称")
     private String companyName;
+    
+    public String getBuildingTypeStr() {
+        return this.buildingType == null ? null : this.buildingType.toString();
+    }
     
     /**
      * 新增house验证组

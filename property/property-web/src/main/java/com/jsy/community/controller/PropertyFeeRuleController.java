@@ -15,7 +15,6 @@ import com.jsy.community.qo.property.UpdateRelevanceQO;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
 import com.jsy.community.vo.CommonResult;
-import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
@@ -81,20 +80,18 @@ public class PropertyFeeRuleController {
         propertyFeeRuleService.addRelevance(updateRelevanceQO);
         return CommonResult.ok();
     }
-    @ApiOperation("查询当前小区业主认证过的房屋集合")
+    @ApiOperation("查询当前小区所有的房屋")
     @GetMapping("/getHouse")
     @Permit("community:property:feeRule:getHouse")
     public CommonResult getHouse(){
-        List<FeeRelevanceTypeVo> list = propertyFeeRuleService.getHouse(UserUtils.getAdminCommunityId());
-        return CommonResult.ok(list);
+        return CommonResult.ok(propertyFeeRuleService.getHouse(UserUtils.getAdminCommunityId()));
     }
 
-    @ApiOperation("查询当前小区的月租或属于业主的车位")
+    @ApiOperation("查询当前小区所有的车位")
     @GetMapping("/getCarPosition")
     @Permit("community:property:feeRule:getCarPosition")
-    public CommonResult getCarPosition(@RequestParam Integer type){
-        List<FeeRelevanceTypeVo> list = propertyFeeRuleService.getCarPosition(UserUtils.getAdminCommunityId(),type);
-        return CommonResult.ok(list);
+    public CommonResult getCarPosition(){
+        return CommonResult.ok(propertyFeeRuleService.getCarPosition(UserUtils.getAdminCommunityId()));
     }
 
 

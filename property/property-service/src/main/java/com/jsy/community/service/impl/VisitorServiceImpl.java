@@ -1,20 +1,18 @@
 package com.jsy.community.service.impl;
 
 import com.alibaba.fastjson.JSON;
-
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsy.community.api.IAdminUserService;
-import com.jsy.community.api.PropertyUserService;
 import com.jsy.community.api.IVisitorService;
+import com.jsy.community.api.PropertyUserService;
 import com.jsy.community.config.PropertyTopicNameEntity;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.dto.face.xu.XUFaceVisitorEditPersonDTO;
 import com.jsy.community.entity.*;
-import com.jsy.community.entity.admin.AdminUserEntity;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.utils.*;
@@ -36,7 +34,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -124,12 +124,13 @@ public class VisitorServiceImpl implements IVisitorService {
         QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("*, TIMESTAMPDIFF(MINUTE, start_time, end_time) as effectiveMinutes");
         if (!StringUtils.isEmpty(query.getName())) {
-            queryWrapper.and(wrapper -> wrapper.eq("check_type", 2).like("name", query.getName()).or().like("contact", query.getName()));
+            queryWrapper.and(wrapper -> wrapper.eq("check_type", 1).like("name", query.getName()).or().like("contact", query.getName()));
             Set<String> strings = baseUserInfoRpcService.queryRealUserDetail(query.getName(), query.getName());
             if (CollectionUtils.isEmpty(strings)) {
-                return visitorEntityPageInfo;
+                queryWrapper.or(wrapper -> wrapper.eq("check_type", 2).eq("uid", null));
+            } else {
+                queryWrapper.or(wrapper -> wrapper.eq("check_type", 2).in("uid", strings));
             }
-            queryWrapper.or(wrapper -> wrapper.eq("check_type", 1).in("uid", strings));
         }
         if (!StringUtils.isEmpty(query.getBuildingId())) {
             queryWrapper.eq("building_id", query.getBuildingId());
@@ -153,6 +154,10 @@ public class VisitorServiceImpl implements IVisitorService {
                     RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(visitorEntity.getUid());
                     if (idCardRealInfo != null) {
                         visitorEntity.setNameOfAuthorizedPerson(idCardRealInfo.getIdCardName());
+                    } else {
+                        if (userDetail != null) {
+                            visitorEntity.setNameOfAuthorizedPerson(userDetail.getNickName());
+                        }
                     }
                 }
             }

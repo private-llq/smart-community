@@ -15,7 +15,6 @@ import com.jsy.community.qo.property.FeeRuleQO;
 import com.jsy.community.qo.property.FeeRuleRelevanceQO;
 import com.jsy.community.qo.property.UpdateRelevanceQO;
 import com.jsy.community.utils.SnowFlake;
-import com.jsy.community.vo.FeeRelevanceTypeVo;
 import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.FeeRuleVO;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @program: com.jsy.community
@@ -50,29 +48,35 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
 
 
     /**
-     * @Description: 查询当前小区的月租或属于业主的车位
+     * @Description: 查询当前小区所有的车位
      * @author: Hu
      * @since: 2021/9/7 11:11
      * @Param: [adminCommunityId]
      * @return: java.util.List<com.jsy.community.vo.HouseTypeVo>
      */
     @Override
-    public List<FeeRelevanceTypeVo> getCarPosition(Long adminCommunityId, Integer type) {
-        return carPositionMapper.getCarPosition(adminCommunityId,type);
+    public List<CarPositionEntity> getCarPosition(Long adminCommunityId) {
+//        return carPositionMapper.getCarPosition(adminCommunityId,type);
+        
+        return carPositionMapper.selectList(new QueryWrapper<CarPositionEntity>().select("id,car_position as name").eq("community_id", adminCommunityId));
     }
 
 
     /**
-     * @Description: 查询当前小区业主认证过的房屋
+     * @Description: 查询当前小区所有的房屋
      * @author: Hu
      * @since: 2021/9/7 11:11
      * @Param: [communityId]
      * @return: java.util.List<com.jsy.community.vo.HouseTypeVo>
      */
     @Override
-    public List<FeeRelevanceTypeVo> getHouse(Long communityId) {
-        List<FeeRelevanceTypeVo> list = houseMapper.getUserHouse(communityId);
-        return list;
+    public List<HouseEntity> getHouse(Long communityId) {
+//        List<FeeRelevanceTypeVo> list = houseMapper.getUserHouse(communityId);
+//        return list;
+        QueryWrapper<HouseEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id, concat(building,unit,door) AS name");
+        queryWrapper.eq("community_id", communityId);
+        return houseMapper.selectList(queryWrapper);
     }
 
 
