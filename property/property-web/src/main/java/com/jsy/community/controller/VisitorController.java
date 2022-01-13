@@ -125,6 +125,8 @@ public class VisitorController {
 		visitorEntity.setCheckTime(LocalDateTime.now());
 		// 默认入园状态为待入园
 		visitorEntity.setStatus(1);
+		// 设置邀请人为当前登录用户
+		visitorEntity.setUid(UserUtils.getUserId());
 		return visitorService.addVisitor(visitorEntity) > 0 ? CommonResult.ok("邀请成功!") : CommonResult.error("邀请失败!");
 	}
 
