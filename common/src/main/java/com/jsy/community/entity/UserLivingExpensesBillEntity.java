@@ -42,9 +42,9 @@ public class UserLivingExpensesBillEntity extends BaseEntity {
      */
     private String uid;
     /**
-     * 账单金额(分)
+     * 账单金额(元)
      */
-    private String billAmount;
+    private BigDecimal billAmount;
     /**
      * 账单交易码
      */
@@ -60,7 +60,7 @@ public class UserLivingExpensesBillEntity extends BaseEntity {
     /**
      * 余额
      */
-    private String balance;
+    private BigDecimal balance;
     /**
      * 起始日期
      */

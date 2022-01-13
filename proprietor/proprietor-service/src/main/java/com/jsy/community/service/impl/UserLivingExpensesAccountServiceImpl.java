@@ -1,5 +1,7 @@
 package com.jsy.community.service.impl;
 import com.google.common.collect.Lists;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -72,15 +74,6 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
     @Transactional(rollbackFor = Exception.class)
     public Long addAccount(UserLivingExpensesAccountEntity accountEntity) {
         accountEntity.setId(SnowFlake.nextId());
-        Boolean billStatus = false;
-        if (accountEntity.getBusinessFlow() == 1) {
-            // 查询缴费信息,无返回值,目的是验证填写信息是否正确,不正确会抛出异常,不往下走
-            directBillInfo(accountEntity);
-        } else {
-            // 查询用户信息和账单,并添加
-            CebQueryBillInfoVO cebQueryBillInfoVO = queryBillInfo(accountEntity);
-            billStatus = addBill(accountEntity, cebQueryBillInfoVO);
-        }
         // 如果没有选择分组,则分配到默认分组
         if (StringUtil.isBlank(accountEntity.getGroupId())) {
             // 查询是否存在分组
@@ -100,6 +93,15 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
                 groupMapper.insert(userLivingExpensesGroupEntity1);
                 accountEntity.setGroupId(userLivingExpensesGroupEntity1.getId().toString());
             }
+        }
+        Boolean billStatus = false;
+        if (accountEntity.getBusinessFlow() == 1) {
+            // 查询缴费信息,无返回值,目的是验证填写信息是否正确,不正确会抛出异常,不往下走
+            directBillInfo(accountEntity);
+        } else {
+            // 查询用户信息和账单,并添加
+            CebQueryBillInfoVO cebQueryBillInfoVO = queryBillInfo(accountEntity);
+            billStatus = addBill(accountEntity, cebQueryBillInfoVO);
         }
         // 添加查询标记
         if (billStatus) {
@@ -339,11 +341,11 @@ public class UserLivingExpensesAccountServiceImpl extends ServiceImpl<UserLiving
                 billEntity.setItemId(accountEntity.getItemId());
                 billEntity.setItemCode(accountEntity.getItemCode());
                 billEntity.setBillKey(accountEntity.getAccount());
-                billEntity.setBillAmount(resultDataModelVO.getPayAmount());
+                billEntity.setBillAmount(resultDataModelVO.getPayAmount() == null ? null : new BigDecimal(resultDataModelVO.getPayAmount()).divide(new BigDecimal(100)));
                 billEntity.setQueryAcqSsn(cebQueryBillInfoVO.getQryAcqSsn());
                 billEntity.setCustomerName(accountEntity.getHouseholder());
                 billEntity.setContactNo(resultDataModelVO.getContractNo());
-                billEntity.setBalance(resultDataModelVO.getBalance());
+                billEntity.setBalance(resultDataModelVO.getBalance() == null ? null : new BigDecimal(resultDataModelVO.getBalance()).divide(new BigDecimal(100)));
                 billEntity.setBeginDate(resultDataModelVO.getBeginDate());
                 billEntity.setEndDate(resultDataModelVO.getEndDate());
                 billEntity.setFieldA(resultDataModelVO.getFiled1());

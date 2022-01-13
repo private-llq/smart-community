@@ -97,7 +97,7 @@ public class ComplainsServiceImpl extends ServiceImpl<ComplainsMapper, ComplainE
             for (ComplainVO complainVO : complainVOS) {
                 RealUserDetail realUserDetail = userDetailMap.get(complainVO.getUid());
                 if (realUserDetail != null) {
-                    complainVO.setMobile(realUserDetail.getRealName());
+                    complainVO.setMobile(realUserDetail.getPhone());
                     complainVO.setName(realUserDetail.getRealName());
                 }
                 RealUserDetail realUserDetail1 = detailMap.get(complainVO.getFeedbackBy());
