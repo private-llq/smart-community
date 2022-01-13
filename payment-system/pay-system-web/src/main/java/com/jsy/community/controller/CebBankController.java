@@ -157,7 +157,6 @@ public class CebBankController {
                 if (cebCallbackVO != null
                         && (BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_PAYMENT.getCode().equals(cebCallbackVO.getOrder_status())
                         || BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_CANCELLATION.getCode().equals(cebCallbackVO.getOrder_status())
-                        || BusinessEnum.CebbankOrderStatusEnum.CANCELLATION_FAILURE.getCode().equals(cebCallbackVO.getOrder_status())
                     )
                 ) {
                     // 调用光大云缴费订单服务修改订单状态完成订单

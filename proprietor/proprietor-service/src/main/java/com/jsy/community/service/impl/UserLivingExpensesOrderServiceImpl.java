@@ -79,12 +79,12 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		deskQO.setType(billEntity.getType());
 		deskQO.setDeviceType(billEntity.getDeviceType());
 		userLivingExpensesOrderEntity.setPayAmount(billEntity.getPayAmount());
+		userLivingExpensesOrderEntity.setUid(billEntity.getUid());
 		if (billEntity.getId() != null) {
 			billEntity = billMapper.selectById(billEntity.getId());
 		}
 		userLivingExpensesOrderEntity.setId(SnowFlake.nextId());
 		// 添加本地订单数据
-		userLivingExpensesOrderEntity.setUid(billEntity.getUid());
 		userLivingExpensesOrderEntity.setTypeId(billEntity.getTypeId());
 		userLivingExpensesOrderEntity.setItemId(billEntity.getItemId());
 		userLivingExpensesOrderEntity.setItemCode(billEntity.getItemCode());
@@ -149,6 +149,8 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		QueryWrapper<UserLivingExpensesOrderEntity> queryWrapper = new QueryWrapper<>();
 		queryWrapper.select("*,DATE_FORMAT(create_time,'%Y-%m') as monthTime");
 		queryWrapper.eq("uid", userLivingExpensesOrderEntity.getUid());
+		queryWrapper.in("order_status", BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_PAYMENT.getCode(),
+				BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_CANCELLATION.getCode());
 		queryWrapper.eq("deleted", 0);
 		// 是否查分类
 		if (StringUtils.isNotBlank(userLivingExpensesOrderEntity.getTypeId())) {
