@@ -136,7 +136,7 @@ public class UserAccountController {
             for (WalletBalanceChange datum : walletBalanceChange.getData()) {
                 UserAccountRecordEntity userAccountRecordEntity = new UserAccountRecordEntity();
                 userAccountRecordEntity.setUid(UserUtils.getUserId());
-                userAccountRecordEntity.setTradeFromStr(datum.getSource());
+                userAccountRecordEntity.setTradeFromStr(datum.getTitle());
                 userAccountRecordEntity.setTradeType(datum.getChangeType());
                 userAccountRecordEntity.setTradeTypeStr(PaymentEnum.TradeTypeEnum.tradeTypeMap.get(datum.getChangeType()));
                 userAccountRecordEntity.setTradeAmount(datum.getAmount().setScale(2, RoundingMode.DOWN));
