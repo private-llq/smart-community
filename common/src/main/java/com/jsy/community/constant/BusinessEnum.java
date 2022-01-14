@@ -1639,12 +1639,12 @@ public interface BusinessEnum {
 	 * @date: 2021/12/20 15:07
 	 **/
 	enum BaseOrderRevenueTypeEnum {
-		SHOP(2, 33, "商城购物 - 收入"),
-		LIVING_EXPENSES(3, 65, "水电缴费 - 收入"),
-		PROPERTY_FEE(4, 129, "物业管理 - 收入"),
-		LEASE(9, 257, "房屋租赁 - 收入"),
-		PARKING_FEE(8, 513, "停车缴费 - 收入"),
-		TEMP_PARKING_FEE(10, 1025, "零时停车缴费 - 收入");
+		SHOP(2, 34, "商城购物 - 收入"),
+		LIVING_EXPENSES(3, 66, "水电缴费 - 收入"),
+		PROPERTY_FEE(4, 130, "物业管理 - 收入"),
+		LEASE(9, 258, "房屋租赁 - 收入"),
+		PARKING_FEE(8, 514, "停车缴费 - 收入"),
+		TEMP_PARKING_FEE(10, 1026, "零时停车缴费 - 收入");
 		private Integer code;
 		private Integer expensesType;
 		private String name;

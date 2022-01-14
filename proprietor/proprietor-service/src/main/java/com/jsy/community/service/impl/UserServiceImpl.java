@@ -2,6 +2,7 @@ package com.jsy.community.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -217,12 +218,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      */
     @Override
     public UserInfoVo queryUserInfo(String uid) {
-        UserEntity user = baseMapper.queryUserInfoByUid(uid);
+        UserInfoVo userInfoVo = new UserInfoVo();
+        UserDetail userDetail = baseUserInfoRpcService.getUserDetail(uid);
+        if (ObjectUtil.isNotNull(userDetail)) {
+            ThirdBindStatusVo thirdBindStatus = baseUserInfoRpcService.getThirdBindStatus(userDetail.getId());
+            if (ObjectUtil.isNotNull(thirdBindStatus)) {
+                userInfoVo.setIsBindAlipay(thirdBindStatus.getAliPayBind() ? 1 : 0);
+                userInfoVo.setIsBindWechat(thirdBindStatus.getWeChatBind() ? 1 : 0);
+            }
+            Boolean payPasswordStatus = baseUserInfoRpcService.getPayPasswordStatus(userDetail.getId());
+            userInfoVo.setIsBindPayPassword(payPasswordStatus ? 1 : 0);
+            UserImVo eHomeUserIm = baseUserInfoRpcService.getEHomeUserIm(userDetail.getId());
+            if (ObjectUtil.isNotNull(eHomeUserIm)) {
+                userInfoVo.setImId(eHomeUserIm.getImId());
+                userInfoVo.setImPassword(eHomeUserIm.getPassword());
+            }
+        } else {
+            throw new ProprietorException(JSYError.ACCOUNT_NOT_EXISTS);
+        }
+        /*UserEntity user = baseMapper.queryUserInfoByUid(uid);
         if (user == null || user.getDeleted() == 1) {
             throw new ProprietorException("账号不存在");
         }
 
-        UserInfoVo userInfoVo = new UserInfoVo();
+
         BeanUtils.copyProperties(user, userInfoVo);
         // 刷新省市区
         ValueOperations<String, String> ops = redisTemplate.opsForValue();
@@ -234,27 +253,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         if (user.getAreaId() != null) {
             userInfoVo.setArea(ops.get("RegionSingle:" + user.getAreaId().toString()));
-        }
+        }*/
         //查询极光推送标签
         UserUroraTagsEntity userUroraTagsEntity = userUroraTagsService.queryUroraTags(uid);
         if (userUroraTagsEntity != null) {
             userInfoVo.setUroraTags(userUroraTagsEntity.getUroraTags());
         }
         //查询用户imId
-        UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().select("im_id,im_password").eq("uid", uid));
+       /* UserIMEntity userIMEntity = userIMMapper.selectOne(new QueryWrapper<UserIMEntity>().select("im_id,im_password").eq("uid", uid));
         if (userIMEntity != null) {
             userInfoVo.setImId(userIMEntity.getImId());
             userInfoVo.setImPassword(userIMEntity.getImPassword());
-        }
+        }*/
         //查询用户是否绑定微信
-        UserThirdPlatformEntity platformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("uid", uid).eq("third_platform_type", 2));
+        /*UserThirdPlatformEntity platformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("uid", uid).eq("third_platform_type", 2));
         if (platformEntity != null) {
             userInfoVo.setIsBindWechat(1);
         } else {
             userInfoVo.setIsBindWechat(0);
-        }
+        }*/
         //查询用户是否设置支付密码
-        UserAuthEntity userAuthEntity = userAuthService.selectByPayPassword(uid);
+        /*UserAuthEntity userAuthEntity = userAuthService.selectByPayPassword(uid);
         if (userAuthEntity != null) {
             if (userAuthEntity.getPayPassword() != null) {
                 userInfoVo.setIsBindPayPassword(1);
@@ -267,13 +286,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             } else {
                 userInfoVo.setIsBindWechat(0);
             }
-        }
-        UserThirdPlatformEntity userThirdPlatformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("uid", uid).eq("third_platform_type", 5));
+        }*/
+        /*UserThirdPlatformEntity userThirdPlatformEntity = userThirdPlatformMapper.selectOne(new QueryWrapper<UserThirdPlatformEntity>().eq("uid", uid).eq("third_platform_type", 5));
         if (userThirdPlatformEntity != null) {
             userInfoVo.setIsBindAlipay(1);
         } else {
             userInfoVo.setIsBindAlipay(0);
-        }
+        }*/
         return userInfoVo;
     }
 

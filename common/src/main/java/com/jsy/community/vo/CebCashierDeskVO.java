@@ -15,4 +15,8 @@ public class CebCashierDeskVO implements Serializable {
     private String code;
     private String url;
     private String message;
+    /**
+     * 本系统订单号
+     */
+    private String orderNo;
 }

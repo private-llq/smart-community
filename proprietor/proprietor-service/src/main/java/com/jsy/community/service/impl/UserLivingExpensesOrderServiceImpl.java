@@ -31,9 +31,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
@@ -63,6 +65,9 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 	@Autowired
 	private UserLivingExpensesBillMapper billMapper;
 
+	@Resource
+	private RedisTemplate<String, String> redisTemplate;
+
 	/**
 	 * @Description: 新增生活缴费订单记录
 	 * @author: DKS
@@ -82,6 +87,9 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		userLivingExpensesOrderEntity.setUid(billEntity.getUid());
 		if (billEntity.getId() != null) {
 			billEntity = billMapper.selectById(billEntity.getId());
+			if (billEntity.getBillStatus().equals(BusinessEnum.PaymentStatusEnum.PAID.getCode())) {
+				throw new ProprietorException(JSYError.ALREADY_PAID_PLEASE_DO_NOT_PAY_AGAIN);
+			}
 		}
 		userLivingExpensesOrderEntity.setId(SnowFlake.nextId());
 		// 添加本地订单数据
@@ -133,7 +141,9 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		resultDataModelQO.setFiled5(billEntity.getFieldE());
 		deskQO.setBillQueryResultDataModel(JSON.toJSONString(resultDataModelQO));
 		// 调用支付服务下单
-		return cebBankService.createCashierDesk(deskQO);
+		CebCashierDeskVO cashierDesk = cebBankService.createCashierDesk(deskQO);
+		cashierDesk.setOrderNo(userLivingExpensesOrderEntity.getIdStr());
+		return cashierDesk;
 	}
 	
 	/**
@@ -164,6 +174,10 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 			queryWrapper.ge("create_time", userLivingExpensesOrderEntity.getQueryTime());
 			queryWrapper.le("create_time", endTime);
 		}
+		// 查询缴费户号
+		if (StringUtils.isNotBlank(userLivingExpensesOrderEntity.getBillKey())) {
+			queryWrapper.eq("bill_key", userLivingExpensesOrderEntity.getBillKey());
+		}
 		List<UserLivingExpensesOrderEntity> userLivingExpensesOrderEntities = userLivingExpensesOrderMapper.selectList(queryWrapper);
 		if (CollectionUtils.isEmpty(userLivingExpensesOrderEntities)) {
 			return new ArrayList<>();
@@ -176,7 +190,8 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		// 查询生活缴费户号列表
 		Map<String, UserLivingExpensesAccountEntity> userLivingExpensesAccountEntityMap = userLivingExpensesAccountEntityByAccount.stream()
 			.collect(Collectors.toMap(UserLivingExpensesAccountEntity::getAccount, Function.identity()));
-		
+		String costIcon = redisTemplate.opsForValue().get("costIcon");
+		Map<Integer, String> map = JSON.parseObject(costIcon, Map.class);
 		// 补充数据
 		for (UserLivingExpensesOrderEntity entity : userLivingExpensesOrderEntities) {
 			UserLivingExpensesAccountEntity userLivingExpensesAccountEntity = userLivingExpensesAccountEntityMap.get(entity.getBillKey());
@@ -189,6 +204,7 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 				entity.setTypeName(userLivingExpensesAccountEntity.getTypeName());
 				entity.setTypeId(userLivingExpensesAccountEntity.getTypeId());
 			}
+			entity.setTypePicUrl((map.get(Integer.valueOf(entity.getTypeId()))));
 		}
 		
 		// 根据月份封装返回数据
@@ -223,7 +239,9 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 			throw new JSYException("未找到生活缴费记录");
 		}
 		// 补充返回字段
-		UserLivingExpensesAccountEntity account = accountMapper.selectOne(new QueryWrapper<UserLivingExpensesAccountEntity>().eq("account", userLivingExpensesOrderEntity.getBillKey()));
+		UserLivingExpensesAccountEntity account = accountMapper.selectOne(new QueryWrapper<UserLivingExpensesAccountEntity>()
+				.eq("uid", userLivingExpensesOrderEntity.getUid())
+				.eq("account", userLivingExpensesOrderEntity.getBillKey()));
 		if (account != null) {
 			// 户主
 			userLivingExpensesOrderEntity.setHouseholder(account.getHouseholder());
