@@ -517,6 +517,8 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
             List<Long> unitIdList = houseMapper.getSubIdList(Arrays.asList(query.getId()));
             if (!CollectionUtils.isEmpty(unitIdList)) {
                 queryWrapper.in("pid", unitIdList);
+            } else {
+                return new PageInfo<>();
             }
         } else {
             //是否查详情
@@ -1224,6 +1226,8 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
             List<Long> unitIdList = houseMapper.getSubIdList(Arrays.asList(entity.getId()));
             if (!CollectionUtils.isEmpty(unitIdList)) {
                 queryWrapper.in("pid", unitIdList);
+            } else {
+                return new ArrayList<>();
             }
         } else {
             //是否查详情
