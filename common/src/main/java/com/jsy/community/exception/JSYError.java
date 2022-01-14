@@ -36,11 +36,13 @@ public enum JSYError {
 
 	// 业主模块3
 	BILL_EXISTS(36001, "账单已经存在"),
+	ALREADY_PAID_PLEASE_DO_NOT_PAY_AGAIN(36002, "已缴费，请不要重复缴费"),
+	ACCOUNT_NOT_EXISTS(36003, "账号不存在"),
 
 	// 支付模块4
 	THIRD_FAILED(46001, "第三方服务调用失败!"),
 	THIRD_QUERY_FAILED(46002, "第三方查询失败!"),
-	DESK_CREATE_ERROR(46003, "收银台失败!"),
+	DESK_CREATE_ERROR(46003, "创建收银台失败!"),
 
 	// 大后台模块5
 	SMS_TYPE_DUPLICATE(50001, "有存在短信模板的分类无法被删除!"),

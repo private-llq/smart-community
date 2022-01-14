@@ -138,4 +138,10 @@ public class UserLivingExpensesOrderEntity extends BaseEntity {
      */
     @TableField(exist = false)
     private String monthTime;
+
+    /**
+     * 类型图标
+     */
+    @TableField(exist = false)
+    private String typePicUrl;
 }

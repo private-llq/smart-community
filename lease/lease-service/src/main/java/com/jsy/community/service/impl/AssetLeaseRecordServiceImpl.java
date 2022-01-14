@@ -1631,7 +1631,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     throw new PaymentException((int) map.get("code"), String.valueOf(map.get("msg")));
                 }
                 // 增加房东余额
-                log.info("开始修改房东余额");
+                /*log.info("开始修改房东余额");
                 TransferEntity transferEntity = new TransferEntity();
                 transferEntity.setSendUid(1456196574147923970L);
                 transferEntity.setSendPayPwd("1234");
@@ -1650,7 +1650,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 log.info("communicationSecret --> {}", BusinessEnum.BaseOrderSourceEnum.LEASE.getSecret());
                 log.info("签名==========:{},{}", sign, MD5Util.getMd5Str(sign));
                 transferEntity.setSign(MD5Util.getMd5Str(sign));
-                basePayRpcService.transfer(transferEntity);
+                basePayRpcService.transfer(transferEntity);*/
                 basePayRpcService.receiveCall(payCallNotice.getSysOrderNo());
                 // userAccountService.rentalIncome(leaseRecordEntity.getConId(), tradeAmount, leaseRecordEntity.getHomeOwnerUid());
                 log.info("房屋押金/房租缴费订单状态修改完成，订单号：" + sysOrderNo);

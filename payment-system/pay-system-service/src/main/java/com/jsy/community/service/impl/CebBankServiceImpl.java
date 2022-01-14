@@ -84,7 +84,7 @@ public class CebBankServiceImpl implements CebBankService {
         HttpResponseModel responseModel = CebBankContributionUtil.login(cebLoginQO);
         if (responseModel == null || !CebBankEntity.successCode.equals(responseModel.getRespCode())) {
             log.info("光大云缴费注册失败,请稍候重试");
-            return null;
+            throw new JSYException(JSYError.THIRD_FAILED);
         }
         String respData = new String(Base64.decodeBase64(responseModel.getRespData()));
         CebLoginVO cebLoginVO = JSON.parseObject(respData, CebLoginVO.class);

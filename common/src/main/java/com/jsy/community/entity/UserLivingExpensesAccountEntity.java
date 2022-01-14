@@ -101,6 +101,13 @@ public class UserLivingExpensesAccountEntity extends BaseEntity {
     private Integer businessFlow;
 
     /**
+     * 0:不支持预缴费;1:支持预交费
+     */
+    @NotNull(groups = {AddQueryAccountValidateGroup.class, AddDirectAccountValidateGroup.class}, message = "缴费选项不能为空")
+    @Range(groups = {AddQueryAccountValidateGroup.class, AddDirectAccountValidateGroup.class}, min = 0, max = 1, message = "缴费选项取值0-1")
+    private Integer isAppoint;
+
+    /**
      * 账单查询成功后的标记,与月份的奇偶数一致,则当月的查询成功
      */
     private Integer querySuccessMark;

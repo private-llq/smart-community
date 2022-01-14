@@ -3,10 +3,12 @@ package com.jsy.community.controller;
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.jsy.community.annotation.ApiJSYController;
+import com.jsy.community.api.CebBankCallbackLogService;
 import com.jsy.community.api.CebBankService;
 import com.jsy.community.api.UserLivingExpensesOrderService;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
+import com.jsy.community.entity.CebBankCallbackLogEntity;
 import com.jsy.community.entity.UserLivingExpensesAccountEntity;
 import com.jsy.community.exception.JSYError;
 import com.jsy.community.exception.JSYException;
@@ -51,6 +53,9 @@ import java.util.concurrent.*;
 public class CebBankController {
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private CebBankService cebBankService;
+
+    @DubboReference(version = Const.version, group = Const.group_payment, check = false)
+    private CebBankCallbackLogService cebBankCallbackLogService;
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
@@ -145,6 +150,10 @@ public class CebBankController {
     @LoginIgnore
     public String cebBankPayCallback(HttpRequestModel httpRequestModel) {
         log.info("光大支付回调响应respData:{}", httpRequestModel.toString());
+        CebBankCallbackLogEntity cebBankCallbackLogEntity = new CebBankCallbackLogEntity();
+        cebBankCallbackLogEntity.setContent(httpRequestModel.toString());
+        cebBankCallbackLogEntity.setId(SnowFlake.nextId());
+        cebBankCallbackLogService.save(cebBankCallbackLogEntity);
         HashMap<String, String> map = new HashMap<>();
         try {
             if (CebBankContributionUtil.verifyhttpResonse(httpRequestModel)) {
@@ -157,7 +166,7 @@ public class CebBankController {
                 if (cebCallbackVO != null
                         && (BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_PAYMENT.getCode().equals(cebCallbackVO.getOrder_status())
                         || BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_CANCELLATION.getCode().equals(cebCallbackVO.getOrder_status())
-                    )
+                )
                 ) {
                     // 调用光大云缴费订单服务修改订单状态完成订单
                     Boolean order = livingExpensesOrderService.completeCebOrder(cebCallbackVO);
@@ -166,23 +175,27 @@ public class CebBankController {
                         map.put("orderDate", String.valueOf(LocalDate.now()));
                         map.put("transacNo", String.valueOf(SnowFlake.nextId()));
                         map.put("order_status", "OK");
+                        cebBankCallbackLogEntity.setResult("ok");
                     } else {
                         log.info("光大支付回调订单状态修改不成功");
                         map.put("orderDate", String.valueOf(LocalDate.now()));
                         map.put("transacNo", String.valueOf(SnowFlake.nextId()));
                         map.put("order_status", "error");
+                        cebBankCallbackLogEntity.setResult("error");
                     }
                 } else {
                     log.info("光大支付回调支付状态不成功,支付状态值为:{}", cebCallbackVO.getOrder_status());
                     map.put("orderDate", String.valueOf(LocalDate.now()));
                     map.put("transacNo", String.valueOf(SnowFlake.nextId()));
                     map.put("order_status", "error");
+                    cebBankCallbackLogEntity.setResult("error");
                 }
             } else {
                 log.info("光大支付回调验签未通过");
                 map.put("orderDate", String.valueOf(LocalDate.now()));
                 map.put("transacNo", String.valueOf(SnowFlake.nextId()));
                 map.put("order_status", "error");
+                cebBankCallbackLogEntity.setResult("error");
             }
         } catch (IOException ioException) {
             ioException.printStackTrace();
@@ -190,7 +203,16 @@ public class CebBankController {
             map.put("orderDate", String.valueOf(LocalDate.now()));
             map.put("transacNo", String.valueOf(SnowFlake.nextId()));
             map.put("order_status", "error");
+            cebBankCallbackLogEntity.setResult("error");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("光大支付回调验签发生异常");
+            map.put("orderDate", String.valueOf(LocalDate.now()));
+            map.put("transacNo", String.valueOf(SnowFlake.nextId()));
+            map.put("order_status", "error");
+            cebBankCallbackLogEntity.setResult("error");
         }
+        cebBankCallbackLogService.updateById(cebBankCallbackLogEntity);
         return JSON.toJSONString(map);
     }
 }
