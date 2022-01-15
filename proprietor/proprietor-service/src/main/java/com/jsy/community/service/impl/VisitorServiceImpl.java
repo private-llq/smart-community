@@ -297,7 +297,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
 //        VisitorHistoryEntity historyEntity = new VisitorHistoryEntity();
 //        BeanUtils.copyProperties(visitorEntity,historyEntity);
 //        historyEntity.setId(SnowFlake.nextId());
-//        historyEntity.setVisitorId(visitorEntity.getId());
+//        historyEntity.setVisitorId(visitorEntity.getUserId());
 //        historyEntity.setAccessType(BusinessConst.ACCESS_TYPE_QRCODE);
 //        pushVisitorRecord(historyEntity);
 //        return returnMap;

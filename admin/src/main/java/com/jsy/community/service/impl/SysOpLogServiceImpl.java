@@ -77,7 +77,7 @@ public class SysOpLogServiceImpl extends ServiceImpl<SysOpLogMapper, SysOpLogEnt
 		// 模糊查询用户名
 		if (StringUtils.isNotBlank(query.getUserName())) {
 			PageVO<UserDetail> pageVO = userInfoRpcService.queryUser("", query.getUserName(), 0, 99999999);
-			Set<Long> userIds = pageVO.getData().stream().map(UserDetail::getId).collect(Collectors.toSet());
+			Set<String> userIds = pageVO.getData().stream().map(UserDetail::getAccount).collect(Collectors.toSet());
 			if (!CollectionUtils.isEmpty(userIds)) {
 				queryWrapper.in("user_id", userIds);
 			} else {
@@ -90,13 +90,13 @@ public class SysOpLogServiceImpl extends ServiceImpl<SysOpLogMapper, SysOpLogEnt
 			return new PageInfo<>();
 		}
 		Set<String> userIds = pageData.getRecords().stream().map(SysOpLogEntity::getUserId).collect(Collectors.toSet());
-		Set<Long> userIdList = userIds.stream().map(s -> Long.parseLong(s.trim())).collect(Collectors.toSet());
-		List<RealUserDetail> realUserDetails = userInfoRpcService.getRealUserDetailsByUid(userIdList);
-		Map<Long, RealUserDetail> realUserDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getId, Function.identity()));
+//		Set<Long> userIdList = userIds.stream().map(s -> Long.parseLong(s.trim())).collect(Collectors.toSet());
+		List<RealUserDetail> realUserDetails = userInfoRpcService.getRealUserDetails(userIds);
+		Map<String, RealUserDetail> realUserDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
 		// 补充用户名
 		for (SysOpLogEntity entity : pageData.getRecords()) {
 			if (entity.getUserId() != null) {
-				entity.setUserName(realUserDetailMap.get(Long.parseLong(entity.getUserId())).getNickName());
+				entity.setUserName(realUserDetailMap.get(entity.getUserId()).getNickName());
 			}
 		}
 		

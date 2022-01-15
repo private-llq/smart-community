@@ -197,7 +197,7 @@ public class FacilityServiceImpl extends ServiceImpl<FacilityMapper, FacilityEnt
 //		Map<Long,Map<Long,Integer>> statusMap = facilityMapper.getStatusBatch(ids);
 		Map<Long,Map<Long,String>> typeNameMap = facilityTypeMapper.queryIdAndNameMap(typeIds);
 		for (FacilityEntity facilityEntity : pageData.getRecords()) {
-//			facilityEntity.setStatus(statusMap.get(BigInteger.valueOf(facilityEntity.getId())) == null ? null : statusMap.get(BigInteger.valueOf(facilityEntity.getId())).get("status"));
+//			facilityEntity.setStatus(statusMap.get(BigInteger.valueOf(facilityEntity.getUserId())) == null ? null : statusMap.get(BigInteger.valueOf(facilityEntity.getUserId())).get("status"));
 			facilityEntity.setFacilityTypeName(typeNameMap.get(BigInteger.valueOf(facilityEntity.getFacilityTypeId())) == null ? null : typeNameMap.get(BigInteger.valueOf(facilityEntity.getFacilityTypeId())).get("name"));
 		}
 		PageInfo<FacilityEntity> pageInfo = new PageInfo<>();

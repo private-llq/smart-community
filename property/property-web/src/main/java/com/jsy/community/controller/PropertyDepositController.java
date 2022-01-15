@@ -53,7 +53,7 @@ public class PropertyDepositController {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少类型参数");
         }
         ValidatorUtils.validateEntity(propertyDepositEntity);
-        AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+        AdminInfoVo loginUser = UserUtils.getAdminInfo();
         propertyDepositEntity.setCommunityId(loginUser.getCommunityId());
         propertyDepositEntity.setCreateBy(loginUser.getUid());
         boolean result = propertyDepositService.addPropertyDeposit(propertyDepositEntity);
@@ -72,9 +72,9 @@ public class PropertyDepositController {
     @Permit("community:property:deposit:update")
     public CommonResult updatePropertyDeposit(@RequestBody PropertyDepositEntity propertyDepositEntity){
         ValidatorUtils.validateEntity(propertyDepositEntity);
-        AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+        AdminInfoVo loginUser = UserUtils.getAdminInfo();
         propertyDepositEntity.setCommunityId(loginUser.getCommunityId());
-        propertyDepositEntity.setUpdateBy(UserUtils.getId());
+        propertyDepositEntity.setUpdateBy(UserUtils.getUserId());
         return propertyDepositService.updatePropertyDeposit(propertyDepositEntity)
             ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改物业押金账单失败");
     }

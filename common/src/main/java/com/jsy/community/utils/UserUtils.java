@@ -123,22 +123,6 @@ public class UserUtils {
 		userInfoVo.setNickname(loginUser.getNickName());
 		return userInfoVo;
 	}
-
-
-	
-	/**
-	 * @Description: 获取request域中用户信息(登录用户自己的信息)
-	 * @Param: []
-	 * @Return: com.jsy.community.vo.UserInfoVo
-	 * @Author: chq459799974
-	 * @Date: 2020/12/3
-	 **/
-	public static AdminInfoVo getAdminUserInfo() {
-//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-//			.getRequest();
-//		return (AdminInfoVo)request.getAttribute(USER_INFO);
-		return getAdminInfo();
-	}
 	
 	/**
 	* @Description: 获取request域中用户id(登录用户自己的uid)
@@ -164,19 +148,19 @@ public class UserUtils {
 		return ContextHolder.getContext().getLoginUser().getId();
 	}
 	
-	/**
-	 * @Description: 获取request域中用户id(登录用户自己的uid)
-	 * @Param: []
-	 * @Return: java.lang.String
-	 * @Author: DKS
-	 * @Date: 2021/10/14
-	 **/
-	public static String getId() {
-//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-//			.getRequest();
-//		return (String) request.getAttribute(USER_ID);
-		return String.valueOf(ContextHolder.getContext().getLoginUser().getId());
-	}
+//	/**
+//	 * @Description: 获取request域中用户id(登录用户自己的uid)
+//	 * @Param: []
+//	 * @Return: java.lang.String
+//	 * @Author: DKS
+//	 * @Date: 2021/10/14
+//	 **/
+//	public static String getUserId() {
+////		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+////			.getRequest();
+////		return (String) request.getAttribute(USER_ID);
+//		return ContextHolder.getContext().getLoginUser().getAccount();
+//	}
 	
 	/**
 	* @Description: 获取request域中用户token
@@ -222,21 +206,6 @@ public class UserUtils {
 //		return (Long) request.getAttribute(USER_COMPANY_ID);
 		AdminInfoVo adminInfo = getAdminInfo();
 		return adminInfo.getCompanyId();
-	}
-
-	/**
-	 * @author: Pipi
-	 * @description: 获取物业端登陆用户角色ID
-	 * @param :
-	 * @return: java.lang.Long
-	 * @date: 2021/8/6 14:28
-	 **/
-	public static Long getAdminRoleId() {
-//		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-//				.getRequest();
-//		return (Long) request.getAttribute(USER_ROLE_ID);
-		AdminInfoVo adminInfo = getAdminInfo();
-		return adminInfo.getRoleId();
 	}
 	
 	/**
@@ -296,18 +265,18 @@ public class UserUtils {
 		return String.valueOf(SnowFlake.nextId());//雪花算法 唯一键
 	}
 	
-	/**
-	* @Description: 设置token
-	 * @Param: [typeName, o]
-	 * @Return: java.lang.String
-	 * @Author: chq459799974
-	 * @Date: 2020/12/4
-	**/
-	public static String setRedisToken(String typeName,Object o){
-		String userToken = randomUUID();
-		redisTemplate.opsForValue().set(typeName + ":" + userToken,o);
-		return userToken;
-	}
+//	/**
+//	* @Description: 设置token
+//	 * @Param: [typeName, o]
+//	 * @Return: java.lang.String
+//	 * @Author: chq459799974
+//	 * @Date: 2020/12/4
+//	**/
+//	public static String setRedisToken(String typeName,Object o){
+//		String userToken = randomUUID();
+//		redisTemplate.opsForValue().set(typeName + ":" + userToken,o);
+//		return userToken;
+//	}
 
 	/**
 	 * @author: Pipi

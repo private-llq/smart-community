@@ -84,7 +84,7 @@ public class CarEquipmentManageController {
     @CarOperation(operation = "新增了【设备管理】")
     @Permit("community:property:carEquipmentManage:addEquipment")
     public CommonResult addEquipment(@RequestBody CarEquipMentQO carEquipMentQO){
-     boolean b =  equipmentManageService.addEquipment(carEquipMentQO,UserUtils.getAdminCommunityId(),UserUtils.getId());
+     boolean b =  equipmentManageService.addEquipment(carEquipMentQO,UserUtils.getAdminCommunityId(),UserUtils.getUserId());
      return CommonResult.ok("添加成功");
     }
     /**
@@ -99,7 +99,7 @@ public class CarEquipmentManageController {
     @CarOperation(operation = "编辑了【设备管理】")
     @Permit("community:property:carEquipmentManage:updateEquipment")
     public CommonResult updateEquipment(@RequestBody CarEquipMentQO carEquipMentQO){
-        boolean b =  equipmentManageService.updateEquipment(carEquipMentQO,UserUtils.getAdminCommunityId(),UserUtils.getId());
+        boolean b =  equipmentManageService.updateEquipment(carEquipMentQO,UserUtils.getAdminCommunityId(),UserUtils.getUserId());
         return CommonResult.ok("修改成功");
     }
 

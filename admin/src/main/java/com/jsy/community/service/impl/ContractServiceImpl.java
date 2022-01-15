@@ -59,10 +59,10 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, AssetLeaseR
     
         Set<String> homeOwnerUid = entities.stream().map(AssetLeaseRecordEntity::getHomeOwnerUid).collect(Collectors.toSet());
         Set<String> tenantUid = entities.stream().map(AssetLeaseRecordEntity::getTenantUid).collect(Collectors.toSet());
-        Set<Long> homeOwnerUids = homeOwnerUid.stream().map(s -> Long.parseLong(s.trim())).collect(Collectors.toSet());
-        Set<Long> tenantUids = tenantUid.stream().map(s -> Long.parseLong(s.trim())).collect(Collectors.toSet());
-        List<RealUserDetail> realUserDetailsByUid = baseUserInfoRpcService.getRealUserDetailsByUid(homeOwnerUids);
-        List<RealUserDetail> realUserDetailsByUid1 = baseUserInfoRpcService.getRealUserDetailsByUid(tenantUids);
+//        Set<Long> homeOwnerUids = homeOwnerUid.stream().map(s -> Long.parseLong(s.trim())).collect(Collectors.toSet());
+//        Set<Long> tenantUids = tenantUid.stream().map(s -> Long.parseLong(s.trim())).collect(Collectors.toSet());
+        List<RealUserDetail> realUserDetailsByUid = baseUserInfoRpcService.getRealUserDetails(homeOwnerUid);
+        List<RealUserDetail> realUserDetailsByUid1 = baseUserInfoRpcService.getRealUserDetails(tenantUid);
         Map<Long, RealUserDetail> realUserDetailMap = realUserDetailsByUid.stream().collect(Collectors.toMap(RealUserDetail::getId, Function.identity()));
         Map<Long, RealUserDetail> realUserDetailMap1 = realUserDetailsByUid1.stream().collect(Collectors.toMap(RealUserDetail::getId, Function.identity()));
     

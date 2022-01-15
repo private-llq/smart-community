@@ -374,7 +374,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             }
 //            List<CarPositionEntity> service = carPositionService.getByIds(ids);
 //            for (CarPositionEntity entity : service) {
-//                positionMap.put(entity.getId(),entity.getCarPosition());
+//                positionMap.put(entity.getUserId(),entity.getCarPosition());
 //            }
             for (CarOrderEntity record : records) {
                 record.setCarPositionId(communityEntity.getId());

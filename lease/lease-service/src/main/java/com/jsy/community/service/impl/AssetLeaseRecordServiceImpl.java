@@ -1455,7 +1455,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 //                UserEntity userEntity = userService.getUser(assetLeaseRecordEntity.getHomeOwnerUid());
 //                HashMap<Object, Object> map = new HashMap<>();
 //                map.put("type",2);
-//                map.put("dataId",leaseRecordEntity.getId());
+//                map.put("dataId",leaseRecordEntity.getUserId());
 //                PushInfoUtil.PushPublicTextMsg(userIMEntity.getImId(),
 //                        "合同签约",
 //                        userEntity.getRealName()+"向你发起了房屋签约！",
@@ -1636,7 +1636,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 transferEntity.setSendUid(1456196574147923970L);
                 transferEntity.setSendPayPwd("1234");
                 UserDetail userDetail = userInfoRpcService.getUserDetail(leaseRecordEntity.getHomeOwnerUid());
-                transferEntity.setReceiveUid(userDetail.getId());
+                transferEntity.setReceiveUid(userDetail.getUserId());
                 transferEntity.setCno("RMB");
                 transferEntity.setAmount(payAmount.setScale(2));
                 transferEntity.setRemark("房屋租金入账");

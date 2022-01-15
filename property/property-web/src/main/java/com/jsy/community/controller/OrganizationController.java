@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IOrganizationService;
 import com.jsy.community.constant.Const;
@@ -38,7 +37,7 @@ public class OrganizationController {
 	@GetMapping("/listOrganization")
 	@Permit("community:property:organization:listOrganization")
 	public CommonResult<TreeCommunityVO> listOrganization() {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		Long communityId = UserUtils.getAdminInfo().getCommunityId();
 		TreeCommunityVO treeCommunityVO = organizationService.listOrganization(communityId);
 		return CommonResult.ok(treeCommunityVO);
 	}
@@ -48,7 +47,7 @@ public class OrganizationController {
 	@businessLog(operation = "新增",content = "新增了【组织机构】")
 	@Permit("community:property:organization:addOrganization")
 	public CommonResult addOrganization(@RequestBody OrganizationEntity organizationEntity) {
-		organizationEntity.setCommunityId(UserUtils.getAdminUserInfo().getCommunityId());
+		organizationEntity.setCommunityId(UserUtils.getAdminInfo().getCommunityId());
 		organizationEntity.setId(SnowFlake.nextId());
 		
 		ValidatorUtils.validateEntity(organizationEntity, OrganizationEntity.addOrganizationValidate.class);
@@ -61,7 +60,7 @@ public class OrganizationController {
 	@businessLog(operation = "删除",content = "删除了【组织机构】")
 	@Permit("community:property:organization:deleteOrganization")
 	public CommonResult deleteOrganization(@RequestParam Long id) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		Long communityId = UserUtils.getAdminInfo().getCommunityId();
 		organizationService.deleteOrganization(id, communityId);
 		return CommonResult.ok();
 	}
@@ -70,7 +69,7 @@ public class OrganizationController {
 	@GetMapping("/getOrganizationById")
 	@Permit("community:property:organization:getOrganizationById")
 	public CommonResult getOrganizationById(@RequestParam Long id) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		Long communityId = UserUtils.getAdminInfo().getCommunityId();
 		OrganizationEntity organization = organizationService.getOrganizationById(id, communityId);
 		return CommonResult.ok(organization);
 	}
@@ -80,7 +79,7 @@ public class OrganizationController {
 	@businessLog(operation = "编辑",content = "更新了【组织机构】")
 	@Permit("community:property:organization:updateOrganization")
 	public CommonResult updateOrganization(@RequestBody OrganizationEntity organization) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		Long communityId = UserUtils.getAdminInfo().getCommunityId();
 		organization.setCommunityId(communityId);
 		ValidatorUtils.validateEntity(organization, OrganizationEntity.updateOrganizationValidate.class);
 		organizationService.updateOrganization(organization);

@@ -42,7 +42,7 @@ public class AdminUserController {
 		if(baseQO.getQuery() == null){
 			baseQO.setQuery(new AdminUserQO());
 		}
-		baseQO.getQuery().setUid(UserUtils.getId());
+		baseQO.getQuery().setUid(UserUtils.getUserId());
 		return CommonResult.ok(adminUserService.queryOperator(baseQO));
 	}
 	

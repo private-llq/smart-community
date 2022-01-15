@@ -357,7 +357,7 @@ public class VisitorServiceImpl implements IVisitorService {
 				Set<String> facilityIds = new HashSet<>();
 				for (CommunityHardWareEntity communityHardWareEntity : communityHardWareEntities) {
 					VisitorFaceSyncRecordEntity visitorFaceSyncRecordEntity = new VisitorFaceSyncRecordEntity();
-					visitorFaceSyncRecordEntity.setVisitorId(visitorEntity.getId());
+					visitorFaceSyncRecordEntity.setVisitorId(visitorEntity.getUserId());
 					visitorFaceSyncRecordEntity.setCommunityId(visitorEntity.getCommunityId());
 					visitorFaceSyncRecordEntity.setFaceUrl(visitorEntity.getFaceUrl());
 					visitorFaceSyncRecordEntity.setFacilityId(communityHardWareEntity.getHardwareId());

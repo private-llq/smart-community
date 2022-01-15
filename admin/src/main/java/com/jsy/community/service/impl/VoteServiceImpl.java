@@ -32,7 +32,6 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @program: com.jsy.community
@@ -187,9 +186,9 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper,VoteEntity> implemen
         for (VoteUserEntity voteUserEntity : entityList) {
             ids.add(voteUserEntity.getUid());
         }
-        Set<Long> idSet = ids.stream().map(Long::parseLong).collect(Collectors.toSet());
-        if (idSet.size()!=0){
-            List<RealUserDetail> realUserDetailsByUid = baseUserInfoRpcService.getRealUserDetailsByUid(idSet);
+//        Set<Long> idSet = ids.stream().map(Long::parseLong).collect(Collectors.toSet());
+        if (!CollectionUtils.isEmpty(ids)){
+            List<RealUserDetail> realUserDetailsByUid = baseUserInfoRpcService.getRealUserDetails(ids);
             for (RealUserDetail userDetail : realUserDetailsByUid) {
                 map.put(String.valueOf(userDetail.getId()),userDetail.getNickName());
             }

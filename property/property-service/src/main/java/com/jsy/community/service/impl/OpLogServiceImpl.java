@@ -82,7 +82,7 @@ public class OpLogServiceImpl extends ServiceImpl<OpLogMapper, OpLogEntity> impl
 		// 模糊查询用户名
 		if (StringUtils.isNotBlank(query.getUserName())) {
 			PageVO<UserDetail> pageVO = baseUserInfoRpcService.queryUser("", query.getUserName(), 0, 99999999);
-			Set<Long> userIds = pageVO.getData().stream().map(UserDetail::getId).collect(Collectors.toSet());
+			Set<String> userIds = pageVO.getData().stream().map(UserDetail::getAccount).collect(Collectors.toSet());
 			if (!CollectionUtils.isEmpty(userIds)) {
 				queryWrapper.in("user_id", userIds);
 			} else {
@@ -96,12 +96,12 @@ public class OpLogServiceImpl extends ServiceImpl<OpLogMapper, OpLogEntity> impl
 		}
 		// 补充用户名
 		Set<String> uidSet = pageData.getRecords().stream().map(OpLogEntity::getUserId).collect(Collectors.toSet());
-		Set<Long> uidsSet = uidSet.stream().map(Long::parseLong).collect(Collectors.toSet());
-		List<RealUserDetail> realUserDetails = baseUserInfoRpcService.getRealUserDetailsByUid(uidsSet);
-		Map<Long, RealUserDetail> userDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getId, Function.identity()));
+//		Set<Long> uidsSet = uidSet.stream().map(Long::parseLong).collect(Collectors.toSet());
+		List<RealUserDetail> realUserDetails = baseUserInfoRpcService.getRealUserDetails(uidSet);
+		Map<String, RealUserDetail> userDetailMap = realUserDetails.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
 		for (OpLogEntity entity : pageData.getRecords()) {
 			if (entity.getUserId() != null) {
-				RealUserDetail realUserDetail = userDetailMap.get(Long.parseLong(entity.getUserId()));
+				RealUserDetail realUserDetail = userDetailMap.get(entity.getUserId());
 				if (realUserDetail != null) {
 					entity.setUserName(realUserDetail.getNickName());
 				}

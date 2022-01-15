@@ -43,7 +43,7 @@ public class SysRoleController {
 	@Permit("community:admin:role:add")
 	public CommonResult addRole(@RequestBody SysRoleEntity sysRoleEntity){
 		ValidatorUtils.validateEntity(sysRoleEntity);
-		sysRoleEntity.setId(Long.valueOf(UserUtils.getId()));
+		sysRoleEntity.setId(Long.valueOf(UserUtils.getUserId()));
 		sysConfigService.addRole(sysRoleEntity);
 		return CommonResult.ok("添加成功");
 	}
@@ -75,7 +75,7 @@ public class SysRoleController {
 	@businessLog(operation = "编辑",content = "更新了【系统角色】")
 	@Permit("community:admin:role:update")
 	public CommonResult updateMenu(@RequestBody SysRoleQO sysRoleQO){
-		String id = UserUtils.getId();
+		String id = UserUtils.getUserId();
 		sysConfigService.updateRole(sysRoleQO, Long.valueOf(id));
 		return CommonResult.ok("修改成功");
 	}

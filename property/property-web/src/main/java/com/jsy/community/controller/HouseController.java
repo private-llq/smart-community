@@ -118,7 +118,7 @@ public class HouseController {
 		}else if (BusinessConst.BUILDING_TYPE_UNIT == houseEntity.getType()){
 			ValidatorUtils.validateEntity(houseEntity,HouseEntity.addUnitGroup.class);
 		}
-		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+		AdminInfoVo loginUser = UserUtils.getAdminInfo();
 		houseEntity.setCommunityId(loginUser.getCommunityId());
 		houseEntity.setCreateBy(loginUser.getUid());
 		boolean result = houseService.addHouse(houseEntity);
@@ -138,7 +138,7 @@ public class HouseController {
 	@Permit("community:property:house:update")
 	public CommonResult updateHouse(@RequestBody HouseEntity houseEntity){
 		ValidatorUtils.validateEntity(houseEntity, HouseEntity.updateHouseValidatedGroup.class);
-		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+		AdminInfoVo loginUser = UserUtils.getAdminInfo();
 		houseEntity.setCommunityId(loginUser.getCommunityId());
 		houseEntity.setCreateBy(loginUser.getUid());
 		boolean result = houseService.updateHouse(houseEntity);
@@ -235,9 +235,9 @@ public class HouseController {
 	@Permit("community:property:house:building:type:add")
 	public CommonResult addHouseBuildingType(@RequestBody HouseBuildingTypeEntity houseBuildingTypeEntity){
 		ValidatorUtils.validateEntity(houseBuildingTypeEntity,HouseBuildingTypeEntity.addHouseBuildingTypeGroup.class);
-		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+		AdminInfoVo loginUser = UserUtils.getAdminInfo();
 		houseBuildingTypeEntity.setCommunityId(loginUser.getCommunityId());
-		houseBuildingTypeEntity.setCreateBy(UserUtils.getId());
+		houseBuildingTypeEntity.setCreateBy(UserUtils.getUserId());
 		return houseService.addHouseBuildingType(houseBuildingTypeEntity)
 			? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"新增楼宇分类失败");
 	}
@@ -255,9 +255,9 @@ public class HouseController {
 	@Permit("community:property:house:building:type:update")
 	public CommonResult updateHouseBuildingType(@RequestBody HouseBuildingTypeEntity houseBuildingTypeEntity){
 		ValidatorUtils.validateEntity(houseBuildingTypeEntity);
-		AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+		AdminInfoVo loginUser = UserUtils.getAdminInfo();
 		houseBuildingTypeEntity.setCommunityId(loginUser.getCommunityId());
-		houseBuildingTypeEntity.setUpdateBy(UserUtils.getId());
+		houseBuildingTypeEntity.setUpdateBy(UserUtils.getUserId());
 		return houseService.updateHouseBuildingType(houseBuildingTypeEntity)
 			? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改楼宇分类失败");
 	}
@@ -335,7 +335,7 @@ public class HouseController {
 //		//参数验证
 //		validFileSuffix(excel);
 //		Long adminCommunityId = UserUtils.getAdminCommunityId();
-//		String userId = UserUtils.getId();
+//		String userId = UserUtils.getUserId();
 //		ArrayList<HouseImportErrorVO> errorVos = new ArrayList<>(32);
 //		List<HouseEntity> houseEntities = houseExcelHandler.importHouseExcel(excel, errorVos);
 //		List<HouseEntity> allHouse = houseService.getAllHouse(adminCommunityId);
@@ -386,7 +386,7 @@ public class HouseController {
 		//参数验证
 		validFileSuffix(excel);
 		Long adminCommunityId = UserUtils.getAdminCommunityId();
-		String userId = UserUtils.getId();
+		String userId = UserUtils.getUserId();
 		ArrayList<HouseImportErrorVO> errorVos = new ArrayList<>(32);
 		List<HouseEntity> houseEntities = houseExcelHandler.importHouseExcel(excel, errorVos);
 		List<HouseEntity> allHouse = houseService.getAllHouse(adminCommunityId);
@@ -556,7 +556,7 @@ public class HouseController {
 		//参数验证
 		validFileSuffix(excel);
 		Long adminCommunityId = UserUtils.getAdminCommunityId();
-		String userId = UserUtils.getId();
+		String userId = UserUtils.getUserId();
 		ArrayList<BuildingImportErrorVO> errorVos = new ArrayList<>(32);
 		List<HouseEntity> houseEntities = houseExcelHandler.importBuildingExcel(excel, errorVos);
 		List<HouseEntity> allBuilding = houseService.selectAllBuilding(adminCommunityId);

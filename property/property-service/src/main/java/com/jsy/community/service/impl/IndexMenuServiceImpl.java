@@ -65,7 +65,7 @@
 //		indexMenuEntity.setId(id);
 //
 //		if (menuEntity != null) {
-//			indexMenuEntity.setParentId(menuEntity.getId());
+//			indexMenuEntity.setParentId(menuEntity.getUserId());
 //			return indexMenuMapper.updateById(indexMenuEntity);
 //		}
 //		return indexMenuMapper.updateById(indexMenuEntity);
@@ -143,7 +143,7 @@
 //		for (Long id : ids) {
 //			IndexMenuEntity indexMenuEntity = indexMenuMapper.selectById(id);
 //			if (indexMenuEntity.getParentId() == 0) {
-//				log.debug("删除的菜单id：{}", indexMenuEntity.getId());
+//				log.debug("删除的菜单id：{}", indexMenuEntity.getUserId());
 //				throw new JSYException(JSYError.REQUEST_PARAM.getCode(), "请先删除子菜单");
 //			}
 //		}
@@ -196,7 +196,7 @@
 //
 //			ArrayList<FrontChildMenu> childMenus = new ArrayList<>();
 //			for (IndexMenuEntity menu : childMenu) {
-//				if (menu.getParentId().equals(indexMenuEntity.getId())) {
+//				if (menu.getParentId().equals(indexMenuEntity.getUserId())) {
 //					FrontChildMenu frontChildMenu = new FrontChildMenu();
 //					BeanUtils.copyProperties(menu, frontChildMenu);
 //					childMenus.add(frontChildMenu);
@@ -224,7 +224,7 @@
 ////		BeanUtils.copyProperties(appMenuEntity, indexMenuEntity);
 ////		indexMenuEntity.setId(SnowFlake.nextId());
 ////		indexMenuMapper.insert(indexMenuEntity);
-////		return indexMenuEntity.getId();//返回新增后数据的id
+////		return indexMenuEntity.getUserId();//返回新增后数据的id
 ////	}
 //
 ////	@Override

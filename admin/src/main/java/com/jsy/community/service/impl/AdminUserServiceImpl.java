@@ -82,9 +82,9 @@ public class AdminUserServiceImpl implements IAdminUserService {
 		if (CollectionUtils.isEmpty(userDetailPageVO.getData())) {
 			return new PageVO<>();
 		}
-		userDetailPageVO.setData(userDetailPageVO.getData().stream().filter(userDetail -> userDetail.getId() != Long.valueOf(query.getUid())).collect(Collectors.toList()));
+		userDetailPageVO.setData(userDetailPageVO.getData().stream().filter(userDetail -> !userDetail.getAccount().equals(query.getUid())).collect(Collectors.toList()));
 		List<Long> companyIds = new ArrayList<>();
-		List<Long> uIds = new ArrayList<>();
+		List<String> uIds = new ArrayList<>();
 		// 模糊查物业公司名称
 		if (org.apache.commons.lang3.StringUtils.isNotBlank(query.getCompanyName())) {
 			List<PropertyCompanyEntity> propertyCompanyEntities = propertyCompanyMapper.selectList(new QueryWrapper<PropertyCompanyEntity>().select("id").like("name", query.getCompanyName()));
@@ -95,7 +95,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 			if (companyIds.size() > 0) {
 				List<AdminUserCompanyEntity> entityList = adminUserCompanyMapper.selectList(new QueryWrapper<AdminUserCompanyEntity>().in("company_id", companyIds).eq("deleted", 0));
 				for (AdminUserCompanyEntity adminUserCompanyEntity : entityList) {
-					uIds.add(Long.valueOf(adminUserCompanyEntity.getUid()));
+					uIds.add(adminUserCompanyEntity.getUid());
 				}
 			}
 			if (uIds.size() == 0) {
@@ -103,14 +103,14 @@ public class AdminUserServiceImpl implements IAdminUserService {
 			}
 		}
 		if (uIds.size() > 0) {
-			userDetailPageVO.getData().removeIf(userDetail -> !uIds.contains(userDetail.getId()));
+			userDetailPageVO.getData().removeIf(userDetail -> !uIds.contains(userDetail.getAccount()));
 		}
 		PageVO<AdminUserEntity> pageVO = new PageVO<>();
 		// 补充数据
 		for (UserDetail userDetail : userDetailPageVO.getData()) {
 			AdminUserEntity adminUserEntity = new AdminUserEntity();
 			// 补充物业公司名称
-			AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", userDetail.getId()));
+			AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", userDetail.getAccount()));
 			if (entity != null) {
 				PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(entity.getCompanyId());
 				if (companyEntity != null) {
@@ -119,8 +119,8 @@ public class AdminUserServiceImpl implements IAdminUserService {
 					adminUserEntity.setCompanyIdStr(String.valueOf(companyEntity.getId()));
 				}
 			}
-			adminUserEntity.setId(userDetail.getId());
-			adminUserEntity.setIdStr(String.valueOf(userDetail.getId()));
+			adminUserEntity.setId(Long.parseLong(userDetail.getAccount()));
+			adminUserEntity.setIdStr(userDetail.getAccount());
 			adminUserEntity.setNickName(userDetail.getNickName());
 			adminUserEntity.setMobile(userDetail.getPhone());
 			adminUserEntity.setCreateTime(LocalDateTime.parse(userDetail.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
@@ -153,8 +153,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 		} catch (BaseException e) {
 			// 手机号是否已经注册
 			if (e.getErrorEnum().getCode() == 103) {
-				userDetail = new UserDetail();
-				userDetail.setId(userInfoRpcService.getUserDetailByPhone(adminUserQO.getMobile()).getId());
+				userDetail = userInfoRpcService.getUserDetailByPhone(adminUserQO.getMobile());
 				result = 2;
 			}
 		}
@@ -167,16 +166,16 @@ public class AdminUserServiceImpl implements IAdminUserService {
 		// 绑定用户和角色
 //		List<Long> roleIds = new ArrayList<>();
 //		roleIds.add(adminUserQO.getRoleId());
-//		baseRoleRpcService.userJoinRole(roleIds, userDetail.getId(), 1460884237115367425L);
+//		baseRoleRpcService.userJoinRole(roleIds, userDetail.getUserId(), 1460884237115367425L);
 		// 先查询是否已经绑定用户和物业公司
-		AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", userDetail.getId()).eq("company_id", adminUserQO.getCompanyId()));
+		AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", userDetail.getAccount()).eq("company_id", adminUserQO.getCompanyId()));
 		// 没有绑定
 		if (entity == null) {
 			// 绑定用户和物业公司
 			entity = new AdminUserCompanyEntity();
 			entity.setId(SnowFlake.nextId());
 			entity.setCompanyId(adminUserQO.getCompanyId());
-			entity.setUid(String.valueOf(userDetail.getId()));
+			entity.setUid(userDetail.getAccount());
 			adminUserCompanyMapper.insert(entity);
 		}
 		return result;
@@ -192,8 +191,9 @@ public class AdminUserServiceImpl implements IAdminUserService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void updateOperator(AdminUserQO adminUserQO){
+		UserDetail userDetail = userInfoRpcService.getUserDetail(String.valueOf(adminUserQO.getId()));
 		//更新资料
-		baseUpdateUserRpcService.updateUserInfo(adminUserQO.getId(), adminUserQO.getNickName(),
+		baseUpdateUserRpcService.updateUserInfo(userDetail.getId(), adminUserQO.getNickName(),
 			adminUserQO.getMobile(), adminUserQO.getPassword(), BusinessConst.PROPERTY_ADMIN);
 	}
 	
@@ -206,13 +206,14 @@ public class AdminUserServiceImpl implements IAdminUserService {
 	 */
 	@Override
 	public void deleteOperator(Long id) {
-		List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(id, BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
+		UserDetail userDetail = userInfoRpcService.getUserDetail(String.valueOf(id));
+		List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
 		// 移除用户角色绑定关系
 		Set<Long> roleIds = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
-		baseRoleRpcService.roleRemoveToUser(roleIds, id);
+		baseRoleRpcService.roleRemoveToUser(roleIds, userDetail.getId());
 		// 移除登录类型范围
-		baseAuthRpcService.removeLoginTypeScope(id, BusinessConst.PROPERTY_ADMIN, false);
-		baseAuthRpcService.removeLoginTypeScope(id, BusinessConst.COMMUNITY_ADMIN, false);
+		baseAuthRpcService.removeLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, false);
+		baseAuthRpcService.removeLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN, false);
 //		baseAuthRpcService.cancellation(id);
 		// 删除的同时也要删除用户和物业公司绑定关系
 		adminUserCompanyMapper.delete(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", id));

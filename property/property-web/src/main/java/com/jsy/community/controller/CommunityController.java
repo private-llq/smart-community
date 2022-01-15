@@ -74,7 +74,7 @@ public class CommunityController {
     @GetMapping
     @Permit("community:property:community")
     public CommonResult getElectronicMap() {
-        Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+        Long communityId = UserUtils.getAdminInfo().getCommunityId();
         Map<String, Object> map = communityService.getElectronicMap(communityId);
         return CommonResult.ok(map);
     }
@@ -109,9 +109,9 @@ public class CommunityController {
         // 设置默认的社区房屋层级模式
         communityEntity.setHouseLevelMode(1);
         // 新增数据
-        Long communityId = communityService.addCommunity(communityEntity, UserUtils.getId());
+        Long communityId = communityService.addCommunity(communityEntity, UserUtils.getUserId());
         // 获取登录用户数据
-        AdminInfoVo adminUserInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo adminUserInfo = UserUtils.getAdminInfo();
         adminUserInfo.getCommunityIdList().add(String.valueOf(communityId));
         String token = UserUtils.getUserToken();
         // 根据token,更新Redis数据
@@ -129,7 +129,7 @@ public class CommunityController {
     @PostMapping("/queryCommunityList")
     @Permit("community:property:community:queryCommunityList")
     public CommonResult communityList(@RequestBody BaseQO<CommunityEntity> baseQO) {
-        PageInfo<PropertyCommunityListVO> communityListVOPageInfo = communityService.queryPropertyCommunityList(baseQO, UserUtils.getAdminUserInfo().getCommunityIdList());
+        PageInfo<PropertyCommunityListVO> communityListVOPageInfo = communityService.queryPropertyCommunityList(baseQO, UserUtils.getAdminInfo().getCommunityIdList());
         return CommonResult.ok(communityListVOPageInfo);
     }
 
@@ -148,7 +148,7 @@ public class CommunityController {
             throw new JSYException(400, "社区ID不能为空!");
         }
         // 需要判定用户有权限的社区是否包含该社区
-        AdminInfoVo adminUserInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo adminUserInfo = UserUtils.getAdminInfo();
         if (!adminUserInfo.getCommunityIdList().contains(communityEntity.getId())) {
             throw new JSYException(400, "你没有该社区的操作权限!");
         }

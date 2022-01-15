@@ -314,8 +314,8 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
 //        Set<String> houseIds = list.stream().filter(h -> h.getRelation() == 7).map(HouseMemberVO::getHouseId).collect(Collectors.toSet());
 //        List<HouseLeaseEntity> houseLeaseEntityList = houseLeaseMapper.selectList(new QueryWrapper<HouseLeaseEntity>().in("house_id", houseIds));
 //        Map<Long, List<Long>> houseLeaseMap = houseLeaseEntityList.stream().collect(Collectors.groupingBy(HouseLeaseEntity::getHouseId,
-//            Collectors.mapping(HouseLeaseEntity::getId, Collectors.toList())));
-//        Set<Long> houseLeaseIds = houseLeaseEntityList.stream().map(HouseLeaseEntity::getId).collect(Collectors.toSet());
+//            Collectors.mapping(HouseLeaseEntity::getUserId, Collectors.toList())));
+//        Set<Long> houseLeaseIds = houseLeaseEntityList.stream().map(HouseLeaseEntity::getUserId).collect(Collectors.toSet());
 //        List<AssetLeaseRecordEntity> entities = assetLeaseRecordMapper.selectList(new QueryWrapper<AssetLeaseRecordEntity>().in("asset_id", houseLeaseIds));
 //        Map<Long, LocalDate> endDateMap = entities.stream().collect(Collectors.toMap(AssetLeaseRecordEntity::getAssetId, AssetLeaseRecordEntity::getEndDate));
         

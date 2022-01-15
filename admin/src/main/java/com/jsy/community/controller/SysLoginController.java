@@ -123,7 +123,7 @@ public class SysLoginController {
 //		String token = sysUserTokenService.createToken(user);
 //		user.setToken(token);
 //		//查询用户菜单
-//		List<SysMenuEntity> menuList = sysConfigService.queryUserMenu(user.getId());
+//		List<SysMenuEntity> menuList = sysConfigService.queryUserMenu(user.getUserId());
 //		user.setMenuList(menuList);
 //		return CommonResult.ok(user);
 //	}

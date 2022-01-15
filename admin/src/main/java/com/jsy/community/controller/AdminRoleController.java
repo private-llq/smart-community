@@ -36,7 +36,7 @@ public class AdminRoleController {
 	@businessLog(operation = "新增",content = "新增了【中台角色】")
 	@Permit("community:admin:admin:role:insert")
 	public CommonResult addRole(@RequestBody AdminRoleQO adminRoleQO){
-		adminRoleQO.setId(Long.valueOf(UserUtils.getId()));
+		adminRoleQO.setId(Long.valueOf(UserUtils.getUserId()));
 		adminRoleService.addRole(adminRoleQO);
 		return CommonResult.ok("添加成功");
 	}
@@ -70,7 +70,7 @@ public class AdminRoleController {
 		if(adminRoleQO.getId() == null){
 			return CommonResult.error("缺少ID");
 		}
-		String id = UserUtils.getId();
+		String id = UserUtils.getUserId();
 		adminRoleService.updateRole(adminRoleQO, Long.valueOf(id));
 		return CommonResult.ok("修改成功");
 	}

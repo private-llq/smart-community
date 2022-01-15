@@ -7,6 +7,7 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.entity.sys.SysMenuEntity;
 import com.jsy.community.entity.sys.SysRoleEntity;
 import com.jsy.community.entity.sys.SysUserRoleEntity;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.SysMenuMapper;
 import com.jsy.community.mapper.SysRoleMapper;
 import com.jsy.community.mapper.SysRoleMenuMapper;
@@ -14,6 +15,7 @@ import com.jsy.community.mapper.SysUserRoleMapper;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.sys.SysMenuQO;
 import com.jsy.community.qo.sys.SysRoleQO;
+import com.jsy.community.service.AdminException;
 import com.jsy.community.service.ISysConfigService;
 import com.jsy.community.utils.MyPageUtils;
 import com.zhsj.base.api.constant.RpcConst;
@@ -133,7 +135,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
 //				return false;
 //			}
 //			if(0 == parent.getBelongTo()){//父级是顶级节点
-//				sysMenuEntity.setBelongTo(parent.getId());
+//				sysMenuEntity.setBelongTo(parent.getUserId());
 //			}else{ //父级也是子级
 //				sysMenuEntity.setBelongTo(parent.getBelongTo());//同步父节点的顶级节点
 //			}
@@ -174,7 +176,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
 //		if(0L != parent.getPid()){ //要新增的菜单非顶级
 //			parent = sysMenuMapper.findParent(parent.getPid());//寻找父节点
 //			if(parent.getPid() == 0){ //顶级节点
-//				sysMenuEntity.setBelongTo(parent.getId());
+//				sysMenuEntity.setBelongTo(parent.getUserId());
 //			}else{
 //				setBelongTo(sysMenuEntity,parent);
 //			}
@@ -326,10 +328,19 @@ public class SysConfigServiceImpl implements ISysConfigService {
 //		sysRoleEntity.setId(SnowFlake.nextId());
 //		//设置角色菜单
 //		if(!CollectionUtils.isEmpty(sysRoleEntity.getMenuIds())){
-//			setRoleMenus(sysRoleEntity.getMenuIds(),sysRoleEntity.getId());
+//			setRoleMenus(sysRoleEntity.getMenuIds(),sysRoleEntity.getUserId());
 //		}
 //		int result = sysRoleMapper.insert(sysRoleEntity);
 //        return result == 1;
+		// 查询角色是否同名
+		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage("", BusinessConst.ULTIMATE_ADMIN, 0, 999999999);
+		List<String> permitRoleNames = permitRolePageVO.getData().stream().map(PermitRole::getName).collect(Collectors.toList());
+		for (String permitRoleName : permitRoleNames) {
+			if (permitRoleName.equals(sysRoleEntity.getName())) {
+				throw new AdminException(JSYError.DUPLICATE_KEY.getCode(), "该角色名称已存在，请勿重新添加!");
+			}
+		}
+		
 		PermitRole permitRole = baseRoleRpcService.createRole(sysRoleEntity.getName(), sysRoleEntity.getRemark(), BusinessConst.ULTIMATE_ADMIN, sysRoleEntity.getId());
 		// 菜单分配给角色
 		baseMenuRpcService.menuJoinRole(sysRoleEntity.getMenuIds(), permitRole.getId(), sysRoleEntity.getId());
@@ -340,7 +351,9 @@ public class SysConfigServiceImpl implements ISysConfigService {
 			permisIds.add(menuPermission.getPermisId());
 		}
 		// 将权限添加到角色
-		permissionRpcService.permitJoinRole(permisIds, permitRole.getId(), sysRoleEntity.getId());
+		if (!CollectionUtils.isEmpty(permisIds)) {
+			permissionRpcService.permitJoinRole(permisIds, permitRole.getId(), sysRoleEntity.getId());
+		}
 	}
 	
 	/**
@@ -354,7 +367,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
 	public void delRole(Long id){
 //		int result = sysRoleMapper.deleteById(id);
 //        return result == 1;
-		List<Long> roleIds = new ArrayList<>();;
+		List<Long> roleIds = new ArrayList<>();
 		roleIds.add(id);
 		baseRoleRpcService.deleteRole(roleIds);
     }
@@ -372,10 +385,19 @@ public class SysConfigServiceImpl implements ISysConfigService {
 //		BeanUtils.copyProperties(sysRoleOQ,entity);
 //		//更新角色菜单
 //		if(!CollectionUtils.isEmpty(entity.getMenuIds())){
-//			setRoleMenus(entity.getMenuIds(),entity.getId());
+//			setRoleMenus(entity.getMenuIds(),entity.getUserId());
 //		}
 //		int result = sysRoleMapper.updateById(entity);
 //        return result == 1;
+		// 查询角色是否同名
+		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage("", BusinessConst.ULTIMATE_ADMIN, 0, 999999999);
+		List<String> permitRoleNames = permitRolePageVO.getData().stream().map(PermitRole::getName).collect(Collectors.toList());
+		for (String permitRoleName : permitRoleNames) {
+			if (permitRoleName.equals(sysRoleOQ.getName())) {
+				throw new AdminException(JSYError.DUPLICATE_KEY.getCode(), "该角色名称已存在，请勿重新添加!");
+			}
+		}
+		
 		UpdateRoleDto updateRoleDto = new UpdateRoleDto();
 		updateRoleDto.setId(sysRoleOQ.getId());
 		updateRoleDto.setName(sysRoleOQ.getName());
@@ -442,15 +464,15 @@ public class SysConfigServiceImpl implements ISysConfigService {
 //		if(!StringUtils.isEmpty(query.getName())){
 //			queryWrapper.like("name",query.getName());
 //		}
-//		if(query.getId() != null){
+//		if(query.getUserId() != null){
 //			//查详情
-//			queryWrapper.eq("id",query.getId());
+//			queryWrapper.eq("id",query.getUserId());
 //		}
 //		Page<SysRoleEntity> pageData = sysRoleMapper.selectPage(page,queryWrapper);
-//		if(query.getId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
+//		if(query.getUserId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
 //			//查菜单权限
 //			SysRoleEntity entity = pageData.getRecords().get(0);
-//			entity.setMenuIds(sysRoleMapper.getRoleMenu(entity.getId()));
+//			entity.setMenuIds(sysRoleMapper.getRoleMenu(entity.getUserId()));
 //		}
 //		PageInfo<SysRoleEntity> pageInfo = new PageInfo<>();
 //		BeanUtils.copyProperties(pageData,pageInfo);

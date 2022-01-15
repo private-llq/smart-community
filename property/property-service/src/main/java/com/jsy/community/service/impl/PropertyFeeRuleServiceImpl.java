@@ -383,12 +383,12 @@ public class PropertyFeeRuleServiceImpl extends ServiceImpl<PropertyFeeRuleMappe
                 if (ruleEntity.getRelevanceType() == 1) {
                     // 查询小区所有房屋
                     List<HouseEntity> allHouse = houseMapper.getAllHouse(ruleEntity.getCommunityId());
-                    List<String> houseId = allHouse.stream().map(houseEntity -> houseEntity.getId() + "").collect(Collectors.toList());
+                    List<String> houseId = allHouse.stream().map(houseEntity -> houseEntity.getUserId() + "").collect(Collectors.toList());
                     ruleEntity.setRelevanceIdList(houseId);
                 } else {
                     // 查询小区所有车位
                     List<CarPositionEntity> allCarPositionByCommunity = carPositionMapper.getAllCarPositionByCommunity(ruleEntity.getCommunityId());
-                    List<String> positionId = allCarPositionByCommunity.stream().map(carPositionEntity -> carPositionEntity.getId() + "").collect(Collectors.toList());
+                    List<String> positionId = allCarPositionByCommunity.stream().map(carPositionEntity -> carPositionEntity.getUserId() + "").collect(Collectors.toList());
                     ruleEntity.setRelevanceIdList(positionId);
                 }
             }*/

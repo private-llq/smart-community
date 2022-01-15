@@ -46,7 +46,7 @@ public class PropertyMarketController {
 //    @ApiOperation("社区集市发布商品")
 //    @Login
 //    public CommonResult addMarket(@RequestBody ProprietorMarketQO marketQO){
-//        String userId = UserUtils.getId();
+//        String userId = UserUtils.getUserId();
 //        int i = marketQO.getPrice().compareTo(BigDecimal.valueOf(BigDecimal.ROUND_DOWN));
 //        if (marketQO.getNegotiable()==0){   //选择不面议  价格不能小于0
 //                if (i<0){
@@ -70,7 +70,7 @@ public class PropertyMarketController {
 //    @ApiOperation("社区集市发布商品")
 //    @Login
 //    public CommonResult updateMarket(@RequestBody ProprietorMarketQO marketQO){
-//        String userId = UserUtils.getId();
+//        String userId = UserUtils.getUserId();
 //       if (marketQO.getNegotiable()==0){   //选择不面议  价格不能小于0
 //           if (marketQO.getPrice()==null){
 //               throw new JSYException("价格有误,请重新输入");
@@ -115,7 +115,7 @@ public class PropertyMarketController {
 //    @ApiOperation("查询用户已发布或已下架的商品")
 //    @Login
 //    public CommonResult selectMarketPage(@RequestBody  BaseQO<ProprietorMarketEntity> baseQO){
-//        String userId = UserUtils.getId();
+//        String userId = UserUtils.getUserId();
 //        ValidatorUtils.validatePageParam(baseQO);
 //        if (baseQO.getQuery()==null) {
 //            baseQO.setQuery(new ProprietorMarketEntity());

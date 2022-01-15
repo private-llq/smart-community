@@ -51,7 +51,7 @@ public class PropertyFeeRuleController {
     @PostMapping("/list")
     @Permit("community:property:feeRule:list")
     public CommonResult feeRule(@RequestBody BaseQO<FeeRuleQO> baseQO){
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         Map<Object, Object> map=propertyFeeRuleService.findList(baseQO,userInfo.getCommunityId());
 
         return CommonResult.ok(map);
@@ -108,7 +108,7 @@ public class PropertyFeeRuleController {
     @PropertyFinanceLog(operation = "收费项目：",type = 1)
     @Permit("community:property:feeRule:startOrOut")
     public CommonResult startOrOut(@RequestParam("status")Integer status,@RequestParam("id") Long id){
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         propertyFeeRuleService.startOrOut(userInfo,status,id);
         return CommonResult.ok();
     }
@@ -116,7 +116,7 @@ public class PropertyFeeRuleController {
     @GetMapping("/statementStatus")
     @Permit("community:property:feeRule:statementStatus")
     public CommonResult statementStatus(@RequestParam("status")Integer status,@RequestParam("id") Long id){
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         propertyFeeRuleService.statementStatus(userInfo,status,id);
         return CommonResult.ok();
     }
@@ -127,7 +127,7 @@ public class PropertyFeeRuleController {
     @Permit("community:property:feeRule:updateById")
     public CommonResult updateById(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
         ValidatorUtils.validateEntity(propertyFeeRuleEntity);
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         propertyFeeRuleEntity.setCommunityId(UserUtils.getAdminCommunityId());
         propertyFeeRuleService.updateOneRule(userInfo,propertyFeeRuleEntity);
         return CommonResult.ok();
@@ -139,7 +139,7 @@ public class PropertyFeeRuleController {
     @Permit("community:property:feeRule:save")
     public CommonResult save(@RequestBody PropertyFeeRuleEntity propertyFeeRuleEntity){
         ValidatorUtils.validateEntity(propertyFeeRuleEntity, PropertyFeeRuleEntity.PropertyFeeRule.class);
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         propertyFeeRuleEntity.setCommunityId(UserUtils.getAdminCommunityId());
         propertyFeeRuleEntity.setName(BusinessEnum.FeeRuleNameEnum.getName(propertyFeeRuleEntity.getType()));
         propertyFeeRuleService.saveOne(userInfo,propertyFeeRuleEntity);
@@ -151,7 +151,7 @@ public class PropertyFeeRuleController {
     @businessLog(operation = "删除",content = "删除了【物业收费规则】")
     @Permit("community:property:feeRule:delete")
     public CommonResult delete(@RequestParam Long id){
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         propertyFeeRuleService.delete(id);
         return CommonResult.ok();
     }

@@ -124,7 +124,7 @@ public class ProprietorController {
         Integer row = 0;
         if(CollectionUtil.isNotEmpty(proprietors)){
             //获取管理员姓名 用于标识每条业主数据的创建人
-            RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(UserUtils.getId());
+            RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(UserUtils.getUserId());
             String adminRealName = "";
             if (idCardRealInfo != null) {
                 adminRealName = idCardRealInfo.getIdCardName();
@@ -404,7 +404,7 @@ public class ProprietorController {
     @Permit("community:property:proprietor")
     public CommonResult<Boolean> update(@RequestBody ProprietorQO qo) {
         ValidatorUtils.validateEntity(qo, ProprietorQO.PropertyUpdateValid.class);
-        return iProprietorService.update(qo, UserUtils.getId()) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        return iProprietorService.update(qo, UserUtils.getUserId()) ? CommonResult.ok() : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
     @PostMapping("/addUser")
@@ -414,7 +414,7 @@ public class ProprietorController {
     public CommonResult<Boolean> addUser(@RequestBody ProprietorQO qo) {
         qo.setCommunityId(UserUtils.getAdminCommunityId());
         ValidatorUtils.validateEntity(qo, ProprietorQO.PropertyAddValid.class);
-        iProprietorService.addUser(qo, UserUtils.getId());
+        iProprietorService.addUser(qo, UserUtils.getUserId());
         return CommonResult.ok("新增成功!");
     }
 

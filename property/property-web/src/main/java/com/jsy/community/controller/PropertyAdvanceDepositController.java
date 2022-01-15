@@ -83,7 +83,7 @@ public class PropertyAdvanceDepositController {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"请输入正确的金额");
         }
         ValidatorUtils.validateEntity(propertyAdvanceDepositEntity);
-        AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+        AdminInfoVo loginUser = UserUtils.getAdminInfo();
         propertyAdvanceDepositEntity.setCommunityId(loginUser.getCommunityId());
         propertyAdvanceDepositEntity.setCreateBy(loginUser.getUid());
         boolean result = propertyAdvanceDepositService.addRechargePropertyAdvanceDeposit(propertyAdvanceDepositEntity);
@@ -105,9 +105,9 @@ public class PropertyAdvanceDepositController {
             throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"请输入正确的金额");
         }
         ValidatorUtils.validateEntity(propertyAdvanceDepositEntity);
-        AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+        AdminInfoVo loginUser = UserUtils.getAdminInfo();
         propertyAdvanceDepositEntity.setCommunityId(loginUser.getCommunityId());
-        propertyAdvanceDepositEntity.setUpdateBy(UserUtils.getId());
+        propertyAdvanceDepositEntity.setUpdateBy(UserUtils.getUserId());
         return propertyAdvanceDepositService.updateRechargePropertyAdvanceDeposit(propertyAdvanceDepositEntity)
             ? CommonResult.ok() : CommonResult.error(JSYError.INTERNAL.getCode(),"修改预存款充值余额失败");
     }
@@ -170,7 +170,7 @@ public class PropertyAdvanceDepositController {
         //参数验证
         validFileSuffix(excel);
         Long adminCommunityId = UserUtils.getAdminCommunityId();
-        String userId = UserUtils.getId();
+        String userId = UserUtils.getUserId();
         ArrayList<AdvanceDepositImportErrorVO> errorVos = new ArrayList<>(32);
         List<PropertyAdvanceDepositEntity> propertyAdvanceDepositEntities = advanceDepositExcelHandler.importAdvanceDepositExcel(excel, errorVos);
         List<HouseEntity> allHouse = houseService.getAllHouse(adminCommunityId);

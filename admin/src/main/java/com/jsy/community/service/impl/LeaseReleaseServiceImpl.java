@@ -95,7 +95,7 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
         // 查姓名、电话
         if (StringUtils.isNotBlank(query.getPhone()) || StringUtils.isNotBlank(query.getNickName())) {
             PageVO<UserDetail> pageVO = userInfoRpcService.queryUser(query.getPhone(), query.getNickName(), 0, 9999);
-            Set<Long> uid = pageVO.getData().stream().map(UserDetail::getId).collect(Collectors.toSet());
+            Set<String> uid = pageVO.getData().stream().map(UserDetail::getAccount).collect(Collectors.toSet());
             if (!CollectionUtils.isEmpty(uid)) {
                 queryWrapper.in("tenant_uid", uid);
             } else {
@@ -120,9 +120,9 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
         houseLeaseStatusMap.putAll(shopLeaseStatusMap);
         // 查询租户姓名和电话
         Set<String> uids = records.stream().map(AssetLeaseRecordEntity::getTenantUid).collect(Collectors.toSet());
-        Set<Long> uidList = uids.stream().map(Long::parseLong).collect(Collectors.toSet());
-        List<RealUserDetail> realUserDetailList = userInfoRpcService.getRealUserDetailsByUid(uidList);
-        Map<Long, RealUserDetail> realUserDetailMap = realUserDetailList.stream().collect(Collectors.toMap(RealUserDetail::getId, Function.identity()));
+//        Set<Long> uidList = uids.stream().map(Long::parseLong).collect(Collectors.toSet());
+        List<RealUserDetail> realUserDetailList = userInfoRpcService.getRealUserDetails(uids);
+        Map<String, RealUserDetail> realUserDetailMap = realUserDetailList.stream().collect(Collectors.toMap(RealUserDetail::getAccount, Function.identity()));
     
         // 填充额外信息
         records.stream().peek(r -> {
@@ -141,8 +141,8 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
                 r.setLeaseStatusName(leaseStatus(houseLeaseStatusMap.get(r.getAssetId())));
             }
             // 填充租户姓名和电话
-            r.setRealName(realUserDetailMap.get(Long.parseLong(r.getTenantUid())).getNickName());
-            r.setTenantPhone(realUserDetailMap.get(Long.parseLong(r.getTenantUid())).getPhone());
+            r.setRealName(realUserDetailMap.get(r.getTenantUid()).getNickName());
+            r.setTenantPhone(realUserDetailMap.get(r.getTenantUid()).getPhone());
         }).collect(Collectors.toList());
         
 //        // 分页查询
@@ -154,10 +154,10 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
 //        List<LeaseReleasePageVO> records = pageData.getRecords();
 //        Set<Long> collect = records.stream().map(LeaseReleasePageVO::getTCommunityId).collect(Collectors.toSet());
 //        List<CommunityEntity> communityList = communityMapper.selectBatchIds(collect);
-//        Map<Long, CommunityEntity> communityMap = communityList.stream().collect(Collectors.toMap(CommunityEntity::getId, Function.identity()));
+//        Map<Long, CommunityEntity> communityMap = communityList.stream().collect(Collectors.toMap(CommunityEntity::getUserId, Function.identity()));
 //        // 查询合同Id
 //        // 资产Id列表
-//        List<Long> assetId = records.stream().map(LeaseReleasePageVO::getId).collect(Collectors.toList());
+//        List<Long> assetId = records.stream().map(LeaseReleasePageVO::getUserId).collect(Collectors.toList());
 //        // 根据资产id查询对应的合同编号
 //        Map<Long, List<String>> assetIdAndConIdMap = assetLeaseRecordService.queryConIdList(assetId);
 //        // 填充额外信息
@@ -169,9 +169,9 @@ public class LeaseReleaseServiceImpl implements LeaseReleaseService {
 //                    r.setCommunity(communityEntity.getName());
 //                }
 //            }
-//            r.setIdStr(String.valueOf(r.getId()));
+//            r.setIdStr(String.valueOf(r.getUserId()));
 //            if (!CollectionUtils.isEmpty(assetIdAndConIdMap)) {
-//                r.setConId(assetIdAndConIdMap.get(r.getId()));
+//                r.setConId(assetIdAndConIdMap.get(r.getUserId()));
 //            }
 //            // 填充租赁状态
 //            r.setLeaseStatus(leaseStatus(r.getTLeaseStatus()));

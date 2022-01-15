@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.ICompanyPayConfigService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CompanyPayConfigEntity;
@@ -57,7 +56,7 @@ public class CompanyPayConfigController {
     @PutMapping("basicConfig")
     @Permit("community:property:company:config:basicConfig")
     public CommonResult basicConfig(@RequestBody CompanyPayConfigEntity communityHardWareEntity) {
-        companyPayConfigService.basicConfig(communityHardWareEntity, UserUtils.getAdminUserInfo().getCompanyId());
+        companyPayConfigService.basicConfig(communityHardWareEntity, UserUtils.getAdminInfo().getCompanyId());
         return CommonResult.ok();
     }
     
@@ -65,7 +64,7 @@ public class CompanyPayConfigController {
     @GetMapping("getConfig")
     @Permit("community:property:company:config:getConfig")
     public CommonResult getConfig() {
-        CompanyPayConfigEntity entity = companyPayConfigService.getConfig(UserUtils.getAdminUserInfo().getCompanyId());
+        CompanyPayConfigEntity entity = companyPayConfigService.getConfig(UserUtils.getAdminInfo().getCompanyId());
         return CommonResult.ok(entity);
     }
     
@@ -73,7 +72,7 @@ public class CompanyPayConfigController {
     @GetMapping("getRefundConfigStatus")
     @Permit("community:property:company:config:getRefundConfigStatus")
     public CommonResult getRefundConfig() {
-        Map map = companyPayConfigService.getRefundConfig(UserUtils.getAdminUserInfo().getCompanyId());
+        Map map = companyPayConfigService.getRefundConfig(UserUtils.getAdminInfo().getCompanyId());
         return CommonResult.ok(map);
     }
     
@@ -81,7 +80,7 @@ public class CompanyPayConfigController {
     @GetMapping("getBasicConfigStatus")
     @Permit("community:property:company:config:getBasicConfigStatus")
     public CommonResult getBasicConfig() {
-        Map map = companyPayConfigService.getBasicConfig(UserUtils.getAdminUserInfo().getCompanyId());
+        Map map = companyPayConfigService.getBasicConfig(UserUtils.getAdminInfo().getCompanyId());
         return CommonResult.ok(map);
     }
 }

@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IDepartmentService;
 import com.jsy.community.constant.Const;
@@ -39,7 +38,7 @@ public class DepartmentController {
 	@GetMapping("/listDepartment")
 	@Permit("community:property:department:listDepartment")
 	public CommonResult listDepartment() {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		Long communityId = UserUtils.getAdminInfo().getCommunityId();
 		TreeCommunityVO treeCommunityVO = departmentService.listDepartment(communityId);
 		return CommonResult.ok(treeCommunityVO);
 	}
@@ -49,7 +48,7 @@ public class DepartmentController {
 	@businessLog(operation = "新增",content = "新增了【社区部门】")
 	@Permit("community:property:department:addDepartment")
 	public CommonResult addDepartment(@RequestBody DepartmentQO departmentEntity) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		Long communityId = UserUtils.getAdminInfo().getCommunityId();
 		departmentEntity.setCommunityId(communityId);
 		departmentEntity.setId(SnowFlake.nextId());
 		
@@ -62,7 +61,7 @@ public class DepartmentController {
 	@GetMapping("/getDepartmentById")
 	@Permit("community:property:department:getDepartmentById")
 	public CommonResult getDepartmentById(@RequestParam Long departmentId) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		Long communityId = UserUtils.getAdminInfo().getCommunityId();
 		DepartmentEntity departmentEntity = departmentService.getDepartmentById(departmentId, communityId);
 		return CommonResult.ok(departmentEntity);
 	}
@@ -72,7 +71,7 @@ public class DepartmentController {
 	@businessLog(operation = "编辑",content = "更新了【社区部门】")
 	@Permit("community:property:department:updateDepartment")
 	public CommonResult updateDepartment(@RequestBody DepartmentQO departmentEntity) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		Long communityId = UserUtils.getAdminInfo().getCommunityId();
 		departmentEntity.setCommunityId(communityId);
 		ValidatorUtils.validateEntity(departmentEntity, DepartmentQO.updateDepartmentValidate.class);
 		departmentService.updateDepartment(departmentEntity);
@@ -84,7 +83,7 @@ public class DepartmentController {
 	@businessLog(operation = "删除",content = "删除了【社区部门】")
 	@Permit("community:property:department:deleteDepartment")
 	public CommonResult deleteDepartment(@RequestParam Long departmentId) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		Long communityId = UserUtils.getAdminInfo().getCommunityId();
 		departmentService.deleteDepartment(departmentId, communityId);
 		return CommonResult.ok();
 	}

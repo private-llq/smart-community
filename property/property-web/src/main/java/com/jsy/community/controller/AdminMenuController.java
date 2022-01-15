@@ -71,7 +71,7 @@ public class AdminMenuController {
 	@Permit("community:property:menu:page")
 	public CommonResult MenuPage(Integer roleType){
 		Map<String, Object> returnMap = new HashMap<>();
-		String id = UserUtils.getId();
+		String id = UserUtils.getUserId();
 		List<PermitMenu> permitMenus = adminConfigService.MenuPage(roleType, Long.valueOf(id));
 		returnMap.put("allMenu", permitMenus);
 		return CommonResult.ok(returnMap);

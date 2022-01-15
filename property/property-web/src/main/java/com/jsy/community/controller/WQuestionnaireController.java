@@ -70,7 +70,7 @@ public class WQuestionnaireController {
     @Permit("community:property:w-questionnaire:selectQuestionnaireListByUser")
     public CommonResult<PageVO> selectQuestionnaireListByUser(@RequestBody SelectQuestionnaireListByUserQO qo) {
         Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
-        String userId = UserUtils.getId();
+        String userId = UserUtils.getUserId();
         PageVO    pageVO= iwQuestionnaireService.selectQuestionnaireListByUser(adminCommunityId,userId,qo);
 
         return CommonResult.ok(pageVO,"查询成功");
@@ -91,7 +91,7 @@ public class WQuestionnaireController {
     @Permit("community:property:w-questionnaire:insterAnswer")
     public CommonResult<Boolean> insterAnswer(@RequestBody InsterAnswerQO qo) {
         Long adminCommunityId = UserUtils.getAdminCommunityId();//小区id
-        String userUuid = UserUtils.getId();
+        String userUuid = UserUtils.getUserId();
         Boolean  aBoolean=  iwQuestionnaireService.insterAnswer(adminCommunityId,userUuid,qo);
         return CommonResult.ok(aBoolean,"提交成功");
     }

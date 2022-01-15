@@ -126,8 +126,8 @@ public class VisitorController {
 		if (visitorEntity == null) {
 			return CommonResult.ok(null);
 		}
-//		visitorEntity.setVisitorPersonRecordList(visitorService.queryPersonRecordList(visitorEntity.getId()));
-//		visitorEntity.setVisitingCarRecordList(visitorService.queryCarRecordList(visitorEntity.getId()));
+//		visitorEntity.setVisitorPersonRecordList(visitorService.queryPersonRecordList(visitorEntity.getUserId()));
+//		visitorEntity.setVisitingCarRecordList(visitorService.queryCarRecordList(visitorEntity.getUserId()));
 		return CommonResult.ok(visitorEntity);
 	}
 

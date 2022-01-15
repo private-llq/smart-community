@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.entity.PushInformEntity;
 import com.jsy.community.exception.JSYError;
@@ -75,7 +74,7 @@ public class SysInformController {
         // 大后台默认开启推送
 	    qo.setPushTag(1);
         ValidatorUtils.validateEntity(qo);
-        qo.setUid(UserUtils.getId());
+        qo.setUid(UserUtils.getUserId());
         return iSysInformService.addPushInform(qo) ? CommonResult.ok("添加成功!") : CommonResult.error("添加失败!");
     }
 	
@@ -91,7 +90,7 @@ public class SysInformController {
 	@businessLog(operation = "删除",content = "删除了【推送通知消息】")
 	@Permit("community:admin:sys:inform:delete")
 	public CommonResult<Boolean> deletePushInform(@RequestParam Long id) {
-		return iSysInformService.deletePushInform(id, UserUtils.getId()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+		return iSysInformService.deletePushInform(id, UserUtils.getUserId()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
 	}
 	
 	/**

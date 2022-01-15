@@ -59,9 +59,9 @@ public class OpLogAop extends BaseAop {
 		Method method = signature.getMethod();
 		
 		//获取用户id和社区id
-		opLog.setUserId(UserUtils.getId());
+		opLog.setUserId(UserUtils.getUserId());
 		opLog.setCommunityId(UserUtils.getAdminCommunityId());
-		opLog.setCreateBy(UserUtils.getId());
+		opLog.setCreateBy(UserUtils.getUserId());
 		
 		//获取操作
 		businessLog businessLog = method.getAnnotation(businessLog.class);
@@ -69,7 +69,7 @@ public class OpLogAop extends BaseAop {
 			String operation = businessLog.operation();
 			String content = businessLog.content();
 			opLog.setOperation(operation);//保存获取的操作
-			UserDetail userDetail = baseUserInfoRpcService.getUserDetail(Long.parseLong(UserUtils.getId()));
+			UserDetail userDetail = baseUserInfoRpcService.getUserDetail(UserUtils.getUserId());
 			if (userDetail != null) {
 				opLog.setContent(userDetail.getNickName() + content);//保存获取的内容
 			}

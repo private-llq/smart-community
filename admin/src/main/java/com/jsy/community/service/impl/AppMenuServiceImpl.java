@@ -69,7 +69,7 @@
 //				ArrayList<FrontChildMenu> childMenus = new ArrayList<>();
 //				if (!CollectionUtils.isEmpty(childMenu)) {
 //					for (AppMenuEntity menu : childMenu) {
-//						if (menu.getParentId().equals( frontMenuEntity.getId())) {
+//						if (menu.getParentId().equals( frontMenuEntity.getUserId())) {
 //							FrontChildMenu frontChildMenu = new FrontChildMenu();
 //							BeanUtils.copyProperties(menu, frontChildMenu);
 //							childMenus.add(frontChildMenu);
@@ -135,7 +135,7 @@
 //			log.debug("修改的菜单id：{}",adminMenu.getParentId());
 //			throw new JSYException("您修改的不是父菜单");
 //		}
-//		AppMenuEntity appMenuEntity = appMenuMapper.selectById(adminMenu.getId());
+//		AppMenuEntity appMenuEntity = appMenuMapper.selectById(adminMenu.getUserId());
 //		if (!appMenuEntity.getParentId().equals(PARENT_MARK)) {
 //			throw new JSYException("您修改的不是父菜单");
 //		}

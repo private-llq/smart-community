@@ -67,11 +67,11 @@ public class OperLogAspect {
         LoginUser loginUser = ContextHolder.getContext().getLoginUser();
         String nickName = loginUser.getNickName();//昵称
 
-        String userId = UserUtils.getId();
+        String userId = UserUtils.getUserId();
         Long adminCommunityId = UserUtils.getAdminCommunityId();
        log.info("用户id"+userId+"社区id"+adminCommunityId);
 //
-//        String userId = UserUtils.getId();//用户id
+//        String userId = UserUtils.getUserId();//用户id
 //        Long roleId = adminUserRoleService.selectRoleIdByUserId(userId, UserUtils.getAdminCompanyId());
         // 获取操作
         try {

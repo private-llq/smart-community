@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.ICarMonthlyVehicleService;
 import com.jsy.community.api.IHouseService;
 import com.jsy.community.constant.Const;
@@ -19,7 +18,6 @@ import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -158,7 +156,7 @@ public class CarMonthlyVehicleController {
     public CommonResult dataImport2(MultipartFile file){
         try {
             List<String[]> strings = POIUtils.readExcel(file);
-            Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+            Long communityId = UserUtils.getAdminInfo().getCommunityId();
             Map<String, Object> map =vehicleService.addLinkByExcel2(strings,communityId);
             return CommonResult.ok(map);
         } catch (IOException e) {
@@ -249,7 +247,7 @@ public class CarMonthlyVehicleController {
     public CommonResult dataImport2Position(MultipartFile file){
         try {
             List<String[]> strings = POIUtils.readExcel(file);
-            Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+            Long communityId = UserUtils.getAdminInfo().getCommunityId();
             Map<String, Object> map =vehicleService.addLinkByExcel2Position(strings,communityId);
             return CommonResult.ok(map);
         } catch (IOException e) {

@@ -73,7 +73,7 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
     @Override
     public Boolean update(ProprietorQO qo, String adminUid) {
         //管理员姓名
-        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(UserUtils.getId());
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(UserUtils.getUserId());
         String adminUserName = "";
         if (idCardRealInfo != null) {
             adminUserName = idCardRealInfo.getIdCardName();
@@ -103,7 +103,7 @@ public class ProprietorServiceImpl extends ServiceImpl<ProprietorMapper, Proprie
             throw new JSYException("房屋业主已经存在,请不要重复添加!");
         }
         //管理员姓名
-        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(UserUtils.getId());
+        RealInfoDto idCardRealInfo = baseUserInfoRpcService.getIdCardRealInfo(UserUtils.getUserId());
         String adminUserName = "";
         if (idCardRealInfo != null) {
             adminUserName = idCardRealInfo.getIdCardName();

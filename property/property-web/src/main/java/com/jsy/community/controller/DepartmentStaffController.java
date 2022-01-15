@@ -5,7 +5,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IDepartmentStaffService;
 import com.jsy.community.constant.Const;
@@ -67,7 +66,7 @@ public class DepartmentStaffController {
 	@businessLog(operation = "新增",content = "新增了【社区员工】")
 	@Permit("community:property:staff:addDepartmentStaff")
 	public CommonResult addDepartmentStaff(@RequestBody DepartmentStaffQO staffEntity) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		Long communityId = UserUtils.getAdminInfo().getCommunityId();
 		staffEntity.setCommunityId(communityId);
 		staffEntity.setId(SnowFlake.nextId());
 		
@@ -81,7 +80,7 @@ public class DepartmentStaffController {
 	@businessLog(operation = "编辑",content = "更新了【社区员工】")
 	@Permit("community:property:staff:updateDepartmentStaff")
 	public CommonResult updateDepartmentStaff(@RequestBody DepartmentStaffQO departmentStaffEntity) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		Long communityId = UserUtils.getAdminInfo().getCommunityId();
 		departmentStaffEntity.setCommunityId(communityId);
 		ValidatorUtils.validateEntity(departmentStaffEntity, DepartmentStaffQO.updateStaffValidate.class);
 		departmentStaffService.updateDepartmentStaff(departmentStaffEntity);
@@ -93,7 +92,7 @@ public class DepartmentStaffController {
 	@businessLog(operation = "删除",content = "删除了【社区员工】")
 	@Permit("community:property:staff:deleteDepartmentStaff")
 	public CommonResult deleteStaffByIds(@ApiParam("员工id") Long id) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		Long communityId = UserUtils.getAdminInfo().getCommunityId();
 		departmentStaffService.deleteStaffByIds(id, communityId);
 		return CommonResult.ok();
 	}
@@ -107,7 +106,7 @@ public class DepartmentStaffController {
 			// 获取Excel中的数据，每一行数据封装成一个String[]，将一个工作簿里面的每行数据封装成一个List<String[]>
 			List<String[]> strings = POIUtils.readExcel(file);
 
-			Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+			Long communityId = UserUtils.getAdminInfo().getCommunityId();
 
 			Map<String, Object> map = departmentStaffService.addLinkByExcel(strings, communityId);
 

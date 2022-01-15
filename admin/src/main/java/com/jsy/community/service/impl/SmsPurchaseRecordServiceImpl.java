@@ -69,9 +69,9 @@ public class SmsPurchaseRecordServiceImpl extends ServiceImpl<SmsPurchaseRecordM
 		if (StringUtils.isNotBlank(query.getKeyword())) {
 			// 通过关键字模糊查询mobile返回用户uid
 			PageVO<UserDetail> userDetailPageVO = baseUserInfoRpcService.queryUser(query.getKeyword(), "", 0, 999999999);
-			List<Long> uidList = new ArrayList<>();
+			List<String> uidList = new ArrayList<>();
 			for (UserDetail userDetail : userDetailPageVO.getData()) {
-				uidList.add(userDetail.getId());
+				uidList.add(userDetail.getAccount());
 			}
 			if (uidList.size() > 0) {
 				queryWrapper.in("pay_by", uidList);
@@ -86,9 +86,9 @@ public class SmsPurchaseRecordServiceImpl extends ServiceImpl<SmsPurchaseRecordM
 		}
 		// 查询账号数据
 		Set<String> payByUid = pageData.getRecords().stream().map(SmsPurchaseRecordEntity::getPayBy).collect(Collectors.toSet());
-		Set<Long> payByUidSet = payByUid.stream().map(Long::parseLong).collect(Collectors.toSet());
-		List<RealUserDetail> realUserDetailsByUid = baseUserInfoRpcService.getRealUserDetailsByUid(payByUidSet);
-		Map<Long, String> realUserMap = realUserDetailsByUid.stream().collect(Collectors.toMap(RealUserDetail::getId, RealUserDetail::getPhone));
+//		Set<Long> payByUidSet = payByUid.stream().map(Long::parseLong).collect(Collectors.toSet());
+		List<RealUserDetail> realUserDetailsByUid = baseUserInfoRpcService.getRealUserDetails(payByUid);
+		Map<String, String> realUserMap = realUserDetailsByUid.stream().collect(Collectors.toMap(RealUserDetail::getAccount, RealUserDetail::getPhone));
 		
 		// 补充数据
 		for (SmsPurchaseRecordEntity smsPurchaseRecordEntity : pageData.getRecords()) {
@@ -96,7 +96,7 @@ public class SmsPurchaseRecordServiceImpl extends ServiceImpl<SmsPurchaseRecordM
 			smsPurchaseRecordEntity.setStatusName(smsPurchaseRecordEntity.getStatus() == 1 ? "已付款" : "未付款");
 			// 补充支付账号
 			if (smsPurchaseRecordEntity.getPayBy() != null) {
-				smsPurchaseRecordEntity.setPayByPhone(realUserMap.get(Long.parseLong(smsPurchaseRecordEntity.getPayBy())));
+				smsPurchaseRecordEntity.setPayByPhone(realUserMap.get(smsPurchaseRecordEntity.getPayBy()));
 			}
 		}
 		PageInfo<SmsPurchaseRecordEntity> pageInfo = new PageInfo<>();

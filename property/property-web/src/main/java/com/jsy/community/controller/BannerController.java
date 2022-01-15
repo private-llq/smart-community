@@ -91,7 +91,7 @@ public class BannerController {
 	@Permit("community:property:banner")
 	public CommonResult upload(@RequestBody BannerEntity bannerEntity){
 		ValidatorUtils.validateEntity(bannerEntity, BannerEntity.addBannerValidatedGroup.class);
-		AdminInfoVo adminUserInfo = UserUtils.getAdminUserInfo();
+		AdminInfoVo adminUserInfo = UserUtils.getAdminInfo();
 		bannerEntity.setCommunityId(adminUserInfo.getCommunityId());
 		bannerEntity.setCreateBy(adminUserInfo.getUid());
 		//写库
@@ -167,7 +167,7 @@ public class BannerController {
 	@Permit("community:property:banner")
 	public CommonResult updateBanner(@RequestBody BannerQO bannerQO){
 		ValidatorUtils.validateEntity(bannerQO,BannerQO.updateBannerValidatedGroup.class);
-		bannerQO.setOperator(UserUtils.getId());
+		bannerQO.setOperator(UserUtils.getUserId());
 		bannerQO.setCommunityId(UserUtils.getAdminCommunityId());
 		return bannerService.updateBanner(bannerQO) ? CommonResult.ok("操作成功") : CommonResult.error(JSYError.INTERNAL.getCode(),"操作失败");
 	}

@@ -174,7 +174,7 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
 //            List<HouseEntity> houseEntities = houseMapper.selectList(houseQueryWrapper);
 //            List<Long> houseIds = new ArrayList<>();
 //            for (HouseEntity houseEntity : houseEntities) {
-//                houseIds.add(houseEntity.getId());
+//                houseIds.add(houseEntity.getUserId());
 //            }
 //            if (houseIds.size() > 0) {
 //                queryWrapper.in("house_id", houseIds);
@@ -191,9 +191,7 @@ public class PropertyAdvanceDepositServiceImpl extends ServiceImpl<PropertyAdvan
             if (houseEntity != null) {
                 propertyAdvanceDepositEntity.setAddress(houseEntity.getBuilding() + houseEntity.getUnit() + houseEntity.getDoor());
             }
-        }
-        // 补充真实姓名、电话
-        for (PropertyAdvanceDepositEntity propertyAdvanceDepositEntity : pageData.getRecords()) {
+            // 补充真实姓名、电话
             ProprietorEntity proprietorEntity = proprietorMapper.queryNameAndMobileByHouseId(propertyAdvanceDepositEntity.getHouseId(), propertyAdvanceDepositEntity.getCommunityId());
             if (proprietorEntity != null) {
                 propertyAdvanceDepositEntity.setRealName(proprietorEntity.getRealName());

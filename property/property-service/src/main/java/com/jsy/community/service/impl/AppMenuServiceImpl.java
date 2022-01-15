@@ -72,7 +72,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 //
 //			List<FrontChildMenu> childMenus = new ArrayList<>();
 //			for (AppMenuEntity child : childList) {
-//				if (child.getParentId().equals(parent.getId())) {
+//				if (child.getParentId().equals(parent.getUserId())) {
 //					FrontChildMenu frontChildMenu = new FrontChildMenu();
 //					BeanUtils.copyProperties(child,frontChildMenu);
 //					childMenus.add(frontChildMenu);
@@ -94,7 +94,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 //			throw new PropertyException("您添加的不是父菜单");
 //		}
 //
-//		AppMenuEntity menuEntity = appMenuMapper.selectById(appMenuEntity.getId());
+//		AppMenuEntity menuEntity = appMenuMapper.selectById(appMenuEntity.getUserId());
 //		if (menuEntity==null) {
 //			throw new PropertyException("您添加的数据不存在，请重新选择");
 //		}
@@ -104,7 +104,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 //		}
 //
 //		// 保存到中间表
-//		appMenuMapper.addParentMenu(appMenuEntity.getId(),communityId);
+//		appMenuMapper.addParentMenu(appMenuEntity.getUserId(),communityId);
 //	}
 //
 //	@Override
@@ -113,7 +113,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 //			throw new PropertyException("您添加的不是子菜单");
 //		}
 //
-//		AppMenuEntity menuEntity = appMenuMapper.selectById(appMenuEntity.getId());
+//		AppMenuEntity menuEntity = appMenuMapper.selectById(appMenuEntity.getUserId());
 //		if (menuEntity==null) {
 //			throw new PropertyException("您添加的数据不存在，请重新选择");
 //		}
@@ -125,7 +125,7 @@ public class AppMenuServiceImpl extends ServiceImpl<AppMenuMapper, AppMenuEntity
 //		}
 //
 //		// 保存到中间表
-//		appMenuMapper.addParentMenu(appMenuEntity.getId(),communityId);
+//		appMenuMapper.addParentMenu(appMenuEntity.getUserId(),communityId);
 //	}
 //
 //	@Override

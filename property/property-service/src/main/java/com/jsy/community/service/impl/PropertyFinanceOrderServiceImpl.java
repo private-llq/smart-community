@@ -674,8 +674,14 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
     public void updateOrder(Long id, BigDecimal coupon) {
         PropertyFinanceOrderEntity orderEntity = propertyFinanceOrderMapper.selectById(id);
         if (orderEntity != null) {
-            orderEntity.setCoupon(coupon);
-            propertyFinanceOrderMapper.updateById(orderEntity);
+            if (orderEntity.getPropertyFee().subtract(coupon).compareTo(BigDecimal.ZERO) >= 0) {
+                orderEntity.setCoupon(coupon);
+                propertyFinanceOrderMapper.updateById(orderEntity);
+            } else {
+                throw new PropertyException(JSYError.COUPON_BEYOND.getCode(), "优惠金额大于所需缴纳费用!");
+            }
+        } else {
+            throw new PropertyException(JSYError.DATA_LOST.getCode(), "账单不存在!");
         }
     }
 

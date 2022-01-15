@@ -91,7 +91,7 @@ public class PropertyMarketServiceImpl extends ServiceImpl<PropertyMarketMapper,
 //    public boolean updateMarket(ProprietorMarketQO marketQO, String userId) {
 //        ProprietorMarketEntity marketEntity = new ProprietorMarketEntity();
 //        BeanUtils.copyProperties(marketQO,marketEntity);
-//        return marketMapper.update(marketEntity,new UpdateWrapper<ProprietorMarketEntity>().eq("id",marketQO.getId())) == 1;
+//        return marketMapper.update(marketEntity,new UpdateWrapper<ProprietorMarketEntity>().eq("id",marketQO.getUserId())) == 1;
 //    }
 
     /**

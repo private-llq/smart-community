@@ -419,8 +419,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		for (UserDetail userDetail : userDetailPageVO.getData()) {
 			SysUserEntity sysUserEntity = new SysUserEntity();
 			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(userDetail.getId(), BusinessConst.ULTIMATE_ADMIN);
-			sysUserEntity.setId(userDetail.getId());
-			sysUserEntity.setIdStr(String.valueOf(userDetail.getId()));
+			sysUserEntity.setId(Long.valueOf(userDetail.getAccount()));
+			sysUserEntity.setIdStr(userDetail.getAccount());
 			sysUserEntity.setNickname(userDetail.getNickName());
 			if (!CollectionUtils.isEmpty(permitRoles)) {
 				sysUserEntity.setRoleId(permitRoles.get(0).getId());
@@ -463,8 +463,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		} catch (BaseException e) {
 			// 手机号是否已经注册
 			if (e.getErrorEnum().getCode() == 103) {
-				userDetail = new UserDetail();
-				userDetail.setId(userInfoRpcService.getUserDetailByPhone(sysUserQO.getPhone()).getId());
+				userDetail = userInfoRpcService.getUserDetailByPhone(sysUserQO.getPhone());
 				result = 2;
 			}
 		}
@@ -476,7 +475,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 		// 先移除大后台默认角色，再给用户添加角色
 //		List<Long> roleId = new ArrayList<>();
 //		roleId.add(1463327674104250369L);
-//		baseRoleRpcService.roleRemoveToUser(roleId, userDetail.getId());
+//		baseRoleRpcService.roleRemoveToUser(roleId, userDetail.getUserId());
 		List<Long> roleIds = new ArrayList<>();
 		roleIds.add(sysUserQO.getRoleId());
 		baseRoleRpcService.userJoinRole(roleIds, userDetail.getId(), sysUserQO.getId());
@@ -492,19 +491,20 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	 **/
 	@Override
 	public void updateOperator(SysUserQO sysUserQO){
+		UserDetail userDetail = userInfoRpcService.getUserDetail(String.valueOf(sysUserQO.getId()));
 		// 更新角色
-		List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(sysUserQO.getId(), BusinessConst.ULTIMATE_ADMIN);
+		List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(userDetail.getId(), BusinessConst.ULTIMATE_ADMIN);
 		if (!CollectionUtils.isEmpty(permitRoles)) {
 			Set<Long> roleIds = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
 			// 移除角色
-			baseRoleRpcService.roleRemoveToUser(roleIds, sysUserQO.getId());
+			baseRoleRpcService.roleRemoveToUser(roleIds, userDetail.getId());
 		}
 		// 增加角色
 		List<Long> addRoles = new ArrayList<>();
 		addRoles.add(sysUserQO.getRoleId());
-		baseRoleRpcService.userJoinRole(addRoles, sysUserQO.getId(), sysUserQO.getUpdateUid());
+		baseRoleRpcService.userJoinRole(addRoles, userDetail.getId(), sysUserQO.getUpdateUid());
 		// 更新资料
-		baseUpdateUserRpcService.updateUserInfo(sysUserQO.getId(), sysUserQO.getNickName(),
+		baseUpdateUserRpcService.updateUserInfo(userDetail.getId(), sysUserQO.getNickName(),
 			sysUserQO.getPhone(), null, BusinessConst.ULTIMATE_ADMIN);
 	}
 	
@@ -516,12 +516,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	 * @Date: 2021/10/13
 	 */
 	public void deleteOperator(Long id) {
-		List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(id, BusinessConst.ULTIMATE_ADMIN);
+		UserDetail userDetail = userInfoRpcService.getUserDetail(String.valueOf(id));
+		List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(userDetail.getId(), BusinessConst.ULTIMATE_ADMIN);
 		// 移除用户角色绑定关系
 		Set<Long> roleIds = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
-		baseRoleRpcService.roleRemoveToUser(roleIds, id);
+		baseRoleRpcService.roleRemoveToUser(roleIds, userDetail.getId());
 		// 移除登录类型范围
-		baseAuthRpcService.removeLoginTypeScope(id, BusinessConst.ULTIMATE_ADMIN, false);
+		baseAuthRpcService.removeLoginTypeScope(userDetail.getId(), BusinessConst.ULTIMATE_ADMIN, false);
 //		baseAuthRpcService.cancellation(id);
 	}
 	
@@ -579,6 +580,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserEntity
 	
 	@Override
 	public String getSysRealName(String userId) {
-		return userInfoRpcService.getUserDetail(Long.parseLong(userId)).getNickName();
+		return userInfoRpcService.getUserDetail(userId).getNickName();
 	}
 }

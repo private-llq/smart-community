@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.Desensitization;
 import com.jsy.community.api.ITenementService;
 import com.jsy.community.aspectj.DesensitizationType;
@@ -41,7 +40,7 @@ public class TenementController {
     public CommonResult list(@RequestBody BaseQO<PropertyRelationQO> baseQO){
         System.out.println(baseQO);
         Long communityId = UserUtils.getAdminCommunityId();
-        Map map=tenementService.list(baseQO,UserUtils.getAdminUserInfo().getCommunityId());
+        Map map=tenementService.list(baseQO,UserUtils.getAdminInfo().getCommunityId());
         return CommonResult.ok(map);
     }
 }

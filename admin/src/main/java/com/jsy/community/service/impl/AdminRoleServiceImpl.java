@@ -108,9 +108,9 @@ public class AdminRoleServiceImpl implements AdminRoleService {
 //        entity.setCompanyId(null);
 //        //更新角色菜单
 //        if(!CollectionUtils.isEmpty(entity.getMenuIds())){
-//            setRoleMenus(entity.getMenuIds(),entity.getId());
+//            setRoleMenus(entity.getMenuIds(),entity.getUserId());
 //        }
-//        return adminRoleMapper.update(entity,new QueryWrapper<AdminRoleEntity>().eq("id",entity.getId()).eq("company_id",adminRoleOQ.getCompanyId())) == 1;
+//        return adminRoleMapper.update(entity,new QueryWrapper<AdminRoleEntity>().eq("id",entity.getUserId()).eq("company_id",adminRoleOQ.getCompanyId())) == 1;
         UpdateRoleDto updateRoleDto = new UpdateRoleDto();
         updateRoleDto.setId(adminRoleOQ.getId());
         updateRoleDto.setName(adminRoleOQ.getName());
@@ -154,15 +154,15 @@ public class AdminRoleServiceImpl implements AdminRoleService {
 //        if(!StringUtils.isEmpty(query.getName())){
 //            queryWrapper.like("name",query.getName());
 //        }
-//        if(query.getId() != null){
+//        if(query.getUserId() != null){
 //            //查详情
-//            queryWrapper.eq("id",query.getId());
+//            queryWrapper.eq("id",query.getUserId());
 //        }
 //        Page<AdminRoleEntity> pageData = adminRoleMapper.selectPage(page,queryWrapper);
-//        if(query.getId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
+//        if(query.getUserId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
 //            //查菜单权限
 //            AdminRoleEntity entity = pageData.getRecords().get(0);
-//            entity.setMenuIds(adminRoleMapper.getRoleMenu(entity.getId()));
+//            entity.setMenuIds(adminRoleMapper.getRoleMenu(entity.getUserId()));
 //        }
 //        PageInfo<AdminRoleEntity> pageInfo = new PageInfo<>();
 //        BeanUtils.copyProperties(pageData,pageInfo);
@@ -222,7 +222,7 @@ public class AdminRoleServiceImpl implements AdminRoleService {
 //		menuEntityQueryWrapper.select("*, name as label");
 //		List<AdminMenuEntity> menuEntities = adminMenuMapper.selectList(menuEntityQueryWrapper);
 //		for (AdminMenuEntity menuEntity : menuEntities) {
-//			if (roleMuneIds.contains(menuEntity.getId())) {
+//			if (roleMuneIds.contains(menuEntity.getUserId())) {
 //				menuEntity.setChecked(true);
 //			} else {
 //				menuEntity.setChecked(false);

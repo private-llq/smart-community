@@ -137,7 +137,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 //		if(0L != parent.getPid()){ //要新增的菜单非顶级
 //			parent = sysMenuMapper.findParent(parent.getPid());//寻找父节点
 //			if(parent.getPid() == 0){ //顶级节点
-//				sysMenuEntity.setBelongTo(parent.getId());
+//				sysMenuEntity.setBelongTo(parent.getUserId());
 //			}else{
 //				setBelongTo(sysMenuEntity,parent);
 //			}
@@ -209,9 +209,18 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 //		adminRoleEntity.setId(SnowFlake.nextId());
 //		//设置角色菜单
 //		if(!CollectionUtils.isEmpty(adminRoleEntity.getMenuIds())){
-//			setRoleMenus(adminRoleEntity.getMenuIds(),adminRoleEntity.getId());
+//			setRoleMenus(adminRoleEntity.getMenuIds(),adminRoleEntity.getUserId());
 //		}
 //		return adminRoleMapper.insert(adminRoleEntity) == 1;
+		// 查询角色是否同名
+		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(0, 999999999, "", BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
+		List<String> permitRoleNames = permitRolePageVO.getData().stream().map(PermitRole::getName).collect(Collectors.toList());
+		for (String permitRoleName : permitRoleNames) {
+			if (permitRoleName.equals(adminRoleEntity.getName())) {
+				throw new PropertyException(JSYError.DUPLICATE_KEY.getCode(), "该角色名称已存在，请勿重新添加!");
+			}
+		}
+		
 		PermitRole permitRole = baseRoleRpcService.createRole(adminRoleEntity.getName(), adminRoleEntity.getRemark(),
 			adminRoleEntity.getRoleType() == BaseUserConstant.Login.DataBasePermitScope.PROPERTY_ADMIN ? BusinessConst.PROPERTY_ADMIN : BusinessConst.COMMUNITY_ADMIN, adminRoleEntity.getId());
 		// 菜单分配给角色
@@ -224,7 +233,9 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 				permisIds.add(menuPermission.getPermisId());
 			}
 			// 权限绑定到角色
-			permissionRpcService.permitJoinRole(permisIds, permitRole.getId(), adminRoleEntity.getId());
+			if (!CollectionUtils.isEmpty(permisIds)) {
+				permissionRpcService.permitJoinRole(permisIds, permitRole.getId(), adminRoleEntity.getId());
+			}
 		}
 		// 新增角色和物业公司关联信息
 		AdminRoleCompanyEntity entity = new AdminRoleCompanyEntity();
@@ -264,9 +275,18 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 //		entity.setCompanyId(null);
 //		//更新角色菜单
 //		if(!CollectionUtils.isEmpty(entity.getMenuIds())){
-//			setRoleMenus(entity.getMenuIds(),entity.getId());
+//			setRoleMenus(entity.getMenuIds(),entity.getUserId());
 //		}
-//		return adminRoleMapper.update(entity,new QueryWrapper<AdminRoleEntity>().eq("id",entity.getId()).eq("company_id",adminRoleOQ.getCompanyId())) == 1;
+//		return adminRoleMapper.update(entity,new QueryWrapper<AdminRoleEntity>().eq("id",entity.getUserId()).eq("company_id",adminRoleOQ.getCompanyId())) == 1;
+		// 查询角色是否同名
+		PageVO<PermitRole> permitRolePageVO = baseRoleRpcService.selectPage(0, 999999999, "", BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
+		List<String> permitRoleNames = permitRolePageVO.getData().stream().map(PermitRole::getName).collect(Collectors.toList());
+		for (String permitRoleName : permitRoleNames) {
+			if (permitRoleName.equals(adminRoleOQ.getName())) {
+				throw new PropertyException(JSYError.DUPLICATE_KEY.getCode(), "该角色名称已存在，请勿重新添加!");
+			}
+		}
+		
 		UpdateRoleDto updateRoleDto = new UpdateRoleDto();
 		updateRoleDto.setId(adminRoleOQ.getId());
 		updateRoleDto.setName(adminRoleOQ.getName());
@@ -310,15 +330,15 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 //		if(!StringUtils.isEmpty(query.getName())){
 //			queryWrapper.like("name",query.getName());
 //		}
-//		if(query.getId() != null){
+//		if(query.getUserId() != null){
 //			//查详情
-//			queryWrapper.eq("id",query.getId());
+//			queryWrapper.eq("id",query.getUserId());
 //		}
 //		Page<AdminRoleEntity> pageData = adminRoleMapper.selectPage(page,queryWrapper);
-//		if(query.getId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
+//		if(query.getUserId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
 //			//查菜单权限
 //			AdminRoleEntity entity = pageData.getRecords().get(0);
-//			entity.setMenuIds(adminRoleMapper.getRoleMenu(entity.getId()));
+//			entity.setMenuIds(adminRoleMapper.getRoleMenu(entity.getUserId()));
 //		}
 //		PageInfo<AdminRoleEntity> pageInfo = new PageInfo<>();
 //		BeanUtils.copyProperties(pageData,pageInfo);
@@ -369,13 +389,13 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		/*// 补充数据
 		for (PermitRole permitRole : permitRolePageVO.getData()) {
 			// 已排除系统默认角色
-			AdminRoleCompanyEntity entity = adminRoleCompanyMapper.selectOne(new QueryWrapper<AdminRoleCompanyEntity>().eq("role_id", permitRole.getId()).eq("deleted", 0));
+			AdminRoleCompanyEntity entity = adminRoleCompanyMapper.selectOne(new QueryWrapper<AdminRoleCompanyEntity>().eq("role_id", permitRole.getUserId()).eq("deleted", 0));
 			// 只返回本物业公司
 			if (entity != null) {
 				if (entity.getCompanyId().equals(query.getCompanyId())) {
 					AdminRoleEntity adminRoleEntity = new AdminRoleEntity();
-					adminRoleEntity.setId(permitRole.getId());
-					adminRoleEntity.setIdStr(String.valueOf(permitRole.getId()));
+					adminRoleEntity.setId(permitRole.getUserId());
+					adminRoleEntity.setIdStr(String.valueOf(permitRole.getUserId()));
 					adminRoleEntity.setName(permitRole.getName());
 					adminRoleEntity.setRemark(permitRole.getRemark());
 					adminRoleEntity.setCreateTime(LocalDateTime.parse(permitRole.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
@@ -408,15 +428,15 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 //		if(!StringUtils.isEmpty(query.getName())){
 //			queryWrapper.like("name",query.getName());
 //		}
-//		if(query.getId() != null){
+//		if(query.getUserId() != null){
 //			//查详情
-//			queryWrapper.eq("id",query.getId());
+//			queryWrapper.eq("id",query.getUserId());
 //		}
 //		Page<AdminRoleEntity> pageData = adminRoleMapper.selectPage(page,queryWrapper);
-//		if(query.getId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
+//		if(query.getUserId() != null && !CollectionUtils.isEmpty(pageData.getRecords())){
 //			//查菜单权限
 //			AdminRoleEntity entity = pageData.getRecords().get(0);
-//			entity.setMenuIds(adminRoleMapper.getRoleMenu(entity.getId()));
+//			entity.setMenuIds(adminRoleMapper.getRoleMenu(entity.getUserId()));
 //		}
 //		PageInfo<AdminRoleEntity> pageInfo = new PageInfo<>();
 //		BeanUtils.copyProperties(pageData,pageInfo);
@@ -512,7 +532,7 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 //		menuEntityQueryWrapper.select("*, name as label");
 //		List<AdminMenuEntity> menuEntities = adminMenuMapper.selectList(menuEntityQueryWrapper);
 //		for (AdminMenuEntity menuEntity : menuEntities) {
-//			if (roleMuneIds.contains(menuEntity.getId())) {
+//			if (roleMuneIds.contains(menuEntity.getUserId())) {
 //				menuEntity.setChecked(true);
 //			} else {
 //				menuEntity.setChecked(false);

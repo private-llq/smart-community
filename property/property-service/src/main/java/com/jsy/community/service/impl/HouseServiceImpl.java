@@ -84,10 +84,10 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 //		QueryWrapper<HouseEntity> queryWrapper = new QueryWrapper<>();
 //		queryWrapper.select("id,code,community_id,building,unit,floor,door,pid,type,comment");
 //		HouseQO query = baseQO.getQuery();
-//		if(query.getId() == null){
+//		if(query.getUserId() == null){
 //			return null;
 //		}
-//		queryWrapper.eq("pid",query.getId());
+//		queryWrapper.eq("pid",query.getUserId());
 ////		queryWrapper.eq("community_id",query.getCommunityId());
 //		Page<HouseEntity> houseEntityPage = houseMapper.selectPage(page, queryWrapper);
 //		PageInfo<HouseEntity> pageInfo = new PageInfo<>();
@@ -289,7 +289,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
 //				break;
 //		}
 //		int result = houseMapper.update(houseEntity,new QueryWrapper<HouseEntity>()
-//			.eq("id",houseEntity.getId())
+//			.eq("id",houseEntity.getUserId())
 //			.eq("type",houseEntity.getType()));
 //		if(result == 1){
 //			return true;
@@ -406,7 +406,7 @@ public class HouseServiceImpl extends ServiceImpl<HouseMapper, HouseEntity> impl
             //禁止手动修改楼栋pid
             houseEntity.setPid(null);
 //            //解绑原有单元
-//            houseMapper.unitUnBindBuilding(houseEntity.getId());
+//            houseMapper.unitUnBindBuilding(houseEntity.getUserId());
 //            //绑定新单元列表
 //            if (!CollectionUtils.isEmpty(houseEntity.getUnitIdList())) {
 //                houseMapper.unitBindBuilding(houseEntity.getUnitIdList(), entity);

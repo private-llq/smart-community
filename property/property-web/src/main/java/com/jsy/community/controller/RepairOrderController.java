@@ -1,12 +1,10 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IRepairOrderService;
 import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.CommonConst;
 import com.jsy.community.entity.RepairOrderEntity;
-import com.jsy.community.entity.UserEntity;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.RepairOrderQO;
 import com.jsy.community.utils.PageInfo;
@@ -62,7 +60,7 @@ public class RepairOrderController {
 			PageInfo<RepairOrderEntity> pageInfo = repairOrderService.listRepairOrder(repairOrderQO);
 			return CommonResult.ok(pageInfo);
 		} else {
-			repairOrderQO.setQuery(new RepairOrderQO().setCommunityId(UserUtils.getAdminUserInfo().getCommunityId()));
+			repairOrderQO.setQuery(new RepairOrderQO().setCommunityId(UserUtils.getAdminInfo().getCommunityId()));
 			PageInfo<RepairOrderEntity> pageInfo = repairOrderService.listRepairOrder(repairOrderQO);
 			return CommonResult.ok(pageInfo);
 		}
@@ -76,9 +74,9 @@ public class RepairOrderController {
 		if (reason.length() > 100) {
 			throw new PropertyException("驳回原因过长");
 		}
-		String uid = UserUtils.getAdminUserInfo().getUid();
-		String number = UserUtils.getAdminUserInfo().getNumber();
-		String realName = UserUtils.getAdminUserInfo().getRealName();
+		String uid = UserUtils.getAdminInfo().getUid();
+		String number = UserUtils.getAdminInfo().getNumber();
+		String realName = UserUtils.getAdminInfo().getRealName();
 		repairOrderService.rejectOrder(id, reason, uid, number, realName);
 		return CommonResult.ok();
 	}
@@ -98,7 +96,7 @@ public class RepairOrderController {
 	public CommonResult dealOrder(@ApiParam("报修订单id") @RequestParam Long id,
 	                              @ApiParam("处理人id") @RequestParam String dealId,
 	                              @ApiParam("费用") BigDecimal money) {
-		String uid = UserUtils.getAdminUserInfo().getUid();
+		String uid = UserUtils.getAdminInfo().getUid();
 		repairOrderService.dealOrder(id, dealId, money, uid);
 		return CommonResult.ok();
 	}
@@ -107,7 +105,7 @@ public class RepairOrderController {
 	@GetMapping("/getRepairPerson")
 	@Permit("community:property:repairOrder:getRepairPerson")
 	public CommonResult getRepairPerson(String condition) {
-		Long communityId = UserUtils.getAdminUserInfo().getCommunityId();
+		Long communityId = UserUtils.getAdminInfo().getCommunityId();
 		List<Map<String, Object>> adminUserList = repairOrderService.getRepairPerson(condition, communityId);
 		return CommonResult.ok(adminUserList);
 	}
@@ -124,7 +122,7 @@ public class RepairOrderController {
 	@GetMapping("/successOrder")
 	@Permit("community:property:repairOrder:successOrder")
 	public CommonResult successOrder(@ApiParam("报修订单id") @RequestParam Long id) {
-		String uid = UserUtils.getAdminUserInfo().getUid();
+		String uid = UserUtils.getAdminInfo().getUid();
 		repairOrderService.successOrder(id, uid);
 		return CommonResult.ok();
 	}

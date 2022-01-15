@@ -155,7 +155,7 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
 //        for (CommunityEntity communityEntity : communityEntities) {
 //            ActivityEntity activityEntity = new ActivityEntity();
 //            activityEntity.setId(SnowFlake.nextId());
-//            activityEntity.setCommunityId(communityEntity.getId());
+//            activityEntity.setCommunityId(communityEntity.getUserId());
 //            activityEntity.setTheme(entity.getTheme());
 //            activityEntity.setContent(entity.getContent());
 //            activityEntity.setBeginActivityTime(entity.getBeginActivityTime());
@@ -168,7 +168,7 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, ActivityEnt
 //            activityEntity.setCreateTime(LocalDateTime.now());
 //            activityEntity.setActivityStatus(1);
 //            activityEntities.add(activityEntity);
-//            idsList.add(activityEntity.getId());
+//            idsList.add(activityEntity.getUserId());
 //        }
 //        // 批量新增活动（所有小区）
 //        int insert = propertyActivityMapper.addActivityEntities(activityEntities);

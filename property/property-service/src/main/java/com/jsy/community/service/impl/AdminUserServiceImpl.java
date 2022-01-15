@@ -509,8 +509,8 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		}
 
 		PageVO<AdminUserEntity> pageVO = new PageVO<>();
-		Set<Long> idSet = userDetailPageVO.getData().stream().filter(userDetail -> userDetail.getId() != Long.valueOf(query.getUid())).map(UserDetail::getId).collect(Collectors.toSet());
-		List<AdminCommunityEntity> adminCommunityEntities = adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("community_id, uid").in("uid", idSet));
+		List<String> idList = userDetailPageVO.getData().stream().filter(userDetail -> !userDetail.getAccount().equals(query.getUid())).map(UserDetail::getAccount).collect(Collectors.toList());
+		List<AdminCommunityEntity> adminCommunityEntities = adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("community_id, uid").in("uid", idList));
 		Map<String, List<String>> map = new HashMap<>();
 		if (!CollectionUtils.isEmpty(adminCommunityEntities)) {
 			map = adminCommunityEntities.stream()
@@ -534,8 +534,8 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 				sb.append(permitRole.getName()).append(",");
 			}
 			adminUserEntity.setCommunityIdList(map.get(String.valueOf(userDetail.getId())));
-			adminUserEntity.setId(userDetail.getId());
-			adminUserEntity.setIdStr(String.valueOf(userDetail.getId()));
+			adminUserEntity.setId(Long.valueOf(userDetail.getAccount()));
+			adminUserEntity.setIdStr(userDetail.getAccount());
 			adminUserEntity.setNickName(userDetail.getNickName());
 			adminUserEntity.setPermitRoles(permitRoles);
 			adminUserEntity.setRoleName(sb.length() > 0 ? sb.deleteCharAt(sb.length()-1).toString() : "");
@@ -603,8 +603,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		} catch (BaseException e) {
 			// 手机号是否已经注册
 			if (e.getErrorEnum().getCode() == 103) {
-				userDetail = new UserDetail();
-				userDetail.setId(userInfoRpcService.getUserDetailByPhone(adminUserQO.getMobile()).getId());
+				userDetail = userInfoRpcService.getUserDetailByPhone(adminUserQO.getMobile());
 				result = 2;
 			}
 		}
@@ -630,19 +629,19 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		baseRoleRpcService.userJoinRole(roleIds, userDetail.getId(), Long.valueOf(adminUserQO.getUid()));
 		
 		// 先查询是否已经绑定用户和物业公司
-		AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", userDetail.getId()).eq("company_id", adminUserQO.getCompanyId()));
+		AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", userDetail.getAccount()).eq("company_id", adminUserQO.getCompanyId()));
 		// 没有绑定
 		if (entity == null) {
 			// 绑定用户和物业公司
 			entity = new AdminUserCompanyEntity();
 			entity.setId(SnowFlake.nextId());
 			entity.setCompanyId(adminUserQO.getCompanyId());
-			entity.setUid(String.valueOf(userDetail.getId()));
+			entity.setUid(userDetail.getAccount());
 			adminUserCompanyMapper.insert(entity);
 		}
 		//添加社区权限
 		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
-			adminConfigService.updateAdminCommunityBatch(adminUserQO.getCommunityIdList(), String.valueOf(userDetail.getId()));
+			adminConfigService.updateAdminCommunityBatch(adminUserQO.getCommunityIdList(), userDetail.getAccount());
 		}
 		return result;
 	}
@@ -657,9 +656,10 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void updateOperator(AdminUserQO adminUserQO, Long id){
+		UserDetail userDetail = userInfoRpcService.getUserDetail(String.valueOf(adminUserQO.getId()));
 		//更新社区权限
 		if(!CollectionUtils.isEmpty(adminUserQO.getCommunityIdList())){
-			adminConfigService.updateAdminCommunityBatch(adminUserQO.getCommunityIdList(), String.valueOf(adminUserQO.getId()));
+			adminConfigService.updateAdminCommunityBatch(adminUserQO.getCommunityIdList(), userDetail.getAccount());
 			//刷新token中的社区权限
 			String token = String.valueOf(redisTemplate.opsForValue().get("Admin:LoginAccount:" + adminUserQO.getMobile()));
 			String tokenValue = String.valueOf(redisTemplate.opsForValue().get("Admin:Login:" + token));
@@ -677,7 +677,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 				throw new PropertyException("传入小区角色时，请同时传入物业角色！");
 			}
 			// 查询角色
-			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(adminUserQO.getId(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
+			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
 			if (!CollectionUtils.isEmpty(permitRoles)) {
 				Set<Long> roleIdSet = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
 				QueryWrapper<AdminRoleCompanyEntity> adminRoleCompanyEntityQueryWrapper = new QueryWrapper<>();
@@ -691,21 +691,21 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 						roles.add(adminRoleCompanyEntity.getRoleId());
 					}
 					// 移除角色
-					baseRoleRpcService.roleRemoveToUser(roles, adminUserQO.getId());
+					baseRoleRpcService.roleRemoveToUser(roles, userDetail.getId());
 				}
 			}
 			// 增加角色
 			List<Long> addRoles = new ArrayList<>();
 			addRoles.add(adminUserQO.getRoleId());
 			addRoles.add(adminUserQO.getCommunityRoleId());
-			baseRoleRpcService.userJoinRole(addRoles, adminUserQO.getId(), id);
+			baseRoleRpcService.userJoinRole(addRoles, userDetail.getId(), id);
 			// 更新资料
-			baseUpdateUserRpcService.updateUserInfo(adminUserQO.getId(), adminUserQO.getNickName(),
+			baseUpdateUserRpcService.updateUserInfo(userDetail.getId(), adminUserQO.getNickName(),
 				adminUserQO.getMobile(), null, BusinessConst.COMMUNITY_ADMIN);
 		} else {
 			// 没有小区角色，只是物业端更新
 			// 查询角色
-			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(adminUserQO.getId(), BusinessConst.PROPERTY_ADMIN);
+			List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(userDetail.getId(), BusinessConst.PROPERTY_ADMIN);
 			if (!CollectionUtils.isEmpty(permitRoles)) {
 				Set<Long> roleIdSet = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
 				QueryWrapper<AdminRoleCompanyEntity> adminRoleCompanyEntityQueryWrapper = new QueryWrapper<>();
@@ -717,14 +717,14 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 					roleIdSet.add(adminRoleCompanyEntity.getRoleId());
 				}
 				// 移除角色
-				baseRoleRpcService.roleRemoveToUser(roleIdSet, adminUserQO.getId());
+				baseRoleRpcService.roleRemoveToUser(roleIdSet, userDetail.getId());
 			}
 			// 增加角色
 			List<Long> addRoles = new ArrayList<>();
 			addRoles.add(adminUserQO.getRoleId());
-			baseRoleRpcService.userJoinRole(addRoles, adminUserQO.getId(), id);
+			baseRoleRpcService.userJoinRole(addRoles, userDetail.getId(), id);
 			// 更新资料
-			baseUpdateUserRpcService.updateUserInfo(adminUserQO.getId(), adminUserQO.getNickName(),
+			baseUpdateUserRpcService.updateUserInfo(userDetail.getId(), adminUserQO.getNickName(),
 				adminUserQO.getMobile(), null, BusinessConst.PROPERTY_ADMIN);
 		}
 	}
@@ -737,13 +737,14 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 	 * @Date: 2021/10/13
 	 */
 	public void deleteOperator(Long id) {
-		List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(id, BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
+		UserDetail userDetail = userInfoRpcService.getUserDetail(String.valueOf(id));
+		List<PermitRole> permitRoles = baseRoleRpcService.listAllRolePermission(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, BusinessConst.COMMUNITY_ADMIN);
 		// 移除用户角色绑定关系
 		Set<Long> roleIds = permitRoles.stream().map(PermitRole::getId).collect(Collectors.toSet());
-		baseRoleRpcService.roleRemoveToUser(roleIds, id);
+		baseRoleRpcService.roleRemoveToUser(roleIds, userDetail.getId());
 		// 移除登录类型范围
-		baseAuthRpcService.removeLoginTypeScope(id, BusinessConst.PROPERTY_ADMIN, false);
-		baseAuthRpcService.removeLoginTypeScope(id, BusinessConst.COMMUNITY_ADMIN, false);
+		baseAuthRpcService.removeLoginTypeScope(userDetail.getId(), BusinessConst.PROPERTY_ADMIN, false);
+		baseAuthRpcService.removeLoginTypeScope(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN, false);
 //		baseAuthRpcService.cancellation(id);
 		// 删除的同时也要删除用户和物业公司绑定关系
 		adminUserCompanyMapper.delete(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", id));

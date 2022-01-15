@@ -207,7 +207,7 @@ public class SmsController {
         entity.setOrderNum(req.get("out_trade_no").toString());
         entity.setGoods(smsWeChatPayQO.getNumber());
         entity.setOrderMoney(new BigDecimal(smsWeChatPayQO.getAmount()).divide(new BigDecimal("100")));
-//        entity.setPayBy(UserUtils.getId());
+//        entity.setPayBy(UserUtils.getUserId());
         entity.setPayBy("1465506950023352321");
         entity.setPayType(1);
         smsPurchaseRecordService.addSmsPurchaseRecord(entity);
@@ -375,7 +375,7 @@ public class SmsController {
             entity.setOrderNum(order);
             entity.setGoods(smsAliPayQO.getSubject());
             entity.setOrderMoney(new BigDecimal(smsAliPayQO.getAmount()));
-//        entity.setPayBy(UserUtils.getId());
+//        entity.setPayBy(UserUtils.getUserId());
             entity.setPayBy("1465506950023352321");
             entity.setPayType(2);
             smsPurchaseRecordService.addSmsPurchaseRecord(entity);
@@ -781,7 +781,7 @@ public class SmsController {
             entity.setOrderNum(order);
             entity.setGoods(smsAliPayQO.getSubject());
             entity.setOrderMoney(new BigDecimal(smsAliPayQO.getAmount()));
-//        entity.setPayBy(UserUtils.getId());
+//        entity.setPayBy(UserUtils.getUserId());
             entity.setPayBy("1465506950023352321");
             entity.setPayType(2);
             smsPurchaseRecordService.addSmsPurchaseRecord(entity);

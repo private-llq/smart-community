@@ -31,7 +31,7 @@ public enum JSYError {
 	FLOOR_BEYOND(ConstError.FLOOR_BEYOND,"总楼层低于房屋楼层，无法修改！"),
 
 	// 物业模块1
-
+	COUPON_BEYOND(10001, "优惠金额超出所需缴纳费用!"),
 	// 租赁模块2
 
 	// 业主模块3

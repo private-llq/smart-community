@@ -128,7 +128,7 @@ public class PropertyRelationController {
         List<RelationImportErrVO> errorVos = new LinkedList<>();
         List<RelationImportQO> list = membersHandler.importRelation(excel,errorVos);
         //导入数据库返回其中错误信息
-        List<RelationImportErrVO> errVOList = propertyRelationService.importRelation(list,UserUtils.getAdminCommunityId(),UserUtils.getId());
+        List<RelationImportErrVO> errVOList = propertyRelationService.importRelation(list,UserUtils.getAdminCommunityId(),UserUtils.getUserId());
         for (RelationImportErrVO errVO : errVOList) {
             errorVos.add(errVO);
         }
@@ -212,7 +212,7 @@ public class PropertyRelationController {
     @Permit("community:property:members:save")
     public CommonResult save(@RequestBody HouseMemberEntity houseMemberEntity){
         ValidatorUtils.validateEntity(houseMemberEntity,HouseMemberEntity.SaveVerification.class);
-        propertyRelationService.save(houseMemberEntity,UserUtils.getAdminUserInfo().getUid());
+        propertyRelationService.save(houseMemberEntity,UserUtils.getAdminInfo().getUid());
         return CommonResult.ok();
     }
     
@@ -285,7 +285,7 @@ public class PropertyRelationController {
     @Permit("community:property:members:list")
     public CommonResult list(@RequestBody BaseQO<PropertyRelationQO> baseQO){
         System.out.println(baseQO);
-        Map map=propertyRelationService.list(baseQO,UserUtils.getAdminUserInfo().getCommunityId());
+        Map map=propertyRelationService.list(baseQO,UserUtils.getAdminInfo().getCommunityId());
         return CommonResult.ok(map);
     }
     
@@ -293,7 +293,7 @@ public class PropertyRelationController {
     @PostMapping("/getHouseId")
     @Permit("community:property:members:getHouseId")
     public CommonResult getHouseId(@RequestBody BaseQO<RelationListQO> baseQO){
-        AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
+        AdminInfoVo adminInfoVo = UserUtils.getAdminInfo();
         List list =propertyRelationService.getHouseId(baseQO,adminInfoVo);
         return CommonResult.ok(list);
     }
@@ -302,7 +302,7 @@ public class PropertyRelationController {
     @PostMapping("/getBuildingId")
     @Permit("community:property:members:getBuildingId")
     public CommonResult getBuildingId(@RequestBody BaseQO<RelationListQO> baseQO){
-        AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
+        AdminInfoVo adminInfoVo = UserUtils.getAdminInfo();
         List list =propertyRelationService.getBuildingId(baseQO,adminInfoVo);
         return CommonResult.ok(list);
     }
@@ -311,7 +311,7 @@ public class PropertyRelationController {
     @PostMapping("/getUnitId")
     @Permit("community:property:members:getUnitId")
     public CommonResult getUnitId(@RequestBody BaseQO<RelationListQO> baseQO){
-        AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
+        AdminInfoVo adminInfoVo = UserUtils.getAdminInfo();
         List list =propertyRelationService.getUnitId(baseQO,adminInfoVo);
         return CommonResult.ok(list);
     }

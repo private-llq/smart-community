@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICommunityFunService;
 import com.jsy.community.constant.Const;
@@ -60,7 +59,7 @@ public class CommunityFunController {
     @Permit("community:property:communityfun:save")
     public CommonResult save(@RequestBody CommunityFunOperationQO communityFunOperationQO) {
         ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunOperationQO.CommunityFunOperationValidated.class);
-        AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
+        AdminInfoVo adminInfoVo = UserUtils.getAdminInfo();
         communityFunService.insetOne(communityFunOperationQO,adminInfoVo);
         return  CommonResult.ok();
     }
@@ -131,7 +130,7 @@ public class CommunityFunController {
     @Permit("community:property:communityfun:update")
     public CommonResult update(@RequestBody CommunityFunOperationQO communityFunOperationQO) {
         ValidatorUtils.validateEntity(communityFunOperationQO, CommunityFunOperationQO.CommunityFunOperationValidated.class);
-        AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
+        AdminInfoVo adminInfoVo = UserUtils.getAdminInfo();
         communityFunService.updateOne(communityFunOperationQO,adminInfoVo);
         return CommonResult.ok();
     }
@@ -160,7 +159,7 @@ public class CommunityFunController {
     @Permit("community:property:communityfun:popUpOnline")
     public CommonResult popUpOnline(@ApiParam("社区趣事id")
                                         @RequestParam("id") Long id) {
-        AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
+        AdminInfoVo adminInfoVo = UserUtils.getAdminInfo();
         communityFunService.popUpOnline(id,adminInfoVo);
         return  CommonResult.ok();
     }

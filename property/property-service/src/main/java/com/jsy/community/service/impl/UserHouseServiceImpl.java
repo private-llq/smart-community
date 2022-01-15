@@ -109,7 +109,7 @@
 //				if (houseEntity != null) {
 //					// 封装楼栋信息
 //					BeanUtils.copyProperties(houseEntity, houseVo);
-//					houseVo.setId(userHouseEntity.getId());
+//					houseVo.setId(userHouseEntity.getUserId());
 //				}
 //				userHouseVOS.add(houseVo);
 //			}
@@ -125,7 +125,7 @@
 //		if (!CollectionUtils.isEmpty(houseEntityList)) {
 //			for (HouseEntity houseEntity : houseEntityList) {
 //				Long communityId = houseEntity.getCommunityId();
-//				Long id = houseEntity.getId();
+//				Long id = houseEntity.getUserId();
 //
 //				UserHouseEntity userHouseEntity = new UserHouseEntity();
 //				userHouseEntity.setUid(uid);

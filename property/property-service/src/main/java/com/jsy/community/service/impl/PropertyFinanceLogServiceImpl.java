@@ -96,8 +96,8 @@ public class PropertyFinanceLogServiceImpl extends ServiceImpl<PropertyFinanceLo
 			return new PageInfo<>();
 		}
 		Set<String> userIds = pageData.getRecords().stream().map(FinanceLogEntity::getUserId).collect(Collectors.toSet());
-		Set<Long> userId = userIds.stream().map(Long::parseLong).collect(Collectors.toSet());
-		List<RealUserDetail> realUserDetailsByUid = baseUserInfoRpcService.getRealUserDetailsByUid(userId);
+//		Set<Long> userId = userIds.stream().map(Long::parseLong).collect(Collectors.toSet());
+		List<RealUserDetail> realUserDetailsByUid = baseUserInfoRpcService.getRealUserDetails(userIds);
 		Map<Long, String> uIdMaps = realUserDetailsByUid.stream().collect(Collectors.toMap(RealUserDetail::getId, RealUserDetail::getNickName));
 		
 		// 补充用户名

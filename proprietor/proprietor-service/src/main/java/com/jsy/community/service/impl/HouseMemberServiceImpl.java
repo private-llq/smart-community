@@ -120,7 +120,7 @@ public class HouseMemberServiceImpl extends ServiceImpl<HouseMemberMapper, House
 	 **/
 //	@Override
 //	public boolean confirmJoin(HouseMemberEntity houseMemberEntity){
-//		int result = houseMemberMapper.confirmJoin(houseMemberEntity.getId());
+//		int result = houseMemberMapper.confirmJoin(houseMemberEntity.getUserId());
 //		int setBelongTo = userMapper.setUserBelongTo(houseMemberEntity.getHouseholderId(),houseMemberEntity.getUid());
 //		if(result == 1 && setBelongTo == 1){
 //			return true;

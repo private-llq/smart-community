@@ -53,8 +53,8 @@ public class SysOpLogAop extends BaseAop {
 		Method method = signature.getMethod();
 		
 		//获取用户id和社区id
-		opLog.setUserId(UserUtils.getId());
-		opLog.setCreateBy(UserUtils.getId());
+		opLog.setUserId(UserUtils.getUserId());
+		opLog.setCreateBy(UserUtils.getUserId());
 		
 		//获取操作
 		businessLog businessLog = method.getAnnotation(businessLog.class);
@@ -62,7 +62,7 @@ public class SysOpLogAop extends BaseAop {
 			String operation = businessLog.operation();
 			String content = businessLog.content();
 			opLog.setOperation(operation);//保存获取的操作
-			String sysRealName = sysUserService.getSysRealName(UserUtils.getId());
+			String sysRealName = sysUserService.getSysRealName(UserUtils.getUserId());
 			if (StringUtils.isNotBlank(sysRealName)) {
 				opLog.setContent(sysRealName + content);//保存获取的内容
 			}

@@ -42,7 +42,7 @@ public class PropertyComplaintsController {
     @PostMapping("/complainFeedback")
     @Permit("community:property:propertyComplaints:complainFeedback")
     public CommonResult complainFeedback(@RequestBody ComplainFeedbackQO complainFeedbackQO){
-        complainFeedbackQO.setUid(UserUtils.getId());
+        complainFeedbackQO.setUid(UserUtils.getUserId());
         propertyComplaintsService.complainFeedback(complainFeedbackQO);
         return CommonResult.ok();
     }

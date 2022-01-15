@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyAdvanceDepositRecordService;
 import com.jsy.community.constant.Const;
@@ -73,7 +72,7 @@ public class PropertyAdvanceDepositRecordController {
 		    throw new JSYException(JSYError.REQUEST_PARAM.getCode(),"缺少预存款id参数");
 	    }
         ValidatorUtils.validateEntity(propertyAdvanceDepositRecordEntity);
-        AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+        AdminInfoVo loginUser = UserUtils.getAdminInfo();
         propertyAdvanceDepositRecordEntity.setCommunityId(loginUser.getCommunityId());
         propertyAdvanceDepositRecordEntity.setCreateBy(loginUser.getUid());
         boolean result = propertyAdvanceDepositRecordService.addPropertyAdvanceDepositRecord(propertyAdvanceDepositRecordEntity);

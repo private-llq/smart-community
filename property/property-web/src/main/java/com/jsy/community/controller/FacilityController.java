@@ -1,7 +1,6 @@
 package com.jsy.community.controller;
 
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.ICommonConstService;
 import com.jsy.community.api.IFacilityService;
@@ -80,7 +79,7 @@ public class FacilityController {
 	@businessLog(operation = "新增",content = "新增了【设备】")
 	@Permit("community:property:facility:addFacility")
 	public CommonResult addFacility(@RequestBody FacilityEntity facilityEntity) {
-		AdminInfoVo adminInfoVo = UserUtils.getAdminUserInfo();
+		AdminInfoVo adminInfoVo = UserUtils.getAdminInfo();
 		facilityEntity.setCommunityId(adminInfoVo.getCommunityId());
 		facilityEntity.setPersonId(adminInfoVo.getUid());
 		facilityEntity.setCreatePerson(adminInfoVo.getRealName());

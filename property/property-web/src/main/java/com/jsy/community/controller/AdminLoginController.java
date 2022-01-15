@@ -165,7 +165,7 @@ public class AdminLoginController {
 		userMenu.sort(Comparator.comparing(PermitMenu::getSort));
 		
 		//用户资料
-//		AdminUserEntity userData = adminUserService.queryByUid(String.valueOf(loginVo.getUserInfo().getId()));
+//		AdminUserEntity userData = adminUserService.queryByUid(String.valueOf(loginVo.getUserInfo().getUserId()));
 		
 		// 查询用户角色
 //		AdminUserRoleEntity adminUserRoleEntity = adminConfigService.queryRoleIdByUid(userData.getUid());
@@ -249,11 +249,11 @@ public class AdminLoginController {
 	public CommonResult enterCommunity(@RequestBody JSONObject jsonObject){
 		Long communityId = jsonObject.getLong("communityId");
 //		UserInfoVo userInfo = UserUtils.getUserInfo();
-//		Long adminId = userInfo.getId();
+//		Long adminId = userInfo.getUserId();
 //		List<String> communityIds = UserUtils.getAdminCommunityIdList();
 		UserUtils.validateCommunityId(communityId);
 		//用户资料
-//		AdminUserEntity user = adminUserService.queryByUid(UserUtils.getId());
+//		AdminUserEntity user = adminUserService.queryByUid(UserUtils.getUserId());
 		AdminInfoVo adminInfoVo = UserUtils.getAdminInfo();
 		//用户菜单
 //		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getAdminRoleId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);

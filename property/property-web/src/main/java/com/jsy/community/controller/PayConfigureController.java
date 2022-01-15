@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.auth.Login;
 import com.jsy.community.api.IPayConfigureService;
 import com.jsy.community.constant.Const;
@@ -70,7 +69,7 @@ public class PayConfigureController {
     @Permit("community:property:alipay:configure:basic:config")
     public CommonResult basicConfig(@RequestBody PayConfigureEntity payConfigureEntity) {
         UserUtils.getAdminCompanyId();
-        payConfigureService.basicConfig(payConfigureEntity, UserUtils.getAdminUserInfo().getCompanyId());
+        payConfigureService.basicConfig(payConfigureEntity, UserUtils.getAdminInfo().getCompanyId());
         return CommonResult.ok("添加成功!");
     }
     
@@ -78,6 +77,6 @@ public class PayConfigureController {
     @GetMapping("getConfig")
     @Permit("community:property:alipay:configure:getConfig")
     public CommonResult getConfig() {
-        return CommonResult.ok(payConfigureService.getConfig(UserUtils.getAdminUserInfo().getCompanyId()),"查询成功!");
+        return CommonResult.ok(payConfigureService.getConfig(UserUtils.getAdminInfo().getCompanyId()),"查询成功!");
     }
 }

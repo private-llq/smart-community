@@ -42,8 +42,8 @@ public class ThreadPoolUtil {
 //			Thread[] threads = new Thread[(int)(group.activeCount() * 1.2)];
 //			int count = group.enumerate(threads, true);
 //			for(int i = 0; i < count; i++) {
-//				if(threadId == threads[i].getId()) {
-//					System.out.println(threads[i].getId() + threads[i].getName());
+//				if(threadId == threads[i].getUserId()) {
+//					System.out.println(threads[i].getUserId() + threads[i].getName());
 //					System.out.println(threads[i].isAlive());
 //					return threads[i];
 //				}

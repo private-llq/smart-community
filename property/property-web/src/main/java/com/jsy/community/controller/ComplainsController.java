@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.IComplainsService;
 import com.jsy.community.constant.Const;
 import com.jsy.community.qo.BaseQO;
@@ -38,7 +37,7 @@ public class ComplainsController {
     @PostMapping("/list")
     @Permit("community:property:complains:list")
     public CommonResult list(@RequestBody BaseQO<PropertyComplaintsQO> baseQO) {
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         Map<String, Object> map = complainsService.listAll(baseQO,userInfo);
         return CommonResult.ok(map);
     }
@@ -46,7 +45,7 @@ public class ComplainsController {
     @PostMapping("/feedback")
     @Permit("community:property:complains:feedback")
     public CommonResult feedback(@RequestBody ComplainFeedbackQO complainFeedbackQO) {
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         complainsService.feedback(complainFeedbackQO,userInfo);
         return CommonResult.ok();
     }

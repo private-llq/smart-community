@@ -49,7 +49,7 @@ public class AdminCommunityInformController {
             qo.setPushTag(0);
         }
         ValidatorUtils.validateEntity(qo, PushInformQO.AddPushInformValidateGroup.class);
-        qo.setUid(UserUtils.getId());
+        qo.setUid(UserUtils.getUserId());
         AdminInfoVo adminInfo = UserUtils.getAdminInfo();
         if (adminInfo.getCommunityId() == null) {
             qo.setAcctId(adminInfo.getCompanyId());
@@ -71,7 +71,7 @@ public class AdminCommunityInformController {
     @businessLog(operation = "删除",content = "删除了【社区推送通知消息】")
     @Permit("community:property:community:inform:delete")
     public CommonResult<Boolean> deletePushInform(@RequestParam Long id) {
-        return communityInformService.deletePushInform(id, UserUtils.getId()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
+        return communityInformService.deletePushInform(id, UserUtils.getUserId()) ? CommonResult.ok("删除成功!") : CommonResult.error(JSYError.NOT_IMPLEMENTED);
     }
 
     /**
@@ -87,7 +87,7 @@ public class AdminCommunityInformController {
     @businessLog(operation = "编辑",content = "更新了【社区消息置顶状态】")
     @Permit("community:property:community:inform:updateTopState")
     public CommonResult<Boolean> updateTopState(@RequestBody OldPushInformQO qo) {
-        qo.setUpdateBy(UserUtils.getId());
+        qo.setUpdateBy(UserUtils.getUserId());
         ValidatorUtils.validateEntity(qo, OldPushInformQO.UpdateTopStateValidate.class);
         return communityInformService.updateTopState(qo) ? CommonResult.ok("操作成功!") : CommonResult.error("操作失败!");
     }
@@ -105,7 +105,7 @@ public class AdminCommunityInformController {
     @businessLog(operation = "编辑",content = "更新了【社区消息发布状态】")
     @Permit("community:property:community:inform:updatePushState")
     public CommonResult<Boolean> updatePushState(@RequestBody OldPushInformQO qo) {
-        qo.setUpdateBy(UserUtils.getId());
+        qo.setUpdateBy(UserUtils.getUserId());
         ValidatorUtils.validateEntity(qo, OldPushInformQO.UpdatePushStateValidate.class);
         if (qo.getPushState() < 1) {
             // 发布状态只能在发布与撤销间反复横跳
@@ -130,7 +130,7 @@ public class AdminCommunityInformController {
         }
 
         /*if (CollectionUtil.isNotEmpty(UserUtils.getAdminCommunityIdList())) {
-            baseQO.getQuery().setCommunityIds(UserUtils.getAdminUserInfo().getCommunityIdList());
+            baseQO.getQuery().setCommunityIds(UserUtils.getAdminInfo().getCommunityIdList());
         }else {
             List<Long> communityIds = new ArrayList<>();
             communityIds.add(UserUtils.getAdminCommunityId());
@@ -154,7 +154,7 @@ public class AdminCommunityInformController {
             return CommonResult.error(JSYError.BAD_REQUEST);
         }
         ValidatorUtils.validateEntity(qo.getQuery(), OldPushInformQO.CommunityPushInformValidate.class);
-        qo.getQuery().setUid(UserUtils.getId());
+        qo.getQuery().setUid(UserUtils.getUserId());
         return CommonResult.ok(communityInformService.queryCommunityInform(qo), "查询成功!");
     }
 
@@ -185,7 +185,7 @@ public class AdminCommunityInformController {
     @Permit("community:property:community:inform:updateDetail")
     public CommonResult updateDetail(@RequestBody PushInformQO qo) {
         ValidatorUtils.validateEntity(qo, PushInformQO.UpdateDetailValidate.class);
-        qo.setUid(UserUtils.getId());
+        qo.setUid(UserUtils.getUserId());
         AdminInfoVo adminInfo = UserUtils.getAdminInfo();
         if (adminInfo.getCommunityId() == null) {
             qo.setAcctId(adminInfo.getCompanyId());

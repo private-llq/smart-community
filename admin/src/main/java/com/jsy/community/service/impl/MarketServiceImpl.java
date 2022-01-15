@@ -86,11 +86,11 @@ public class MarketServiceImpl extends ServiceImpl<MarketMapper, ProprietorMarke
     
         PageVO<UserDetail> userDetailPageVO = baseUserInfoRpcService.queryUser(query.getPhone(), query.getRealName(), 0, 999999999);
         if (!CollectionUtils.isEmpty(userDetailPageVO.getData())) {
-            Set<Long> userDetailIds = userDetailPageVO.getData().stream().map(UserDetail::getId).collect(Collectors.toSet());
-            List<String> collect = userDetailIds.stream().map(String::valueOf).collect(Collectors.toList());
-            query.setUserDetailIds(collect);
+            List<String> userDetailIds = userDetailPageVO.getData().stream().map(UserDetail::getAccount).collect(Collectors.toList());
+//            List<String> collect = userDetailIds.stream().map(String::valueOf).collect(Collectors.toList());
+            query.setUserDetailIds(userDetailIds);
             
-            Map<Long, String> nickNameMap = userDetailPageVO.getData().stream().collect(Collectors.toMap(UserDetail::getId, UserDetail::getNickName));
+            Map<String, String> nickNameMap = userDetailPageVO.getData().stream().collect(Collectors.toMap(UserDetail::getAccount, UserDetail::getNickName));
         
             List<ProprietorMarketEntity> list =  marketMapper.selectMarketAllPage(query,page1,baseQO.getSize());
             for (ProprietorMarketEntity li : list){
@@ -100,7 +100,7 @@ public class MarketServiceImpl extends ServiceImpl<MarketMapper, ProprietorMarke
                 marketVO.setPriceName(li.getNegotiable() == 1 ? "面议" : String.valueOf(li.getPrice()));
                 // 补充状态名称
                 marketVO.setStateName(li.getState() == 1 ? "已上架" : "已下架");
-                marketVO.setNickName(nickNameMap.get(Long.parseLong(li.getUid())));
+                marketVO.setNickName(nickNameMap.get(li.getUid()));
                 arrayList.add(marketVO);
             }
             Long total = marketMapper.findTotals(query);
@@ -180,7 +180,7 @@ public class MarketServiceImpl extends ServiceImpl<MarketMapper, ProprietorMarke
         ArrayList<ProprietorMarketVO> arrayList = new ArrayList<>();
     
         PageVO<UserDetail> userDetailPageVO = baseUserInfoRpcService.queryUser("", "", 0, 999999999);
-        Map<Long, String> nickNameMap = userDetailPageVO.getData().stream().collect(Collectors.toMap(UserDetail::getId, UserDetail::getNickName));
+        Map<String, String> nickNameMap = userDetailPageVO.getData().stream().collect(Collectors.toMap(UserDetail::getAccount, UserDetail::getNickName));
         
         List<ProprietorMarketEntity> list =  marketMapper.selectMarketBlacklist(page1,baseQO.getSize());
         for (ProprietorMarketEntity li : list){
@@ -190,7 +190,7 @@ public class MarketServiceImpl extends ServiceImpl<MarketMapper, ProprietorMarke
             marketVO.setPriceName(li.getNegotiable() == 1 ? "面议" : String.valueOf(li.getPrice()));
             // 补充状态名称
             marketVO.setStateName(li.getState() == 1 ? "已上架" : "已下架");
-            marketVO.setNickName(nickNameMap.get(Long.parseLong(li.getUid())));
+            marketVO.setNickName(nickNameMap.get(li.getUid()));
             arrayList.add(marketVO);
         }
         Long total = marketMapper.findCount();

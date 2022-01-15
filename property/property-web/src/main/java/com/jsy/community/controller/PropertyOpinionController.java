@@ -1,6 +1,5 @@
 package com.jsy.community.controller;
 
-import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.annotation.businessLog;
 import com.jsy.community.api.IPropertyOpinionService;
 import com.jsy.community.constant.Const;
@@ -39,7 +38,7 @@ public class PropertyOpinionController {
     @Permit("community:property:propertyOpinion:create")
     public CommonResult create(@RequestBody PropertyOpinionEntity propertyOpinionEntity){
         ValidatorUtils.validateEntity(propertyOpinionEntity,PropertyOpinionEntity.PropertyOpinionValidated.class);
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         Integer count = propertyOpinionService.selectCount(userInfo);
         if (count==3){
             return CommonResult.error("超过当天最大意见反馈！");

@@ -802,7 +802,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             userThirdPlatformEntity.setId(SnowFlake.nextId());
             userThirdPlatformMapper.insert(userThirdPlatformEntity);
 //            returnMap.put("exists",false);
-//            returnMap.put("data",userThirdPlatformEntity.getId());
+//            returnMap.put("data",userThirdPlatformEntity.getUserId());
             return createBindMobile(userThirdPlatformEntity.getId());
         } else {
             if (!StringUtils.isEmpty(entity.getUid())) {
@@ -821,7 +821,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 //非首次授权，但未绑定手机
 //                //继续返回id
 //                returnMap.put("exists",false);
-//                returnMap.put("data",entity.getId());
+//                returnMap.put("data",entity.getUserId());
                 return createBindMobile(entity.getId());
             }
 //            return returnMap;

@@ -36,7 +36,7 @@ public class CarBasicsController {
      @CarOperation(operation = "更新了【临时车规则】")
      @Permit("community:property:carBasics:addBasics")
     public CommonResult addBasics(@RequestBody CarBasicsRuleQO carBasicsRuleQO){
-         boolean b = carBasics.addBasics(carBasicsRuleQO,UserUtils.getId(),UserUtils.getAdminCommunityId());
+         boolean b = carBasics.addBasics(carBasicsRuleQO,UserUtils.getUserId(),UserUtils.getAdminCommunityId());
          return CommonResult.ok("操作成功");
      }
 
@@ -46,7 +46,7 @@ public class CarBasicsController {
      @Permit("community:property:carBasics:findOne")
      public CommonResult findSpecial(){
          System.out.println(UserUtils.getAdminCommunityId());
-         String userId = UserUtils.getId();
+         String userId = UserUtils.getUserId();
          CarBasicsEntity  carBasicsEntity = carBasics.findOne(UserUtils.getAdminCommunityId());
          return CommonResult.ok(carBasicsEntity);
      }
@@ -57,7 +57,7 @@ public class CarBasicsController {
      @CarOperation(operation = "更新了【特殊车辆是否收费】")
      @Permit("community:property:carBasics:exceptionCar")
      public CommonResult addExceptionCar(@RequestParam("exceptionCar") Integer exceptionCar){
-         String userId = UserUtils.getId();
+         String userId = UserUtils.getUserId();
          Long communityId = UserUtils.getAdminCommunityId();
          boolean b =  carBasics.addExceptionCar(exceptionCar,userId,communityId);
         return CommonResult.ok("操作成功");
@@ -69,7 +69,7 @@ public class CarBasicsController {
       @CarOperation(operation = "更新了【包月选项】")
       @Permit("community:property:carBasics:monthlyPayment")
      public CommonResult addMonthlyPayment(@RequestBody CarBasicsMonthQO carBasicsMonthQO){
-         boolean b = carBasics.addMonthlyPayment(carBasicsMonthQO,UserUtils.getId(),UserUtils.getAdminCommunityId());
+         boolean b = carBasics.addMonthlyPayment(carBasicsMonthQO,UserUtils.getUserId(),UserUtils.getAdminCommunityId());
         return CommonResult.ok("操作成功");
 
      }
@@ -79,7 +79,7 @@ public class CarBasicsController {
     @CarOperation(operation = "更新了【包月选项】")
     @Permit("community:property:carBasics:addBasics2")
     public CommonResult addBasics2(){
-        String userId = UserUtils.getId();
+        String userId = UserUtils.getUserId();
         Long communityId = UserUtils.getAdminCommunityId();
         boolean b = carBasics.addBasics2(userId,communityId);
         return CommonResult.ok("操作成功");

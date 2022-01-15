@@ -83,7 +83,7 @@ public class PropertyFinanceOrderController {
         FinanceOrderQO query = baseQO.getQuery();
         query.setCommunityId(UserUtils.getAdminCommunityId());
         baseQO.setQuery(query);
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         Map<String, Object> map = propertyFinanceOrderService.findList(userInfo, baseQO);
         return CommonResult.ok(map);
     }
@@ -109,7 +109,7 @@ public class PropertyFinanceOrderController {
     @businessLog(operation = "编辑", content = "更新了【订单优惠金额】")
     @Permit("community:property:financeOrder:updateOrder")
     public CommonResult updateOrder(@RequestParam("id") Long id, @RequestParam("coupon") BigDecimal coupon) {
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         if (coupon.compareTo(BigDecimal.ZERO) < 0) {
             throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "优惠金额不能填写负数");
         }
@@ -122,7 +122,7 @@ public class PropertyFinanceOrderController {
     @businessLog(operation = "删除", content = "删除了【一条物业房间账单】")
     @Permit("community:property:financeOrder:delete")
     public CommonResult delete(@RequestParam("id") Long id) {
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         propertyFinanceOrderService.delete(id);
         return CommonResult.ok();
     }
@@ -132,7 +132,7 @@ public class PropertyFinanceOrderController {
     @businessLog(operation = "删除", content = "删除了【多条物业房间账单】")
     @Permit("community:property:financeOrder:deleteIds")
     public CommonResult deleteIds(@RequestParam("ids") String ids) {
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         propertyFinanceOrderService.deleteIds(ids);
         return CommonResult.ok();
     }
@@ -151,7 +151,7 @@ public class PropertyFinanceOrderController {
     @businessLog(operation = "删除", content = "删除了【多条物业房间账单】")
     @Permit("community:property:financeOrder:deletes")
     public CommonResult deletes(@RequestBody FinanceOrderOperationQO financeOrderOperationQO) {
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         propertyFinanceOrderService.deletes(financeOrderOperationQO);
         return CommonResult.ok();
     }
@@ -161,7 +161,7 @@ public class PropertyFinanceOrderController {
     @businessLog(operation = "编辑", content = "更新了【一条物业房间账单状态】")
     @Permit("community:property:financeOrder:update")
     public CommonResult update(@RequestParam("id") Long id) {
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         propertyFinanceOrderService.update(id);
         return CommonResult.ok();
     }
@@ -171,7 +171,7 @@ public class PropertyFinanceOrderController {
     @businessLog(operation = "编辑", content = "更新了【多条条物业房间账单状态】")
     @Permit("community:property:financeOrder:updateStatusIds")
     public CommonResult updateStatusIds(@RequestParam("ids") String ids, Integer hide) {
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         propertyFinanceOrderService.updateStatusIds(ids, hide);
         return CommonResult.ok();
     }
@@ -181,7 +181,7 @@ public class PropertyFinanceOrderController {
     @businessLog(operation = "编辑", content = "更新了【多条物业房间账单状态】")
     @Permit("community:property:financeOrder:updates")
     public CommonResult updates(@RequestBody FinanceOrderOperationQO financeOrderOperationQO) {
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         propertyFinanceOrderService.updates(financeOrderOperationQO);
         return CommonResult.ok();
     }
@@ -190,7 +190,7 @@ public class PropertyFinanceOrderController {
     @GetMapping("/getOrderNum")
     @Permit("community:property:financeOrder:getOrderNum")
     public CommonResult getOrderNum(@RequestParam("id") Long id) {
-        AdminInfoVo userInfo = UserUtils.getAdminUserInfo();
+        AdminInfoVo userInfo = UserUtils.getAdminInfo();
         PropertyFinanceOrderVO propertyFinanceOrderVO = propertyFinanceOrderService.getOrderNum(userInfo, id);
         return CommonResult.ok(propertyFinanceOrderVO);
     }
@@ -643,7 +643,7 @@ public class PropertyFinanceOrderController {
             throw new PropertyException(JSYError.REQUEST_PARAM.getCode(), "缺少类型参数");
         }
         ValidatorUtils.validateEntity(propertyFinanceOrderEntity);
-        AdminInfoVo loginUser = UserUtils.getAdminUserInfo();
+        AdminInfoVo loginUser = UserUtils.getAdminInfo();
         propertyFinanceOrderEntity.setCommunityId(loginUser.getCommunityId());
         PropertyFinanceOrderEntity entity = propertyFinanceOrderService.addTemporaryCharges(propertyFinanceOrderEntity);
         return entity != null ? CommonResult.ok(entity) : CommonResult.error(JSYError.INTERNAL.getCode(), "新增物业账单临时收费失败");
@@ -707,7 +707,7 @@ public class PropertyFinanceOrderController {
         //参数验证
         validFileSuffix(excel);
         Long adminCommunityId = UserUtils.getAdminCommunityId();
-        String userId = UserUtils.getId();
+        String userId = UserUtils.getUserId();
         ArrayList<FinanceImportErrorVO> errorVos = new ArrayList<>(32);
         List<PropertyFinanceOrderEntity> propertyFinanceOrderEntities = financeExcel.importFinanceExcel(excel, errorVos);
         List<HouseEntity> allHouse = houseService.getAllHouse(adminCommunityId);
