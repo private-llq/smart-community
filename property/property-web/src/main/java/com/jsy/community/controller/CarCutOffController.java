@@ -40,7 +40,7 @@ public class CarCutOffController{
      * @Author: Tian
      * @Date: 2021/9/6-13:55
      **/
-    @LoginIgnore
+
     @PostMapping("/selectPage")
     public CommonResult selectPage(@RequestParam CarCutOffQO carCutOffQO){
         Long total = carCutOffService.selectPage(carCutOffQO);
@@ -85,7 +85,7 @@ public class CarCutOffController{
         return CommonResult.ok(carCutOffEntityList,"查询成功");
     }
 
-    @LoginIgnore
+
     @ApiOperation("导出模板")
     @PostMapping("/carCutOFFExport")
     @ResponseBody

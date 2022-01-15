@@ -44,7 +44,7 @@ public class CarLaneController {
      * @param carLaneEntity
      * @return
      */
-    @LoginIgnore
+
     @PutMapping("UpdateCarLane")
     @CarOperation(operation = "更新了【车道管理】")
     public CommonResult UpdateCarLane(@RequestBody CarLaneEntity carLaneEntity) {
@@ -58,7 +58,7 @@ public class CarLaneController {
      * @param uid
      * @return
      */
-    @LoginIgnore
+
     @DeleteMapping("DelCarLane")
     @CarOperation(operation = "删除了【车道管理】")
     public CommonResult DelCarLane(@RequestParam("uid") String uid) {

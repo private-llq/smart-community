@@ -76,7 +76,7 @@ public class CarMonthlyVehicleController {
      * @param uid
      * @return
      */
-    @LoginIgnore
+
     @DeleteMapping("DelMonthlyVehicle")
     @CarOperation(operation = "删除了【月租停车】")
     public CommonResult DelMonthlyVehicle(@RequestParam("uid") String uid) {
@@ -129,7 +129,7 @@ public class CarMonthlyVehicleController {
     /**
      * 上传模板
      */
-    @LoginIgnore
+
     @PostMapping("uploadTemplate")
     public  String uploadTemplate(MultipartFile file){
         String path = MinioUtils.upload(file, "template");
@@ -141,7 +141,7 @@ public class CarMonthlyVehicleController {
     /**
      * 下载模板
      */
-    @LoginIgnore
+
     @CarOperation(operation = "下载了【包月车辆导入模板】")
     @PostMapping("dataExportTemplate")
     public String dataExportTemplate(){
@@ -320,7 +320,7 @@ public class CarMonthlyVehicleController {
     /**
      * 包月车位导入模板下载
      */
-    @LoginIgnore
+
     @PostMapping("dataExportTemplate2Position")
     @CarOperation(operation = "下载了【包月车位导入模板】")
     public String dataExportTemplate2Position(){
