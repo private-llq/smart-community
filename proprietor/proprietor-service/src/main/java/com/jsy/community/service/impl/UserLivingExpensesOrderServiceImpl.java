@@ -157,7 +157,7 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 	public List<LivingExpensesOrderListVO> getListOfUserLivingExpensesOrder(UserLivingExpensesOrderEntity userLivingExpensesOrderEntity) {
 		
 		QueryWrapper<UserLivingExpensesOrderEntity> queryWrapper = new QueryWrapper<>();
-		queryWrapper.select("*,DATE_FORMAT(create_time,'%Y-%m') as monthTime");
+		queryWrapper.select("*,DATE_FORMAT(create_time,'%Y年%m月') as monthTime");
 		queryWrapper.eq("uid", userLivingExpensesOrderEntity.getUid());
 		queryWrapper.in("order_status", BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_PAYMENT.getCode(),
 				BusinessEnum.CebbankOrderStatusEnum.SUCCESSFUL_CANCELLATION.getCode());
@@ -293,6 +293,12 @@ public class UserLivingExpensesOrderServiceImpl extends ServiceImpl<UserLivingEx
 		UserLivingExpensesBillEntity userLivingExpensesBillEntity = new UserLivingExpensesBillEntity();
 		userLivingExpensesBillEntity.setBillStatus(BusinessEnum.PaymentStatusEnum.PAID.getCode());
 		billMapper.update(userLivingExpensesBillEntity, billEntityQueryWrapper);
+		// 将其他用户的该账单删除(有两种方案,一种是删除,一种是改为已支付,但是改为已支付可能为引起误会,因为没有支付订单记录,所以选择删除)
+		QueryWrapper<UserLivingExpensesBillEntity> expensesBillEntityQueryWrapper = new QueryWrapper<>();
+		expensesBillEntityQueryWrapper.ne("id", userLivingExpensesOrderEntity.getBillId());
+		expensesBillEntityQueryWrapper.eq("bill_key", userLivingExpensesOrderEntity.getBillKey());
+		expensesBillEntityQueryWrapper.eq("contact_no", userLivingExpensesOrderEntity.getContactNo());
+		billMapper.delete(expensesBillEntityQueryWrapper);
 		log.info("修改账单缴费状态完成");
 		return i == 1;
 	}

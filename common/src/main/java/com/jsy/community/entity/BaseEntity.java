@@ -23,11 +23,14 @@ public class BaseEntity implements Serializable {
 	//兼容H5，使用字符串格式， 针对js long型长度不够的问题
 	@TableField(exist = false)
 	private String idStr;
+
 	public String getIdStr(){
 		return String.valueOf(id);
 	}
+
 	@TableLogic
 	private Long deleted;
+
 	@TableField(fill = FieldFill.INSERT)
 	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
