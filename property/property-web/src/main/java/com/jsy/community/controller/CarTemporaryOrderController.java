@@ -56,7 +56,7 @@ public class CarTemporaryOrderController {
         return CommonResult.ok(map,"查询成功");
     }
 
-    @LoginIgnore
+
     @ApiOperation("导出模板")
     @PostMapping("/carTemporaryOrderExport")
     @ResponseBody

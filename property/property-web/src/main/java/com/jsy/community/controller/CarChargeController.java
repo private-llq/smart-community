@@ -55,7 +55,7 @@ public class CarChargeController {
         return CommonResult.ok();
     }
 
-    @LoginIgnore
+
     @PutMapping("/update")
     @CarOperation(operation = "更新了【停车收费设置模板】")
     public CommonResult update(@RequestBody CarChargeEntity carChargeEntity){
@@ -64,7 +64,7 @@ public class CarChargeController {
 
     }
     
-    @LoginIgnore
+
     @DeleteMapping("/del")
     @CarOperation(operation = "删除了【停车收费设置模板】")
     public CommonResult delete(@RequestParam("uid") String uid){
@@ -112,7 +112,7 @@ public class CarChargeController {
     /**
      * 订单支付返回收费详情
      */
-    @LoginIgnore
+
     @PostMapping("/orderCharge")
     public CommonResult orderCharge(@RequestParam Long adminCommunityId,@RequestParam String carNumber){
         orderChargeDto orderCharge =carChargeService.orderCharge(adminCommunityId,carNumber);
