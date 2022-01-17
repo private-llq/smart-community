@@ -21,6 +21,10 @@ import com.jsy.community.vo.property.HouseImportErrorVO;
 import com.jsy.community.vo.property.HouseMemberVO;
 import com.jsy.community.vo.property.RelationImportErrVO;
 import com.jsy.community.vo.property.RelationImportQO;
+import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
+import com.zhsj.base.api.vo.PageVO;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
@@ -33,6 +37,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,6 +49,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @program: com.jsy.community
@@ -62,6 +68,8 @@ public class PropertyRelationController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private IHouseInfoService houseInfoService;
+    @DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check=false)
+    private IBaseUserInfoRpcService baseUserInfoRpcService;
 
     @Autowired
     private MembersHandler membersHandler;
@@ -98,7 +106,16 @@ public class PropertyRelationController {
     @Permit("community:property:members:export")
     public ResponseEntity<byte[]> export(@RequestBody HouseMemberQO houseMemberQO){
         houseMemberQO.setCommunityId(UserUtils.getAdminCommunityId());
+        PageVO<UserDetail> pageVO = baseUserInfoRpcService.queryUser("", "", 0, 999999999);
+        Map<String, String> nickNameMap = pageVO.getData().stream().collect(Collectors.toMap(UserDetail::getAccount, UserDetail::getNickName));
         List<HouseMemberVO> houseMemberVOS = propertyRelationService.queryExportRelationExcel(houseMemberQO);
+        houseMemberVOS.stream().peek(h -> {
+            // 填充用户昵称
+            if (!CollectionUtils.isEmpty(nickNameMap)) {
+                h.setAppName(nickNameMap.get(h.getUid()));
+            }
+        }).collect(Collectors.toList());
+        
         //设置excel 响应头信息
         MultiValueMap<String, String> multiValueMap = new HttpHeaders();
         //设置响应类型为附件类型直接下载这种

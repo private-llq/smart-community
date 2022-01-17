@@ -408,11 +408,12 @@ public class PropertyRelationServiceImpl implements IPropertyRelationService {
                     proprietorEntity.setId(SnowFlake.nextId());
                     proprietorEntity.setRealName(memberEntity.getName());
                     entities.add(proprietorEntity);
-
-                    UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("mobile", memberEntity.getMobile()));
+    
+                    UserDetail userDetailByPhone = baseUserInfoRpcService.getUserDetailByPhone(memberEntity.getMobile());
+//                    UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("mobile", memberEntity.getMobile()));
                     userHouseEntity = new UserHouseEntity();
-                    if (userEntity != null) {
-                        userHouseEntity.setUid(userEntity.getUid());
+                    if (userDetailByPhone != null) {
+                        userHouseEntity.setUid(userDetailByPhone.getAccount());
                     }
                     userHouseEntity.setHouseId(memberEntity.getHouseId());
                     userHouseEntity.setId(SnowFlake.nextId());

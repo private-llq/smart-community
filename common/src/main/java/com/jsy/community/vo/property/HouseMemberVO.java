@@ -18,6 +18,11 @@ public class HouseMemberVO implements Serializable {
      * id
      */
     private String id;
+    
+    /**
+     * uid
+     */
+    private String uid;
 
     /**
      * 房间id
