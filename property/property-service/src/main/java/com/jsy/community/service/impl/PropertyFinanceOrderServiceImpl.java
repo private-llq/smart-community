@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -23,9 +24,12 @@ import com.jsy.community.vo.admin.AdminInfoVo;
 import com.jsy.community.vo.property.FinanceOrderAndCarOrHouseInfoVO;
 import com.jsy.community.vo.property.PropertyFinanceOrderVO;
 import com.zhsj.base.api.constant.RpcConst;
+import com.zhsj.base.api.entity.RealInfoDto;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.basecommon.constant.BaseConstant;
 import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
+import com.zhsj.sign.api.rpc.IContractRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -108,6 +112,9 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
 
     @DubboReference(version = com.zhsj.im.chat.api.constant.RpcConst.Rpc.VERSION, group = com.zhsj.im.chat.api.constant.RpcConst.Rpc.Group.GROUP_IM_CHAT, check=false)
     private IImChatPublicPushRpcService iImChatPublicPushRpcService;
+
+    @DubboReference(version = BaseConstant.Rpc.VERSION, group = BaseConstant.Rpc.Group.GROUP_CONTRACT)
+    private IContractRpcService contractRpcService;
 
     /**
      * @Description: 查询房间所有未缴账单
@@ -720,8 +727,21 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 detailedList.append("\n");
             }
         }
+        RealInfoDto idCardRealInfo = userInfoRpcService.getIdCardRealInfo(orderEntity.getUid());
+        if (ObjectUtil.isNull(idCardRealInfo)) {
+            throw new ProprietorException(JSYError.ACCOUNT_NOT_EXISTS);
+        }
         //支付上链
-        CochainResponseEntity responseEntity = OrderCochainUtil.orderCochain("物业费",
+        contractRpcService.communityOrderUpLink("物业费",
+                1,
+                payType,
+                total,
+                tripartiteOrder,
+                idCardRealInfo.getIdCardNumber(),
+                companyEntity.getUnifiedSocialCreditCode(),
+                detailedList.toString(),
+                null);
+        /*CochainResponseEntity responseEntity = OrderCochainUtil.orderCochain("物业费",
                 1,
                 payType,
                 total,
@@ -730,7 +750,7 @@ public class PropertyFinanceOrderServiceImpl extends ServiceImpl<PropertyFinance
                 companyEntity.getUnifiedSocialCreditCode(),
                 detailedList.toString(),
                 null);
-        log.info("支付上链："+responseEntity);
+        log.info("支付上链："+responseEntity);*/
         Map<Object, Object> map = new HashMap<>();
         map.put("type", 3);
         map.put("dataId", tripartiteOrder);

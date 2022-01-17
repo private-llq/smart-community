@@ -164,6 +164,7 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, VisitorEntity
                 visitorEntity.setAddress(communityInfo.getName());
             }
         }
+        visitorEntity.setCheckType(BusinessEnum.CheckTypeEnum.OWNER_AUTHORIZATION.getCode());
         int insert = visitorMapper.insert(visitorEntity);
         if(1 != insert){
             throw new ProprietorException(JSYError.INTERNAL.getCode(),"访客登记 新增失败");

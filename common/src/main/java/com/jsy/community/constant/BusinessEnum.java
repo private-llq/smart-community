@@ -1812,8 +1812,10 @@ public interface BusinessEnum {
 		INIT(0, "订单创建成功"),
 		SUCCESSFUL_PAYMENT(1, "支付成功"),
 		PAYMENT_FAILURE(2, "支付失败"),
-		SUCCESSFUL_CANCELLATION(3, "销账成功"),
-		CANCELLATION_FAILURE(4, "销账失败"),
+//		SUCCESSFUL_CANCELLATION(3, "销账成功"),
+		SUCCESSFUL_CANCELLATION(3, "缴费成功"),
+//		CANCELLATION_FAILURE(4, "销账失败"),
+		CANCELLATION_FAILURE(4, "缴费失败"),
 		UNKNOWN_STATUS(5, "未知状态"),
 		REAL_TIME_REFUNDS(8, "实时退款");
 		private final Integer code;
@@ -1836,13 +1838,56 @@ public interface BusinessEnum {
 		public static final Map<Integer, String> cebbankOrderStatusMap = new HashMap<>();
 
 		static {
-			for (PaymentStatusEnum trade : PaymentStatusEnum.values()) {
+			for (CebbankOrderStatusEnum trade : CebbankOrderStatusEnum.values()) {
 				HashMap<String, Object> map = new HashMap<>();
 				map.put("code", trade.getCode());
 				map.put("name", trade.getName());
 				cebbankOrderStatusList.add(map);
 				cebbankOrderStatusMap.put(trade.getCode(), trade.getName());
 			}
+		}
+	}
+
+	// 审核方式枚举
+	enum CheckTypeEnum{
+		OWNER_AUTHORIZATION("业主授权", 1),
+		PROPERTY_AUTHORIZATION("物业授权", 2);
+		private String name;
+		private Integer code;
+
+		CheckTypeEnum(String name, Integer code) {
+			this.name = name;
+			this.code = code;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Integer getCode() {
+			return code;
+		}
+
+		public void setCode(Integer code) {
+			this.code = code;
+		}
+
+		@Override
+		public String toString() {
+			return this.code + "_" + this.name;
+		}
+
+		public static String getName(Integer code) {
+			for (CheckTypeEnum value : CheckTypeEnum.values()) {
+				if (code.equals(value.getCode())) {
+					return value.getName();
+				}
+			}
+			return null;
 		}
 	}
 }

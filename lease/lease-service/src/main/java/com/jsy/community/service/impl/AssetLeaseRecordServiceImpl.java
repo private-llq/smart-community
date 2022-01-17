@@ -1,5 +1,6 @@
 package com.jsy.community.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -33,13 +34,16 @@ import com.jsy.community.vo.UserInfoVo;
 import com.jsy.community.vo.lease.HouseLeaseContractVO;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.domain.PayCallNotice;
+import com.zhsj.base.api.entity.RealInfoDto;
 import com.zhsj.base.api.entity.TransferEntity;
 import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBasePayRpcService;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.basecommon.constant.BaseConstant;
 import com.zhsj.basecommon.utils.MD5Util;
 import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
+import com.zhsj.sign.api.rpc.IContractRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -148,6 +152,9 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
     @DubboReference(version = Const.version, group = Const.group_payment, check = false)
     private HousingRentalOrderService housingRentalOrderService;
+
+    @DubboReference(version = BaseConstant.Rpc.VERSION, group = BaseConstant.Rpc.Group.GROUP_CONTRACT)
+    private IContractRpcService contractRpcService;
 
     /**
      * @param assetLeaseRecordEntity : 房屋租赁记录表实体
@@ -1565,9 +1572,22 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
 
             UserImVo userIm = userInfoRpcService.getEHomeUserIm(assetLeaseRecordEntity.getTenantUid());
             PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(assetLeaseRecordEntity.getCommunityId());
-            UserDetail userDetail = userInfoRpcService.getUserDetail(assetLeaseRecordEntity.getTenantUid());
+            RealInfoDto idCardRealInfo = userInfoRpcService.getIdCardRealInfo(assetLeaseRecordEntity.getTenantUid());
+            RealInfoDto realInfoDto = userInfoRpcService.getIdCardRealInfo(assetLeaseRecordEntity.getHomeOwnerUid());
+            if (ObjectUtil.isNull(idCardRealInfo) || ObjectUtil.isNull(realInfoDto)) {
+                throw new ProprietorException(JSYError.ACCOUNT_NOT_EXISTS);
+            }
             //支付上链
-            CochainResponseEntity cochainResponseEntity = OrderCochainUtil.orderCochain("房屋租金",
+            contractRpcService.communityOrderUpLink("房屋租金",
+                    1,
+                    payType,
+                    total,
+                    orderNum,
+                    idCardRealInfo.getIdCardNumber(),
+                    realInfoDto.getIdCardNumber(),
+                    "房屋租金支付",
+                    null);
+            /*CochainResponseEntity cochainResponseEntity = OrderCochainUtil.orderCochain("房屋租金",
                     1,
                     payType,
                     total,
@@ -1576,7 +1596,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     companyEntity.getUnifiedSocialCreditCode(),
                     "房屋租金支付",
                     null);
-            log.info("支付上链："+cochainResponseEntity);
+            log.info("支付上链："+cochainResponseEntity);*/
 
             //消息推送
             Map<Object, Object> map = new HashMap<>();
