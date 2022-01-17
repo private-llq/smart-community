@@ -34,7 +34,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -77,7 +79,8 @@ public class AdminUserServiceImpl implements IAdminUserService {
 		Page<AdminUserEntity> page = new Page<>();
 		MyPageUtils.setPageAndSize(page, baseQO);
 		
-		PageVO<UserDetail> userDetailPageVO = userInfoRpcService.queryUser(query.getMobile(), "", BusinessConst.PROPERTY_ADMIN, null, baseQO.getPage().intValue(), baseQO.getSize().intValue());
+		// 查出所有
+		PageVO<UserDetail> userDetailPageVO = userInfoRpcService.queryUser(query.getMobile(), "", BusinessConst.PROPERTY_ADMIN, null, 0, 999999999);
 		
 		if (CollectionUtils.isEmpty(userDetailPageVO.getData())) {
 			return new PageVO<>();
@@ -105,31 +108,70 @@ public class AdminUserServiceImpl implements IAdminUserService {
 		if (uIds.size() > 0) {
 			userDetailPageVO.getData().removeIf(userDetail -> !uIds.contains(userDetail.getAccount()));
 		}
+		
+		if (CollectionUtils.isEmpty(userDetailPageVO.getData())) {
+			return new PageVO<>();
+		}
 		PageVO<AdminUserEntity> pageVO = new PageVO<>();
-		// 补充数据
-		for (UserDetail userDetail : userDetailPageVO.getData()) {
+		
+//		// 补充数据
+//		for (UserDetail userDetail : userDetailPageVO.getData()) {
+//			AdminUserEntity adminUserEntity = new AdminUserEntity();
+//			// 补充物业公司名称
+//			AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", userDetail.getAccount()));
+//			if (entity != null) {
+//				PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(entity.getCompanyId());
+//				if (companyEntity != null) {
+//					adminUserEntity.setCompanyName(companyEntity.getName());
+//					adminUserEntity.setCommunityId(companyEntity.getId());
+//					adminUserEntity.setCompanyIdStr(String.valueOf(companyEntity.getId()));
+//				}
+//			}
+//			adminUserEntity.setId(Long.parseLong(userDetail.getAccount()));
+//			adminUserEntity.setIdStr(userDetail.getAccount());
+//			adminUserEntity.setNickName(userDetail.getNickName());
+//			adminUserEntity.setMobile(userDetail.getPhone());
+//			adminUserEntity.setCreateTime(LocalDateTime.parse(userDetail.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+//			pageVO.getData().add(adminUserEntity);
+//		}
+		
+		// 获取物业公司信息
+		Set<String> accountSet = userDetailPageVO.getData().stream().map(UserDetail::getAccount).collect(Collectors.toSet());
+		List<AdminUserCompanyEntity> entityList = adminUserCompanyMapper.selectList(new QueryWrapper<AdminUserCompanyEntity>().in("uid", accountSet));
+		Map<String, Long> companyMap = entityList.stream().collect(Collectors.toMap(AdminUserCompanyEntity::getUid, AdminUserCompanyEntity::getCompanyId));
+		List<PropertyCompanyEntity> propertyCompanyEntities = propertyCompanyMapper.selectList(new QueryWrapper<>());
+		Map<Long, PropertyCompanyEntity> propertyCompanyEntityMap = propertyCompanyEntities.stream().collect(Collectors.toMap(PropertyCompanyEntity::getId, Function.identity()));
+		
+		int end = baseQO.getSize() * baseQO.getPage() < userDetailPageVO.getData().size() ? (int) (baseQO.getSize() * baseQO.getPage()) : userDetailPageVO.getData().size();
+		int start = (int) (baseQO.getSize() * (baseQO.getPage() - 1));
+		for (int i = start; i < end; i++) {
 			AdminUserEntity adminUserEntity = new AdminUserEntity();
 			// 补充物业公司名称
-			AdminUserCompanyEntity entity = adminUserCompanyMapper.selectOne(new QueryWrapper<AdminUserCompanyEntity>().eq("uid", userDetail.getAccount()));
-			if (entity != null) {
-				PropertyCompanyEntity companyEntity = propertyCompanyMapper.selectById(entity.getCompanyId());
-				if (companyEntity != null) {
-					adminUserEntity.setCompanyName(companyEntity.getName());
-					adminUserEntity.setCommunityId(companyEntity.getId());
-					adminUserEntity.setCompanyIdStr(String.valueOf(companyEntity.getId()));
+			if (!CollectionUtils.isEmpty(companyMap)) {
+				Long companyId = companyMap.get(userDetailPageVO.getData().get(i).getAccount());
+				if (!CollectionUtils.isEmpty(propertyCompanyEntityMap)) {
+					PropertyCompanyEntity companyEntity = propertyCompanyEntityMap.get(companyId);
+					if (companyEntity != null) {
+						adminUserEntity.setCompanyName(companyEntity.getName());
+						adminUserEntity.setCommunityId(companyEntity.getId());
+						adminUserEntity.setCompanyIdStr(String.valueOf(companyEntity.getId()));
+					}
 				}
 			}
-			adminUserEntity.setId(Long.parseLong(userDetail.getAccount()));
-			adminUserEntity.setIdStr(userDetail.getAccount());
-			adminUserEntity.setNickName(userDetail.getNickName());
-			adminUserEntity.setMobile(userDetail.getPhone());
-			adminUserEntity.setCreateTime(LocalDateTime.parse(userDetail.getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+			adminUserEntity.setId(userDetailPageVO.getData().get(i).getId());
+			adminUserEntity.setIdStr(String.valueOf(userDetailPageVO.getData().get(i).getId()));
+			adminUserEntity.setNickName(userDetailPageVO.getData().get(i).getNickName());
+			adminUserEntity.setMobile(userDetailPageVO.getData().get(i).getPhone());
+			adminUserEntity.setCreateTime(LocalDateTime.parse(userDetailPageVO.getData().get(i).getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 			pageVO.getData().add(adminUserEntity);
 		}
-		pageVO.setPageNum(userDetailPageVO.getPageNum());
-		pageVO.setPageSize(userDetailPageVO.getPageSize());
-		pageVO.setPages(userDetailPageVO.getPages());
-		pageVO.setTotal(userDetailPageVO.getTotal());
+		
+		
+		pageVO.setPageNum(baseQO.getPage());
+		pageVO.setPageSize(baseQO.getSize());
+		Long pages = userDetailPageVO.getData().size() > 0 ? new Double(Math.ceil(userDetailPageVO.getData().size() / baseQO.getSize())).longValue() : 0;
+		pageVO.setPages(pages);
+		pageVO.setTotal((long) userDetailPageVO.getData().size());
 		return pageVO;
 	}
 	

@@ -701,7 +701,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			baseRoleRpcService.userJoinRole(addRoles, userDetail.getId(), id);
 			// 更新资料
 			baseUpdateUserRpcService.updateUserInfo(userDetail.getId(), adminUserQO.getNickName(),
-				adminUserQO.getMobile(), null, BusinessConst.COMMUNITY_ADMIN);
+				adminUserQO.getMobile(), "", BusinessConst.COMMUNITY_ADMIN);
 		} else {
 			// 没有小区角色，只是物业端更新
 			// 查询角色
@@ -725,7 +725,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			baseRoleRpcService.userJoinRole(addRoles, userDetail.getId(), id);
 			// 更新资料
 			baseUpdateUserRpcService.updateUserInfo(userDetail.getId(), adminUserQO.getNickName(),
-				adminUserQO.getMobile(), null, BusinessConst.PROPERTY_ADMIN);
+				adminUserQO.getMobile(), "", BusinessConst.PROPERTY_ADMIN);
 		}
 	}
 	
