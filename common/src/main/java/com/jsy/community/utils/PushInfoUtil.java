@@ -160,10 +160,32 @@ public class PushInfoUtil {
      * desc：描述
      * @return: ImResponseEntity
      */
-    public static void pushPayAppMsg(IImChatPublicPushRpcService iImChatPublicPushRpcService,String imId,Integer type,String amount,String detailUrl,String desc,Map map,String fromImId){
+    public static void pushPayAppMsg(IImChatPublicPushRpcService iImChatPublicPushRpcService,
+                                     String imId,
+                                     Integer type,
+                                     String amount,
+                                     String detailUrl,
+                                     String desc,
+                                     Map map,
+                                     String fromImId
+    ){
         List<Links> links = new LinkedList<>();
         links.add(new Links(detailUrl, "查看详情"));
-        iImChatPublicPushRpcService.sendMessage(new PayAppMsg(amount,desc,"RMB",detailUrl,type==1?"微信支付":"支付宝支付",null,links,fromImId,2,imId,map));
+        iImChatPublicPushRpcService.sendMessage(
+                new PayAppMsg(
+                    amount,
+                    desc,
+                    "RMB",
+                    detailUrl,
+                    type==1?"微信支付":"支付宝支付",
+                    null,
+                    links,
+                    fromImId,
+                    2,
+                    imId,
+                    map
+                )
+        );
 
 //        String str = IdUtil.fastUUID();
 //

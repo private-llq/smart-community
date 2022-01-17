@@ -51,7 +51,7 @@ dubbo:
   application:
     name: ${spring.application.name}
   cloud:
-    subscribed-services: property-service,proprietor-service,lease-service,im-chat-user
+    subscribed-services: property-service,proprietor-service,lease-service,im-chat-user,sign-contract-serice
   consumer:
     check: false
     retries: 0

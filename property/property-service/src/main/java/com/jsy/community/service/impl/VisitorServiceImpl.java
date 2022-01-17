@@ -9,6 +9,7 @@ import com.jsy.community.api.IAdminUserService;
 import com.jsy.community.api.IVisitorService;
 import com.jsy.community.api.PropertyUserService;
 import com.jsy.community.config.PropertyTopicNameEntity;
+import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.dto.face.xu.XUFaceVisitorEditPersonDTO;
@@ -143,9 +144,9 @@ public class VisitorServiceImpl implements IVisitorService {
 
         if (!CollectionUtils.isEmpty(visitorEntityPage.getRecords())) {
             for (VisitorEntity visitorEntity : visitorEntityPage.getRecords()) {
-                visitorEntity.setCheckStatusStr(PropertyConstsEnum.CheckStatusEnum.getName(visitorEntity.getCheckStatus()));
+                visitorEntity.setCheckStatusStr(BusinessEnum.CheckTypeEnum.getName(visitorEntity.getCheckStatus()));
                 if (visitorEntity.getCheckType() != null) {
-                    visitorEntity.setCheckTypeStr(PropertyConstsEnum.CheckTypeEnum.getName(visitorEntity.getCheckType()));
+                    visitorEntity.setCheckTypeStr(BusinessEnum.CheckTypeEnum.getName(visitorEntity.getCheckType()));
                 }
                 if (visitorEntity.getUid() != null) {
                     UserDetail userDetail = baseUserInfoRpcService.getUserDetail(visitorEntity.getUid());

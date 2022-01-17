@@ -207,49 +207,6 @@ public interface PropertyConstsEnum {
 		}
 	}
 
-	// 审核方式枚举
-	enum CheckTypeEnum{
-		PROPERTY_AUTHORIZATION("物业授权", 1),
-		OWNER_AUTHORIZATION("业主授权", 2);
-		private String name;
-		private Integer code;
-
-		CheckTypeEnum(String name, Integer code) {
-			this.name = name;
-			this.code = code;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public Integer getCode() {
-			return code;
-		}
-
-		public void setCode(Integer code) {
-			this.code = code;
-		}
-
-		@Override
-		public String toString() {
-			return this.code + "_" + this.name;
-		}
-
-		public static String getName(Integer code) {
-			for (CheckTypeEnum value : CheckTypeEnum.values()) {
-				if (code.equals(value.getCode())) {
-					return value.getName();
-				}
-			}
-			return null;
-		}
-	}
-
 	// 审核状态枚举
 	enum CheckStatusEnum{
 		UNAUDITED("未审核", 0),

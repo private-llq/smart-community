@@ -190,6 +190,12 @@
             <version>5.4.6</version>
             <scope>compile</scope>
         </dependency>
+        <!-- 签章的api -->
+        <dependency>
+            <groupId>com.zhsj</groupId>
+            <artifactId>zhsj-sign-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
     </dependencies>
 

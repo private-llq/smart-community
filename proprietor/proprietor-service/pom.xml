@@ -131,6 +131,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-quartz</artifactId>
 		</dependency>
+		<!-- 签章的api -->
+		<dependency>
+			<groupId>com.zhsj</groupId>
+			<artifactId>zhsj-sign-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 
 	</dependencies>

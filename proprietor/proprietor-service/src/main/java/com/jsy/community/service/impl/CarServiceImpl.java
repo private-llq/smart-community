@@ -1,6 +1,7 @@
 package com.jsy.community.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -11,6 +12,7 @@ import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.*;
 import com.jsy.community.entity.property.*;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.mapper.*;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.property.CarChargeQO;
@@ -24,7 +26,9 @@ import com.zhsj.base.api.entity.RealInfoDto;
 import com.zhsj.base.api.entity.UserDetail;
 import com.zhsj.base.api.rpc.IBaseUserInfoRpcService;
 import com.zhsj.base.api.vo.UserImVo;
+import com.zhsj.basecommon.constant.BaseConstant;
 import com.zhsj.im.chat.api.rpc.IImChatPublicPushRpcService;
+import com.zhsj.sign.api.rpc.IContractRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -105,6 +109,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
     @DubboReference(version = Const.version,group = Const.group_property,check = false)
     private ICarCutOffService carCutOffService;
+
+    @DubboReference(version = BaseConstant.Rpc.VERSION, group = BaseConstant.Rpc.Group.GROUP_CONTRACT)
+    private IContractRpcService contractRpcService;
 
 
 
@@ -280,8 +287,21 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             tempDateTime = tempDateTime.plusHours( hours );
             long minutes = tempDateTime.until( toDateTime, ChronoUnit.MINUTES);
             PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(communityEntity.getPropertyId());
+            RealInfoDto idCardRealInfo = userInfoRpcService.getIdCardRealInfo(carOrderEntity.getUid());
+            if (ObjectUtil.isNull(idCardRealInfo)) {
+                throw new ProprietorException(JSYError.ACCOUNT_NOT_EXISTS);
+            }
             //支付上链
-            OrderCochainUtil.orderCochain("停车费",
+            contractRpcService.communityOrderUpLink("停车费",
+                    1,
+                    payType,
+                    total,
+                    outTradeNo,
+                    idCardRealInfo.getIdCardNumber(),
+                    companyEntity.getUnifiedSocialCreditCode(),
+                    hours+"小时"+minutes+"分钟"+"停车位",
+                    null);
+            /*OrderCochainUtil.orderCochain("停车费",
                     1,
                     payType,
                     total,
@@ -289,7 +309,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                     carOrderEntity.getUid(),
                     companyEntity.getUnifiedSocialCreditCode(),
                     hours+"小时"+minutes+"分钟"+"停车位",
-                    null);
+                    null);*/
 
             //推送消息
             UserImVo userIm = userInfoRpcService.getEHomeUserIm(carOrderEntity.getUid());
@@ -638,8 +658,21 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
             carOrderRecordMapper.updateById(entity);
 
             PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(communityEntity.getPropertyId());
+            RealInfoDto idCardRealInfo = userInfoRpcService.getIdCardRealInfo(entity.getUid());
+            if (ObjectUtil.isNull(idCardRealInfo)) {
+                throw new ProprietorException(JSYError.ACCOUNT_NOT_EXISTS);
+            }
             //支付上链
-            OrderCochainUtil.orderCochain("停车费",
+            contractRpcService.communityOrderUpLink("停车费",
+                    1,
+                    entity.getPayType(),
+                    entity.getMoney(),
+                    entity.getOrderNum(),
+                    idCardRealInfo.getIdCardNumber(),
+                    companyEntity.getUnifiedSocialCreditCode(),
+                    entity.getMonth()+"月车位租金费",
+                    null);
+            /*OrderCochainUtil.orderCochain("停车费",
                     1,
                     entity.getPayType(),
                     entity.getMoney(),
@@ -647,7 +680,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                     entity.getUid(),
                     companyEntity.getUnifiedSocialCreditCode(),
                     entity.getMonth()+"月车位租金费",
-                    null);
+                    null);*/
             //推送消息
             UserImVo userIm = userInfoRpcService.getEHomeUserIm(entity.getUid());
             HashMap<Object, Object> map = new HashMap<>();
@@ -711,6 +744,9 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
         // UserEntity userEntity = userMapper.selectOne(new QueryWrapper<UserEntity>().eq("uid", entity.getUid()));
         UserDetail userDetail = userInfoRpcService.getUserDetail(entity.getUid());
         RealInfoDto idCardRealInfo = userInfoRpcService.getIdCardRealInfo(entity.getUid());
+        if (ObjectUtil.isNull(idCardRealInfo)) {
+            throw new ProprietorException(JSYError.ACCOUNT_NOT_EXISTS);
+        }
         CarEntity carEntity = new CarEntity();
             if (userDetail != null && idCardRealInfo != null) {
                 BeanUtils.copyProperties(entity,carEntity);
@@ -800,7 +836,16 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
 
                 PropertyCompanyEntity companyEntity = propertyCompanyService.selectCompany(communityEntity.getPropertyId());
                 //支付上链
-                OrderCochainUtil.orderCochain("停车费",
+                contractRpcService.communityOrderUpLink("停车费",
+                        1,
+                        entity.getPayType(),
+                        entity.getMoney(),
+                        entity.getOrderNum(),
+                        idCardRealInfo.getIdCardNumber(),
+                        companyEntity.getUnifiedSocialCreditCode(),
+                        entity.getMonth()+"月车位租金费",
+                        null);
+                /*OrderCochainUtil.orderCochain("停车费",
                         1,
                         entity.getPayType(),
                         entity.getMoney(),
@@ -808,7 +853,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, CarEntity> implements
                         entity.getUid(),
                         companyEntity.getUnifiedSocialCreditCode(),
                         entity.getMonth()+"月车位租金费",
-                        null);
+                        null);*/
                 //推送消息
                 UserImVo userIm = userInfoRpcService.getEHomeUserIm(entity.getUid());
                 HashMap<Object, Object> map = new HashMap<>();
