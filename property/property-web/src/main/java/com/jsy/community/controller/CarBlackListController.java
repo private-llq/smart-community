@@ -73,7 +73,7 @@ public class CarBlackListController {
      * @param uid
      * @return
      */
-    @LoginIgnore
+
     @DeleteMapping("delBlackList")
     @CarOperation(operation = "移除了【车辆黑名单】")
     public CommonResult delBlackList(@RequestParam("uid") String uid){
