@@ -23,10 +23,8 @@ import com.jsy.community.vo.admin.AdminInfoVo;
 import com.zhsj.base.api.constant.RpcConst;
 import com.zhsj.base.api.domain.PermitMenu;
 import com.zhsj.base.api.domain.PermitRole;
-import com.zhsj.base.api.rpc.IBaseAuthRpcService;
-import com.zhsj.base.api.rpc.IBaseMenuRpcService;
-import com.zhsj.base.api.rpc.IBaseRoleRpcService;
-import com.zhsj.base.api.rpc.IBaseSmsRpcService;
+import com.zhsj.base.api.entity.UserDetail;
+import com.zhsj.base.api.rpc.*;
 import com.zhsj.base.api.vo.LoginVo;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
@@ -77,6 +75,8 @@ public class AdminLoginController {
 	private ICommunityService communityService;
 	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
 	private IBaseSmsRpcService baseSmsRpcService;
+	@DubboReference(version = RpcConst.Rpc.VERSION, group = RpcConst.Rpc.Group.GROUP_BASE_USER, check = false)
+	private IBaseUserInfoRpcService userInfoRpcService;
 
 	
 	@Resource
@@ -171,13 +171,13 @@ public class AdminLoginController {
 //		AdminUserRoleEntity adminUserRoleEntity = adminConfigService.queryRoleIdByUid(userData.getUid());
 
 		//有权限的小区列表
-		List<AdminCommunityEntity> adminCommunityList = adminConfigService.listAdminCommunity(String.valueOf(loginVo.getUserInfo().getId()));
+		List<AdminCommunityEntity> adminCommunityList = adminConfigService.listAdminCommunity(String.valueOf(loginVo.getUserInfo().getAccount()));
 		
 		//用户菜单
 //		List<AdminMenuEntity> userMenu = new ArrayList<>();
 		//返回VO
 		AdminInfoVo adminInfoVo = new AdminInfoVo();
-		adminInfoVo.setUid(String.valueOf(loginVo.getUserInfo().getId()));
+		adminInfoVo.setUid(String.valueOf(loginVo.getUserInfo().getAccount()));
 		adminInfoVo.setMobile(loginVo.getUserInfo().getPhone());
 		adminInfoVo.setRealName(loginVo.getUserInfo().getNickName());
 		
@@ -212,7 +212,7 @@ public class AdminLoginController {
 		adminInfoVo.setMenuList(userMenu);
 		
 		//设置物业公司名称
-		Long companyId = iPropertyCompanyService.getPropertyCompanyIdByUid(String.valueOf(loginVo.getUserInfo().getId()));
+		Long companyId = iPropertyCompanyService.getPropertyCompanyIdByUid(String.valueOf(loginVo.getUserInfo().getAccount()));
 		adminInfoVo.setCompanyId(companyId);
 		adminInfoVo.setCompanyName(iPropertyCompanyService.getCompanyNameByCompanyId(companyId));
 		
@@ -255,9 +255,10 @@ public class AdminLoginController {
 		//用户资料
 //		AdminUserEntity user = adminUserService.queryByUid(UserUtils.getUserId());
 		AdminInfoVo adminInfoVo = UserUtils.getAdminInfo();
+		UserDetail userDetail = userInfoRpcService.getUserDetail(adminInfoVo.getUid());
 		//用户菜单
 //		List<AdminMenuEntity> userMenu = adminConfigService.queryMenuByUid(UserUtils.getAdminRoleId(), PropertyConsts.LOGIN_TYPE_COMMUNITY);
-		List<PermitMenu> userMenu = baseMenuRpcService.all(Long.valueOf(adminInfoVo.getUid()), BusinessConst.COMMUNITY_ADMIN);
+		List<PermitMenu> userMenu = baseMenuRpcService.all(userDetail.getId(), BusinessConst.COMMUNITY_ADMIN);
 		// list排序
 		userMenu.sort(Comparator.comparing(PermitMenu::getSort));
 		//设置小区级菜单
