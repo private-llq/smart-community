@@ -132,7 +132,7 @@ public class AdminRoleController {
 	@GetMapping("/roleDetail")
 	@Permit("community:property:role:roleDetail")
 	public CommonResult roleDetail(@RequestParam("roleId") Long roleId) {
-		return CommonResult.ok(adminConfigService.queryRoleDetail(roleId, UserUtils.getAdminCompanyId()), "查询成功!");
+		return CommonResult.ok(adminConfigService.queryRoleDetail(roleId, UserUtils.getAdminCompanyId()));
 	}
 }
 

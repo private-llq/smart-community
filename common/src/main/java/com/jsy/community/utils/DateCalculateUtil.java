@@ -229,13 +229,20 @@ public class DateCalculateUtil {
 		}
 	}
 
+	/**
+	 * @author: Pipi
+	 * @description: 判断当日加三天之后,是否还是这个月
+	 * @param :
+	 * @return: {@link Boolean}
+	 * @date: 2022/1/17 17:33
+	 **/
 	public static Boolean getLastThridDayOfMonth() {
 		LocalDate localDate = LocalDate.now();
 		int monthValue = localDate.getMonthValue();
-		int dayOfMonth = localDate.getDayOfMonth();
 		int monthValue1 = localDate.plusDays(3).getMonthValue();
-		return true;
+		return monthValue == monthValue1;
 	}
+
 	
 	public static void main(String[] args) throws ParseException {
 		String firstYearDateOfAmount = getFirstYearDateOfAmount(2019);
