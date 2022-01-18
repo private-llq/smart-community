@@ -2,6 +2,7 @@ package com.jsy.community.controller;
 
 import com.jsy.community.annotation.ApiJSYController;
 import com.jsy.community.api.ICarBlackListService;
+import com.jsy.community.api.PropertyException;
 import com.jsy.community.constant.Const;
 import com.jsy.community.entity.property.CarBlackListEntity;
 import com.jsy.community.qo.BaseQO;
@@ -12,17 +13,33 @@ import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.LoginIgnore;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
+import springfox.bean.validators.plugins.schema.MinMaxAnnotationPlugin;
+
+import java.util.regex.Pattern;
 
 @Api(tags = "车辆黑名单")
 @RestController
 @RequestMapping("/carBlackList")
+@Slf4j
 // @ApiJSYController
 public class CarBlackListController {
 
     @DubboReference(version = Const.version, group = Const.group_property, check = false)
     private ICarBlackListService blackListService;
+
+   private static String el="[京津晋冀蒙辽吉黑沪苏浙皖闽赣鲁豫鄂湘粤桂琼渝川贵云藏陕甘青宁新][ABCDEFGHJKLMNPQRSTUVWXY][\\dABCDEFGHJKLNMxPQRSTUVWXYZ]{5}|[京津晋冀蒙辽吉黑沪苏浙皖闽赣鲁豫鄂湘粤桂琼渝川贵云藏陕甘青宁新][ABCDEFGHJKLMNPQRSTUVWXY][1-9DF][1-9ABCDEFGHJKLMNPQRSTUVWXYZ]\\d{3}[1-9DF]";
+
+
+//    public static void main(String[] args) {
+//       String els="[京津晋冀蒙辽吉黑沪苏浙皖闽赣鲁豫鄂湘粤桂琼渝川贵云藏陕甘青宁新][ABCDEFGHJKLMNPQRSTUVWXY][\\dABCDEFGHJKLNMxPQRSTUVWXYZ]{5}|" +
+//                  "[京津晋冀蒙辽吉黑沪苏浙皖闽赣鲁豫鄂湘粤桂琼渝川贵云藏陕甘青宁新][ABCDEFGHJKLMNPQRSTUVWXY][1-9DF][1-9ABCDEFGHJKLMNPQRSTUVWXYZ]\\d{3}[1-9DF]";
+//        String carNumber="沪A99996D";
+//        boolean matches = Pattern.matches(els,carNumber);
+//        System.out.println(matches);
+//    }
 
 
 
@@ -62,6 +79,12 @@ public class CarBlackListController {
     @CarOperation(operation = "新增了【车辆黑名单】")
     @Permit("community:property:carBlackList:saveBlackList")
     public CommonResult saveBlackList(@RequestBody CarBlackListEntity carBlackListEntity){
+        String carNumber = carBlackListEntity.getCarNumber();
+        boolean matches = Pattern.matches(el, carNumber);
+        log.info("格式"+matches);
+        if(!matches){
+            throw new PropertyException(500,"车牌号格式错误");
+        }
         blackListService.saveBlackList(carBlackListEntity,UserUtils.getAdminCommunityId());
         return CommonResult.ok();
 
