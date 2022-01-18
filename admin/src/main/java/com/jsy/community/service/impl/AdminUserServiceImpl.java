@@ -158,8 +158,8 @@ public class AdminUserServiceImpl implements IAdminUserService {
 					}
 				}
 			}
-			adminUserEntity.setId(userDetailPageVO.getData().get(i).getId());
-			adminUserEntity.setIdStr(String.valueOf(userDetailPageVO.getData().get(i).getId()));
+			adminUserEntity.setId(Long.valueOf(userDetailPageVO.getData().get(i).getAccount()));
+			adminUserEntity.setIdStr(userDetailPageVO.getData().get(i).getAccount());
 			adminUserEntity.setNickName(userDetailPageVO.getData().get(i).getNickName());
 			adminUserEntity.setMobile(userDetailPageVO.getData().get(i).getPhone());
 			adminUserEntity.setCreateTime(LocalDateTime.parse(userDetailPageVO.getData().get(i).getUtcCreate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));

@@ -1,8 +1,10 @@
 package com.jsy.community.controller;
 
 import com.jsy.community.annotation.businessLog;
+import com.jsy.community.exception.JSYError;
 import com.jsy.community.qo.BaseQO;
 import com.jsy.community.qo.admin.AdminUserQO;
+import com.jsy.community.service.AdminException;
 import com.jsy.community.service.IAdminUserService;
 import com.jsy.community.utils.UserUtils;
 import com.jsy.community.utils.ValidatorUtils;
@@ -10,6 +12,7 @@ import com.jsy.community.vo.CommonResult;
 import com.zhsj.baseweb.annotation.Permit;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -73,7 +76,12 @@ public class AdminUserController {
 	@businessLog(operation = "编辑",content = "更新了【账号管理】")
 	@Permit("community:admin:account:update")
 	public CommonResult updateOperator(@RequestBody AdminUserQO adminUserQO){
-		ValidatorUtils.validateEntity(adminUserQO);
+		if (StringUtils.isNotBlank(adminUserQO.getPassword())) {
+			String pattern = "^(?=.*[A-Z0-9])(?=.*[a-z0-9])(?=.*[a-zA-Z])(.{6,12})$";
+			if (!adminUserQO.getPassword().matches(pattern)) {
+				throw new AdminException(JSYError.REQUEST_PARAM.getCode(), "请输入一个正确的6-12位密码,至少包含大写字母或小写字母或数字两种!");
+			}
+		}
 		adminUserService.updateOperator(adminUserQO);
 		return CommonResult.ok("操作成功");
 	}
