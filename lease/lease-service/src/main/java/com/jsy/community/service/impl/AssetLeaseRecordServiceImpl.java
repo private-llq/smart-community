@@ -1578,7 +1578,8 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                 throw new ProprietorException(JSYError.ACCOUNT_NOT_EXISTS);
             }
             //支付上链
-            contractRpcService.communityOrderUpLink("房屋租金",
+            // 统一订单,由刘金荣那边统一上链,这里注释
+            /*contractRpcService.communityOrderUpLink("房屋租金",
                     1,
                     payType,
                     total,
@@ -1586,7 +1587,7 @@ public class AssetLeaseRecordServiceImpl extends ServiceImpl<AssetLeaseRecordMap
                     idCardRealInfo.getIdCardNumber(),
                     realInfoDto.getIdCardNumber(),
                     "房屋租金支付",
-                    null);
+                    null);*/
             /*CochainResponseEntity cochainResponseEntity = OrderCochainUtil.orderCochain("房屋租金",
                     1,
                     payType,
