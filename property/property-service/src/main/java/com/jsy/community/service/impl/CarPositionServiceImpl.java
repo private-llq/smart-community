@@ -319,18 +319,17 @@ public class CarPositionServiceImpl extends ServiceImpl<CarPositionMapper, CarPo
     @Transactional
     public Boolean updateCarPosition(UpdateCarPositionQO qo) {
         CarPositionEntity carPositionEntity1 = carPositionMapper.selectById(qo.getId());
-
-        QueryWrapper<CarPositionEntity> queryWrapper = new QueryWrapper<>();
+        if (!carPositionEntity1.getCarPosition().equals(qo.getCarPosition())) {//查询出来的车牌号和修改的车牌号不相同
+            QueryWrapper<CarPositionEntity> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("community_id",carPositionEntity1.getCommunityId());
             queryWrapper.eq("car_position",qo.getCarPosition());
-        List<CarPositionEntity> list = carPositionMapper.selectList(queryWrapper);
-        if (list.size()>0) {
-            throw  new PropertyException(500,"车位号已存在");
+            Integer integer = carPositionMapper.selectCount(queryWrapper);
+            if (integer>0) {
+                throw  new PropertyException(500,"车位号已存在");
+            }
         }
-
         CarPositionEntity carPositionEntity = new CarPositionEntity();
         BeanUtils.copyProperties(qo, carPositionEntity);
-
         int i = carPositionMapper.updateById(carPositionEntity);
         if (i > 0) {
             return true;
