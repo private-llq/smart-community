@@ -8,6 +8,7 @@ import com.jsy.community.constant.BusinessConst;
 import com.jsy.community.constant.Const;
 import com.jsy.community.consts.PropertyConsts;
 import com.jsy.community.entity.CommunityEntity;
+import com.jsy.community.entity.PropertyCompanyEntity;
 import com.jsy.community.entity.UserAuthEntity;
 import com.jsy.community.entity.admin.AdminCommunityEntity;
 import com.jsy.community.exception.JSYError;
@@ -43,6 +44,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -159,6 +161,15 @@ public class AdminLoginController {
 			loginVo = baseAuthRpcService.propertyLogin(form.getAccount(), RSAUtil.privateDecrypt(form.getPassword(), RSAUtil.getPrivateKey(RSAUtil.COMMON_PRIVATE_KEY)), "PHONE_PWD");
 		}
 		log.info(form.getAccount() + "开始登录");
+		// 判断物业公司有效期
+		Long companyIdByUid = iPropertyCompanyService.getPropertyCompanyIdByUid(loginVo.getUserInfo().getAccount());
+		PropertyCompanyEntity companyEntity = iPropertyCompanyService.selectCompany(companyIdByUid);
+		if (companyEntity.getOverTime() != null) {
+			if (LocalDate.now().isAfter(companyEntity.getOverTime())) {
+				throw new PropertyException(JSYError.COMPANY_TIME_EXPIRE.getCode(), "该物业已到期，请联系管理员！");
+			}
+		}
+		
 		// 获取用户菜单
 		List<PermitMenu> userMenu = baseMenuRpcService.all(loginVo.getUserInfo().getId(), BusinessConst.PROPERTY_ADMIN);
 		// list排序

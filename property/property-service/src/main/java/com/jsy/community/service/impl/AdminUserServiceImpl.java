@@ -509,7 +509,10 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		}
 
 		PageVO<AdminUserEntity> pageVO = new PageVO<>();
-		List<String> idList = userDetailPageVO.getData().stream().filter(userDetail -> !userDetail.getAccount().equals(query.getUid())).map(UserDetail::getAccount).collect(Collectors.toList());
+		List<String> idList = userDetailPageVO.getData().stream().map(UserDetail::getAccount).collect(Collectors.toList());
+		if (CollectionUtils.isEmpty(idList)) {
+			return new PageVO<>();
+		}
 		List<AdminCommunityEntity> adminCommunityEntities = adminCommunityMapper.selectList(new QueryWrapper<AdminCommunityEntity>().select("community_id, uid").in("uid", idList));
 		Map<String, List<String>> map = new HashMap<>();
 		if (!CollectionUtils.isEmpty(adminCommunityEntities)) {

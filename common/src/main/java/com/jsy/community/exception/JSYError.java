@@ -32,6 +32,7 @@ public enum JSYError {
 
 	// 物业模块1
 	COUPON_BEYOND(10001, "优惠金额超出所需缴纳费用!"),
+	COMPANY_TIME_EXPIRE(10002, "该物业已到期，请联系管理员！"),
 	// 租赁模块2
 
 	// 业主模块3

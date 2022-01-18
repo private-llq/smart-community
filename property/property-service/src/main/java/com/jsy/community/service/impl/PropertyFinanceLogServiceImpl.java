@@ -76,7 +76,7 @@ public class PropertyFinanceLogServiceImpl extends ServiceImpl<PropertyFinanceLo
 		// 模糊查询用户名
 		if (StringUtils.isNotBlank(query.getUserName())) {
 			PageVO<UserDetail> pageVO = baseUserInfoRpcService.queryUser("", query.getUserName(), 0, 9999);
-			Set<Long> uid = pageVO.getData().stream().map(UserDetail::getId).collect(Collectors.toSet());
+			Set<String> uid = pageVO.getData().stream().map(UserDetail::getAccount).collect(Collectors.toSet());
 			if (uid.size() > 0) {
 				queryWrapper.in("user_id", uid);
 			} else {
@@ -98,11 +98,11 @@ public class PropertyFinanceLogServiceImpl extends ServiceImpl<PropertyFinanceLo
 		Set<String> userIds = pageData.getRecords().stream().map(FinanceLogEntity::getUserId).collect(Collectors.toSet());
 //		Set<Long> userId = userIds.stream().map(Long::parseLong).collect(Collectors.toSet());
 		List<RealUserDetail> realUserDetailsByUid = baseUserInfoRpcService.getRealUserDetails(userIds);
-		Map<Long, String> uIdMaps = realUserDetailsByUid.stream().collect(Collectors.toMap(RealUserDetail::getId, RealUserDetail::getNickName));
+		Map<String, String> uIdMaps = realUserDetailsByUid.stream().collect(Collectors.toMap(RealUserDetail::getAccount, RealUserDetail::getNickName));
 		
 		// 补充用户名
 		for (FinanceLogEntity entity : pageData.getRecords()) {
-			entity.setUserName(uIdMaps.get(Long.parseLong(entity.getUserId())));
+			entity.setUserName(uIdMaps.get(entity.getUserId()));
 		}
 		
 		PageInfo<FinanceLogEntity> pageInfo = new PageInfo<>();

@@ -11,7 +11,6 @@ import com.jsy.community.api.PropertyUserService;
 import com.jsy.community.config.PropertyTopicNameEntity;
 import com.jsy.community.constant.BusinessEnum;
 import com.jsy.community.constant.Const;
-import com.jsy.community.consts.PropertyConstsEnum;
 import com.jsy.community.dto.face.xu.XUFaceVisitorEditPersonDTO;
 import com.jsy.community.entity.*;
 import com.jsy.community.mapper.*;
@@ -125,12 +124,12 @@ public class VisitorServiceImpl implements IVisitorService {
         QueryWrapper<VisitorEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("*, TIMESTAMPDIFF(MINUTE, start_time, end_time) as effectiveMinutes");
         if (!StringUtils.isEmpty(query.getName())) {
-            queryWrapper.and(wrapper -> wrapper.eq("check_type", 1).like("name", query.getName()).or().like("contact", query.getName()));
+            queryWrapper.and(wrapper -> wrapper.like("name", query.getName()).or().like("contact", query.getName()));
             Set<String> strings = baseUserInfoRpcService.queryRealUserDetail(query.getName(), query.getName());
             if (CollectionUtils.isEmpty(strings)) {
-                queryWrapper.or(wrapper -> wrapper.eq("check_type", 2).eq("uid", null));
+                queryWrapper.or(wrapper -> wrapper.eq("uid", null));
             } else {
-                queryWrapper.or(wrapper -> wrapper.eq("check_type", 2).in("uid", strings));
+                queryWrapper.or(wrapper -> wrapper.in("uid", strings));
             }
         }
         if (!StringUtils.isEmpty(query.getBuildingId())) {
