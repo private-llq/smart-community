@@ -352,7 +352,10 @@ public class AdminConfigServiceImpl implements IAdminConfigService {
 		if (CollectionUtils.isEmpty(permitRolePageVO.getData())) {
 			return new PageVO<>();
 		}
-		Set<Long> roleIdSet = permitRolePageVO.getData().stream().map(PermitRole::getId).collect(Collectors.toSet());
+		Set<Long> roleIdSet = permitRolePageVO.getData().stream().filter(p -> p.getType() != 1).map(PermitRole::getId).collect(Collectors.toSet());
+		if (CollectionUtils.isEmpty(roleIdSet)) {
+			return new PageVO<>();
+		}
 		List<AdminRoleCompanyEntity> roleCompanyEntityList = adminRoleCompanyMapper.selectList(new QueryWrapper<AdminRoleCompanyEntity>().eq("company_id", query.getCompanyId()).in("role_id", roleIdSet));
 		if (!CollectionUtils.isEmpty(roleCompanyEntityList)) {
 			List<Long> companyRoleIdSet = roleCompanyEntityList.stream().map(AdminRoleCompanyEntity::getRoleId).collect(Collectors.toList());
