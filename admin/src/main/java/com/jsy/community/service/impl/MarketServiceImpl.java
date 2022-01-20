@@ -20,9 +20,11 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,7 +92,7 @@ public class MarketServiceImpl extends ServiceImpl<MarketMapper, ProprietorMarke
 //            List<String> collect = userDetailIds.stream().map(String::valueOf).collect(Collectors.toList());
             query.setUserDetailIds(userDetailIds);
             
-            Map<String, String> nickNameMap = userDetailPageVO.getData().stream().collect(Collectors.toMap(UserDetail::getAccount, UserDetail::getNickName));
+            Map<String, UserDetail> nickNameMap = userDetailPageVO.getData().stream().collect(Collectors.toMap(UserDetail::getAccount, Function.identity()));
         
             List<ProprietorMarketEntity> list =  marketMapper.selectMarketAllPage(query,page1,baseQO.getSize());
             for (ProprietorMarketEntity li : list){
@@ -100,7 +102,12 @@ public class MarketServiceImpl extends ServiceImpl<MarketMapper, ProprietorMarke
                 marketVO.setPriceName(li.getNegotiable() == 1 ? "面议" : String.valueOf(li.getPrice()));
                 // 补充状态名称
                 marketVO.setStateName(li.getState() == 1 ? "已上架" : "已下架");
-                marketVO.setNickName(nickNameMap.get(li.getUid()));
+                UserDetail userDetail = nickNameMap.get(li.getUid());
+                if (!ObjectUtils.isEmpty(userDetail)) {
+                    marketVO.setNickName(userDetail.getNickName());
+                    marketVO.setPhone(userDetail.getPhone());
+                }
+
                 arrayList.add(marketVO);
             }
             Long total = marketMapper.findTotals(query);
